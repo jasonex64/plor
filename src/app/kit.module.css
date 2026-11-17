@@ -14,6 +14,13 @@
   background: var(--surface);
 }
 
+/* Cards that stack straight in a page are 16px apart, set once here for every page
+   (docs/milestones/M20-design-rules-and-clean-up.md, 20c; answer 11). Pages that hold their cards in a column of their
+   own (Me, Today, Streak, a profile) space them with that column's 16px gap. */
+:global(main) > * + .card {
+  margin-top: 16px;
+}
+
 /* The one tinted card on a screen (mockup 3's .tile.soft), in the theme's soft slot. */
 .soft {
   background: var(--soft);

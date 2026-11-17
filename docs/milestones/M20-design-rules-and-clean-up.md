@@ -65,7 +65,18 @@ The human opened the day with twelve items, each now an inbox issue (#243 to #25
 | 40 | The human: "Still haven't seen a fix for the streak badge next to the player thing on the top left of the screen. The fact that it's like different sizes and doesn't line up right looks quite ugly." When, and which way? | "20c next, badge matches avatar (Recommended)": 20c is built before 20b; the streak pill takes the avatar's height, on one centre line, measured first and the numbers shown to the human |
 | 41 | #256 moved a group's Share, Reset, Leave and Delete into the Members card at the bottom: keep it? | "Move the groups reset into the members card at the bottom. I think that's fine." |
 
-Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), the sidebar's one left edge (20c), 20e's four questions.
+## 20c's measurements and answers (2026-11-17, evening)
+Measured by a temporary Playwright script on slot 2's built app (`next start`, Chromium with its scrollbars shown, a fresh player with one group), at 1280 and 1920px wide, 900 and 400px tall, on Today, Friends, Groups, Me, a group's page, a profile and Streak. **The hypothesis held** (20c's "Expected"): the content's left edge is 296px on every tab at 1280px (the right column fills the room), and at 1920px it is 456px on a page that doesn't scroll and 448.5px on one that does, the scrollbar's 15px halved; nothing else moves it. Also measured: the cards on Friends and a group's page touch (0px apart; Me and a profile 16px); a group's page and a profile start their first card 60px lower than Friends and Me, under the "‹ Groups" Back line; in the sidebar the wordmark's letters and the avatar start at 28px, the tab icons at 37px and the Settings gear at 35px; the streak pill is 34px tall and the avatar 30px, already on one centre line (95px).
+
+| # | Asked | Answer |
+|---|---|---|
+| 42 | The sidebar's one left edge: the wordmark's 28px or the tab icons' 37px? | "28px, the wordmark's line (Recommended)": the tab icons and the gear move left to sit under the "P" and the avatar |
+| 43 | At 1920px the content moves 7.5px between a page that scrolls and one that doesn't: fix it? | "Always keep the scrollbar's room (Recommended)": CSS `scrollbar-gutter: stable`, with MDN's page added to SOURCES.md |
+| 44 | The Back line pushes a detail page's first card 60px down: how does it line up? | "Back moves onto the heading's line (Recommended)": from 768px "‹ Groups" sits at the right end of the page's heading row; on phones in the top bar, in the wordmark's place; the first card starts at the same height on every page |
+
+The pill's height is the avatar's 1.875rem (answer 40).
+
+Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), 20e's four questions.
 
 ## What the team found (2026-11-16; four Sonnet subagents, read from code and the web, **nothing measured in a browser**)
 **The audit of `src/app`** (branch `process-parallel-sessions` at `8d76800`, which holds `main` to #226):
@@ -196,7 +207,9 @@ The audit's three that would change the feel most: the score as the main thing, 
 | 16px | the gap between cards, on every page | as built on Me, Today and Streak; the human, 2026-11-16, answer 11 |
 | a 40px face and a 4px edge, 44px in all | the raised button (20b) | the human, 2026-11-16, answer 11; the 4px is `--shadow-button` as built |
 | heading and small-text sizes | 20f | **asks**: chosen from the sizes in use |
-| the sidebar's one left edge; the pill's and avatar's one height | 20c | **asks**: after measuring |
+| 28px | the sidebar's one left edge (20c) | as built: the wordmark's letters, the nav's 16px padding and `.word`'s 12px (`shell.module.css`); the human, answer 42 |
+| 1.875rem (30px) | the streak pill's height, the avatar's (20c) | as built: `avatar.module.css` `.slot`; the human, answer 40 |
+| 16px | the gap between cards on Friends, Groups and a group's page (20c) | answer 11, above |
 | the 40% safe circle | 20g | web.dev, maskable icons (SOURCES.md) |
 | the menu of motion timings shown on `/admin/kit`: a pop in from 90% at Wordle's 100ms, Plor's 200ms and Connections' 300ms; a fade in from 95% at Carbon's moderate-02 240ms, Material's medium1 250ms and Atlassian's xlong 400ms | 20a (shown only), 20k (the picked ones) | the pop's timings: `docs/research/reports/Game look directions for Plor.md`, "Try Route 1 first" ("a menu, not a recommendation"); the pop's 90% start: the app's pops as built (`kit.module.css` `.pop`, DESIGN.md Motion); the fade's timings and its 95% start (Atlassian's entrance): `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`, "Motion menu", each with its page; **the human picks** (answer 20) |
 | the three proposals' colour strengths and sizes | 20a (shown only) | the five themes' slots and the games' colours as built (DESIGN.md, "Colour slots and themes"); sizes from those in use; **the human picks** one version (answer 24) |
