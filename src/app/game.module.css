@@ -4,6 +4,9 @@
    through its 14px padding and sits inside its 2px border. */
 .banner {
   align-items: center;
+  /* The band at the top and Play, Continue or Result at the bottom (L25), so two cards side by side, one height since
+     inbox #246, hold their buttons level. */
+  justify-content: space-between;
   text-align: center;
 }
 
