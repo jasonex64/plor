@@ -20,13 +20,21 @@ export default defineConfig({
   // One retry in CI (human, 2026-11-06: "retry, bukld faster next"): 19 of the last 64 runs failed, mostly on one different
   // test of 149. A test that needed it is listed as flaky in the log; a retry there is a lead, not a pass to forget.
   retries: process.env.CI ? 1 : 0,
-  // On CI a failed test keeps a video of its page, which CI uploads: what the page did, with no network data, so not the
-  // stack's key a trace holds (docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2). Only pages Playwright makes
-  // are filmed, so tests take the `page` fixture rather than opening their own context.
-  use: { baseURL: appUrl, trace: "retain-on-failure", video: process.env.CI ? "retain-on-failure" : "off" },
+  // On CI every test keeps a screenshot of how its page ended and a video of what it did, passed or failed, which CI
+  // uploads as the proof of a visible change (docs/milestones/PROCESS-lint-rules.md, answers 3 and 8): pictures, with no
+  // network data, so not the stack's key a trace holds (docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2). Only
+  // pages Playwright makes are filmed, so tests take the `page` fixture rather than opening their own context.
+  use: {
+    baseURL: appUrl,
+    trace: "retain-on-failure",
+    screenshot: process.env.CI ? "on" : "off",
+    video: process.env.CI ? "on" : "off",
+  },
   projects: [
-    // Every test, the e2e CI runs (`npm run test:e2e`).
+    // Every test, the e2e CI runs (`npm run test:e2e`), at Desktop Chrome's 1280 × 720 unless the test sets its own size.
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // A test tagged @visual runs again at phone size (docs/milestones/PROCESS-lint-rules.md, answers 11, 12 and 29 to 31).
+    { name: "phone", grep: /@visual/, use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } } },
   ],
   // The built app players get, not `next dev`, here and on CI alike (docs/milestones/M21-faster-e2e.md, 21a; answer 3):
   // measured in PR #237, the suite spent 13.2 minutes in tests on a built app against 24.3 on the dev server, and two
