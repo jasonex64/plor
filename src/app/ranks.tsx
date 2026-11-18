@@ -13,11 +13,13 @@ const n = (v: number) => Math.round(v * 100) / 100;
 const ring = (count: number, draw: (a: number) => ReactNode, offset = 0) =>
   Array.from({ length: count }, (_, i) => <Fragment key={i}>{draw(offset + (i * 360) / count)}</Fragment>);
 // The light comes from the top right: petals pointing that way take the lighter shade.
+// Drawn as the human approved it: docs/milestones/M14-14b-2a-streak-ranks.md, question 8 and its Numbers.
 const lit = (a: number) => {
   const d = ((a % 360) + 360) % 360;
   return d <= 110 || d >= 320;
 };
 // A pointed petal from (x, y), len long and w wide, turned a degrees about its base.
+// Drawn as the human approved it: docs/milestones/M14-14b-2a-streak-ranks.md, question 8 and its Numbers.
 const tip = (x: number, y: number, a: number, len: number, w: number, fill: string, detail = false) => (
   <path
     className={detail ? styles.detail : undefined}
@@ -27,6 +29,7 @@ const tip = (x: number, y: number, a: number, len: number, w: number, fill: stri
   />
 );
 // A cherry petal from the centre, len long and w wide, with the notch at its end.
+// Drawn as the human approved it: docs/milestones/M14-14b-2a-streak-ranks.md, question 8 and its Numbers.
 const notch = (a: number, len: number, w: number, fill: string) => (
   <path
     d={`M12 12C${n(12 - w)} ${n(12 - len * 0.3)} ${n(12 - w * 1.1)} ${n(12 - len * 0.75)} ${n(12 - w * 0.7)} ${n(12 - len)}L12 ${n(12 - len * 0.85)}L${n(12 + w * 0.7)} ${n(12 - len)}C${n(12 + w * 1.1)} ${n(12 - len * 0.75)} ${n(12 + w)} ${n(12 - len * 0.3)} 12 12Z`}
@@ -38,6 +41,7 @@ const notch = (a: number, len: number, w: number, fill: string) => (
 const WINE = "#2a0f1a";
 const [SEED, DAISY, MORNING_GLORY, HIBISCUS, LOTUS, SAKURA] = STREAK_RANK_FROM;
 
+// Drawn as the human approved it: docs/milestones/M14-14b-2a-streak-ranks.md, question 8 and its Numbers.
 export const RANKS: Rank[] = [
   {
     name: "Seed",

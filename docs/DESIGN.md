@@ -42,7 +42,7 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | `--danger` | `#b4232f` | `#ff5c5c` | `#b4232f` | `#ff5c5c` | `#ff5c5c` |
 | Lines | `globals.css:9-41` | `:73-97` | `:103-127` | `:129-153` | `:155-179` |
 
-- Each theme also sets `--soft` (the accent at low strength), `--safe`, `--safe-bg`, `--caught`, `--caught-bg`, four shades `--shade-1` to `--shade-4` (Me's calendar uses the fourth for a played day; the guest peek uses the first three), in the same blocks.
+- Each theme also sets `--soft` (the accent at low strength), `--safe`, `--safe-bg`, `--caught`, `--caught-bg`, four shades `--shade-1` to `--shade-4` (Me's calendar uses the fourth for a played day; the guest peek's drawn calendar uses all four, `src/app/guest-peek.module.css:75-89`), in the same blocks.
 - Paper is the default (`:root`, `globals.css:8`); with no theme chosen, a dark device gets Night's values (`globals.css:45-71`). A chosen theme is a `[data-theme]` attribute on `<html>`.
 - Each game's banner has its own colour in every theme: Offbeat's `--offbeat: #2f3d5c` with `--on-offbeat: #ffffff` (`globals.css:35-36`), Fragments' `--fragments: #5a2f5e` with `--on-fragments: #ffffff` (`globals.css:39-40`; M16 16f-2, answer 31). The banner draws either through `--game` and `--on-game` (`game.module.css`, `.banner`, `.banner.fragments`).
 - `src/app/colors.test.ts` checks the pairings' contrast.

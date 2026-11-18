@@ -22,25 +22,23 @@ export type RaceInput = {
   measure: (text: string, weight: number) => number;
 };
 
-const TOP = 12;
-const BOTTOM = 26;
-const LEFT = 26;
-const RIGHT = 14;
-// The axis numbers' gap to the plot, and the end labels' to the last day's line.
-const AXIS_GAP = 6;
-const LABEL_GAP = 13;
-// End labels: at least this far apart, with a tick back to the dot once moved further than TICK_FROM.
-const LABEL_STEP = 14;
-const TICK_FROM = 4;
+// Plot margins, docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers: "12 top, 26 bottom; left 26 … right 14".
+const TOP = 12, BOTTOM = 26, LEFT = 26, RIGHT = 14;
+// The axis numbers' gap to the plot, and the end labels' to the last day's line
+// (docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers: "its 6px gap", "13 right of the end").
+const AXIS_GAP = 6, LABEL_GAP = 13;
+// End labels: at least this far apart, with a tick back to the dot once moved further than TICK_FROM
+// (docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers: "14 apart at least; tick when more than 4 from the dot").
+const LABEL_STEP = 14, TICK_FROM = 4;
 // Answer 29: 1, 2, 2.5 or 5 × 10ⁿ, at most 4 steps above 0.
-const STEPS = [1, 2, 2.5, 5];
-const MOST_STEPS = 4;
+const STEPS = [1, 2, 2.5, 5], MOST_STEPS = 4;
 // Answer 30.
 const NAME_MAX = 10;
 const SHORT_DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const LONG_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function gridStep(max: number): number {
+  // The 10ⁿ of answer 29.
   for (let scale = 1; ; scale *= 10) {
     for (const step of STEPS) if (Math.ceil(max / (step * scale)) <= MOST_STEPS) return step * scale;
   }
@@ -69,6 +67,10 @@ export function summary(label: string, entries: { name: string; you: boolean; po
   return `${label}, day by day: ${lead}${you && !leader.you ? `; you have ${you.points}` : ""}.`;
 }
 
+// The sizes below not named above are the approved mockup's (answer 27; https://claude.ai/artifact/X2izfDnUBedKQQz2GHgheX,
+// project/Card.dc.html, checked 2026-11-17): text 4 below the point it marks, ticks 4 from the dot and 2 short of the
+// label, day names 6 above the bottom, axis numbers at weight 400; the badge's radius 8 and the labels' weights 700 and
+// 800 are the ticket's Numbers; 7 days and 6 gaps between them make the week.
 export function layout({ players, days, hidden, picked, width, height, long, text, measure }: RaceInput) {
   // The room kept for text, and the labels' spacing, grow with it (14b-17, answer 6); the mockup's values are at 12px.
   const k = text / 12;

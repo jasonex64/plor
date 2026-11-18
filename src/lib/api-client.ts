@@ -1,6 +1,7 @@
 // The browser's one way to call the API: it sends the protocol version and turns error responses into
 // thrown ApiErrors (DECISIONS.md: Error handling; docs/milestones/M00-data-design.md §2).
 import { PROTOCOL_VERSION } from "@/lib/protocol";
+import { STATUS } from "@/lib/status";
 
 export class ApiError extends Error {
   constructor(
@@ -26,7 +27,7 @@ export async function api<T>(path: string, init: { method: "GET" | "POST"; body?
   if (!response.ok && !response.headers.get("content-type")?.includes("application/json")) throw new ApiError("internal", response.status);
   const json = await response.json();
   if (response.ok) return json as T;
-  if (response.status === 409 && json.error === "client_outdated") {
+  if (response.status === STATUS.conflict && json.error === "client_outdated") {
     // A newer server is live: reload loudly instead of talking to it with an old client (§2).
     window.alert("Plor was updated. The page will reload.");
     window.location.reload();

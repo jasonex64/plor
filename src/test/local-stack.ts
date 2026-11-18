@@ -10,6 +10,7 @@ import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
 import { apiRequest, cookieJar } from "./request-scope";
 import { TURNSTILE_TEST_HOSTNAME, TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./turnstile-keys";
 import { localStack } from "../../scripts/slot.ts";
+import { STATUS } from "@/lib/status";
 
 export { TURNSTILE_TEST_PASS_SECRET };
 
@@ -50,7 +51,7 @@ export function ipFor(email: string): string {
 export async function requestCode(email: string): Promise<{ subject: string; html: string; code: string }> {
   const before = (await inbox(email)).length;
   const response = await sendCode(apiRequest("/api/auth/email", { method: "POST", body: { email }, ip: ipFor(email) }));
-  expect(response.status).toBe(200);
+  expect(response.status).toBe(STATUS.ok);
   await expect.poll(async () => (await inbox(email)).length).toBe(before + 1);
   const [newest] = await inbox(email);
   const message = await (await fetch(`${MAILPIT}/api/v1/message/${newest.ID}`)).json();
@@ -69,7 +70,7 @@ export async function enterCode(email: string, code: string): Promise<{ status: 
 export async function signIn(email: string): Promise<{ subject: string; session: Map<string, string> }> {
   cookieJar.clear();
   const { subject, code } = await requestCode(email);
-  expect(await enterCode(email, code)).toEqual({ status: 200, body: { ok: true } });
+  expect(await enterCode(email, code)).toEqual({ status: STATUS.ok, body: { ok: true } });
   return { subject, session: new Map(cookieJar) };
 }
 

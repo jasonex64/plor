@@ -435,7 +435,7 @@ describe("the feed's pages", () => {
     useSession(V.session);
     const real = (await page()).body.feed.next as string;
     const encode = (v: unknown) => Buffer.from(JSON.stringify(v)).toString("base64url");
-    for (const bad of ["", "nonsense", "!!!", encode({}), encode(["2026-01-01T00:00:00.000000Z", 0]), encode(["yesterday", 0, "x"]), encode(["2026-13-45T00:00:00.000000Z", 0, "x"]), encode(["2026-01-01T00:00:00.000000Z", 2, "x"]), encode(["2026-01-01T00:00:00.000000Z", 0, ""]), encode(["2026-01-01T00:00:00.000000Z", 0, 5])]) {
+    for (const bad of ["", "nonsense", "!!!", encode({}), encode(["2026-01-01T00:00:00.000000Z", 0]), encode(["yesterday", 0, "x"]), encode(["2026-13-45T00:00:00.000000Z", 0, "x"]), encode(["2026-01-01T00:00:00.000000Z", 2, "x"]), encode(["2026-01-01T00:00:00.000000Z", 0, ""]), encode(["2026-01-01T00:00:00.000000Z", 0, 5]), encode(["2026-01-01T00:00:00.000000Z", 0, "x", "extra"])]) {
       expect(await page(bad), bad).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
     }
     expect((await page(real)).status).toBe(200);

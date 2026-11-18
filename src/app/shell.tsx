@@ -225,7 +225,7 @@ export function Shell({ lost, admin, profile, streak, requests, onChanged, onSet
   onSignedOut: () => void;
 }) {
   const path = usePathname();
-  const sidebar = useMinWidth(768);
+  const sidebar = useMinWidth(768); // docs/milestones/M14-14a-1-shell.md, Numbers (768px)
   useBodyFlag("shell", true);
   const nav = useRef<HTMLElement>(null);
   useSlideTaps(nav);

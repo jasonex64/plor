@@ -7,6 +7,7 @@ import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { circleSql } from "./circle";
 import { INVITE_CODE } from "./invite-code";
+import { STATUS } from "@/lib/status";
 
 // A player as the API gives them: the username, and the name shown, which is the display name if set, else the
 // username (M07 7a).
@@ -19,7 +20,7 @@ export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 
 // A player's ID from a request body, checked before the database is asked: a malformed one is a 400, not a database error.
 export function readUserId(input: unknown): string {
-  if (typeof input !== "string" || !UUID.test(input)) throw new AppError("bad_request", 400, "userId");
+  if (typeof input !== "string" || !UUID.test(input)) throw new AppError("bad_request", STATUS.badRequest, "userId");
   return input;
 }
 
@@ -27,13 +28,13 @@ export function readUserId(input: unknown): string {
 // cut to that length, so every character is random. The migration makes codes the same way
 // (supabase/migrations/20261028140000_baseline.sql).
 export function newInviteCode(): string {
-  return randomBytes(Math.ceil((INVITE_CODE_LENGTH * 6) / 8)).toString("base64url").slice(0, INVITE_CODE_LENGTH);
+  return randomBytes(Math.ceil((INVITE_CODE_LENGTH * 6) / 8)).toString("base64url").slice(0, INVITE_CODE_LENGTH); // 6 bits a character from 8-bit bytes: https://www.rfc-editor.org/rfc/rfc4648.html 4, 5
 }
 
 // A code from a link or a request body. Anything that can't be a code is the same 404 as an unknown one, so the
 // database is never asked about it.
 export function readInviteCode(input: unknown): string {
-  if (typeof input !== "string" || !INVITE_CODE.test(input)) throw new AppError("invite_invalid", 404);
+  if (typeof input !== "string" || !INVITE_CODE.test(input)) throw new AppError("invite_invalid", STATUS.notFound);
   return input;
 }
 
@@ -43,7 +44,7 @@ export async function removeFriend(db: Db, userId: string, friendId: string): Pr
     "delete from private.friendship where user_a = least($1::uuid, $2::uuid) and user_b = greatest($1::uuid, $2::uuid)",
     [userId, friendId],
   );
-  if (rowCount === 0) throw new AppError("not_friends", 404);
+  if (rowCount === 0) throw new AppError("not_friends", STATUS.notFound);
 }
 
 export async function listFriends(db: Db, userId: string): Promise<FriendWithId[]> {

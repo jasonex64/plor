@@ -15,6 +15,7 @@ import { dayCounts, pooledCounts } from "./ledger";
 import { thingNames } from "./payload";
 import { assertTypedLength, buildState, NOT_OPEN, OUT_OF_ORDER, RUN_OVER, TIME_UP, todaysPuzzle, type RunState, type StoredEvent } from "./runs";
 import { FINISHED, type RunStatus } from "./status";
+import { STATUS } from "@/lib/status";
 
 // The guest's run, which is always today's: one left over midnight is not resumed, it waits for the purge (Design, "Same
 // rules as a signed-in run"). null when there is none: never started, or left by a day that has closed.
@@ -87,12 +88,12 @@ export async function startGuestRun(db: Db, tokenHash: string): Promise<RunState
   } catch (err) {
     // The foreign key to private.puzzle: nothing is published for today.
     if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "guest_run_game_id_puzzle_date_fkey") {
-      throw new AppError("no_puzzle_today", 404);
+      throw new AppError("no_puzzle_today", STATUS.notFound);
     }
     throw err;
   }
   const state = await guestTodaysState(db, tokenHash);
-  if (!state) throw new AppError("no_puzzle_today", 404);
+  if (!state) throw new AppError("no_puzzle_today", STATUS.notFound);
   return state;
 }
 
@@ -100,9 +101,9 @@ export async function startGuestRun(db: Db, tokenHash: string): Promise<RunState
 // closed. A retry after the end meets the database's rules, as a player's does.
 export async function answerGuest(db: Db, tokenHash: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean; needs?: string }> {
   const found = await todaysRun(db, tokenHash);
-  if (!found) throw new AppError("run_over", 409);
+  if (!found) throw new AppError("run_over", STATUS.conflict);
   const { date, puzzle } = found;
-  if (index >= puzzle.questions.length) throw new AppError("bad_request", 400, "no such question");
+  if (index >= puzzle.questions.length) throw new AppError("bad_request", STATUS.badRequest, "no such question");
 
   const { rows: current } = await db.query<{ status: RunStatus; answered: number; started: boolean }>(
     `select status, answered, deadline is not null as started
@@ -110,13 +111,13 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
     [tokenHash, GAME_ID, date],
   );
   // The purge can take the run between the two reads, at the day's close.
-  if (current.length === 0) throw new AppError("run_over", 409);
+  if (current.length === 0) throw new AppError("run_over", STATUS.conflict);
   const isCurrent = current[0].status === "in_progress" && current[0].answered === index;
   // As a signed-in answer: no answer before Next, and a stolen letter only counts on the question in play, so a client
   // can't probe the letters or the list of a question it hasn't reached.
-  if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
+  if (isCurrent && !current[0].started) throw new AppError("not_open", STATUS.conflict);
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
-  if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+  if (!avoids(typed, stolen)) throw new AppError("stolen_letter", STATUS.badRequest);
   assertTypedLength(typed);
   const resolved = await resolveTyped(dayLookup(db, puzzle), (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
   // Letters are stolen only on the question in play, so this is one: a free retry that says the letter (M15 15h).
@@ -126,7 +127,7 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
     if (isCurrent) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: true };
     const run = await stateOf(db, tokenHash, date, puzzle);
     if (run.status === "timed_out") return { run, notInList: false };
-    throw new AppError("not_current_question", 409);
+    throw new AppError("not_current_question", STATUS.conflict);
   }
   const entryId = resolved.thingId;
   // A retry reads the stored answer first: the database's order rule would refuse the second insert (OB002) before
@@ -142,12 +143,12 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
     if (err.code === TIME_UP) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: false };
-    if (err.code === NOT_OPEN) throw new AppError("not_open", 409);
+    if (err.code === NOT_OPEN) throw new AppError("not_open", STATUS.conflict);
     // The purge took the run between our read and our insert, at the day's close: its rows, and the foreign key, are gone.
-    if (err.code === "23503") throw new AppError("run_over", 409);
+    if (err.code === "23503") throw new AppError("run_over", STATUS.conflict);
     if (err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
       if (await settledAnswer(db, tokenHash, date, index, entryId)) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: false };
-      throw new AppError(err.code === RUN_OVER ? "run_over" : "out_of_order", 409);
+      throw new AppError(err.code === RUN_OVER ? "run_over" : "out_of_order", STATUS.conflict);
     }
     throw err;
   }
@@ -162,7 +163,7 @@ export async function openNextGuest(db: Db, tokenHash: string): Promise<RunState
      where s.token_hash = $1 and s.game_id = $2 and s.puzzle_date = private.today()`,
     [tokenHash, GAME_ID],
   );
-  if (rows.length === 0) throw new AppError("run_over", 409);
+  if (rows.length === 0) throw new AppError("run_over", STATUS.conflict);
   const { date, answered, content: puzzle } = rows[0];
   try {
     await db.query(
@@ -172,9 +173,9 @@ export async function openNextGuest(db: Db, tokenHash: string): Promise<RunState
     );
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
-    if (err.code === RUN_OVER || err.code === "23503") throw new AppError("run_over", 409);
+    if (err.code === RUN_OVER || err.code === "23503") throw new AppError("run_over", STATUS.conflict);
     // question_idx must be over 0: Start opens question 1, so Next before the first answer has nothing to open.
-    if (err.code === "23514" && err.constraint === "guest_question_open_question_idx_check") throw new AppError("no_reveal", 409);
+    if (err.code === "23514" && err.constraint === "guest_question_open_question_idx_check") throw new AppError("no_reveal", STATUS.conflict);
     throw err;
   }
   return stateOf(db, tokenHash, date, puzzle);
@@ -184,6 +185,6 @@ export async function openNextGuest(db: Db, tokenHash: string): Promise<RunState
 async function settledAnswer(db: Db, tokenHash: string, date: string, index: number, entryId: string): Promise<boolean> {
   const stored = (await events(db, tokenHash, date)).find((e) => e.question_idx === index);
   if (!stored) return false;
-  if (stored.entry_id !== entryId) throw new AppError("already_answered", 409);
+  if (stored.entry_id !== entryId) throw new AppError("already_answered", STATUS.conflict);
   return true;
 }

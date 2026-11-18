@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { log } from "@/lib/log";
 import { PROTOCOL_VERSION } from "@/lib/protocol";
+import { STATUS } from "@/lib/status";
 
 // The single place errors become HTTP responses (DECISIONS.md: Error handling).
 // Expected failures throw AppError; anything else is a bug, logged at error level and returned as 500.
@@ -33,7 +34,7 @@ async function run(fn: (request: Request) => Promise<Response>, request: Request
       return Response.json({ ok: false, error: err.code }, { status: err.status });
     }
     log.error("unhandled route error", { error: String(err), stack: (err as Error).stack });
-    return Response.json({ ok: false, error: "internal" }, { status: 500 });
+    return Response.json({ ok: false, error: "internal" }, { status: STATUS.internalServerError });
   }
 }
 
@@ -55,7 +56,7 @@ function noStore(response: Response): Response {
 // API requests carry the client's protocol version; a mismatch tells the client to reload
 // (docs/milestones/M00-data-design.md §2). Navigations (email links, OAuth redirects) can't send it.
 export function checkProtocol(request: Request): void {
-  if (request.headers.get("x-protocol") !== String(PROTOCOL_VERSION)) throw new AppError("client_outdated", 409);
+  if (request.headers.get("x-protocol") !== String(PROTOCOL_VERSION)) throw new AppError("client_outdated", STATUS.conflict);
 }
 
 // The JSON body of an API request, which must be an object. Field checks belong to each route.
@@ -64,8 +65,8 @@ export async function readJsonObject(request: Request): Promise<Record<string, u
   try {
     body = await request.json();
   } catch {
-    throw new AppError("bad_request", 400, "body is not JSON");
+    throw new AppError("bad_request", STATUS.badRequest, "body is not JSON");
   }
-  if (typeof body !== "object" || body === null || Array.isArray(body)) throw new AppError("bad_request", 400, "body is not an object");
+  if (typeof body !== "object" || body === null || Array.isArray(body)) throw new AppError("bad_request", STATUS.badRequest, "body is not an object");
   return body as Record<string, unknown>;
 }

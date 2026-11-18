@@ -89,7 +89,7 @@ export function parseBank(file: string, text: string): { bank: Bank | null; erro
 
 // Days between two calendar dates.
 export function daysApart(a: string, b: string): number {
-  return Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
+  return Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / (24 * 60 * 60 * 1000);
 }
 
 // Drafted days that ask a category less than REPEAT_GAP_DAYS apart (human, 2026-10-24, M13 D7: "at least 30 days";
@@ -118,7 +118,7 @@ export function usesOf(q: BankQuestion, days: Puzzle[]): string[] {
 
 // A small stable hash, as the draft seeds its letters and hosts with.
 export function seed(text: string): number {
-  return [...text].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  return [...text].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7); // kept as built (human, 2026-11-17, docs/milestones/PROCESS-lint-rules.md answer 26)
 }
 
 // The day's 7 bank questions for a date (13d): only questions whose category no other drafted day asks within

@@ -13,6 +13,7 @@ import { dayCounts, pooledCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
 import { FINISHED, type RunStatus } from "./status";
+import { STATUS } from "@/lib/status";
 
 // points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION). bonus: its
 // provisional rarity bonus, from the expectation alone; the final one comes once the day is over (M09). share: once the
@@ -202,14 +203,14 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
     // The foreign key to private.puzzle: nothing is published for today. The run's other foreign key, to
     // auth.users, raises 23503 too and stays a 500 (M02 2f, B1).
     if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "run_game_id_puzzle_date_fkey") {
-      throw new AppError("no_puzzle_today", 404);
+      throw new AppError("no_puzzle_today", STATUS.notFound);
     }
     throw err;
   }
   // Read back as "today" again: if midnight passed since the insert, the player sees the new day (not started), which
   // may have no puzzle.
   const state = await todaysState(db, userId);
-  if (!state) throw new AppError("no_puzzle_today", 404);
+  if (!state) throw new AppError("no_puzzle_today", STATUS.notFound);
   return state;
 }
 
@@ -217,7 +218,7 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
 // given (audit W1, docs/audits/2026-11-11-weekly-audit.md). One check for signed-in answers, test misses and guests'.
 export function assertTypedLength(typed: string): void {
   // A NUL character can't be stored in Postgres text (it fails with 22021 when the miss is logged), so it is refused too (19b).
-  if (typed.length > TYPED_ANSWER_MAX_LENGTH || typed.includes("\0")) throw new AppError("text_invalid", 400);
+  if (typed.length > TYPED_ANSWER_MAX_LENGTH || typed.includes("\0")) throw new AppError("text_invalid", STATUS.badRequest);
 }
 
 // Answers one question of the player's latest run with typed text, which the server turns into a thing of the
@@ -235,9 +236,9 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
      order by r.puzzle_date desc limit 1`,
     [userId, GAME_ID],
   );
-  if (rows.length === 0) throw new AppError("no_run", 404);
+  if (rows.length === 0) throw new AppError("no_run", STATUS.notFound);
   const { date, content: puzzle } = rows[0];
-  if (index >= puzzle.questions.length) throw new AppError("bad_request", 400, "no such question");
+  if (index >= puzzle.questions.length) throw new AppError("bad_request", STATUS.badRequest, "no such question");
 
   // A stolen letter can't be typed in the answer box (G11), so text with one comes from a bypassed client. Letters
   // count only on the question in play: checking another index would let a client probe the letters of questions
@@ -250,9 +251,9 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   const isCurrent = current[0]?.status === "in_progress" && current[0].answered === index;
   // At the reveal the next question isn't open yet: no answer and no miss before Next, so its list can't be probed
   // and no miss is logged for a question the player hasn't seen (13c-4 review). The trigger also refuses (OB006).
-  if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
+  if (isCurrent && !current[0].started) throw new AppError("not_open", STATUS.conflict);
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
-  if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+  if (!avoids(typed, stolen)) throw new AppError("stolen_letter", STATUS.badRequest);
   assertTypedLength(typed);
   const resolved = await resolveTyped(dayLookup(db, puzzle), (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
   if (resolved && "needs" in resolved) return { run: await stateOf(db, userId, date, puzzle), notInList: true, needs: resolved.needs };
@@ -282,11 +283,11 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
     // Too late for this question: the run has ended, and the state says so (rule 3; the trigger decides).
     if (err.code === TIME_UP) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
     // The question hasn't been opened with Next: the client is behind, and a reload shows the reveal.
-    if (err.code === NOT_OPEN) throw new AppError("not_open", 409);
+    if (err.code === NOT_OPEN) throw new AppError("not_open", STATUS.conflict);
     // A concurrent request may have answered this index between our read and our insert (ROADMAP: never 500).
     if (err.code === "23505" || err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
       if (await settledAnswer(db, userId, date, index, entryId)) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
-      throw new AppError(err.code === RUN_OVER ? "run_over" : "out_of_order", 409);
+      throw new AppError(err.code === RUN_OVER ? "run_over" : "out_of_order", STATUS.conflict);
     }
     throw err;
   }
@@ -303,7 +304,7 @@ export async function openNext(db: Db, userId: string): Promise<RunState> {
      order by s.puzzle_date desc limit 1`,
     [userId, GAME_ID],
   );
-  if (rows.length === 0) throw new AppError("no_run", 404);
+  if (rows.length === 0) throw new AppError("no_run", STATUS.notFound);
   const { date, answered, content: puzzle } = rows[0];
   try {
     await db.query(
@@ -313,12 +314,12 @@ export async function openNext(db: Db, userId: string): Promise<RunState> {
     );
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
-    if (err.code === RUN_OVER) throw new AppError("run_over", 409);
+    if (err.code === RUN_OVER) throw new AppError("run_over", STATUS.conflict);
     // An answer from another tab landed between our read and our insert, so the index we read is behind (19b); the
     // same reply as an answer to a question that isn't next.
-    if (err.code === OUT_OF_ORDER) throw new AppError("out_of_order", 409);
+    if (err.code === OUT_OF_ORDER) throw new AppError("out_of_order", STATUS.conflict);
     // question_idx must be over 0: Start opens question 1, so Next before the first answer has nothing to open.
-    if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("no_reveal", 409);
+    if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("no_reveal", STATUS.conflict);
     throw err;
   }
   return stateOf(db, userId, date, puzzle);
@@ -328,7 +329,7 @@ export async function openNext(db: Db, userId: string): Promise<RunState> {
 async function settledAnswer(db: Db, userId: string, date: string, index: number, entryId: string): Promise<boolean> {
   const stored = (await events(db, userId, date)).find((e) => e.question_idx === index);
   if (!stored) return false;
-  if (stored.entry_id !== entryId) throw new AppError("already_answered", 409);
+  if (stored.entry_id !== entryId) throw new AppError("already_answered", STATUS.conflict);
   return true;
 }
 
@@ -355,11 +356,11 @@ async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: nu
     ]));
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "23514" && err.constraint === "missed_answer_typed_length") {
-      throw new AppError("text_invalid", 400);
+      throw new AppError("text_invalid", STATUS.badRequest);
     }
     throw err;
   }
-  if (!logged) throw new AppError("not_current_question", 409);
+  if (!logged) throw new AppError("not_current_question", STATUS.conflict);
 }
 
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays any day, a draft too, and nothing is saved
@@ -378,14 +379,14 @@ export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lo
   const resolve = async (index: number, typed: string) => {
     // As in play: a stolen letter can't be typed in the answer box (G11).
     const stolen = stolenLetters(puzzle, index);
-    if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+    if (!avoids(typed, stolen)) throw new AppError("stolen_letter", STATUS.badRequest);
     return resolveTyped(lookup, (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
   };
   const over = () => stored.some((e) => e.matched) || stored.length === total;
   for (const typed of moves.texts) {
-    if (over()) throw new AppError("bad_request", 400, "texts after the run's end");
+    if (over()) throw new AppError("bad_request", STATUS.badRequest, "texts after the run's end");
     const resolved = await resolve(stored.length, typed);
-    if (!resolved || "needs" in resolved) throw new AppError("bad_request", 400, "a text that names no answer");
+    if (!resolved || "needs" in resolved) throw new AppError("bad_request", STATUS.badRequest, "a text that names no answer");
     // inDay: a test run's answers count as given on their day, so its bonus reads as play's provisional one.
     stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
   }
@@ -393,7 +394,7 @@ export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lo
   let notInList = false;
   let needs: string | undefined;
   if (moves.text !== null) {
-    if (!open || moves.timedOut) throw new AppError("not_open", 409);
+    if (!open || moves.timedOut) throw new AppError("not_open", STATUS.conflict);
     const resolved = await resolve(stored.length, moves.text);
     // As in play: a free retry that says the letter, and no report to the audit.
     if (resolved && "needs" in resolved) {

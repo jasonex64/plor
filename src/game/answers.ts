@@ -8,6 +8,7 @@ import { shownName } from "./payload";
 import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // An answer the question accepted: its main name, the name the search matched when that's another of its names,
 // its tier from the day's levels, and how many players gave it, or null while too few answered the question (M11 H5).
@@ -25,7 +26,7 @@ export async function searchAnswers(db: Db, userId: string, date: string, index:
       return { name, matched: normalize(name) === r.matched ? null : r.matched, tier: r.tier, players: r.players };
     });
   } catch (err) {
-    if (err instanceof DatabaseError && err.code === "OB013") throw new AppError("answers_closed", 403);
+    if (err instanceof DatabaseError && err.code === "OB013") throw new AppError("answers_closed", STATUS.forbidden);
     throw err;
   }
 }

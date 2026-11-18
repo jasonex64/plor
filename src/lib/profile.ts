@@ -4,6 +4,7 @@ import { DatabaseError } from "pg";
 import type { Db } from "@/lib/db";
 import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // The player's settings (docs/milestones/M14-14a-3b-settings.md): Skip the game screen (L39), off until turned on;
 // and the theme (docs/milestones/M14-14b-1-themes.md; L21), following the
@@ -42,7 +43,7 @@ export function readSettings(input: Record<string, unknown>): Partial<Settings> 
   };
   const keys = Object.keys(input);
   if (keys.length === 0 || keys.some((k) => !(k in valid) || !valid[k as keyof Settings](input[k]))) {
-    throw new AppError("settings_invalid", 400);
+    throw new AppError("settings_invalid", STATUS.badRequest);
   }
   return input as Partial<Settings>;
 }
@@ -55,7 +56,7 @@ export async function setSettings(db: Db, userId: string, settings: Partial<Sett
      where user_id = $1 returning ${SETTINGS} as settings`,
     [userId, settings.skipGameScreen ?? null, settings.theme ?? null],
   );
-  if (!rows[0]) throw new AppError("no_profile", 409);
+  if (!rows[0]) throw new AppError("no_profile", STATUS.conflict);
   return rows[0].settings;
 }
 
@@ -71,7 +72,7 @@ export async function createProfile(db: Db, userId: string, username: string): P
 // requires (M07 D1), so a name typed with combining accents is still accepted. Anything else gets 400.
 export function readDisplayName(input: unknown): string | null {
   if (input === null) return null;
-  if (typeof input !== "string" || input.includes("\0")) throw new AppError("display_name_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("display_name_invalid", STATUS.badRequest);
   return input.normalize("NFC").trim();
 }
 
@@ -79,7 +80,7 @@ export function readDisplayName(input: unknown): string | null {
 export async function setDisplayName(db: Db, userId: string, displayName: string | null): Promise<void> {
   try {
     const { rowCount } = await db.query("update private.profile set display_name = $2 where user_id = $1", [userId, displayName]);
-    if (rowCount === 0) throw new AppError("no_profile", 409);
+    if (rowCount === 0) throw new AppError("no_profile", STATUS.conflict);
   } catch (err) {
     throw profileError(err);
   }
@@ -90,7 +91,7 @@ export async function setDisplayName(db: Db, userId: string, displayName: string
 export async function changeUsername(db: Db, userId: string, username: string): Promise<void> {
   try {
     const { rowCount } = await db.query("update private.profile set username = $2 where user_id = $1", [userId, username]);
-    if (rowCount === 0) throw new AppError("no_profile", 409);
+    if (rowCount === 0) throw new AppError("no_profile", STATUS.conflict);
   } catch (err) {
     throw profileError(err);
   }
@@ -99,12 +100,12 @@ export async function changeUsername(db: Db, userId: string, username: string): 
 // Maps the constraint a rejected write broke to the player-facing error; anything else is rethrown as is.
 function profileError(err: unknown): unknown {
   if (!(err instanceof DatabaseError)) return err;
-  if (err.code === "23514" && err.constraint === "profile_username_format") return new AppError("username_invalid", 400);
-  if (err.code === "23514" && err.constraint === "profile_display_name_format") return new AppError("display_name_invalid", 400);
-  if (err.code === "23505" && err.constraint === "profile_username_key") return new AppError("username_taken", 409);
-  if (err.code === "23505" && err.constraint === "profile_pkey") return new AppError("profile_exists", 409);
-  if (err.code === "OB011") return new AppError("username_change_too_soon", 409);
+  if (err.code === "23514" && err.constraint === "profile_username_format") return new AppError("username_invalid", STATUS.badRequest);
+  if (err.code === "23514" && err.constraint === "profile_display_name_format") return new AppError("display_name_invalid", STATUS.badRequest);
+  if (err.code === "23505" && err.constraint === "profile_username_key") return new AppError("username_taken", STATUS.conflict);
+  if (err.code === "23505" && err.constraint === "profile_pkey") return new AppError("profile_exists", STATUS.conflict);
+  if (err.code === "OB011") return new AppError("username_change_too_soon", STATUS.conflict);
   // A name someone gave up less than 30 days ago is held (M17 17b, answers 10 and 22): to the player it is taken.
-  if (err.code === "OB017") return new AppError("username_taken", 409);
+  if (err.code === "OB017") return new AppError("username_taken", STATUS.conflict);
   return err;
 }

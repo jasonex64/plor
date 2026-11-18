@@ -11,6 +11,7 @@ import { FINISHED } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
+import { STATUS } from "@/lib/status";
 
 export type Emoji = (typeof REACTIONS)[number];
 
@@ -26,7 +27,7 @@ export const NO_REACTIONS: Reactions = { counts: [], mine: null };
 // null removes the player's reaction; the page sends it when they tap the one they already chose.
 export function readEmoji(input: unknown): Emoji | null {
   if (input === null) return null;
-  if (!REACTIONS.includes(input as Emoji)) throw new AppError("bad_request", 400, "emoji");
+  if (!REACTIONS.includes(input as Emoji)) throw new AppError("bad_request", STATUS.badRequest, "emoji");
   return input as Emoji;
 }
 
@@ -36,7 +37,7 @@ export function readTarget(input: unknown): Target {
     if (t.type === "comment") return { type: "comment", id: readCommentId(t.id) };
     if (t.type === "run") return { type: "run", userId: readUserId(t.userId) };
   }
-  throw new AppError("bad_request", 400, "target");
+  throw new AppError("bad_request", STATUS.badRequest, "target");
 }
 
 // Sets the player's reaction on a target, replacing any other they had there, or removes it (emoji null). The page
@@ -82,12 +83,12 @@ export async function setReaction(pool: Pool, userId: string, game: BoardGame, d
       [userId, game, date, target.type === "comment" ? target.id : null, target.type === "run" ? target.userId : null, FINISHED],
     );
     const row = rows[0];
-    if (row.past) throw new AppError("day_past", 409);
-    if (date !== row.today) throw new AppError("bad_request", 400, "date");
-    if (!row.finished) throw new AppError("not_finished", 409);
+    if (row.past) throw new AppError("day_past", STATUS.conflict);
+    if (date !== row.today) throw new AppError("bad_request", STATUS.badRequest, "date");
+    if (!row.finished) throw new AppError("not_finished", STATUS.conflict);
     // Someone else's comment the player can't see is the same 404 as a missing one, like deleting (8a).
-    if (row.played === null) throw target.type === "comment" ? new AppError("comment_not_found", 404) : new AppError("not_friends", 404);
-    if (!row.played) throw new AppError("run_not_found", 404);
+    if (row.played === null) throw target.type === "comment" ? new AppError("comment_not_found", STATUS.notFound) : new AppError("not_friends", STATUS.notFound);
+    if (!row.played) throw new AppError("run_not_found", STATUS.notFound);
 
     if (emoji !== null) {
       // Still today: midnight may have passed since the check above.
@@ -96,7 +97,7 @@ export async function setReaction(pool: Pool, userId: string, game: BoardGame, d
          select $1, $2, $3::date, $4::bigint, $5::uuid, $6 where private.today() = $3::date`,
         [userId, game, date, row.comment_id, row.run_user_id, emoji],
       );
-      if (rowCount === 0) throw new AppError("day_past", 409);
+      if (rowCount === 0) throw new AppError("day_past", STATUS.conflict);
     }
     await client.query("commit");
   } catch (err) {
@@ -111,9 +112,9 @@ export async function setReaction(pool: Pool, userId: string, game: BoardGame, d
     // Another tab stored this player's reaction first (the unique index), or a member's leaving took the comment's rows
     // while this replaced one (a deadlock the database broke): a message to try again, not a 500 (19b).
     if (err instanceof DatabaseError && err.code === "23505" && (err.constraint === "reaction_one_per_comment" || err.constraint === "reaction_one_per_run")) {
-      throw new AppError("reaction_changed", 409);
+      throw new AppError("reaction_changed", STATUS.conflict);
     }
-    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", 409);
+    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", STATUS.conflict);
     throw err;
   } finally {
     client.release(broken);

@@ -101,7 +101,7 @@ function Carousel({ front, onPlace, children }: { front: number; onPlace: (place
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = row.current!;
-    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 768));
+    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 768)); // docs/milestones/M16-16f-the-shared-pieces.md, Numbers (answers 42 and 43)
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
