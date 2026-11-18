@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is built (answers 42 to 44, below), in its PR; next 20b (answer 40).
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below); next 20b (answer 40).
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
