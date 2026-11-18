@@ -44,6 +44,12 @@
   line-height: 1;
 }
 
+/* A detail page's Back stands in the wordmark's place (docs/milestones/M20-design-rules-and-clean-up.md, answer 44;
+   globals.css, .page-back). */
+:global(body:has(.page-back:not(:empty))) .topWord {
+  visibility: hidden;
+}
+
 /* The top bar's right side: the streak's pill and the gear, 6px apart (round 7's .me). */
 .me {
   display: flex;
@@ -53,14 +59,17 @@
 
 /* The streak's pill (round 7's .streak; docs/milestones/M14-14b-2a-streak-ranks.md): the rank's 22px flower and the
    number, as mockup 3's streak chip (M14 14b-8), with a 1.5px ink border; fully round beside the round avatar, in the
-   soft accent tint (M14 14b-10, answers 6 and 20). It looks 34px tall; its ::after makes it a 44px target, as every
+   soft accent tint (M14 14b-10, answers 6 and 20). It is the avatar's height, 1.875rem (avatar.module.css .slot), so the
+   two line up (docs/milestones/M20-design-rules-and-clean-up.md, answer 40); its ::after makes it a 44px target, as every
    control is (docs/milestones/M14-14b-18-headings-today-invites-words.md, answer 7; 14b-10, answer 7). */
 .streak {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 10px 2px 6px;
+  box-sizing: border-box;
+  height: 1.875rem;
+  padding: 0 10px 0 6px;
   border: 1.5px solid var(--ink);
   border-radius: 999px;
   background: var(--soft);
@@ -227,10 +236,17 @@
     justify-content: flex-start;
     gap: 8px;
     min-height: 46px;
-    padding: 0 6px;
+    /* The wordmark's 12px less the tab's 2px border, so the icon starts on the wordmark's left edge
+       (docs/milestones/M20-design-rules-and-clean-up.md, answer 42). */
+    padding: 0 10px;
     border: 2px solid transparent;
     border-radius: var(--r-small);
     font-size: 1rem;
+  }
+
+  /* The icon at its own width, not the tab bar's 48px pill, so it starts at the tab's padding (answer 42). */
+  .icon {
+    width: auto;
   }
 
   /* The current item, as mockup 3's sidebar draws it: the soft fill and a 2px ink border, flat (M14 14b-10, answer 3). */
@@ -274,7 +290,8 @@
     gap: 8px;
     min-height: 46px;
     margin: auto 0 0;
-    padding: 0 6px;
+    /* The wordmark's 12px, so the gear starts on its left edge (answer 42). */
+    padding: 0 12px;
     border: 0;
     border-radius: var(--r-small);
     background: transparent;
