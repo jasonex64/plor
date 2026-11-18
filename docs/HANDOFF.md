@@ -4,7 +4,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 **Updated last:** 2026-11-17, night, on `process-formal-verification` (slot 1, `C:/Users/jason/RIFF`). **This file is the newest handoff.** Its section comes first; the sessions' notes merged in from `main` follow.
 
-**`process-formal-verification` (2026-11-17, night):** being finished; this section is rewritten when it is.
+**`process-formal-verification` (2026-11-17, night): done, PR #279 open, for the human to merge** (ticket `docs/milestones/PROCESS-formal-verification.md`, sixteen answers quoted). It changes nothing on plor.app.
+- **Built:** pstack's `statechart` and `create-formal-verification-skill` in `.claude/skills` (`cursor/plugins@2f87c85`, no statechart tests, three Windows changes); three verify skills, `verify-fragments-run`, `verify-offbeat-run`, `verify-group-membership`, each rerun by `npm run verify -- <name>` (4 s, 4 s, 11 to 28 s); three statecharts in `docs/statecharts/` (sent to the human as SVGs). Reviewed: no model defect; blocking items fixed; the rest in ROADMAP, For the agent rules.
+- **Any session changing a covered file** (each verify skill's coverage table) reruns that check before calling the work done (DECISIONS, Formal verification).
+- **Finding, waits on the human:** a Fragments word on its way when another tab presses Next is judged on, and can use up, the next round (ROADMAP, For M16, "A retry of round k's word…"; numbered steps there). Fixing it means the try names its round; the check fails once it holds.
+- **This PC now has** mise 2026.11.9 (`%LOCALAPPDATA%\mise-bin`, on the user PATH: a new terminal sees it), Java Temurin 25 and TLC 1.7.4 under `%LOCALAPPDATA%\mise`, and `pele@1.9.0` in `%LOCALAPPDATA%\pele`. The Mac has none: its first `npm run verify` installs Java and TLC through mise, once mise is installed there.
+- **Slot 1** holds this branch; `npm run slots -- free 1` once #279 merges, then delete the branch. Nothing left running.
+- **Next:** merge #279 on green checks, on the human's word.
 
 **Before this (merged from `main`):** 2026-11-17, late evening, on `content-2026-11-18` (slot 3, `C:/Users/jason/plor-3`), by the session that looked into the bed question. **This file is the newest handoff.** Before it, the same evening, a session on `fix-fragments-raw-points` (slot 1, `C:/Users/jason/RIFF`) filed the human's second batch of inbox items and fixed one; the section after this one is from `fix-long-status-wraps`. The same evening, a session on `m20-design-rules-and-clean-up` (slot 2, `C:/Users/jason/plor-2`) built 20c, PR #273: its notes are next.
 
