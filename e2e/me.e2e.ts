@@ -166,7 +166,8 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
   // The friends list sits below (docs/milestones/M14-14a-3b-settings.md, criterion 7), pointing to Find a player (M17 17c, G3).
   await expect(page.getByRole("region", { name: "Your friends" })).toContainText("No friends yet. Find a player by their username, above.");
 
-  // The leaderboards: the player's own row.
+  // The leaderboards: the player's own row, on This week (one period at a time since M20 20i).
+  await page.getByRole("region", { name: "Friends leaderboard" }).getByRole("radio", { name: "This week", exact: true }).check();
   const week = page.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem");
   await expect(week.locator("[data-initial='M']")).toHaveCount(1);
   // The slot is drawn by CSS and hidden from screen readers, so the row's text is the name alone.

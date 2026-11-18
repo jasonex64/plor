@@ -251,6 +251,9 @@ test("a long name on a board row is cut at the default text size, and shown whol
   await signInAndPick(page, "cl");
   await DB.query("update private.profile set display_name = 'Bartholomew Fitzwilliams' where username = $1", [`cl${RUN}`]);
   await page.reload();
+  // The week's board, where the player's row is: the board opens on Today (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
+  const thisWeek = () => page.getByRole("region", { name: "Friends leaderboard" }).getByRole("radio", { name: "This week", exact: true }).check();
+  await thisWeek();
   const row = page.getByRole("listitem").filter({ hasText: "Bartholomew Fitzwilliams (you)" }).first();
   const fits = () =>
     row.evaluate((li) => {
@@ -273,6 +276,7 @@ test("a long name on a board row is cut at the default text size, and shown whol
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Page.setFontSizes", { fontSizes: { standard: 32 } });
   await page.reload();
+  await thisWeek();
   await expect(row).toBeVisible();
   const big = await fits();
   expect({ cut: big.cut, oneLine: big.oneLine }).toEqual({ cut: false, oneLine: false });

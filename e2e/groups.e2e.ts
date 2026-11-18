@@ -70,7 +70,9 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   const [boardY, commentsY, membersY] = [await top("Group leaderboard"), await top("Comments"), await top("Members")];
   expect(boardY).toBeLessThan(commentsY);
   expect(commentsY).toBeLessThan(membersY);
-  // Neither has points this week: a tie, by name, with the viewer marked (10c).
+  // Neither has points this week: a tie, by name, with the viewer marked (10c). One period shows at a time, Today on
+  // load (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
+  await joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("radio", { name: "This week", exact: true }).check();
   const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
   await expect(board.getByRole("listitem")).toHaveText([`ga${RUN}: 0 points`, `gb${RUN} (you): 0 points`]);
 
@@ -163,7 +165,8 @@ test("the reset reloads a group's page", async ({ browser }) => {
   await signInAndPick(page, "gr");
   await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Night Owls");
   await page.getByRole("button", { name: "Create group" }).click();
-  await expect(page.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" })).toBeVisible();
+  // Today on load (20i).
+  await expect(page.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "Today" })).toBeVisible();
   const reloads = ["/api/groups/detail", "/api/groups/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
   await page.clock.fastForward("25:00:00");
   await Promise.all(reloads);

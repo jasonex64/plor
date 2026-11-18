@@ -348,3 +348,34 @@ test("a long finished status wraps inside its chip and leaves the name its room"
   expect(chip!.x + chip!.width).toBeLessThanOrEqual(box!.x + box!.width);
   expect(chip!.x + chip!.width).toBeCloseTo(notYet!.x + notYet!.width, 0);
 });
+
+// M20 20i (inbox #248; docs/milestones/M20-design-rules-and-clean-up.md, answer 27): the Friends tab's and a group's
+// leaderboard are one board with a Period switch, Today, This week and Last week, opened on Today on every load.
+test("the Friends tab's and a group's leaderboard are one board with a Period switch, opened on Today", async ({ browser }) => {
+  test.slow();
+  const page = await viewer(browser, "bvp");
+  await page.goto("/groups");
+  await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Period Club");
+  await page.getByRole("button", { name: "Create group" }).click();
+  await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
+  const group = new URL(page.url()).pathname;
+  for (const [path, title] of [["/friends", "Friends leaderboard"], [group, "Group leaderboard"]] as const) {
+    await page.goto(path);
+    const card = page.getByRole("region", { name: title });
+    const period = card.getByRole("radiogroup", { name: "Period", exact: true });
+    await expect(period.getByRole("radio")).toHaveCount(3);
+    await expect(period.getByRole("radio", { name: "Today", exact: true })).toBeChecked();
+    const shown = () => card.getByRole("region").filter({ has: page.getByRole("heading", { level: 3 }) });
+    await expect(card.getByRole("region", { name: "Today", exact: true })).toBeVisible();
+    await expect(shown()).toHaveCount(1);
+    for (const name of ["This week", "Last week", "Today"]) {
+      await period.getByRole("radio", { name, exact: true }).check();
+      await expect(card.getByRole("region", { name, exact: true })).toBeVisible();
+      await expect(shown()).toHaveCount(1);
+    }
+    // Opened on Today again on the next load.
+    await period.getByRole("radio", { name: "Last week", exact: true }).check();
+    await page.reload();
+    await expect(page.getByRole("region", { name: title }).getByRole("radiogroup", { name: "Period", exact: true }).getByRole("radio", { name: "Today", exact: true })).toBeChecked();
+  }
+});

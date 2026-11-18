@@ -44,7 +44,8 @@ export function GameSwitch<T extends string>({ choices, value, onChange }: { cho
 }
 
 // title names the board (its heading and region); path is the API route that returns it, which the game is added to;
-// todayPath is today's (docs/milestones/M22-todays-board.md, answer 9), shown above This week.
+// todayPath is today's (docs/milestones/M22-todays-board.md, answer 9). One period shows at a time, chosen by the Period
+// switch, Today on every load (inbox #248; docs/milestones/M20-design-rules-and-clean-up.md, answer 27).
 export function Leaderboard({ title, path, todayPath }: { title: string; path: string; todayPath: string }) {
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
   const [today, setToday] = useState<TodayBoard | null>(null);
@@ -57,8 +58,10 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
   // The overall board's Sum on every load, or its Average (answer 29).
   const [average, setAverage] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
+  const [period, setPeriod] = useState<keyof typeof BOARD_PERIODS>("today");
   const name = useId();
   const countName = useId();
+  const periodName = useId();
   // Switching games faster than the answers come back shows only the newest game's (M11 H6).
   const [latest] = useState(latestOnly);
   const [latestToday] = useState(latestOnly);
@@ -86,7 +89,16 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
           setGame(id);
         }}
       />
-      {/* The overall board is a list (answer 33): Sum or Average in the place of List or Graph. */}
+      <div role="radiogroup" aria-label="Period" className={styles.switch} style={{ "--choices": 3 } as CSSProperties}>
+        {(["today", "this", "last"] as const).map((p) => (
+          <label key={p} className={period === p ? `${styles.choice} ${styles.on}` : styles.choice}>
+            <input type="radio" name={periodName} checked={period === p} onChange={() => setPeriod(p)} />
+            {BOARD_PERIODS[p]}
+          </label>
+        ))}
+      </div>
+      {/* The overall board is a list (answer 33): Sum or Average in the place of List or Graph. List or Graph is a week's
+          (the graph is the week's race), so Today has neither. */}
       {overall ? (
         <div role="radiogroup" aria-label="Count" className={styles.switch}>
           {([false, true] as const).map((a) => (
@@ -97,22 +109,24 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
           ))}
         </div>
       ) : (
-        // Today's period switch, once more (answer 3).
-        <div role="radiogroup" aria-label="View" className={styles.switch}>
-          {([false, true] as const).map((g) => (
-            <label key={String(g)} className={graph === g ? `${styles.choice} ${styles.on}` : styles.choice}>
-              <input type="radio" name={name} checked={graph === g} onChange={() => setGraph(g)} />
-              {g ? "Graph" : "List"}
-            </label>
-          ))}
-        </div>
+        period !== "today" && (
+          // Today's period switch, once more (answer 3).
+          <div role="radiogroup" aria-label="View" className={styles.switch}>
+            {([false, true] as const).map((g) => (
+              <label key={String(g)} className={graph === g ? `${styles.choice} ${styles.on}` : styles.choice}>
+                <input type="radio" name={name} checked={graph === g} onChange={() => setGraph(g)} />
+                {g ? "Graph" : "List"}
+              </label>
+            ))}
+          </div>
+        )
       )}
-      {graph && !overall && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
-      <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
+      {graph && !overall && period !== "today" && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
+      {period !== "today" && <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>}
       {/* The overall board adds up par scores, not points; these notes are Claude's words, approved with the ticket
           (docs/milestones/M15-15i-par-scores.md). */}
       {overall && <p className={styles.note}>{average ? "Your average score out of 100, per game played." : "Each day adds your score out of 100 in each game."}</p>}
-      {today && (
+      {period === "today" && today && (
         <section aria-label="Today" className={styles.week}>
           <div className={kit.head}>
             <h3>Today</h3>
@@ -121,28 +135,35 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
           <TodayStandings board={today} game={game} average={average} />
         </section>
       )}
-      {board && overall && (
-        <>
-          <OverallStandings label="This week" week={(board as OverallBoard).thisWeek} average={average} />
-          <OverallStandings label="Last week" week={(board as OverallBoard).lastWeek} average={average} />
-        </>
+      {period !== "today" && board && overall && (
+        <OverallStandings
+          key={period}
+          label={BOARD_PERIODS[period]}
+          week={period === "this" ? (board as OverallBoard).thisWeek : (board as OverallBoard).lastWeek}
+          average={average}
+        />
       )}
-      {board && !overall && (
-        <>
-          <Standings label="This week" week={(board as Board).thisWeek} graph={graph} picked={picked} onPick={setPicked} />
-          <Standings label="Last week" week={(board as Board).lastWeek} graph={graph} picked={picked} onPick={setPicked} />
-        </>
+      {period !== "today" && board && !overall && (
+        <Standings
+          key={period}
+          label={BOARD_PERIODS[period]}
+          week={period === "this" ? (board as Board).thisWeek : (board as Board).lastWeek}
+          graph={graph}
+          picked={picked}
+          onPick={setPicked}
+        />
       )}
-      {!board && !error && (
+      {(period === "today" ? !today && !todayError : !board && !error) && (
         <Skeleton label="Loading scores">
           <Line />
         </Skeleton>
       )}
-      {error && <p role="alert">{error}</p>}
-      {todayError && <p role="alert">{todayError}</p>}
+      {period === "today" ? todayError && <p role="alert">{todayError}</p> : error && <p role="alert">{error}</p>}
     </section>
   );
 }
+
+const BOARD_PERIODS = { today: "Today", this: "This week", last: "Last week" } as const;
 
 // The card's periods, each by its name (M22, answer 3).
 const PERIODS = { today: "Today", yesterday: "Yesterday", week: "This week" } as const;

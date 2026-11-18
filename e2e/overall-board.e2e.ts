@@ -65,6 +65,8 @@ async function bothViews(page: Page, board: string, x: string, y: string) {
   const count = region.getByRole("radiogroup", { name: "Count" });
   await expect(count.getByRole("radio", { name: "Sum" })).toBeChecked();
   await expect(region.getByText("Each day adds your score out of 100 in each game.")).toBeVisible();
+  // One period shows at a time, Today on load (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
+  await region.getByRole("radio", { name: "Last week", exact: true }).check();
   await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 100$`), new RegExp(`${x} \\(you\\): 80$`)]);
   await count.getByText("Average").click();
   await expect(region.getByText("Your average score out of 100, per game played.")).toBeVisible();
