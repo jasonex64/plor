@@ -1646,7 +1646,7 @@ export type Mark = { id: string; synonym_of: string[]; duplicates: string[]; sai
 // named (a P2959 pair, or two items each marked the other's synonym) the one with more sitelinks keeps its ID, and a
 // tie is a fork. A fork (an item pointing at two kept items) doesn't merge and goes to the review; so does a longer
 // circle. The human's merges add pairs and must agree with Wikidata's marks; their apart pairs never merge. A merge
-// across two sets stops (none on 2026-10-27; build for today). Every decision must still fit the loaded items.
+// across two sets stops (none on 2026-10-27). Every decision must still fit the loaded items.
 export type MergePlan = { into: Map<string, string>; forks: string[][]; saidSame: string[][] };
 export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Sameness): MergePlan {
   const links = new Map(marks.map((m) => [m.id, m.sitelinks]));
