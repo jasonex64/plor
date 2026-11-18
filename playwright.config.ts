@@ -20,14 +20,14 @@ export default defineConfig({
   // One retry in CI (human, 2026-11-06: "retry, bukld faster next"): 19 of the last 64 runs failed, mostly on one different
   // test of 149. A test that needed it is listed as flaky in the log; a retry there is a lead, not a pass to forget.
   retries: process.env.CI ? 1 : 0,
-  // On CI every test keeps a screenshot of how its page ended and a video of what it did, passed or failed, which CI
-  // uploads as the proof of a visible change (docs/milestones/PROCESS-lint-rules.md, answers 3 and 8): pictures, with no
-  // network data, so not the stack's key a trace holds (docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2). Only
-  // pages Playwright makes are filmed, so tests take the `page` fixture rather than opening their own context.
+  // On CI every test keeps a video of what its page did, passed or failed, which CI uploads as the proof of a visible
+  // change (docs/milestones/PROCESS-lint-rules.md, answers 3, 8 and 33): pictures, with no network data, so not the
+  // stack's key a trace holds (docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2). Only pages Playwright makes
+  // are filmed, so tests take the `page` fixture rather than opening their own context. No screenshots (answer 33): they
+  // took every page still open, and tests that open their own contexts leave them open for the rest of the run.
   use: {
     baseURL: appUrl,
     trace: "retain-on-failure",
-    screenshot: process.env.CI ? "on" : "off",
     video: process.env.CI ? "on" : "off",
   },
   projects: [

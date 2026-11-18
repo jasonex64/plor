@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). **Plan step 4, screenshots and video on CI, in review** on `process-lint-rules` (its PR; round 9's four answers below); the dropped rules (step 5) wait.
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). **Plan step 4, video on CI, in review** on `process-lint-rules` (#284; rounds 9 and 10 below: no screenshots, answer 33); the dropped rules (step 5) wait.
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -77,6 +77,9 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 31. **The desktop size:** **"1280 × 720 (Recommended)"**: Playwright's Desktop Chrome, which every untagged test already runs at.
 32. **How long CI keeps the screenshots and videos:** **"14 days (Recommended)"**.
 
+**Round 10** (after #284's first CI run held 9,553 screenshots, 503 MB, mostly earlier tests' pages: tests open their own browser contexts 116 times and close one 9 times, and Playwright's screenshot takes every page still open)
+33. **How to fix it before merging:** **"Video only, no screenshots"**: CI keeps the videos (62 tests, the ones on the `page` fixture; 15 MB) and no screenshots. A test that opens its own contexts gets no picture.
+
 ## Source
 - Playwright (SOURCES.md, M07 D7): the `video` option, https://playwright.dev/docs/test-use-options#video-modes; the `screenshot` option (same page); a test's `tag` and a project's `grep`, https://playwright.dev/docs/test-annotations and https://playwright.dev/docs/test-projects, checked in the installed 1.64.1's `types/test.d.ts`; the GitHub Actions artifact upload already in `.github/workflows/e2e.yml` (upload-artifact's `retention-days`, SOURCES.md).
 - Playwright (SOURCES.md, M07 D7): the `screenshot` option, https://playwright.dev/docs/test-use-options ("'off', 'on' and 'only-on-failure'").
@@ -102,7 +105,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 **Stay as sentences** (answers 1 and 13): every behaviour rule (sessions, asking first, the ticket steps, no assumptions stated as facts, hypothesis before experiment, one way to do each thing, repeated procedures are scripts, leave no scraps, security, stop and ask, testing, done means, branches, slots), and "No defensive bloat".
 
 **Proof for every visible change** (answers 3, 4, 8, 11, 12):
-- CI's e2e keeps a screenshot and a video of every test, not only failed ones, and uploads them as the run's artifact, kept 14 days (answer 32). Only pages Playwright makes are filmed (DECISIONS, 2026-11-10), so a test that opens its own browser context has no video.
+- CI's e2e keeps a video of every test, not only failed ones, and uploads them as the run's artifact, kept 14 days (answer 32). No screenshots (answer 33). Only pages Playwright makes are filmed (DECISIONS, 2026-11-10), so a test that opens its own browser context has no video.
 - A test tagged `@visual` runs twice, at phone (390 × 844) and desktop (1280 × 720) size; every other test runs at its one size, as now. A test written or changed from now on that checks something a player sees, and doesn't set its own size, is tagged (answers 29 to 31): the rule goes into CLAUDE.md's Testing section.
 - The agent sends the same files to the human in the app.
 - "Done means" gains: a visible change's evidence links the CI run's artifact.
@@ -112,7 +115,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 - [ ] `npm run lint` passes on the branch, with every converted rule switched on as an error.
 - [ ] Each rule's test shows one bad example failing and one good example passing: `npm test -- eslint-rules` passes, and fails if the rule is switched off.
 - [ ] CLAUDE.md no longer holds the converted or dropped rules' sentences and holds the new rule: `grep -nE "Fail loudly|No invented numbers|Clean only your orphans|Keep the diff surgical|Comments explain why|Build for today" CLAUDE.md` prints nothing. ("Never cheat a check" left this list in rule 4: lint covers only its skip half, and its weaken, delete and mock half is behaviour, which stays a sentence by answer 1. "Fail loudly" and "Clean only your orphans" kept their behaviour halves under new names.)
-- [ ] A CI e2e run on the PR uploads a screenshot and a video of every test, and a visual test's at both sizes: the run's artifact list shows them.
+- [ ] A CI e2e run on the PR uploads a video of every test on the `page` fixture, and a visual test's at both sizes: the run's artifact list shows them. (Screenshots left this criterion by answer 33.)
 - [ ] DECISIONS.md: the "Linting" row names the local rules; the "Config and tunables" row allows a sourced number beside its use (answer 10); a log entry.
 - [ ] SOURCES.md has the ESLint row and the Playwright `screenshot` page (answer 13).
 
@@ -126,18 +129,18 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 | 0 and 1 | the numbers the rule allows without a source | the human, 2026-11-17, answer 6 |
 | 390 × 844 | a visual test's phone size | the human, 2026-11-17, answer 12 (the size `e2e/boards.e2e.ts:21` already uses) |
 | 1280 × 720 | a visual test's desktop size | the human, 2026-11-17, answer 31 (Playwright's Desktop Chrome, checked in the installed 1.64.1: `devices["Desktop Chrome"].viewport`) |
-| 14 days | how long CI keeps the screenshots and videos | the human, 2026-11-17, answer 32 |
+| 14 days | how long CI keeps the videos | the human, 2026-11-17, answer 32 |
 
 ## Plan
 1. ~~Ask the open questions~~: done, answers 10 to 13 → verify: `grep -c "^  - \*\*Answer:\*\*" docs/milestones/PROCESS-lint-rules.md` prints 4.
 2. ~~Add answer 13's pages to SOURCES.md, read them, and name the sections followed~~: done (Source, above) → verify: `grep -n "eslint.org" docs/SOURCES.md` prints the row.
 3. One PR per rule, each from this branch: the rule, its test, the old code fixed, its sentence removed → verify: `npm run lint` and `npm test -- eslint-rules` pass; the test fails with the rule off.
-4. Playwright keeps screenshots and video for every test; CI uploads them → verify: the PR's e2e run lists the files.
+4. Playwright keeps a video of every test; CI uploads them (answer 33: no screenshots) → verify: the PR's e2e run lists the files.
 5. CLAUDE.md's new rule, the dropped rules, the `audit` skill, DECISIONS → verify: the `grep` in Acceptance criteria prints nothing.
 6. The `reviewer` agent reviews the diff.
 
 ## Removes
-The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "retain-on-failure" : "off"` setting and CI's `failed-test-videos` upload, which step 4 replaces. Nothing else yet: the rules' PRs list what each removes.
+The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "retain-on-failure" : "off"` setting, CI's `failed-test-videos` upload and `test:e2e`'s `--project=chromium`, which step 4 replaces. Nothing else yet: the rules' PRs list what each removes.
 
 ---
 *Fill in the sections below at the end.*
@@ -180,7 +183,8 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Hypothesis 2: one test tagged `@visual` for the check (`guest-play.e2e.ts:223`) lists under both projects and nothing else moves to `phone`. → `Total: 213`; the only `[phone]` line is that test. Held.
 - Hypothesis 3: run as CI would (`CI=1`), a test on the `page` fixture leaves a `.png` and a `.webm` at each size, and a test that opens its own contexts (`not-found.e2e.ts:18`) leaves screenshots but no video (DECISIONS, 2026-11-10). → `3 passed`; `test-finished-1.png` and `video.webm` in the tagged test's `-chromium` and `-phone` folders, measured 1280 × 720 and 390 × 844; `test-finished-1.png` and `test-finished-2.png` (one per browser), no `.webm`, for the other. Held. The pictures were looked at and sent to the human in the app; the tag and `test-results/` were removed after.
 - Missed, then fixed (the `reviewer` agent, blocking): `npm run test:e2e`, the command CI runs, was `playwright test --project=chromium`, so `phone` would never have run on CI; hypotheses 1 and 2 had been checked with `npx playwright test --list`, not CI's command. The script is now `playwright test` (every project). Rechecked with `npm run test:e2e -- --list`: `212   [chromium]`, no `[phone]`; with the tag, `Total: 213` and the one `[phone]` line. Held.
-- CI's half (the PR's run uploads `e2e-screenshots-and-videos`): below, once the run is done. No test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
+- Hypothesis 4: CI's run uploads about 212 screenshots, one per test. Run 44239502367 (#284, green): artifact `e2e-screenshots-and-videos`, 471,252,481 bytes; 9,553 `.png`, 62 `.webm`, nothing else, in 214 test folders. Disproved: a late test held over 100 `test-finished-N.png`, mostly earlier tests' pages (the e2e files call `newContext` 116 times and `.close()` 9 times). Asked the human (answer 33): video only.
+- CI's half after answer 33 (the run uploads `e2e-videos`): below, once the run is done. No test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
 
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):

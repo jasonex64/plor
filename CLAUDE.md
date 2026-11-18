@@ -58,7 +58,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - Long-running systems (servers, matchmaking, sessions, jobs) must be verified **running under realistic conditions**. That means started, reachable and doing real work, with evidence such as `scripts/status` output or log lines. "It compiled" and "it started" don't count as "it works".
 
 ## Done means
-1. Every acceptance criterion has evidence (the command and its output, not a description). A change a player can see also links the PR's CI run artifact `e2e-screenshots-and-videos`, and the agent sends those screenshots and videos to the human in the app.
+1. Every acceptance criterion has evidence (the command and its output, not a description). A change a player can see also links the PR's CI run artifact `e2e-videos`, and the agent sends the videos that show it to the human in the app.
 2. The ticket's **Source diff** is filled in, and every deviation from the source has a reason.
 3. The `reviewer` agent has reviewed the diff. It runs in a fresh context and did not write the code.
 4. Only **blocking** findings get fixed now. Everything else is recorded under "Next revision" in ROADMAP.md *before* anything is done about it.
