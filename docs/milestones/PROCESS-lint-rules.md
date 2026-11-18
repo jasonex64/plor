@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). **Plan step 4, screenshots and video on CI, in review** on `process-lint-rules` (its PR; round 9's four answers below); the dropped rules (step 5) wait. 
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). **Plan step 4, screenshots and video on CI, in review** on `process-lint-rules` (its PR; round 9's four answers below); the dropped rules (step 5) wait.
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -179,6 +179,7 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Hypothesis 1: with no test tagged, `phone` lists nothing and `chromium` lists every test. `npx playwright test --list` → `212   [chromium]`, no `[phone]` line, `Total: 212 tests in 48 files`. Held.
 - Hypothesis 2: one test tagged `@visual` for the check (`guest-play.e2e.ts:223`) lists under both projects and nothing else moves to `phone`. → `Total: 213`; the only `[phone]` line is that test. Held.
 - Hypothesis 3: run as CI would (`CI=1`), a test on the `page` fixture leaves a `.png` and a `.webm` at each size, and a test that opens its own contexts (`not-found.e2e.ts:18`) leaves screenshots but no video (DECISIONS, 2026-11-10). → `3 passed`; `test-finished-1.png` and `video.webm` in the tagged test's `-chromium` and `-phone` folders, measured 1280 × 720 and 390 × 844; `test-finished-1.png` and `test-finished-2.png` (one per browser), no `.webm`, for the other. Held. The pictures were looked at and sent to the human in the app; the tag and `test-results/` were removed after.
+- Missed, then fixed (the `reviewer` agent, blocking): `npm run test:e2e`, the command CI runs, was `playwright test --project=chromium`, so `phone` would never have run on CI; hypotheses 1 and 2 had been checked with `npx playwright test --list`, not CI's command. The script is now `playwright test` (every project). Rechecked with `npm run test:e2e -- --list`: `212   [chromium]`, no `[phone]`; with the tag, `Total: 213` and the one `[phone]` line. Held.
 - CI's half (the PR's run uploads `e2e-screenshots-and-videos`): below, once the run is done. No test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
 
 ## Review
@@ -197,6 +198,10 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 **Rule 4, `local/no-skipped-tests`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings: none. It found no false positive on the repo (`test.describe.configure`, `test.use` pass) and judged the acceptance grep's edit justified by answer 1, not a weakening.
 - Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): the forms it misses, none used here; three more test cases.
+
+**Plan step 4, screenshots and video** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking, fixed: `npm run test:e2e` named only the `chromium` project, so CI would never run `phone` (Evidence, above).
+- It checked and found fine: the phone viewport and a test's own size; no trace or network data uploaded; zero files only warns; retry folders kept apart; nothing orphaned. Nothing deferred.
 
 **Rule 5, `local/no-service-role`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings: none. It re-ran lint (exit 0) and the rule's test (8 passed), and found the key named nowhere in `src`, `scripts`, `e2e` or the root configs.
