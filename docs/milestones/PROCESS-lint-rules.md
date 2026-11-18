@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** planned (2026-11-17), ticket in PR #274 on `process-lint-rules`, not approved. Thirteen questions answered (below, quoted); nothing is built.
+**Status:** approved (2026-11-17, the human: "Approve it"), ticket and sources in PR #274 on `process-lint-rules`. Thirteen questions answered (below, quoted); the sources are read (plan step 2); no rule is built. The desktop size of a visual test is still to confirm (Numbers).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -41,7 +41,8 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 
 ## Source
 - Playwright (SOURCES.md, M07 D7): the `video` option, https://playwright.dev/docs/test-use-options#video-modes; the GitHub Actions artifact upload already in `.github/workflows/e2e.yml`.
-- ESLint: the three pages of answer 13, added to SOURCES.md and read in plan step 2, before any rule is written. Nothing is built from memory.
+- Playwright (SOURCES.md, M07 D7): the `screenshot` option, https://playwright.dev/docs/test-use-options ("'off', 'on' and 'only-on-failure'").
+- ESLint, writing rules (SOURCES.md, PROCESS-lint-rules): "Rule Structure", "Report Problems", "Accessing Comments" and "Runtime Rules" on the custom rules page; `RuleTester#run` and "Customizing describe and it"; `no-magic-numbers`' options. Read from the "latest" (v10) pages; the installed ESLint is 9.39.5, and the parts used were checked in its types.
 
 ## The design
 **The new rule in CLAUDE.md** replaces "Add a rule here only after an agent has actually made that mistake, or when the human asks for one":
@@ -90,7 +91,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 
 ## Plan
 1. ~~Ask the open questions~~: done, answers 10 to 13 → verify: `grep -c "^  - \*\*Answer:\*\*" docs/milestones/PROCESS-lint-rules.md` prints 4.
-2. Add answer 13's pages to SOURCES.md, read them, and name the sections followed → verify: `grep -n "eslint.org" docs/SOURCES.md` prints the row.
+2. ~~Add answer 13's pages to SOURCES.md, read them, and name the sections followed~~: done (Source, above) → verify: `grep -n "eslint.org" docs/SOURCES.md` prints the row.
 3. One PR per rule, each from this branch: the rule, its test, the old code fixed, its sentence removed → verify: `npm run lint` and `npm test -- eslint-rules` pass; the test fails with the rule off.
 4. Playwright keeps screenshots and video for every test; CI uploads them → verify: the PR's e2e run lists the files.
 5. CLAUDE.md's new rule, the dropped rules, the `audit` skill, DECISIONS → verify: the `grep` in Acceptance criteria prints nothing.
