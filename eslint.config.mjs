@@ -45,6 +45,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Another session's worktree, with its own build output: linted from its own checkout.
     ".claude/worktrees/**",
+    // pstack's statechart, copied at its commit with only the Windows changes its ticket records
+    // (docs/milestones/PROCESS-formal-verification.md, Source diff): third-party code, not rewritten to our rules.
+    ".claude/skills/statechart/**",
   ]),
 ]);
 

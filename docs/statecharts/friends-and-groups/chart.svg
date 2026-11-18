@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pele pele-state" viewBox="0 0 1595 737" width="1595" height="737" style="max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)" fill="var(--_fg)" role="graphics-document document" aria-roledescription="state"><style>.pele {
+  --pele-bg: #ffffff;
+  --pele-fg: #1c1c1c;
+  --pele-muted: #656565;
+  --pele-line: #808080;
+  --pele-surface: #fcfcfc;
+  --pele-surface-alt: #f1f1f1;
+  --pele-border: #c9c9c9;
+}
+.pele .blue rect { fill: #c3e0ff; }
+.pele .orange rect { fill: #f0d3bf; }
+.pele .purple rect { fill: #e3d5ff; }
+.pele .yellow rect { fill: #f0dcbf; }
+.pele .teal rect { fill: #bfe3df; }
+.pele .tan rect { fill: #e5d9ce; }
+.pele .pink rect { fill: #ffcbe6; }
+.pele .breaks rect {
+  fill: #ffecee !important;
+  stroke: #e72e3b !important;
+  stroke-width: 2.5px !important;
+}
+.pele .breaks text {
+  fill: #cd2834 !important;
+}
+.pele .mayBreak rect {
+  fill: #fff3e6 !important;
+  stroke: #e8730c !important;
+  stroke-width: 2.5px !important;
+}
+.pele .mayBreak text {
+  fill: #b85a06 !important;
+}
+.pele .bugPath rect {
+  stroke: #1680f3 !important;
+  stroke-width: 2.5px !important;
+}
+.pele .repeats rect {
+  stroke: #9b35d6 !important;
+  stroke-width: 2.5px !important;
+  stroke-dasharray: 6 3;
+}
+@media (prefers-color-scheme: dark) {
+  .pele {
+    --pele-bg: #1f1f1f;
+    --pele-fg: #f5f5f5;
+    --pele-muted: #acacac;
+    --pele-line: #939393;
+    --pele-surface: #121212;
+    --pele-surface-alt: #2c2c2c;
+    --pele-border: #4e4e4e;
+  }
+  .pele .blue rect { fill: #1b3857; }
+  .pele .orange rect { fill: #573117; }
+  .pele .purple rect { fill: #3c2e57; }
+  .pele .yellow rect { fill: #573d17; }
+  .pele .teal rect { fill: #174641; }
+  .pele .tan rect { fill: #3d3127; }
+  .pele .pink rect { fill: #57233e; }
+  .pele .breaks rect {
+    fill: #2e2021 !important;
+    stroke: #cf2b35 !important;
+  }
+  .pele .breaks text {
+    fill: #ff6463 !important;
+  }
+  .pele .mayBreak rect {
+    fill: #2e2619 !important;
+    stroke: #d0700f !important;
+  }
+  .pele .mayBreak text {
+    fill: #ffa257 !important;
+  }
+  .pele .bugPath rect {
+    stroke: #116dd2 !important;
+  }
+  .pele .repeats rect {
+    stroke: #9a3fcf !important;
+  }
+}
+</style><text class="pele-title" font-weight="var(--_tw)" text-anchor="middle" xml:space="preserve"><tspan x="797.5" y="25.6">Friends and groups</tspan></text><g transform="translate(0,36)"><g class="pele-clusters"><g class="pele-cluster pele-state-composite" data-id="all"><rect x="8" y="8" width="1578.67" height="685" rx="10" fill="var(--_a)" fill-opacity="0.5" stroke="var(--_b)"/><path d="M8,44H1586.67" fill="none" stroke="var(--_b)"/><text class="pele-cluster-label" x="797.33" y="31.6" text-anchor="middle">At the same time</text></g><g class="pele-cluster pele-state-composite" data-id="r0"><rect x="34" y="70" width="848.34" height="597" rx="10" fill="var(--_a)" fill-opacity="0.5" stroke="var(--_b)"/><path d="M34,106H882.34" fill="none" stroke="var(--_b)"/><text class="pele-cluster-label" x="458.17" y="93.6" text-anchor="middle">Friends (not verified)</text></g><g class="pele-cluster pele-state-composite" data-id="r1"><rect x="942.34" y="123.5" width="618.32" height="490" rx="10" fill="var(--_a)" fill-opacity="0.5" stroke="var(--_b)"/><path d="M942.34,159.5H1560.67" fill="none" stroke="var(--_b)"/><text class="pele-cluster-label" x="1251.51" y="147.1" text-anchor="middle">Groups</text></g></g><g class="pele-dividers" stroke-dasharray="4 4" fill="none" stroke="var(--_b)"><path class="pele-divider" d="M912.34,44V693"/></g><g class="pele-edges" fill="none" stroke="var(--_l)" stroke-linecap="round"><g class="pele-edge pele-transition" data-id="edge0"><path d="M517.33,136L517.33,173"/><path class="pele-marker" d="M517.33,180L513.97,172L520.69,172Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge1"><path d="M477.33,224L477.33,236.25C477.33,246.02 411.47,252 304.02,252C196.57,252 130.71,271.76 130.71,304L130.71,344C130.71,349.63 187.52,349.63 187.52,355.25L187.52,359"/><path class="pele-marker" d="M187.52,366L184.16,358L190.88,358Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge2"><path d="M509.33,224L509.33,237C509.33,261.18 495.57,276 473.11,276C450.64,276 436.88,286.64 436.88,304L436.88,344C436.88,349.63 506.2,349.63 506.2,355.25L506.2,359"/><path class="pele-marker" d="M506.2,366L502.84,358L509.56,358Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge3"><path d="M223.14,366L223.14,356.38C223.14,350.19 289.05,350.19 289.05,344L289.05,304C289.05,279.2 327.86,264 391.19,264C454.52,264 493.33,253.74 493.33,237L493.33,231"/><path class="pele-marker" d="M493.33,224L496.69,232L489.97,232Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge4"><path d="M197.33,410L197.33,575.25C197.33,579.94 502.85,589.31 502.85,594L502.85,600"/><path class="pele-marker" d="M502.85,607L499.49,599L506.21,599Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge5"><path d="M223.14,410C223.14,419.25 265.02,419.25 265.02,428.5L265.02,468.5C265.02,471.97 501.33,478.91 501.33,482.38L501.33,487"/><path class="pele-marker" d="M501.33,494L497.97,486L504.69,486Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge6"><path d="M528.47,366L528.47,356.38C528.47,350.19 606.89,350.19 606.89,344L606.89,304C606.89,282.92 591.39,270 566.11,270C540.83,270 525.33,257.46 525.33,237L525.33,231"/><path class="pele-marker" d="M525.33,224L528.69,232L521.97,232Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge7"><path d="M517.33,410L517.33,487"/><path class="pele-marker" d="M517.33,494L513.97,486L520.69,486Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge8"><path d="M534.85,607L534.85,594C534.85,588.75 802.77,580.5 802.77,575.25L802.77,314C802.77,275.5 557.33,275.5 557.33,237L557.33,231"/><path class="pele-marker" d="M557.33,224L560.69,232L553.97,232Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge9"><path d="M533.33,494L533.33,481C533.33,469.75 701.62,469.75 701.62,458.5L701.62,314C701.62,279.28 671.16,258 621.48,258C571.79,258 541.33,250.02 541.33,237L541.33,231"/><path class="pele-marker" d="M541.33,224L544.69,232L537.97,232Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge10"><path d="M518.85,538L518.85,600"/><path class="pele-marker" d="M518.85,607L515.49,599L522.21,599Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge11"><path d="M1233.55,189.5L1233.55,226.5"/><path class="pele-marker" d="M1233.55,233.5L1230.19,225.5L1236.91,225.5Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge12"><path d="M1209.55,277.5L1209.55,289.75C1209.55,299.52 1176.86,305.5 1123.52,305.5C1070.18,305.5 1037.49,326.21 1037.49,360L1037.49,518C1037.49,529.25 1204.63,529.25 1204.63,540.5L1204.63,546.5"/><path class="pele-marker" d="M1204.63,553.5L1201.27,545.5L1207.99,545.5Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge13"><path d="M1225.55,277.5L1225.55,290.5C1225.55,307.24 1207.78,317.5 1178.78,317.5C1149.79,317.5 1132.02,328.14 1132.02,345.5L1132.02,403.5C1132.02,409.13 1201.97,409.13 1201.97,414.75L1201.97,418.5"/><path class="pele-marker" d="M1201.97,425.5L1198.61,417.5L1205.33,417.5Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge14"><path d="M1262.47,553.5L1262.47,540.5C1262.47,529.4 1444.9,529.1 1444.9,518L1444.9,360C1444.9,326.21 1409.31,305.5 1351.23,305.5C1293.15,305.5 1257.55,299.52 1257.55,289.75L1257.55,284.5"/><path class="pele-marker" d="M1257.55,277.5L1260.91,285.5L1254.19,285.5Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge15"><path d="M1265.14,425.5L1265.14,415.88C1265.14,409.69 1335.09,409.69 1335.09,403.5L1335.09,345.5C1335.09,328.14 1317.32,317.5 1288.32,317.5C1259.33,317.5 1241.55,307.24 1241.55,290.5L1241.55,284.5"/><path class="pele-marker" d="M1241.55,277.5L1244.91,285.5L1238.19,285.5Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge16"><path d="M1233.55,469.5L1233.55,546.5"/><path class="pele-marker" d="M1233.55,553.5L1230.19,545.5L1236.91,545.5Z" fill="var(--_l)" stroke="none"/></g></g><g class="pele-edge-labels" font-size="14"><g class="pele-edge-label" data-id="edge1"><rect x="52" y="313.5" width="157.42" height="21" rx="3" fill="var(--_bg)"/><text x="130.71" y="328.9" text-anchor="middle">they send you a request</text></g><g class="pele-edge-label" data-id="edge2"><rect x="368.68" y="313.5" width="136.39" height="21" rx="3" fill="var(--_bg)"/><text x="436.88" y="328.9" text-anchor="middle">you press Add friend</text></g><g class="pele-edge-label" data-id="edge3"><rect x="229.42" y="313.5" width="119.26" height="21" rx="3" fill="var(--_bg)"/><text x="289.05" y="328.9" text-anchor="middle">you press Decline</text></g><g class="pele-edge-label" data-id="edge4"><rect x="105.8" y="505.5" width="183.07" height="21" rx="3" fill="var(--_bg)"/><text x="197.33" y="520.9" text-anchor="middle">you press Decline and block</text></g><g class="pele-edge-label" data-id="edge5"><rect x="207.33" y="438" width="115.38" height="21" rx="3" fill="var(--_bg)"/><text x="265.02" y="453.4" text-anchor="middle">you press Accept</text></g><g class="pele-edge-label" data-id="edge6"><rect x="525.07" y="306" width="163.62" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="606.89" y="319.9">they decline or you press</tspan><tspan x="606.89" y="337.9">Cancel request</tspan></text></g><g class="pele-edge-label" data-id="edge7"><rect x="431.23" y="430.5" width="172.21" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="517.33" y="444.4">they accept or they send a</tspan><tspan x="517.33" y="462.4">request too</tspan></text></g><g class="pele-edge-label" data-id="edge8"><rect x="741.19" y="505.5" width="123.15" height="21" rx="3" fill="var(--_bg)"/><text x="802.77" y="520.9" text-anchor="middle">you press Unblock</text></g><g class="pele-edge-label" data-id="edge9"><rect x="610.47" y="377.5" width="182.3" height="21" rx="3" fill="var(--_bg)"/><text x="701.62" y="392.9" text-anchor="middle">one of you presses Remove</text></g><g class="pele-edge-label" data-id="edge10"><rect x="465.44" y="558.5" width="106.81" height="21" rx="3" fill="var(--_bg)"/><text x="518.85" y="573.9" text-anchor="middle">you press Block</text></g><g class="pele-edge-label" data-id="edge12"><rect x="960.34" y="437" width="154.29" height="21" rx="3" fill="var(--_bg)"/><text x="1037.49" y="452.4" text-anchor="middle">you press Create group</text></g><g class="pele-edge-label" data-id="edge13"><rect x="1047.49" y="364" width="169.06" height="21" rx="3" fill="var(--_bg)"/><text x="1132.02" y="379.4" text-anchor="middle">you join from an invite link</text></g><g class="pele-edge-label" data-id="edge14"><rect x="1347.14" y="429.5" width="195.53" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="1444.9" y="443.4">you press Delete group or you</tspan><tspan x="1444.9" y="461.4">press Leave group</tspan></text></g><g class="pele-edge-label" data-id="edge15"><rect x="1236.54" y="347.5" width="197.1" height="54" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="1335.09" y="361.4">the creator removes you or</tspan><tspan x="1335.09" y="379.4">deletes the group or you press</tspan><tspan x="1335.09" y="397.4">Leave group</tspan></text></g><g class="pele-edge-label" data-id="edge16"><rect x="1129.94" y="490" width="207.22" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="1233.55" y="503.9">the creator leaves and you have</tspan><tspan x="1233.55" y="521.9">been in longest</tspan></text></g></g><g class="pele-nodes"><g class="pele-node pele-state" data-id="s0" transform="translate(517.33,202)"><rect x="-54.68" y="-22" width="109.36" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Not friends</text></g><g class="pele-node pele-state" data-id="s1" transform="translate(205.33,388)"><rect x="-69.81" y="-22" width="139.62" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Request to you</text></g><g class="pele-node pele-state" data-id="s2" transform="translate(517.33,388)"><rect x="-63.14" y="-22" width="126.27" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Request sent</text></g><g class="pele-node pele-state" data-id="s3" transform="translate(518.85,629)"><rect x="-44.46" y="-22" width="88.91" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Blocked</text></g><g class="pele-node pele-state" data-id="s4" transform="translate(518.85,516)"><rect x="-42.67" y="-22" width="85.34" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Friends</text></g><g class="pele-node pele-state-start" data-id="r0_start" transform="translate(517.33,129)"><circle r="7" fill="var(--_l)"/></g><g class="pele-node pele-state" data-id="s5" transform="translate(1233.55,255.5)"><rect x="-56.47" y="-22" width="112.94" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">In no group</text></g><g class="pele-node pele-state" data-id="s6" transform="translate(1233.55,575.5)"><rect x="-80.92" y="-22" width="161.84" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Creator of a group</text></g><g class="pele-node pele-state" data-id="s7" transform="translate(1233.55,447.5)"><rect x="-83.58" y="-22" width="167.17" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Member of a group</text></g><g class="pele-node pele-state-start" data-id="r1_start" transform="translate(1233.55,182.5)"><circle r="7" fill="var(--_l)"/></g></g></g></svg>
