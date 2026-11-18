@@ -327,3 +327,20 @@ button.link {
     animation: none;
   }
 }
+
+/* The names box (docs/milestones/M20-design-rules-and-clean-up.md, 20j, answer 53): who used a reaction, under the line
+   it's on and as wide, so a long list wraps there; the reaction chip's padding, border and corners on the surface, in
+   the line's 13px, over what's below it as the reactions' popover is (reactions.module.css .panel). */
+.tip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  padding: 1px 8px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+  background: var(--surface);
+  color: var(--text);
+  white-space: normal;
+}

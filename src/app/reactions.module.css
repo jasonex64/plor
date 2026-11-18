@@ -9,11 +9,19 @@
   font-size: 0.8125rem;
 }
 
+/* What the names box (kit .tip) spans: a row's second line, or the reactions where they sit beside a name (M20 20j). */
+.line {
+  position: relative;
+}
+
+/* A finger's hold shows its names, not the phone's text selection or callout (M20 20j, answer 51). */
 .used {
   padding: 1px 8px;
   border: 1.5px solid transparent;
   border-radius: var(--r-small);
   white-space: pre;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .mine {

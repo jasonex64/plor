@@ -217,8 +217,14 @@ test("the feed's comments have no bullets, reactions are apart, and back arrows 
   const comment = feed.getByRole("article").filter({ hasText: "Two reactions." });
   await expect(comment).toBeVisible();
   expect(await comment.evaluate((el) => getComputedStyle(el).display)).not.toBe("list-item");
-  // The viewer's own is ❤️, read "❤️ 1, yours"; the comma between the two is read, not shown (Source diff).
-  expect(await comment.evaluate((li) => li.textContent)).toContain("😂 1, ❤️ 1, yours");
+  // The viewer's own is ❤️, read "❤️ 1, yours"; the comma between the two is read, not shown (Source diff). Each
+  // reaction's names box (M20 20j) is hidden until hover or focus, so it isn't read here: it's left out.
+  const read = await comment.evaluate((li) => {
+    const copy = li.cloneNode(true) as Element;
+    copy.querySelectorAll("[role='tooltip'][hidden]").forEach((tip) => tip.remove());
+    return copy.textContent;
+  });
+  expect(read).toContain("😂 1, ❤️ 1, yours");
 
   for (const path of [GAME.path, "/streak"]) {
     await page.goto(path);

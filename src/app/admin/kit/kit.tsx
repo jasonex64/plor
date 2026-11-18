@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
 import admin from "../admin.module.css";
 import kit from "../../kit.module.css";
 import { ButtonLink } from "../../button-link";
+import { Reactions } from "../../reactions";
+import type { Reactions as ReactionsData } from "@/reactions/reactions";
 import { Looks } from "./looks";
 import styles from "./kit.module.css";
 
@@ -24,6 +26,8 @@ function Piece({ name, when, children }: { name: string; when: string; children:
 // The heading and small-text sizes in use (the M20 audit, 2026-11-16); which stay is 20f's question to the human.
 const HEADINGS = ["2.5rem", "1.875rem", "1.625rem", "1.5rem", "1.25rem"];
 const SMALL = ["0.9375rem", "0.875rem", "0.8125rem", "0.75rem"];
+// The names box's sample, not a rule: three 😂, one of them yours, and one ❤️ (docs/milestones/M20-design-rules-and-clean-up.md, 20j).
+const SAMPLE_REACTIONS: ReactionsData = { counts: [{ emoji: "😂", count: 3, names: ["Ana", "Sam"] }, { emoji: "❤️", count: 1, names: ["Ben"] }], mine: "😂" };
 
 export function Kit() {
   return (
@@ -103,6 +107,9 @@ export function Kit() {
           <span className={`${kit.badge} ${kit.hot}`} data-place="1" />
           <span className={kit.badge} data-place="2" />
         </div>
+      </Piece>
+      <Piece name="Names box" when="Who used a reaction, under its line: hover or focus a reaction, or hold it on a phone.">
+        <Reactions reactions={SAMPLE_REACTIONS} />
       </Piece>
       <Piece name="Hover rule" when="Anything pressable that isn't the main button: the soft fill and the text colour under the pointer.">
         <a href="/admin/kit" className={`${kit.hover} ${styles.hoverSample}`}>

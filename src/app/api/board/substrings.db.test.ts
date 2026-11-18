@@ -162,7 +162,7 @@ describe("Fragments' live board over HTTP", () => {
     useSession(V.session);
     const r = await call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { game: SUBSTRINGS_ID, date: today, target: { type: "run", userId: F.userId }, emoji: "👍" } })));
     expect(r.status).toBe(200);
-    expect((await friendOf(F)).row.reactions).toEqual({ counts: [{ emoji: "👍", count: 1 }], mine: "👍" });
+    expect((await friendOf(F)).row.reactions).toEqual({ counts: [{ emoji: "👍", count: 1, names: [] }], mine: "👍" });
     expect((await friendOf(F, "offbeat")).row).toMatchObject({ state: "not_started", reactions: null });
   });
 

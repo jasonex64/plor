@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is merged (#277, 2026-11-17, on green checks, the human's "Merge when green"; answers 45 to 50, below). 20h is merged (#281, on green checks, the human's "Merge when green": the feed's results carry their game's 4px edge, the Balanced look's; a comment none); 20i is built, in its PR (one Period switch, Today / This week / Last week, Today on every load; List / Graph and the weeks' note only on a week); next 20e or 20f, each with its own questions, or 20h to 20j.
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is merged (#277, 2026-11-17, on green checks, the human's "Merge when green"; answers 45 to 50, below). 20h is merged (#281, on green checks, the human's "Merge when green": the feed's results carry their game's 4px edge, the Balanced look's; a comment none); 20i is merged (#283, by GitHub's auto-merge on green checks, the human's "Yes, merge and go": one Period switch, Today / This week / Last week, Today on every load); 20j is built, in its PR (who reacted: answers 51 to 53, below); next 20e or 20f, each with its own questions, or 20h to 20j.
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
@@ -85,6 +85,15 @@ The pill's height is the avatar's 1.875rem (answer 40).
 | 48 | The Settings gear has no solid version for the hover swap (answer 37) | "Draw a solid gear (Recommended)": a filled gear in the tab icons' style, swapped as the tabs' are |
 | 49 | 20b's review: flat buttons on a game card (How to play, Result, the back card's Play) had dark text on the card's dark colour (WCAG 2.2 1.4.3). How do they look there? | "Like the card's chips (Recommended)": the card's white text and a see-through white edge, the chips' 50%, and the chips' 12% white fill under the pointer |
 | 50 | 20b's review: the admin's Puzzles shows each game's day with its Approve, two raised buttons | "Allow both on admin pages (Recommended)": one raised button in view is the player screens' rule |
+
+## 20j's check and answers (2026-11-17, night)
+**First, as 20j asks:** a reaction's count already includes only people the viewer can see: on a friend's run, the viewer and their friends (`src/reactions/reactions.ts`, `runReactions`, `seesAuthorSql`); on a comment, the viewer's friends on the friends thread or the group's members on a group's, never someone either has blocked (`commentReactions`, `seesCommentReactionSql`, `src/friends/circle.ts`). The names come from those same rows, so they show no one the viewer couldn't already see. Nothing to stop for.
+
+| # | Asked | Answer |
+|---|---|---|
+| 51 | On a phone, a long press needs a hold time | "Long press, 500ms (Recommended)": Apple's default for UIKit's long press, "The default duration is 0.5 seconds." (SOURCES.md); a finger that starts scrolling cancels it, through the browser's own pointercancel, so no distance is picked |
+| 52 | The names' order | "You first, then A to Z (Recommended)" |
+| 53 | How the list shows | "A small box under the reaction (Recommended)": a kit piece, the chip's 1.5px ink border and small corners on the surface, 13px text (the reactions' size in the kit's looks), added to DESIGN.md's Rules and `/admin/kit` |
 
 Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), 20e's four questions.
 

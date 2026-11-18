@@ -5,9 +5,9 @@
 // used, as small text with the player's own tinted, and its ⋯ opens a popover of the set, the player's own pressed.
 // Picking another replaces it; picking it again removes it. A pick shows at once and is held for Undo
 // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b), so no button waits.
-import { REACTIONS } from "@/config/tunables";
+import { LONG_PRESS_MS, REACTIONS } from "@/config/tunables";
 import type { Emoji, Reactions as ReactionsData } from "@/reactions/reactions";
-import { Fragment, useCallback, useEffect, useId, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useDismiss } from "./dismiss";
 import kit from "./kit.module.css";
 import styles from "./reactions.module.css";
@@ -21,29 +21,89 @@ export function Reactions({ reactions, below = false, name = "Reactions" }: { re
   if (reactions.counts.length === 0) return null;
   const summary = (
     // Named for screen readers, "Reactions: 😂 1, ❤️ 2" (docs/milestones/M14-14b-21-screen-readers.md, answer 6).
-    <span role="group" aria-label={name} className={styles.summary}>
+    <span role="group" aria-label={name} className={below ? styles.summary : `${styles.summary} ${styles.line}`}>
       {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
-        const count = reactions.counts.find((c) => c.emoji === emoji)!.count;
+        const { count, names } = reactions.counts.find((c) => c.emoji === emoji)!;
         const mine = reactions.mine === emoji;
         return (
           <Fragment key={emoji}>
             {/* Read "😂 1, ❤️ 2", not run together; between the counts, so each count's own text is as it was
                 (docs/milestones/M14-14b-18-headings-today-invites-words.md). */}
             {i > 0 && <span className="sr-only">, </span>}
-            <span className={mine ? `${styles.used} ${styles.mine}` : styles.used}>
+            <Used mine={mine} who={[...(mine ? ["You"] : []), ...names]}>
               {/* Keyed by how often its count has grown, so each new reaction pops it in again (14b-10b, answer 12). */}
               <span key={grown[emoji] ?? 0} className={grown[emoji] ? `${styles.emoji} ${kit.pop}` : styles.emoji}>
                 {emoji}
               </span>
               {` ${count}`}
               {mine && <span className="sr-only">, yours</span>}
-            </span>
+            </Used>
           </Fragment>
         );
       })}
     </span>
   );
-  return below ? <div className={kit.below}>{summary}</div> : summary;
+  // On a row's second line the names box spans that line (kit .tip), so the line holds it.
+  return below ? <div className={`${kit.below} ${styles.line}`}>{summary}</div> : summary;
+}
+
+// One reaction used, and who used it (docs/milestones/M20-design-rules-and-clean-up.md, 20j; answers 28 and 51 to 53):
+// the names, "You" first then A to Z, show in the kit's names box under the line (kit.module.css .tip) while the pointer
+// is on it or it has focus, and on a phone once a finger has held it LONG_PRESS_MS; Escape or a press elsewhere hides
+// them (WCAG 2.2 1.4.13: dismissible, hoverable, persistent). They are its description, so a screen reader reads them on
+// focus whether they show or not; they show on a keyboard's focus only (:focus-visible), as a tap that focuses the chip on
+// a phone would otherwise show them at once, not after the hold (20j's review). A finger that starts to scroll cancels the hold (the browser's pointercancel). The box
+// is the chip's sibling, so the chip's text is its own; both sit in one span, so the pointer can move onto the box.
+function Used({ mine, who, children }: { mine: boolean; who: string[]; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const tip = useId();
+  const root = useRef<HTMLSpanElement>(null);
+  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const release = () => {
+    if (hold.current) clearTimeout(hold.current);
+    hold.current = null;
+  };
+  useEffect(() => release, []);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onPress = (event: Event) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPress);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPress);
+    };
+  }, [open]);
+  return (
+    <span
+      ref={root}
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse") setOpen(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") setOpen(false);
+      }}
+      onPointerDown={(e) => {
+        if (e.pointerType !== "touch") return;
+        release();
+        hold.current = setTimeout(() => setOpen(true), LONG_PRESS_MS);
+      }}
+      onPointerUp={release}
+      onPointerCancel={release}
+    >
+      <span tabIndex={0} aria-describedby={tip} className={mine ? `${styles.used} ${styles.mine}` : styles.used} onFocus={(e) => setOpen(e.currentTarget.matches(":focus-visible"))} onBlur={() => setOpen(false)}>
+        {children}
+      </span>
+      <span role="tooltip" id={tip} className={kit.tip} hidden={!open}>
+        {who.join(", ")}
+      </span>
+    </span>
+  );
 }
 
 // How many times each emoji's count has grown since the reactions were first shown: a reaction added, the player's own or

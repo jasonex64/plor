@@ -129,8 +129,8 @@ describe("blocking", () => {
     expect(await boardFriends()).toEqual([B.username]);
     expect(await weekOf(friendsBoard, "/api/leaderboard?game=offbeat")).toEqual([A.username, B.username].toSorted());
     expect(await seen(`?group=${club}`)).toEqual([
-      ["club from b", [{ emoji: "👍", count: 1 }]],
-      ["club from a", [{ emoji: "😂", count: 1 }]],
+      ["club from b", [{ emoji: "👍", count: 1, names: [] }]],
+      ["club from a", [{ emoji: "😂", count: 1, names: [B.username] }]],
     ]);
     expect(await seen()).toEqual([
       ["friends from b", []],
@@ -143,8 +143,8 @@ describe("blocking", () => {
     // reactions on them (answer 21: comments come whole), and the friends threads' not at all.
     useSession(C.session);
     expect((await feed()).map((c) => [c.body, c.reactions.counts])).toEqual([
-      ["club from a", [{ emoji: "😂", count: 1 }]],
-      ["club from b", [{ emoji: "👍", count: 1 }]],
+      ["club from a", [{ emoji: "😂", count: 1, names: [B.username] }]],
+      ["club from b", [{ emoji: "👍", count: 1, names: [A.username] }]],
     ]);
   });
 

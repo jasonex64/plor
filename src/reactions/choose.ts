@@ -6,10 +6,12 @@ import type { Emoji, Reactions } from "./reactions";
 
 export function choose(reactions: Reactions, emoji: Emoji | null): Reactions {
   const counts = new Map(reactions.counts.map((c) => [c.emoji, c.count]));
+  // The others' names stay with their emoji; the player's own is mine, never a name (M20 20j).
+  const names = new Map(reactions.counts.map((c) => [c.emoji, c.names]));
   if (reactions.mine) counts.set(reactions.mine, (counts.get(reactions.mine) ?? 0) - 1);
   if (emoji) counts.set(emoji, (counts.get(emoji) ?? 0) + 1);
   return {
-    counts: REACTIONS.filter((e) => (counts.get(e) ?? 0) > 0).map((e) => ({ emoji: e, count: counts.get(e)! })),
+    counts: REACTIONS.filter((e) => (counts.get(e) ?? 0) > 0).map((e) => ({ emoji: e, count: counts.get(e)!, names: names.get(e) ?? [] })),
     mine: emoji,
   };
 }

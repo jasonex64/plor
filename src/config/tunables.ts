@@ -66,6 +66,10 @@ export const POOL_PAGE_SIZE = 20;
 // through it.
 export const REACTIONS = ["👍", "😂", "😮", "😢", "❤️"] as const;
 
+// How long a finger holds a reaction before its names show (docs/milestones/M20-design-rules-and-clean-up.md, answer 51):
+// Apple's default for a long press, "The default duration is 0.5 seconds." (SOURCES.md, UIKit minimumPressDuration).
+export const LONG_PRESS_MS = 500;
+
 // "Where everyone ended": how many friends are named per place before "+ k more" (human, 2026-10-21;
 // docs/milestones/M07-friends-and-live-board.md, D2).
 export const FRIENDS_PER_PLACE = 3;

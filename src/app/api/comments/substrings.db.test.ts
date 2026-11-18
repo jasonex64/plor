@@ -208,7 +208,7 @@ describe("Fragments' comments and reactions", () => {
     expect((await react(SUBSTRINGS_ID, { type: "comment", id: commentOf[`b ${SUBSTRINGS_ID}`] }, "👍")).status).toBe(200);
     expect((await react(SUBSTRINGS_ID, { type: "comment", id: commentOf[`b club ${SUBSTRINGS_ID}`] }, "😂")).status).toBe(200);
     const fragments = (await thread(SUBSTRINGS_ID)).body.thread.comments;
-    expect(fragments[0].reactions).toEqual({ counts: [{ emoji: "👍", count: 1 }], mine: "👍" });
+    expect(fragments[0].reactions).toEqual({ counts: [{ emoji: "👍", count: 1, names: [] }], mine: "👍" });
     const offbeat = (await thread(GAME_ID)).body.thread.comments;
     expect(offbeat[0].reactions).toEqual({ counts: [], mine: null });
   });
@@ -218,8 +218,8 @@ describe("Fragments' comments and reactions", () => {
     expect((await react(SUBSTRINGS_ID, { type: "run", userId: B.userId }, "👍")).status).toBe(200);
     expect((await react(GAME_ID, { type: "run", userId: B.userId }, "❤️")).status).toBe(200);
     const counts = async (game: typeof GAME_ID | typeof SUBSTRINGS_ID) => (await runReactions(getPool(), A.userId, game, today, [B.userId])).get(B.userId);
-    expect(await counts(SUBSTRINGS_ID)).toEqual({ counts: [{ emoji: "👍", count: 1 }], mine: "👍" });
-    expect(await counts(GAME_ID)).toEqual({ counts: [{ emoji: "❤️", count: 1 }], mine: "❤️" });
+    expect(await counts(SUBSTRINGS_ID)).toEqual({ counts: [{ emoji: "👍", count: 1, names: [] }], mine: "👍" });
+    expect(await counts(GAME_ID)).toEqual({ counts: [{ emoji: "❤️", count: 1, names: [] }], mine: "❤️" });
     // C has no Fragments run, a stranger isn't a friend, and a player who hasn't finished Fragments can't react.
     expect(await react(SUBSTRINGS_ID, { type: "run", userId: C.userId }, "👍")).toEqual({ status: 404, body: { ok: false, error: "run_not_found" } });
     expect(await react(SUBSTRINGS_ID, { type: "run", userId: D.userId }, "👍")).toEqual({ status: 404, body: { ok: false, error: "not_friends" } });

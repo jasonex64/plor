@@ -142,9 +142,9 @@ describe("reactions on comments and on friends' runs", () => {
     await getCaught();
     expect(await reactionsOnComment(commentOf.b)).toEqual(none);
     expect(await react(onComment(commentOf.b), "👍")).toEqual({ status: 200, body: { ok: true } });
-    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "👍", count: 1 }], mine: "👍" });
+    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "👍", count: 1, names: [] }], mine: "👍" });
     expect((await react(onComment(commentOf.b), "❤️")).status).toBe(200);
-    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "❤️", count: 1 }], mine: "❤️" });
+    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "❤️", count: 1, names: [] }], mine: "❤️" });
     expect((await react(onComment(commentOf.b), null)).status).toBe(200);
     expect(await reactionsOnComment(commentOf.b)).toEqual(none);
     // Removing what isn't there is not an error: tapping twice quickly ends where it started.
@@ -202,17 +202,17 @@ describe("reactions on comments and on friends' runs", () => {
   it("shows reactions on a run to the runner and their friends, but not a friend of a friend's", async () => {
     // A's last reaction on B's run is the set's last, ❤️; D's 😂 is on it too.
     useSession(players.a.session);
-    expect(await reactionsOnRun(players.b.username)).toEqual({ counts: [{ emoji: "❤️", count: 1 }], mine: "❤️" });
+    expect(await reactionsOnRun(players.b.username)).toEqual({ counts: [{ emoji: "❤️", count: 1, names: [] }], mine: "❤️" });
     useSession(players.b.session);
     expect((await board()).reactionsOnMine).toEqual({
       counts: [
-        { emoji: "😂", count: 1 },
-        { emoji: "❤️", count: 1 },
+        { emoji: "😂", count: 1, names: [players.d.username] },
+        { emoji: "❤️", count: 1, names: [players.a.username] },
       ],
       mine: null,
     });
     useSession(players.d.session);
-    expect(await reactionsOnRun(players.b.username)).toEqual({ counts: [{ emoji: "😂", count: 1 }], mine: "😂" });
+    expect(await reactionsOnRun(players.b.username)).toEqual({ counts: [{ emoji: "😂", count: 1, names: [] }], mine: "😂" });
   });
 
   it("shows reactions on a comment to its readers the same way, counted in the set's order", async () => {
@@ -224,13 +224,32 @@ describe("reactions on comments and on friends' runs", () => {
     expect((await react(onComment(commentOf.b), "😮")).status).toBe(200);
     expect(await reactionsOnComment(commentOf.b)).toEqual({
       counts: [
-        { emoji: "👍", count: 1 },
-        { emoji: "😮", count: 2 },
+        { emoji: "👍", count: 1, names: [players.d.username] },
+        { emoji: "😮", count: 2, names: [players.a.username] },
       ],
       mine: "😮",
     });
     useSession(players.a.session);
-    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "😮", count: 2 }], mine: "😮" });
+    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "😮", count: 2, names: [players.b.username] }], mine: "😮" });
+  });
+
+  // M20 20j (docs/milestones/M20-design-rules-and-clean-up.md, answers 28 and 52): each reaction names the others who used
+  // it, A to Z by the name the app shows (a display name, else the username), and only people the viewer can see; the
+  // viewer's own is `mine`, not a name. A is "Zed" and D "Amy" here, so A to Z isn't the order they reacted in.
+  it("names the others who used each reaction, A to Z by their shown name, and only those the viewer can see", async () => {
+    const pool = getPool();
+    const named = (player: Player, name: string | null) => pool.query("update private.profile set display_name = $2 where user_id = $1", [player.userId, name]);
+    await named(players.a, "Zed");
+    await named(players.d, "Amy");
+    useSession(players.d.session);
+    expect((await react(onComment(commentOf.b), "😮")).status).toBe(200);
+    useSession(players.b.session);
+    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "😮", count: 3, names: ["Amy", "Zed"] }], mine: "😮" });
+    // A isn't D's friend: D's reaction is neither counted nor named for A.
+    useSession(players.a.session);
+    expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "😮", count: 2, names: [players.b.username] }], mine: "😮" });
+    await named(players.a, null);
+    await named(players.d, null);
   });
 
   it("refuses targets A can't see: a non-friend's comment or run, A's own run, someone unknown, a friend with no run", async () => {
@@ -267,7 +286,7 @@ describe("reactions on comments and on friends' runs", () => {
       rows[0].id,
     ]);
     useSession(players.a.session);
-    expect(await reactionsOnComment(rows[0].id, yesterday)).toEqual({ counts: [{ emoji: "😢", count: 1 }], mine: null });
+    expect(await reactionsOnComment(rows[0].id, yesterday)).toEqual({ counts: [{ emoji: "😢", count: 1, names: [players.b.username] }], mine: null });
     useSession(players.b.session);
     expect(await react(onComment(rows[0].id), null, yesterday)).toEqual({ status: 409, body: { ok: false, error: "day_past" } });
     expect(await react(onComment(rows[0].id), "👍", yesterday)).toEqual({ status: 409, body: { ok: false, error: "day_past" } });

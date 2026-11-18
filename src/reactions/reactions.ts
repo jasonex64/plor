@@ -16,7 +16,9 @@ import { STATUS } from "@/lib/status";
 export type Emoji = (typeof REACTIONS)[number];
 
 // What the viewer sees on one target: how many of each emoji, in the set's order and only those used, and their own.
-export type Reactions = { counts: { emoji: Emoji; count: number }[]; mine: Emoji | null };
+// names: the others who used that emoji, by the name the app shows them by, A to Z; the viewer's own is mine
+// (docs/milestones/M20-design-rules-and-clean-up.md, 20j, answers 28 and 52).
+export type Reactions = { counts: { emoji: Emoji; count: number; names: string[] }[]; mine: Emoji | null };
 
 // A comment by its ID, or a friend's run of the game that day by the friend's ID (a username can change hands after the page was
 // drawn: M19 19e).
@@ -121,13 +123,18 @@ export async function setReaction(pool: Pool, userId: string, game: BoardGame, d
   }
 }
 
-type CountRow = { target: string; emoji: Emoji; count: number; mine: boolean };
+type CountRow = { target: string; emoji: Emoji; count: number; mine: boolean; names: string[] };
+
+// The others who used an emoji, from the same rows as its count, so only people the viewer can see: by the name the app
+// shows (a display name, else the username), A to Z (M20 20j, answers 28 and 52).
+const NAMES_SQL = `coalesce(array_agg(coalesce(p.display_name, p.username::text) order by lower(coalesce(p.display_name, p.username::text)))
+                    filter (where r.user_id <> $1), '{}') as names`;
 
 // Reactions on each of these comments, by comment ID.
 export async function commentReactions(db: Db, viewerId: string, commentIds: string[]): Promise<Map<string, Reactions>> {
   const { rows } = await db.query<CountRow>(
-    `select r.comment_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine
-     from private.reaction r join private.comment c on c.id = r.comment_id
+    `select r.comment_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine, ${NAMES_SQL}
+     from private.reaction r join private.comment c on c.id = r.comment_id join private.profile p on p.user_id = r.user_id
      where r.comment_id = any($2::bigint[]) and ${seesCommentReactionSql("$1", "c", "r.user_id")}
      group by r.comment_id, r.emoji`,
     [viewerId, commentIds],
@@ -138,8 +145,8 @@ export async function commentReactions(db: Db, viewerId: string, commentIds: str
 // Reactions on each of these players' runs of a game on a day, by user ID: only the viewer's own and their friends' count.
 export async function runReactions(db: Db, viewerId: string, game: BoardGame, date: string, userIds: string[]): Promise<Map<string, Reactions>> {
   const { rows } = await db.query<CountRow>(
-    `select r.run_user_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine
-     from private.reaction r
+    `select r.run_user_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine, ${NAMES_SQL}
+     from private.reaction r join private.profile p on p.user_id = r.user_id
      where r.run_user_id = any($4::uuid[]) and r.game_id = $2 and r.puzzle_date = $3::date and ${seesAuthorSql("$1", "r.user_id")}
      group by r.run_user_id, r.emoji`,
     [viewerId, game, date, userIds],
@@ -152,7 +159,7 @@ function summarize(rows: CountRow[]): Map<string, Reactions> {
   const sorted = rows.toSorted((x, y) => REACTIONS.indexOf(x.emoji) - REACTIONS.indexOf(y.emoji));
   for (const r of sorted) {
     const reactions = byTarget.get(r.target) ?? { counts: [], mine: null };
-    reactions.counts.push({ emoji: r.emoji, count: r.count });
+    reactions.counts.push({ emoji: r.emoji, count: r.count, names: r.names });
     if (r.mine) reactions.mine = r.emoji;
     byTarget.set(r.target, reactions);
   }
