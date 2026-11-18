@@ -11,7 +11,7 @@ Report only: the audit changes the report and ROADMAP.md (step 5) and nothing el
 2. **Scope:** `main`, plus each open PR's diff (`gh pr diff <number>`). Skip what the last report in `docs/audits/` or ROADMAP's "Next revision" already lists.
 3. **Three read-only auditors in parallel** (Agent, `model: sonnet`). Each finding gives file:line evidence; anything not read or run is marked *unverified*.
    - **Bugs:** logic errors, unhandled failures, races, missing checks at boundaries (CLAUDE.md, "No defensive bloat"), tests that can't fail.
-   - **Bloat:** dead code, unused exports, dependencies, config, flags or scripts, duplicate paths, a second way to do what DECISIONS.md settles, abstractions with a single use.
+   - **Bloat:** dead code, unused exports, dependencies, config, flags or scripts, duplicate paths, a second way to do what DECISIONS.md settles.
    - **Docs:** text in `*.md` (CLAUDE.md, `docs/`, `.claude/`) nobody will act on: closed items still listed, history that belongs in git, repeats of another doc, facts the code contradicts.
 4. **Re-check** every finding you'll report by reading the cited lines yourself. Drop what doesn't hold.
 5. **Write** `docs/audits/<date>-weekly-audit.md`: scope, method, then the findings ranked, each with an ID, kind, evidence, why it matters and the milestone it belongs to. Add each finding to ROADMAP's "Next revision" under that milestone (or "For the human"), in that section's format, citing the report. With no findings, the report says so and ROADMAP is unchanged.

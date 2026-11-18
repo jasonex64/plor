@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). Plan step 4, video on CI, merged (#284; rounds 9 and 10 below: no screenshots, answer 33). **Step 5, the dropped rules, next** on `process-lint-rules`.
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). Plan step 4, video on CI, merged (#284; rounds 9 and 10 below: no screenshots, answer 33). **Step 5, the dropped rules, in review** on `process-lint-rules` (its PR), the ticket's last; one criterion is half met (the phone videos wait for the first `@visual` test).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -112,12 +112,12 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 - The repo is public: anyone signed in to GitHub can download the artifact (answer 4 accepts this).
 
 ## Acceptance criteria
-- [ ] `npm run lint` passes on the branch, with every converted rule switched on as an error.
-- [ ] Each rule's test shows one bad example failing and one good example passing: `npm test -- eslint-rules` passes, and fails if the rule is switched off.
-- [ ] CLAUDE.md no longer holds the converted or dropped rules' sentences and holds the new rule: `grep -nE "Fail loudly|No invented numbers|Clean only your orphans|Keep the diff surgical|Comments explain why|Build for today" CLAUDE.md` prints nothing. ("Never cheat a check" left this list in rule 4: lint covers only its skip half, and its weaken, delete and mock half is behaviour, which stays a sentence by answer 1. "Fail loudly" and "Clean only your orphans" kept their behaviour halves under new names.)
-- [ ] A CI e2e run on the PR uploads a video of every test on the `page` fixture, and a visual test's at both sizes: the run's artifact list shows them. (Screenshots left this criterion by answer 33.)
-- [ ] DECISIONS.md: the "Linting" row names the local rules; the "Config and tunables" row allows a sourced number beside its use (answer 10); a log entry.
-- [ ] SOURCES.md has the ESLint row and the Playwright `screenshot` page (answer 13).
+- [x] `npm run lint` passes on the branch, with every converted rule switched on as an error. (Evidence, step 5: exit 0.)
+- [x] Each rule's test shows one bad example failing and one good example passing: `npm test -- eslint-rules` passes, and fails if the rule is switched off. (Evidence, rules 1, 2, 4 and 5; rule 3 is ESLint's own, shown on a probe.)
+- [x] CLAUDE.md no longer holds the converted or dropped rules' sentences and holds the new rule: `grep -nE "Fail loudly|No invented numbers|Clean only your orphans|Keep the diff surgical|Comments explain why|Build for today" CLAUDE.md` prints nothing. ("Never cheat a check" left this list in rule 4: lint covers only its skip half, and its weaken, delete and mock half is behaviour, which stays a sentence by answer 1. "Fail loudly" and "Clean only your orphans" kept their behaviour halves under new names.)
+- [ ] A CI e2e run on the PR uploads a video of every test on the `page` fixture, and a visual test's at both sizes: the run's artifact list shows them. (Screenshots left this criterion by answer 33.) **Half met:** run 44243101548 uploaded the 62 videos; no test is tagged yet (answer 29), so the phone half is shown only on a local run (Evidence, step 4) and waits for CI's first `@visual` test.
+- [x] DECISIONS.md: the "Linting" row names the local rules; the "Config and tunables" row allows a sourced number beside its use (answer 10); a log entry.
+- [x] SOURCES.md has the ESLint row and the Playwright `screenshot` page (answer 13).
 
 ## Out of scope
 - Automatic checks for behaviour mistakes (answer 1).
@@ -135,12 +135,12 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 1. ~~Ask the open questions~~: done, answers 10 to 13 → verify: `grep -c "^  - \*\*Answer:\*\*" docs/milestones/PROCESS-lint-rules.md` prints 4.
 2. ~~Add answer 13's pages to SOURCES.md, read them, and name the sections followed~~: done (Source, above) → verify: `grep -n "eslint.org" docs/SOURCES.md` prints the row.
 3. One PR per rule, each from this branch: the rule, its test, the old code fixed, its sentence removed → verify: `npm run lint` and `npm test -- eslint-rules` pass; the test fails with the rule off.
-4. Playwright keeps a video of every test; CI uploads them (answer 33: no screenshots) → verify: the PR's e2e run lists the files.
-5. CLAUDE.md's new rule, the dropped rules, the `audit` skill, DECISIONS → verify: the `grep` in Acceptance criteria prints nothing.
+4. ~~Playwright keeps a video of every test; CI uploads them (answer 33: no screenshots)~~: done, #284 → verify: the PR's e2e run lists the files.
+5. ~~CLAUDE.md's new rule, the dropped rules, the `audit` skill, DECISIONS~~: done → verify: the `grep` in Acceptance criteria prints nothing.
 6. The `reviewer` agent reviews the diff.
 
 ## Removes
-The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "retain-on-failure" : "off"` setting, CI's `failed-test-videos` upload and `test:e2e`'s `--project=chromium`, which step 4 replaces. Nothing else yet: the rules' PRs list what each removes.
+The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "retain-on-failure" : "off"` setting, CI's `failed-test-videos` upload and `test:e2e`'s `--project=chromium`, which step 4 replaces; in step 5, the audit's "abstractions with a single use" check (the dropped "Build for today") and the two places that named a dropped rule (DECISIONS' "Hard to reverse" lead-in, a comment in `scripts/base.ts`). The rules' PRs list what each removed.
 
 ---
 *Fill in the sections below at the end.*
@@ -148,6 +148,12 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| ESLint, custom rules: a rule is `meta` plus `create(context)`, reporting by `messageId`; RuleTester runs valid and invalid cases | Four rules in `eslint-rules/`, each with a RuleTester test under Vitest, in a plugin object `local` | None |
+| The human's answer 6: only 0 and 1 need no source | 0, 1, 2, 24, 60, 100, 360 and 1000 need none | Answer 16 added the unit numbers |
+| Playwright, `screenshot` option: `on` keeps a screenshot after every test | No screenshots | Answer 33: `on` took every page still open, and the tests leave their own contexts open, so #284's first run held 9,553 pictures (503 MB), mostly earlier tests' pages |
+| Playwright, `video` option: `on` keeps every test's video | `on` on CI | Only pages Playwright makes are filmed (DECISIONS, 2026-11-10), so the 150 or so tests that open their own contexts have no video; making them use fixtures is outside this ticket |
+| Playwright, tags and a project's `grep` | `@visual` tag; a `phone` project with `grep: /@visual/` | None |
+| upload-artifact, `retention-days` | 14 | None (answer 32) |
 
 ## Evidence
 **Rule 1, `local/fail-loudly`** (2026-11-17, slot 3):
@@ -185,6 +191,11 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Missed, then fixed (the `reviewer` agent, blocking): `npm run test:e2e`, the command CI runs, was `playwright test --project=chromium`, so `phone` would never have run on CI; hypotheses 1 and 2 had been checked with `npx playwright test --list`, not CI's command. The script is now `playwright test` (every project). Rechecked with `npm run test:e2e -- --list`: `212   [chromium]`, no `[phone]`; with the tag, `Total: 213` and the one `[phone]` line. Held.
 - Hypothesis 4: CI's run uploads about 212 screenshots, one per test. Run 44239502367 (#284, green): artifact `e2e-screenshots-and-videos`, 471,252,481 bytes; 9,553 `.png`, 62 `.webm`, nothing else, in 214 test folders. Disproved: a late test held over 100 `test-finished-N.png`, mostly earlier tests' pages (the e2e files call `newContext` 116 times and `.close()` 9 times). Asked the human (answer 33): video only.
 - Hypothesis 5, after answer 33: the run uploads only videos, about 62 and 15 MB. Run 44243101548 (#284's last commit, green): artifact `e2e-videos`, 14,525,699 bytes, expires 2026-12-02 (14 days); 62 `.webm`, nothing else, in 62 folders. Held. One video (a guest plays game 1 to the result) was sent to the human in the app. No `-phone` folder: no test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
+
+**Step 5, the dropped rules** (2026-11-17, slot 3):
+- Hypothesis: the three sentences live only in CLAUDE.md, with the audit skill's "abstractions with a single use" and two citations by name (DECISIONS' "Hard to reverse", `scripts/base.ts:1649`) as the only places acting on them; old research notes and log entries are history and stay. `grep -rniE "diff surgical|comments explain why|build for today"` (outside `docs/audits/`, the M tickets, research notes and DECISIONS' log) → those places only. Held.
+- The acceptance `grep -nE "Fail loudly|No invented numbers|Clean only your orphans|Keep the diff surgical|Comments explain why|Build for today" CLAUDE.md` → prints nothing (exit 1).
+- `npm run lint` → exit 0. `npx vitest run eslint-rules` → `Tests  45 passed (45)`. `npx tsc --noEmit` → exit 0.
 
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
