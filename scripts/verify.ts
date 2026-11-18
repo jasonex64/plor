@@ -51,7 +51,8 @@ const tlc = (cfgText: string) => {
       { cwd: dir, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
     );
     if (r.error) throw r.error;
-    const states = /([\d,]+) distinct states found/.exec(r.stdout)?.[1] ?? "?";
+    // The last count is the final one; progress lines print counts before it.
+    const states = [...r.stdout.matchAll(/([\d,]+) distinct states found/g)].at(-1)?.[1] ?? "?";
     return { status: r.status, output: r.stdout + r.stderr, states, seconds: ((Date.now() - started) / 1000).toFixed(1) };
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
