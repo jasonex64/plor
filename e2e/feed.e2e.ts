@@ -410,22 +410,27 @@ test("a reaction names who used it on hover, on focus and after a long press", a
   await expect(box).toBeHidden();
   await used.hover();
   await expect(box).toHaveText("You, Amy, Zed");
+  // As wide as the row's second line, so the names don't wrap at the chip's width.
+  expect((await box.boundingBox())!.width).toBeGreaterThan((await used.boundingBox())!.width);
   await page.mouse.move(0, 0);
   await expect(box).toBeHidden();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Shift+Tab");
   await used.focus();
+  await expect(used).toBeFocused();
   await expect(box).toBeVisible();
   await expect(used).toHaveAccessibleDescription("You, Amy, Zed");
   await page.keyboard.press("Escape");
   await expect(box).toBeHidden();
 
-  // A phone: a finger held 500ms shows the names; let go sooner and nothing shows.
+  // A phone: a tap, which focuses the chip, shows nothing; a finger held 500ms shows the names.
   const phone = await (await browser.newContext({ storageState: await page.context().storageState(), hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })).newPage();
   await phone.goto("/");
   const held = articles(phone).filter({ hasText: words }).getByRole("group", { name: "Reactions" }).locator("[aria-describedby]");
   const names = articles(phone).filter({ hasText: words }).getByRole("tooltip");
   await held.scrollIntoViewIfNeeded();
-  await held.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });
-  await held.dispatchEvent("pointerup", { pointerType: "touch", isPrimary: true });
+  await held.tap();
+  await expect(held).toBeFocused();
   await phone.waitForTimeout(600);
   await expect(names).toBeHidden();
   await held.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });

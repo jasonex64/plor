@@ -21,7 +21,7 @@ export function Reactions({ reactions, below = false, name = "Reactions" }: { re
   if (reactions.counts.length === 0) return null;
   const summary = (
     // Named for screen readers, "Reactions: 😂 1, ❤️ 2" (docs/milestones/M14-14b-21-screen-readers.md, answer 6).
-    <span role="group" aria-label={name} className={styles.summary}>
+    <span role="group" aria-label={name} className={below ? styles.summary : `${styles.summary} ${styles.line}`}>
       {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
         const { count, names } = reactions.counts.find((c) => c.emoji === emoji)!;
         const mine = reactions.mine === emoji;
@@ -43,14 +43,16 @@ export function Reactions({ reactions, below = false, name = "Reactions" }: { re
       })}
     </span>
   );
-  return below ? <div className={kit.below}>{summary}</div> : summary;
+  // On a row's second line the names box spans that line (kit .tip), so the line holds it.
+  return below ? <div className={`${kit.below} ${styles.line}`}>{summary}</div> : summary;
 }
 
 // One reaction used, and who used it (docs/milestones/M20-design-rules-and-clean-up.md, 20j; answers 28 and 51 to 53):
 // the names, "You" first then A to Z, show in the kit's names box under the line (kit.module.css .tip) while the pointer
 // is on it or it has focus, and on a phone once a finger has held it LONG_PRESS_MS; Escape or a press elsewhere hides
 // them (WCAG 2.2 1.4.13: dismissible, hoverable, persistent). They are its description, so a screen reader reads them on
-// focus whether they show or not. A finger that starts to scroll cancels the hold (the browser's pointercancel). The box
+// focus whether they show or not; they show on a keyboard's focus only (:focus-visible), as a tap that focuses the chip on
+// a phone would otherwise show them at once, not after the hold (20j's review). A finger that starts to scroll cancels the hold (the browser's pointercancel). The box
 // is the chip's sibling, so the chip's text is its own; both sit in one span, so the pointer can move onto the box.
 function Used({ mine, who, children }: { mine: boolean; who: string[]; children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -94,7 +96,7 @@ function Used({ mine, who, children }: { mine: boolean; who: string[]; children:
       onPointerUp={release}
       onPointerCancel={release}
     >
-      <span tabIndex={0} aria-describedby={tip} className={mine ? `${styles.used} ${styles.mine}` : styles.used} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
+      <span tabIndex={0} aria-describedby={tip} className={mine ? `${styles.used} ${styles.mine}` : styles.used} onFocus={(e) => setOpen(e.currentTarget.matches(":focus-visible"))} onBlur={() => setOpen(false)}>
         {children}
       </span>
       <span role="tooltip" id={tip} className={kit.tip} hidden={!open}>

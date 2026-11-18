@@ -4,10 +4,14 @@
    mockup 3's .reacts). Each keeps the chips' room, so the player's own can take the tint and an accent edge (answer 6)
    without the others moving. */
 .summary {
-  position: relative;
   display: inline-flex;
   flex-wrap: wrap;
   font-size: 0.8125rem;
+}
+
+/* What the names box (kit .tip) spans: a row's second line, or the reactions where they sit beside a name (M20 20j). */
+.line {
+  position: relative;
 }
 
 /* A finger's hold shows its names, not the phone's text selection or callout (M20 20j, answer 51). */
