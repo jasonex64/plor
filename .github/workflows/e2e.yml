@@ -46,12 +46,14 @@ jobs:
       - name: Show the page each failed test ended on
         if: failure()
         run: find test-results -name error-context.md -exec cat {} +
-      # What a failed test's page did, as video: Playwright keeps one per failed test on CI (playwright.config.ts). Only the
-      # .webm files are uploaded, no trace or network data (the human, docs/milestones/M16-16g-3-village-e2e-on-ci.md,
-      # answer 2; DECISIONS.md). The repository's default retention applies.
-      - name: Keep the failed tests' videos
-        if: failure()
+      # What every filmed test's page did, passed or failed: Playwright keeps a video of each on CI (playwright.config.ts),
+      # the proof a visible change links to (docs/milestones/PROCESS-lint-rules.md, answers 3, 8 and 33). Only the .webm
+      # files are uploaded, no trace or network data (the human, docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2;
+      # DECISIONS.md). Kept 14 days (answer 32).
+      - name: Keep every test's video
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: failed-test-videos
+          name: e2e-videos
           path: test-results/**/*.webm
+          retention-days: 14
