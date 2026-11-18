@@ -44,7 +44,7 @@
         "c582743e-80d6-59a8-873e-9fe36de73208"
       ],
       "host_answers": [
-        "c582743e-80d6-59a8-873e-9fe36de73208"
+        "1b561820-6351-5023-a538-efc1ac7b8185"
       ],
       "levels": {
         "e26ac5df-ec61-5299-960d-89660a4c07f2": "uncommon",
@@ -60,36 +60,7 @@
         "51322cb0-9db0-5f5f-b918-f776eff6fa39": "common",
         "c582743e-80d6-59a8-873e-9fe36de73208": "common"
       },
-      "steals": "m"
-    },
-    {
-      "prompt": "Name a kind of flag",
-      "category": "flag",
-      "host_bank": [
-        "c87ab208-f28f-5eb6-b9f2-9793a9ed51ce",
-        "3bab2557-b304-5be9-a940-3c0bbab34ceb",
-        "651ba653-acee-5125-9f4f-59734e515b23",
-        "9ad7f21c-d3cf-55e3-9972-517c57f2f687",
-        "0604e15b-13bc-5780-80a4-e3dc729fbe21",
-        "b152f919-2e7e-5ac9-813f-939d7f2b4506"
-      ],
-      "host_answers": [
-        "651ba653-acee-5125-9f4f-59734e515b23"
-      ],
-      "levels": {
-        "9c880c13-5970-547d-a4e2-ccce9b7ce0b6": "uncommon",
-        "1a0fe765-c5d3-5acd-a7ce-aa71633b1697": "uncommon",
-        "60bfbdc7-9200-5f77-9923-e05812e080e7": "uncommon",
-        "dda884b7-cbc8-5d81-b7b5-ba653021eec6": "uncommon",
-        "ccb6bcdc-5e8b-519a-ae65-62292f4cfcd2": "uncommon",
-        "9c876961-2da8-5e56-8150-7be1f1c85f1d": "uncommon",
-        "c87ab208-f28f-5eb6-b9f2-9793a9ed51ce": "common",
-        "3bab2557-b304-5be9-a940-3c0bbab34ceb": "common",
-        "651ba653-acee-5125-9f4f-59734e515b23": "common",
-        "9ad7f21c-d3cf-55e3-9972-517c57f2f687": "common",
-        "0604e15b-13bc-5780-80a4-e3dc729fbe21": "common",
-        "b152f919-2e7e-5ac9-813f-939d7f2b4506": "common"
-      }
+      "steals": "d"
     },
     {
       "prompt": "Name an item of clothing",
@@ -103,7 +74,7 @@
         "93701ebb-2e3c-5302-8cff-0f9ebb43e58a"
       ],
       "host_answers": [
-        "7fe33b80-372c-5d4a-9ae4-f74e6dc56e86"
+        "d87ea5bc-2414-5f79-9512-1fcb546f9d0d"
       ],
       "levels": {
         "f9d71191-0967-586a-a868-95a896860f4d": "uncommon",
@@ -117,8 +88,7 @@
         "d87ea5bc-2414-5f79-9512-1fcb546f9d0d": "common",
         "f5e45768-0ba0-538d-b760-91c8b98179b3": "common",
         "93701ebb-2e3c-5302-8cff-0f9ebb43e58a": "common"
-      },
-      "steals": "h"
+      }
     },
     {
       "prompt": "Name a fuel",
@@ -132,8 +102,7 @@
         "8a33c239-5b14-5e5d-95ba-6285c1fe6307"
       ],
       "host_answers": [
-        "6846a5a1-a102-5abe-9ed6-9e1cd5699ad5",
-        "76b684d5-8ece-5b6f-90b7-61779f0f4aba"
+        "5572282b-9960-5350-8bd2-116962d4bc0f"
       ],
       "levels": {
         "aabd7fc8-49a7-5f6a-a9c6-f4f5e7c30170": "uncommon",
@@ -149,7 +118,7 @@
         "13ef4687-abc7-546b-b6fd-ec6f903176b3": "common",
         "8a33c239-5b14-5e5d-95ba-6285c1fe6307": "common"
       },
-      "steals": "n"
+      "steals": "m"
     },
     {
       "prompt": "Name a stringed instrument",
@@ -163,8 +132,8 @@
         "8de79b5b-474e-5096-baa7-84a7dc1b83b3"
       ],
       "host_answers": [
-        "8de79b5b-474e-5096-baa7-84a7dc1b83b3",
-        "f326ecb7-f8fc-5bc6-aec4-9b6b7d051edb"
+        "f326ecb7-f8fc-5bc6-aec4-9b6b7d051edb",
+        "16da1958-9603-5c68-a5a9-a463ee306130"
       ],
       "levels": {
         "85632010-c722-56bc-be5d-096242d7da1f": "uncommon",
@@ -179,6 +148,37 @@
         "f909216a-51b2-5e29-aab3-55f6a15fe052": "common",
         "8cf5ba3e-6463-5066-93eb-2bddab13a251": "common",
         "8de79b5b-474e-5096-baa7-84a7dc1b83b3": "common"
+      },
+      "steals": "n"
+    },
+    {
+      "prompt": "Name a kind of road",
+      "category": "road",
+      "host_bank": [
+        "3e55e8f2-e471-5c1c-a23c-969a80c71576",
+        "189506a1-8345-5ca7-ad43-4e4d319a7ca7",
+        "2327fc44-5808-5de2-bef1-34f55404535d",
+        "a7c235ee-9d32-5b52-a696-518f83602344",
+        "b7cad822-b6a5-55d2-866c-e100950d2308",
+        "9499e710-c5fb-59d4-8f46-999e40e2f242"
+      ],
+      "host_answers": [
+        "9499e710-c5fb-59d4-8f46-999e40e2f242",
+        "3e55e8f2-e471-5c1c-a23c-969a80c71576"
+      ],
+      "levels": {
+        "e20cf341-46dc-5f23-987e-2246b5c02764": "uncommon",
+        "537dbf42-7103-59bb-849b-85af4036cf30": "uncommon",
+        "436149ce-0c39-590e-a255-68e0019ba82f": "uncommon",
+        "46e5157a-9988-5dab-ad6c-b55ae05aeb4d": "uncommon",
+        "e40837e3-6f36-519d-93b2-1bba6b33b2ed": "uncommon",
+        "36577424-9f26-5e59-adb5-a646ad2dedf3": "uncommon",
+        "3e55e8f2-e471-5c1c-a23c-969a80c71576": "common",
+        "189506a1-8345-5ca7-ad43-4e4d319a7ca7": "common",
+        "2327fc44-5808-5de2-bef1-34f55404535d": "common",
+        "a7c235ee-9d32-5b52-a696-518f83602344": "common",
+        "b7cad822-b6a5-55d2-866c-e100950d2308": "common",
+        "9499e710-c5fb-59d4-8f46-999e40e2f242": "common"
       }
     },
     {

@@ -59,7 +59,7 @@
         "e71d817d-e7b5-5414-b1dd-c7311a67318f": "common",
         "4fc1c21e-b77d-5688-96fb-b92b62499d90": "common"
       },
-      "steals": "d"
+      "steals": "p"
     },
     {
       "prompt": "Name a fish",
@@ -73,7 +73,7 @@
         "63e38ba9-66b4-56c6-8d81-6b719198e7b4"
       ],
       "host_answers": [
-        "312729a6-cbf1-5d91-afab-5a10de3b7a1d"
+        "dd86f527-ac23-5475-85ef-101a5a73fad4"
       ],
       "levels": {
         "1645ff3d-b171-552b-95e3-39a8f524f59f": "uncommon",
@@ -117,7 +117,7 @@
         "53d678aa-d263-5c97-990b-465c3dc60aa2": "common",
         "23b670b1-31aa-5c65-965a-fe80b8fe6743": "common"
       },
-      "steals": "m"
+      "steals": "h"
     },
     {
       "prompt": "Name a kind of book",
@@ -131,8 +131,8 @@
         "6dfec0f5-0b9a-5331-a13a-0176072c6b2e"
       ],
       "host_answers": [
-        "49760724-9d1a-524f-91be-e87cd772b4f3",
-        "17043c38-37e7-5907-89d7-69b1a1534bd3"
+        "4a53bb64-1ce4-5ab0-b3a6-66257ecbd41d",
+        "6dfec0f5-0b9a-5331-a13a-0176072c6b2e"
       ],
       "levels": {
         "5fb356dd-f5f9-5193-a689-42e2c7331114": "uncommon",
@@ -148,7 +148,7 @@
         "17043c38-37e7-5907-89d7-69b1a1534bd3": "common",
         "6dfec0f5-0b9a-5331-a13a-0176072c6b2e": "common"
       },
-      "steals": "l"
+      "steals": "s"
     },
     {
       "prompt": "Name a knot",
@@ -163,7 +163,7 @@
       ],
       "host_answers": [
         "2ac36909-9119-5f4f-ab46-a77851d98ac0",
-        "3b0d503c-88e0-5dbe-bf72-d8e160046cf2"
+        "66cfa850-b719-583d-a372-2b7de1ad559f"
       ],
       "levels": {
         "e664bd66-56c8-51f9-9b25-61001171bb0e": "uncommon",
@@ -181,36 +181,33 @@
       }
     },
     {
-      "prompt": "Name a meal",
-      "category": "meal",
+      "prompt": "Name a snake",
+      "category": "snake",
       "host_bank": [
-        "7f44e082-a7cc-52e7-84e8-a5be78ce3766",
-        "d09ab92c-fd3c-52e8-ae2c-569cece0f988",
-        "69daa352-66a3-53c1-a8ce-7d63a2cd678d",
-        "9e3f5f48-417d-5309-99c4-3970de0aa499",
-        "fd6e5773-0c0f-5152-9f0d-b1f0f7ded9cd",
-        "067a3b4e-a667-5c6f-a939-dfdb9b6983ec"
+        "0173c6c4-6519-542a-98d7-e9bf67dfbea4",
+        "6858dabb-49d1-59a8-b6e9-a32bd6f51bfc",
+        "dfe87cdf-fcbf-5996-997b-5523fbdbda3a",
+        "4ac64208-9f1d-5254-b6ab-3def24529844",
+        "006e5f7f-6f81-59a5-8eb0-2aea2e325fb9"
       ],
       "host_answers": [
-        "7f44e082-a7cc-52e7-84e8-a5be78ce3766",
-        "fd6e5773-0c0f-5152-9f0d-b1f0f7ded9cd",
-        "9e3f5f48-417d-5309-99c4-3970de0aa499"
+        "006e5f7f-6f81-59a5-8eb0-2aea2e325fb9",
+        "0173c6c4-6519-542a-98d7-e9bf67dfbea4",
+        "4ac64208-9f1d-5254-b6ab-3def24529844"
       ],
       "levels": {
-        "16e25acb-0ba7-5d8c-b328-da50ec61faf0": "uncommon",
-        "1bf20a3a-7851-52b6-8b8d-cd128e8423be": "uncommon",
-        "1e32b4d7-6374-588a-80fb-031be7bcc0b5": "uncommon",
-        "979c4b29-6532-5540-af56-def611dbff60": "uncommon",
-        "d049e744-ef2d-5d4f-ba8d-d4724dcd03e3": "uncommon",
-        "1a4535cd-0d27-58fc-b0b9-9b3475605808": "uncommon",
-        "7f44e082-a7cc-52e7-84e8-a5be78ce3766": "common",
-        "d09ab92c-fd3c-52e8-ae2c-569cece0f988": "common",
-        "69daa352-66a3-53c1-a8ce-7d63a2cd678d": "common",
-        "9e3f5f48-417d-5309-99c4-3970de0aa499": "common",
-        "fd6e5773-0c0f-5152-9f0d-b1f0f7ded9cd": "common",
-        "067a3b4e-a667-5c6f-a939-dfdb9b6983ec": "common"
+        "edf00f35-c91a-506e-ab22-9aeabf75fe0d": "uncommon",
+        "96ccae0f-9312-5b4d-b10d-8f5ca5669b97": "uncommon",
+        "3bda80ea-f717-5a5e-8392-6f5a3a2f0867": "uncommon",
+        "f82689d5-ba7e-5312-89a2-c40e97cb28d3": "uncommon",
+        "e9a80720-69b4-5c24-bf3b-7b63fd2caee7": "uncommon",
+        "0173c6c4-6519-542a-98d7-e9bf67dfbea4": "common",
+        "6858dabb-49d1-59a8-b6e9-a32bd6f51bfc": "common",
+        "dfe87cdf-fcbf-5996-997b-5523fbdbda3a": "common",
+        "4ac64208-9f1d-5254-b6ab-3def24529844": "common",
+        "006e5f7f-6f81-59a5-8eb0-2aea2e325fb9": "common"
       },
-      "steals": "o"
+      "steals": "i"
     }
   ]
 }
