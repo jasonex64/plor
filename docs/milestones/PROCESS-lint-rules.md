@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). Plan step 4, video on CI, merged (#284; rounds 9 and 10 below: no screenshots, answer 33). **Step 5, the dropped rules, in review** on `process-lint-rules` (its PR), the ticket's last; one criterion is half met (the phone videos wait for the first `@visual` test).
+**Status:** done with #287 (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). Five rules merged (#275, #276, #278, #280, #282); CI keeps every filmed test's video (#284; no screenshots, answer 33); the three fuzzy rules dropped (#287). One criterion is half met: the phone-size videos wait for the first `@visual` test (Acceptance criteria).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
