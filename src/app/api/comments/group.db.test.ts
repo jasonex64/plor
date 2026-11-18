@@ -169,7 +169,7 @@ describe("a group's thread", () => {
       [C.userId, GAME_ID, today, aComment.id],
     );
     useSession(A.session);
-    expect((await comments(`?group=${club}`))[0].reactions.counts).toEqual([{ emoji: "👍", count: 1 }]);
+    expect((await comments(`?group=${club}`))[0].reactions.counts).toEqual([{ emoji: "👍", count: 1, names: [B.username] }]);
   });
 
   it("lets a member report another's comment, hiding it from them alone, and refuses a non-member (M08 D5)", async () => {

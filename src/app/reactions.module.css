@@ -4,16 +4,20 @@
    mockup 3's .reacts). Each keeps the chips' room, so the player's own can take the tint and an accent edge (answer 6)
    without the others moving. */
 .summary {
+  position: relative;
   display: inline-flex;
   flex-wrap: wrap;
   font-size: 0.8125rem;
 }
 
+/* A finger's hold shows its names, not the phone's text selection or callout (M20 20j, answer 51). */
 .used {
   padding: 1px 8px;
   border: 1.5px solid transparent;
   border-radius: var(--r-small);
   white-space: pre;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .mine {

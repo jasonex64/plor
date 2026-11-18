@@ -319,7 +319,7 @@ describe("the feed's pages", () => {
     const own = items.find((i) => i.kind === "result" && i.game === GAME_ID && i.userId === F.userId && i.date === today)!;
     const theirs = await runReactions(getPool(), V.userId, GAME_ID, today, [F.userId]);
     expect(own.reactions).toEqual(theirs.get(F.userId));
-    expect(own.reactions!.counts).toEqual([{ emoji: "😂", count: 1 }]);
+    expect(own.reactions!.counts).toEqual([{ emoji: "😂", count: 1, names: [] }]);
     const frag = items.find((i) => i.kind === "result" && i.game === SUBSTRINGS_ID && i.userId === F.userId && i.date === today)!;
     expect(frag.reactions).toEqual((await runReactions(getPool(), V.userId, SUBSTRINGS_ID, today, [F.userId])).get(F.userId));
 
@@ -330,7 +330,7 @@ describe("the feed's pages", () => {
     });
     const again = (await flat()).find((i) => i.id === target.id)!;
     expect(again.reactions).toEqual((await commentReactions(getPool(), V.userId, [target.id!])).get(target.id!));
-    expect(again.reactions!.counts).toEqual([{ emoji: "😮", count: 1 }]);
+    expect(again.reactions!.counts).toEqual([{ emoji: "😮", count: 1, names: [G.username] }]);
   });
 
   it("blurs today's result of a game W hasn't finished: name, game and time, and nothing of the run or its reactions", async () => {
@@ -370,7 +370,7 @@ describe("the feed's pages", () => {
     expect(find(GAME_ID, today).reactions).toEqual((await runReactions(getPool(), W.userId, GAME_ID, today, [F.userId])).get(F.userId));
     const yest = find(SUBSTRINGS_ID, yesterday);
     expect(yest).toMatchObject({ blurred: false, score: scoreRun([WORD], "j").total });
-    expect(yest.reactions!.counts).toEqual([{ emoji: "❤️", count: 1 }]);
+    expect(yest.reactions!.counts).toEqual([{ emoji: "❤️", count: 1, names: [] }]);
     expect(find(GAME_ID, today, W)).toMatchObject({ mine: true, blurred: false });
 
     // A friend's comment on the game W hasn't finished comes with its body.
@@ -398,7 +398,7 @@ describe("the feed's pages", () => {
     const shown = (await flat()).find((i) => i.kind === "result" && i.game === SUBSTRINGS_ID && i.date === today && i.userId === F.userId)!;
     expect(shown).toMatchObject({ blurred: false, score: scoreRun([WORD], "j").total });
     expect(shown.reactions).toEqual((await runReactions(getPool(), W.userId, SUBSTRINGS_ID, today, [F.userId])).get(F.userId));
-    expect(shown.reactions!.counts).toEqual([{ emoji: "😢", count: 1 }]);
+    expect(shown.reactions!.counts).toEqual([{ emoji: "😢", count: 1, names: [] }]);
     expect((await page()).body.feed.finishedToday).toEqual([GAME_ID, SUBSTRINGS_ID]);
   });
 

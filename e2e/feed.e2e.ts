@@ -383,3 +383,51 @@ test("a friend's result carries its game's colour on its row, and a comment none
   expect(await edge(result(SUBSTRINGS.name))).toBe(`${await slot("--fragments")} 4px 0px 0px 0px inset`);
   expect(await edge(articles(page).filter({ hasText: words }))).toBe("none");
 });
+
+// M20 20j (inbox #249; docs/milestones/M20-design-rules-and-clean-up.md, answers 28 and 51 to 53): a reaction names who
+// used it, "You" first then A to Z, under the pointer, on focus (Escape hides it) and after a finger holds it 500ms.
+test("a reaction names who used it on hover, on focus and after a long press", async ({ browser }) => {
+  test.slow();
+  const page = await viewer(browser, "fj");
+  const zed = await friendOf("fk", "fj");
+  const amy = await friendOf("fl", "fj");
+  await DB.query("update private.profile set display_name = $2 where user_id = $1", [zed, "Zed"]);
+  await DB.query("update private.profile set display_name = $2 where user_id = $1", [amy, "Amy"]);
+  await offbeatCaught(await idOf("fj"));
+  const words = `who reacted ${RUN}`;
+  await comment(zed, words, 5);
+  await seed(async (q) => {
+    await q(
+      "insert into private.reaction (user_id, game_id, puzzle_date, comment_id, emoji) select u, c.game_id, c.puzzle_date, c.id, '😂' from private.comment c, unnest($2::uuid[]) as u where c.body = $1",
+      [words, [amy, zed, await idOf("fj")]],
+    );
+  });
+  await page.goto("/");
+  const item = articles(page).filter({ hasText: words });
+  const used = item.getByRole("group", { name: "Reactions" }).locator("[aria-describedby]");
+  const box = item.getByRole("tooltip");
+  await expect(used).toHaveText(/😂 3/);
+  await expect(box).toBeHidden();
+  await used.hover();
+  await expect(box).toHaveText("You, Amy, Zed");
+  await page.mouse.move(0, 0);
+  await expect(box).toBeHidden();
+  await used.focus();
+  await expect(box).toBeVisible();
+  await expect(used).toHaveAccessibleDescription("You, Amy, Zed");
+  await page.keyboard.press("Escape");
+  await expect(box).toBeHidden();
+
+  // A phone: a finger held 500ms shows the names; let go sooner and nothing shows.
+  const phone = await (await browser.newContext({ storageState: await page.context().storageState(), hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })).newPage();
+  await phone.goto("/");
+  const held = articles(phone).filter({ hasText: words }).getByRole("group", { name: "Reactions" }).locator("[aria-describedby]");
+  const names = articles(phone).filter({ hasText: words }).getByRole("tooltip");
+  await held.scrollIntoViewIfNeeded();
+  await held.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });
+  await held.dispatchEvent("pointerup", { pointerType: "touch", isPrimary: true });
+  await phone.waitForTimeout(600);
+  await expect(names).toBeHidden();
+  await held.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });
+  await expect(names).toHaveText("You, Amy, Zed");
+});
