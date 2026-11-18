@@ -217,10 +217,11 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   await page.setViewportSize(WIDE);
   await page.reload();
   await expect(tiles).toHaveCount(4);
-  for (const tile of await tiles.all()) expect(await tile.evaluate((el) => getComputedStyle(el).fontSize)).toBe("40px");
+  // 30px, the scale's big numbers (M20 20f, answer 60; 40px before it).
+  for (const tile of await tiles.all()) expect(await tile.evaluate((el) => getComputedStyle(el).fontSize)).toBe("30px");
 
   // /streak's number.
   await page.goto("/streak");
   const number = page.getByRole("heading", { name: /^Your streak/ }).locator("span");
-  expect(await number.evaluate((el) => getComputedStyle(el).fontSize)).toBe("40px");
+  expect(await number.evaluate((el) => getComputedStyle(el).fontSize)).toBe("30px");
 });

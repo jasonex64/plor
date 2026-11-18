@@ -33,7 +33,7 @@
 /* 14px, as How to play's place (how-to-play.module.css, .place). */
 .place {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
 }
 
 /* Position: relative, so a card's offsetLeft counts from the strip (today-cards.tsx). The arrows and the keyboard scroll it,

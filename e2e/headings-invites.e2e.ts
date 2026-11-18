@@ -33,7 +33,7 @@ const refuseClipboard = (page: Page) =>
     navigator.clipboard.writeText = () => Promise.reject(new DOMException("Write permission denied.", "NotAllowedError"));
   });
 
-test("from 768px the page's name sits under Plor in its heading, by the tab it's under", async ({ page }) => {
+test("from 768px the page's name is its heading, by the tab it's under, and it's read under Plor", async ({ page }) => {
   test.slow();
   await page.setViewportSize(WIDE);
   await page.goto("/");
@@ -54,15 +54,16 @@ test("from 768px the page's name sits under Plor in its heading, by the tab it's
     await expect(h1, path).toHaveAccessibleName(`Plor, ${name}`);
     const line = h1.getByText(name, { exact: true });
     await expect(line, path).toBeVisible();
-    // The card heading's size, muted, so "Plor" stays loudest (Numbers).
+    // The scale's top size, 30px, in the text colour: the sidebar shows "Plor" (M20 20f, answers 7 and 62; before it,
+    // the card heading's size, muted, under a "Plor" that was loudest).
     expect(await line.evaluate((el) => [getComputedStyle(el).fontSize, getComputedStyle(el).color])).toEqual(
       await page.evaluate(() => {
         const probe = document.createElement("span");
-        probe.style.color = "var(--muted)";
+        probe.style.color = "var(--text)";
         document.body.append(probe);
         const color = getComputedStyle(probe).color;
         probe.remove();
-        return [`${parseFloat(getComputedStyle(document.documentElement).fontSize) * 1.5}px`, color];
+        return [`${parseFloat(getComputedStyle(document.documentElement).fontSize) * 1.875}px`, color];
       }),
     );
   }

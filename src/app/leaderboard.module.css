@@ -22,7 +22,7 @@
   min-height: 40px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
   cursor: pointer;
 }
 
@@ -53,7 +53,7 @@
 }
 
 .board {
-  font-size: 0.875rem;
+  font-size: var(--text-note);
   font-weight: 700;
   color: var(--muted);
 }
@@ -62,7 +62,7 @@
    its rows, as far apart as the mockup's card spaces them. */
 .note {
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
 }
 
 .week {
@@ -72,7 +72,7 @@
 }
 
 .week h3 {
-  font-size: 1rem;
+  font-size: var(--text-body);
 }
 
 /* A board's row keeps its name whole beside the points, and the points drop under it, still at the right, when the two

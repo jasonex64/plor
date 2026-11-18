@@ -13,7 +13,7 @@
   border-radius: 50%;
   background: var(--soft);
   color: var(--text);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 700;
   vertical-align: middle;
 }
@@ -26,5 +26,5 @@
   width: 4rem;
   height: 4rem;
   border-radius: 50%;
-  font-size: 1.625rem;
+  font-size: var(--text-heading);
 }

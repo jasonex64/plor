@@ -24,8 +24,16 @@ function Piece({ name, when, children }: { name: string; when: string; children:
 }
 
 // The heading and small-text sizes in use (the M20 audit, 2026-11-16); which stay is 20f's question to the human.
-const HEADINGS = ["2.5rem", "1.875rem", "1.625rem", "1.5rem", "1.25rem"];
-const SMALL = ["0.9375rem", "0.875rem", "0.8125rem", "0.75rem"];
+// The kit's text sizes (kit.module.css; docs/milestones/M20-design-rules-and-clean-up.md, answers 60 to 62).
+const SIZES = [
+  ["--text-display", "A page's name, a big number"],
+  ["--text-heading", "A card's heading"],
+  ["--text-subheading", "A heading in a card"],
+  ["--text-body", "The body"],
+  ["--text-note", "A note, a label, a flat button"],
+  ["--text-caption", "The reactions line, a date"],
+  ["--text-label", "A chip, a badge"],
+];
 // The names box's sample, not a rule: three 😂, one of them yours, and one ❤️ (docs/milestones/M20-design-rules-and-clean-up.md, 20j).
 const SAMPLE_REACTIONS: ReactionsData = { counts: [{ emoji: "😂", count: 3, names: ["Ana", "Sam"] }, { emoji: "❤️", count: 1, names: ["Ben"] }], mine: "😂" };
 
@@ -142,15 +150,10 @@ export function Kit() {
           A pressable thing
         </a>
       </Piece>
-      <Piece name="Headings and small text" when="The sizes in use today; which stay is 20f's question.">
-        {HEADINGS.map((size) => (
-          <p key={size} className={styles.sample} style={{ fontSize: size }}>
-            Heading {size}
-          </p>
-        ))}
-        {SMALL.map((size) => (
-          <p key={size} className={styles.small} style={{ fontSize: size }}>
-            Small text {size}
+      <Piece name="Text sizes" when="Every text by its role, from the kit's seven sizes.">
+        {SIZES.map(([size, role]) => (
+          <p key={size} className={styles.sample} style={{ fontSize: `var(${size})` }}>
+            {role} <span className={styles.small}>{size}</span>
           </p>
         ))}
       </Piece>

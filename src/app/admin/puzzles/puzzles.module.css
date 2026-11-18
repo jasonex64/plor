@@ -58,7 +58,7 @@
   min-height: 30px;
   margin: 0;
   padding: 0 10px;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   cursor: pointer;
 }
 
@@ -119,7 +119,7 @@
 
 .fixFirst {
   color: var(--danger);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 700;
 }
 

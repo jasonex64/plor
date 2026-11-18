@@ -110,3 +110,25 @@ test("Back sits on the heading's line, and in the top bar on phones", async ({ b
   await back.click();
   await expect(page).toHaveURL(/\/me$/);
 });
+
+// M20 20f (answers 7 and 62): on a computer "Plor" shows once, in the sidebar, and the page's heading is the page's
+// name alone, at the scale's top size (30px) in the text colour; it's still read "Plor, Friends".
+test("on a computer Plor shows once, and the page's name is its heading at 30px", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  await page.goto("/friends");
+  await signInAndPick(page, "lp");
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Friends" })).toBeVisible();
+  const plors = await page.evaluate(() =>
+    [...document.querySelectorAll("body *")].filter((el) => {
+      const own = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent!.trim()).join("");
+      return own === "Plor" && el.checkVisibility() && el.getBoundingClientRect().width > 1;
+    }).length,
+  );
+  expect(plors).toBe(1);
+  const heading = page.locator("main > h1");
+  await expect(heading).toHaveAccessibleName("Plor, Friends");
+  const name = heading.getByText("Friends", { exact: true });
+  await expect(name).toBeVisible();
+  const text = await page.evaluate(() => getComputedStyle(document.body).color);
+  expect(await name.evaluate((el) => [getComputedStyle(el).fontSize, getComputedStyle(el).color])).toEqual(["30px", text]);
+});

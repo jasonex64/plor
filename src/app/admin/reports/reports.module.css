@@ -17,7 +17,7 @@ li.item {
   padding: 10px 12px;
   border-radius: var(--r-small);
   background: var(--bg);
-  font-size: 0.9375rem;
+  font-size: var(--text-note);
 }
 
 .confirm {

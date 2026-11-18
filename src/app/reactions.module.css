@@ -6,7 +6,7 @@
 .summary {
   display: inline-flex;
   flex-wrap: wrap;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
 }
 
 /* What the names box (kit .tip) spans: a row's second line, or the reactions where they sit beside a name (M20 20j). */

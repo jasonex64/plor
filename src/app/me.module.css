@@ -24,13 +24,13 @@
 
 .name {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-heading);
   line-height: 1;
 }
 
 .muted {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
 }
 
 /* The totals: two to a row, each a stat with its number above its label, split by a thin cross of --line (14b-15,
@@ -65,13 +65,13 @@
   /* 40px where it fits, else 24% of the tile: "999,999", the widest total it fits, is 3.875 times its size in Baloo 2
      at 800, plus up to half a pixel a glyph where Chromium rounds glyphs to whole pixels (Linux, CI), down to a 320px
      phone's 91px tile (M14 14b-10, answers 22 to 24, measured). */
-  font-size: min(2.5rem, 24cqi);
+  font-size: min(var(--text-display), 24cqi);
   font-weight: 800;
   line-height: 1;
 }
 
 .totals dt {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 600;
 }
 
@@ -95,7 +95,7 @@
 
 .game h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--text-subheading);
 }
 
 /* The game's plain block beside its name, edged like the kit's tiles. */
@@ -122,7 +122,7 @@
 
 .weekday {
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: var(--text-label);
   font-weight: 700;
   text-align: center;
 }
@@ -163,9 +163,9 @@
 }
 
 .rare strong {
-  font-size: 1.0625rem;
+  font-size: var(--text-subheading);
 }
 
 .rare .muted {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
 }

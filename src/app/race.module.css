@@ -20,7 +20,7 @@
 .todayName,
 .hiddenName {
   fill: var(--muted);
-  font-size: 0.75rem;
+  font-size: var(--text-label);
 }
 
 /* Today under its dashed line, in the text colour (the mockup). */
@@ -79,7 +79,7 @@
 
 .badgeText {
   fill: var(--on-accent);
-  font-size: 0.6875rem;
+  font-size: var(--text-label);
   font-weight: 800;
 }
 
@@ -90,7 +90,7 @@
 
 /* End labels, haloed in the card's colour so a line or the Today line under them doesn't cut through. */
 .label {
-  font-size: 0.75rem;
+  font-size: var(--text-label);
   font-weight: 700;
   fill: var(--text);
   paint-order: stroke;
@@ -111,7 +111,7 @@
 /* Find a player: the field with its ✕, its suggestions in the flow under it as the kit's card, and its notes. */
 .findLabel {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
   font-weight: 700;
 }
 
@@ -181,11 +181,11 @@
 }
 
 .none {
-  font-size: 0.875rem;
+  font-size: var(--text-note);
 }
 
 .hint {
-  font-size: 0.75rem;
+  font-size: var(--text-label);
 }
 
 /* A week's head: the date chip and Show table side by side, wrapping when the text is bigger (14b-17, answer 6). */
@@ -205,7 +205,7 @@
   border: 1.5px dashed var(--edge);
   border-radius: var(--r-small);
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
   text-align: center;
 }
 
@@ -217,7 +217,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--text-note);
 }
 
 .table th,
