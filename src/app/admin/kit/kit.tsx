@@ -94,6 +94,27 @@ export function Kit() {
           </li>
         </ul>
       </Piece>
+      <Piece name="Board row" when="A row on a board: a hairline with the board's game edge; your own row the accent edge, in bold.">
+        <ul className={`${kit.rows} ${kit.offbeat}`}>
+          <li className={`${kit.row} ${kit.board}`}>
+            <span className={`${kit.badge} ${kit.hot}`} data-place="1" />
+            <span className={kit.grow}>A friend</span>
+            <span>1,210</span>
+          </li>
+          <li className={`${kit.row} ${kit.board} ${kit.you}`}>
+            <span className={kit.badge} data-place="2" />
+            <span className={kit.grow}>You</span>
+            <span>1,140</span>
+          </li>
+        </ul>
+      </Piece>
+      <Piece name="Comment row" when="A comment: no box, so the card's edge is the one strong line.">
+        <ul className={kit.rows}>
+          <li className={`${kit.row} ${kit.bare}`}>
+            <span className={kit.grow}>that last question was brutal</span>
+          </li>
+        </ul>
+      </Piece>
       <Piece name="Chip" when="A short fact beside something else; the dark, safe and caught kinds.">
         <div className={kit.chips}>
           <span className={kit.chip}>7 rounds</span>

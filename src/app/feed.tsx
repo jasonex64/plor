@@ -14,6 +14,7 @@ import type { FeedCommentItem, FeedPage, FeedResultItem } from "@/comments/feed-
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { choose } from "@/reactions/choose";
+import { gameColour } from "./game-colour";
 import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
 import { GAME, GAME_ID, SUBSTRINGS } from "@/platform/game";
@@ -345,13 +346,13 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
                 className={item.kind === "comment" && arrived.has(item.id) ? `${styles.item} ${kit.pop}` : styles.item}
               >
                 {line && <p className={styles.date}>{line}</p>}
-                {/* A result carries its game's colour and a comment none, so the two don't look alike (inbox #243;
-                    docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34). */}
+                {/* A result carries its game's colour and a comment no box, so the two don't look alike (inbox #243;
+                    docs/milestones/M20-design-rules-and-clean-up.md, answers 19, 34 and 56). */}
                 <div
                   className={
                     item.kind === "comment"
-                      ? `${kit.row} ${commentStyles.comment}`
-                      : `${kit.row} ${commentStyles.comment} ${styles.result} ${item.game === GAME_ID ? styles.offbeat : styles.fragments}`
+                      ? `${kit.row} ${kit.bare} ${commentStyles.comment}`
+                      : `${kit.row} ${commentStyles.comment} ${kit.edge} ${gameColour(item.game)}`
                   }
                 >
                   {item.kind === "comment" ? (

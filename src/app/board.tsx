@@ -28,6 +28,7 @@ import {
 import { Avatar } from "./avatar";
 import styles from "./board.module.css";
 import kit from "./kit.module.css";
+import { gameColour } from "./game-colour";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { endedText } from "./ended-text";
@@ -148,7 +149,7 @@ export function Board({
   }
 
   return (
-    <section aria-label="Friends today" className={kit.card}>
+    <section aria-label="Friends today" className={`${kit.card} ${gameColour(shown) ?? ""}`}>
       <h2>Friends today</h2>
       <LiveStatus channel={channel} />
       {/* The games with a day today, when the page doesn't name one and there are two (answers 56 and 57). */}
@@ -177,7 +178,7 @@ export function Board({
       {shownBoard && shownBoard.friends.length > 0 && (
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
-            <li key={f.username} className={`${kit.row} ${styles.friend}`}>
+            <li key={f.username} className={`${kit.row} ${kit.board} ${styles.friend}`}>
               <Avatar name={f.name} />
               <b className={styles.name}>{f.name}</b>
               <span className="sr-only">:</span> <span className={`${toneOf(f)} ${styles.status}`}>{describe(f, shownBoard.rounds)}</span>
@@ -244,7 +245,7 @@ function WhereEveryoneEnded({ username, mine, friends }: { username: string; min
       <h3>Where everyone ended</h3>
       <ul className={kit.rows}>
         {placeRows(mine, friends).map((row) => (
-          <li key={placeLabel(row.place)} className={row.you ? `${kit.row} ${kit.you}` : kit.row}>
+          <li key={placeLabel(row.place)} className={row.you ? `${kit.row} ${kit.board} ${kit.you}` : `${kit.row} ${kit.board}`}>
             <details>
               <summary>
                 {placeLabel(row.place)}: {[...(row.you ? ["You"] : []), ...row.named.map((p) => p.name)].join(", ")}

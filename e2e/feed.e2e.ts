@@ -436,3 +436,22 @@ test("a reaction names who used it on hover, on focus and after a long press", a
   await held.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });
   await expect(names).toHaveText("You, Amy, Zed");
 });
+
+// M20 20k-1 (answer 56): a comment has no box, in the feed and in the result screen's thread, so the card's edge is the
+// one strong line; a result keeps its box and edge (20h).
+test("a comment has no box, in the feed and in the result screen's thread", async ({ browser }) => {
+  const page = await viewer(browser, "fm");
+  const friend = await friendOf("fn", "fm");
+  await offbeatCaught(await idOf("fm"));
+  const words = `no box ${RUN}`;
+  await comment(friend, words, 5);
+  const border = (item: ReturnType<typeof page.locator>) => item.evaluate((el) => getComputedStyle(el).borderTopColor);
+  await page.goto("/");
+  const inFeed = articles(page).filter({ hasText: words }).locator("[class*='row']").first();
+  await expect(inFeed).toBeVisible();
+  expect(await border(inFeed)).toBe("rgba(0, 0, 0, 0)");
+  await page.goto(GAME.path);
+  const inThread = page.getByRole("region", { name: `${GAME.name} comments` }).getByRole("listitem").filter({ hasText: words });
+  await expect(inThread).toBeVisible();
+  expect(await border(inThread)).toBe("rgba(0, 0, 0, 0)");
+});

@@ -379,3 +379,33 @@ test("the Friends tab's and a group's leaderboard are one board with a Period sw
     await expect(page.getByRole("region", { name: title }).getByRole("radiogroup", { name: "Period", exact: true }).getByRole("radio", { name: "Today", exact: true })).toBeChecked();
   }
 });
+
+// M20 20k-1 (docs/milestones/M20-design-rules-and-clean-up.md, answers 34 and 56): the Balanced look's one border level
+// on every board. A row is a hairline in the theme's --line with its game's 4px edge inside its left; your own row the
+// accent edge, in bold.
+test("a board's rows are a hairline with their game's edge, and your own row the accent edge", async ({ browser }) => {
+  test.slow();
+  const page = await viewer(browser, "bvk");
+  const friend = await friendOf("bvk", "bfk");
+  await finishOffbeat(page);
+  const slot = (name: string) =>
+    page.evaluate((name) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(${name})`;
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }, name);
+  const looks = (row: ReturnType<typeof page.locator>) =>
+    row.evaluate((el) => ({ border: getComputedStyle(el).borderTopColor, edge: getComputedStyle(el).boxShadow, weight: getComputedStyle(el).fontWeight }));
+  await page.goto("/friends");
+  const friendRow = row(page, friend.username);
+  await expect(friendRow).toBeVisible();
+  expect(await looks(friendRow)).toEqual({ border: await slot("--line"), edge: `${await slot("--offbeat")} 4px 0px 0px 0px inset`, weight: "400" });
+  const leaderboard = page.getByRole("region", { name: "Friends leaderboard" });
+  await leaderboard.getByRole("radio", { name: "This week", exact: true }).check();
+  const mine = leaderboard.getByRole("region", { name: "This week" }).getByRole("listitem").filter({ hasText: "(you)" });
+  await expect(mine).toBeVisible();
+  expect(await looks(mine)).toEqual({ border: await slot("--line"), edge: `${await slot("--accent")} 4px 0px 0px 0px inset`, weight: "700" });
+});
