@@ -8,10 +8,11 @@ import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
 import { blockedSql, friendsSql } from "./circle";
 import type { Friend } from "./friends";
+import { STATUS } from "@/lib/status";
 
 // The username a route's body names. Anything that isn't text gets 400.
 export function readUsername(input: unknown): string {
-  if (typeof input !== "string" || input.includes("\0")) throw new AppError("bad_request", 400, "username");
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("bad_request", STATUS.badRequest, "username");
   return input;
 }
 
@@ -37,7 +38,7 @@ async function withPair<T>(
       [userId, username],
     );
     const me = rows.find((r) => r.user_id === userId);
-    if (!me) throw new AppError("no_profile", 409);
+    if (!me) throw new AppError("no_profile", STATUS.conflict);
     if (me.named) throw refuse.own;
     const them = rows.find((r) => r.user_id !== userId);
     if (!them) throw refuse.unknown;
@@ -60,7 +61,7 @@ async function withPair<T>(
 }
 
 // A request named by a username nobody has, or by the player's own, is the same 404 as one that isn't there.
-const requestNotFound = () => ({ own: new AppError("request_not_found", 404), unknown: new AppError("request_not_found", 404) });
+const requestNotFound = () => ({ own: new AppError("request_not_found", STATUS.notFound), unknown: new AppError("request_not_found", STATUS.notFound) });
 
 // Both ways at once: one row per pair, the smaller user ID first (M07 7b). Already friends changes nothing.
 const BEFRIEND = `insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))
@@ -70,7 +71,7 @@ const BEFRIEND = `insert into private.friendship (user_a, user_b) values (least(
 // the same "sent". A player who has blocked the sender gets nothing and the sender is told the same "sent" (13): the
 // row is stored and the blocker's reads leave it out.
 export async function sendRequest(pool: Pool, userId: string, username: string): Promise<"sent" | "friends"> {
-  const refuse = { own: new AppError("request_own", 409), unknown: new AppError("player_not_found", 404) };
+  const refuse = { own: new AppError("request_own", STATUS.conflict), unknown: new AppError("player_not_found", STATUS.notFound) };
   return withPair(pool, userId, username, refuse, async (client, them) => {
     const { rows } = await client.query<{ blocking: boolean; friends: boolean }>(
       `select exists (select from private.block k where k.blocker = $1 and k.blocked = $2) as blocking,
@@ -78,8 +79,8 @@ export async function sendRequest(pool: Pool, userId: string, username: string):
       [userId, them],
     );
     // The blocker knows they blocked, so this tells them nothing new (answer 29).
-    if (rows[0].blocking) throw new AppError("unblock_first", 409);
-    if (rows[0].friends) throw new AppError("already_friends", 409);
+    if (rows[0].blocking) throw new AppError("unblock_first", STATUS.conflict);
+    if (rows[0].friends) throw new AppError("already_friends", STATUS.conflict);
     // Their request can't be one I hid (I have no block on them, above) nor from a player who blocked me (a block
     // deletes the blocker's own request, D3), so the friendship below never meets OB016.
     const { rowCount } = await client.query("delete from private.friend_request where sender = $2 and receiver = $1", [userId, them]);
@@ -99,7 +100,7 @@ const TAKE_RECEIVED = `delete from private.friend_request r where r.sender = $2 
 export async function acceptRequest(pool: Pool, userId: string, username: string): Promise<void> {
   await withPair(pool, userId, username, requestNotFound(), async (client, them) => {
     const { rowCount } = await client.query(TAKE_RECEIVED, [userId, them]);
-    if (!rowCount) throw new AppError("request_not_found", 404);
+    if (!rowCount) throw new AppError("request_not_found", STATUS.notFound);
     await client.query(BEFRIEND, [userId, them]);
   });
 }
@@ -108,14 +109,14 @@ export async function acceptRequest(pool: Pool, userId: string, username: string
 export async function declineRequest(pool: Pool, userId: string, username: string): Promise<void> {
   await withPair(pool, userId, username, requestNotFound(), async (client, them) => {
     const { rowCount } = await client.query(TAKE_RECEIVED, [userId, them]);
-    if (!rowCount) throw new AppError("request_not_found", 404);
+    if (!rowCount) throw new AppError("request_not_found", STATUS.notFound);
   });
 }
 
 export async function cancelRequest(pool: Pool, userId: string, username: string): Promise<void> {
   await withPair(pool, userId, username, requestNotFound(), async (client, them) => {
     const { rowCount } = await client.query("delete from private.friend_request where sender = $1 and receiver = $2", [userId, them]);
-    if (!rowCount) throw new AppError("request_not_found", 404);
+    if (!rowCount) throw new AppError("request_not_found", STATUS.notFound);
   });
 }
 
@@ -123,7 +124,7 @@ export async function cancelRequest(pool: Pool, userId: string, username: string
 // them (private.block_ends_friendship); their request to me stays, hidden. "Decline and block" is this alone: a
 // decline would take the request out of the sender's sent list (answers 5, 20, 28).
 export async function blockPlayer(pool: Pool, userId: string, username: string): Promise<void> {
-  const refuse = { own: new AppError("block_own", 409), unknown: new AppError("player_not_found", 404) };
+  const refuse = { own: new AppError("block_own", STATUS.conflict), unknown: new AppError("player_not_found", STATUS.notFound) };
   await withPair(pool, userId, username, refuse, async (client, them) => {
     await client.query("insert into private.block (blocker, blocked) values ($1, $2) on conflict do nothing", [userId, them]);
   });
@@ -131,10 +132,10 @@ export async function blockPlayer(pool: Pool, userId: string, username: string):
 
 // Lifts my block of a player. It restores no friendship and no request (answer 21, D2).
 export async function unblockPlayer(pool: Pool, userId: string, username: string): Promise<void> {
-  const refuse = { own: new AppError("not_blocked", 404), unknown: new AppError("not_blocked", 404) };
+  const refuse = { own: new AppError("not_blocked", STATUS.notFound), unknown: new AppError("not_blocked", STATUS.notFound) };
   await withPair(pool, userId, username, refuse, async (client, them) => {
     const { rows } = await client.query<{ lifted: boolean }>("select private.unblock($1, $2) as lifted", [userId, them]);
-    if (!rows[0].lifted) throw new AppError("not_blocked", 404);
+    if (!rows[0].lifted) throw new AppError("not_blocked", STATUS.notFound);
   });
 }
 

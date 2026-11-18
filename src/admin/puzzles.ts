@@ -9,6 +9,7 @@ import { GAME_ID } from "@/platform/game";
 import { thingNames, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // Every drafted day in the deployment, by date. CI validates these files, so one that fails here is a bug: it throws.
 // The folder is written out in full ("content", "offbeat") so the build can see which folder is read; a path built from
@@ -88,9 +89,9 @@ export async function listDays(db: Db, drafts: Map<string, Puzzle>): Promise<{ t
 // The SQLSTATEs the two guarded functions raise (supabase/migrations/20261028140000_baseline.sql), as API errors.
 function guarded(err: unknown): never {
   if (err instanceof DatabaseError) {
-    if (err.code === "OB007") throw new AppError("admins_only", 403);
-    if (err.code === "OB008") throw new AppError("day_past", 409);
-    if (err.code === "OB004") throw new AppError("puzzle_started", 409);
+    if (err.code === "OB007") throw new AppError("admins_only", STATUS.forbidden);
+    if (err.code === "OB008") throw new AppError("day_past", STATUS.conflict);
+    if (err.code === "OB004") throw new AppError("puzzle_started", STATUS.conflict);
   }
   throw err;
 }

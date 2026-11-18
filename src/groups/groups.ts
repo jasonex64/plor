@@ -5,6 +5,7 @@ import { DatabaseError } from "pg";
 import { newInviteCode, UUID, type FriendWithId } from "@/friends/friends";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 export type GroupSummary = { id: string; name: string };
 // A member as the others see them (G3): the ID identifies them (the creator removes by it), and the name shown is the
@@ -15,13 +16,13 @@ export type Group = GroupSummary & { inviteCode: string; creator: boolean; start
 
 // A group ID from a link or a request body. Anything that can't be one is the same 404 as a group the player isn't in.
 export function readGroupId(input: unknown): string {
-  if (typeof input !== "string" || !UUID.test(input)) throw new AppError("group_not_found", 404);
+  if (typeof input !== "string" || !UUID.test(input)) throw new AppError("group_not_found", STATUS.notFound);
   return input;
 }
 
 // Trimmed and in NFC, the form the database requires, as display names (M07 D1); the database checks the rest (G11).
 export function readGroupName(input: unknown): string {
-  if (typeof input !== "string" || input.includes("\0")) throw new AppError("group_name_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("group_name_invalid", STATUS.badRequest);
   return input.normalize("NFC").trim();
 }
 
@@ -64,14 +65,14 @@ export async function getGroup(db: Db, userId: string, groupId: string): Promise
      where g.id = $2 and exists (select from private.group_member where group_id = g.id and user_id = $1)`,
     [userId, groupId],
   );
-  if (!rows[0]) throw new AppError("group_not_found", 404);
+  if (!rows[0]) throw new AppError("group_not_found", STATUS.notFound);
   return rows[0];
 }
 
 // Which group a code opens, for the join page to ask "Join <name>?".
 export async function findGroupByCode(db: Db, code: string): Promise<GroupSummary> {
   const { rows } = await db.query<GroupSummary>("select id, name from private.player_group where invite_code = $1", [code]);
-  if (!rows[0]) throw new AppError("invite_invalid", 404);
+  if (!rows[0]) throw new AppError("invite_invalid", STATUS.notFound);
   return rows[0];
 }
 
@@ -83,7 +84,7 @@ export async function joinGroup(db: Db, userId: string, code: string): Promise<G
        select g.id, g.name from g join m on m.group_id = g.id`,
       [userId, code],
     );
-    if (!rows[0]) throw new AppError("invite_invalid", 404);
+    if (!rows[0]) throw new AppError("invite_invalid", STATUS.notFound);
     return rows[0];
   } catch (err) {
     throw groupError(err);
@@ -107,10 +108,10 @@ export async function leaveGroup(db: Db, userId: string, groupId: string): Promi
   } catch (err) {
     // The leave deletes the member's comments and the reactions on them, so it can meet a reaction being replaced, and
     // the database stops one of the two (40P01; 19b).
-    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", 409);
+    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", STATUS.conflict);
     throw err;
   }
-  if (rowCount === 0) throw new AppError("group_not_found", 404);
+  if (rowCount === 0) throw new AppError("group_not_found", STATUS.notFound);
 }
 
 // The creator's powers (G1). Each checks first, so a member who isn't the creator gets 403 and anyone else 404, and
@@ -121,15 +122,15 @@ async function checkCreator(db: Db, userId: string, groupId: string): Promise<vo
      join private.group_member m on m.group_id = g.id and m.user_id = $1 where g.id = $2`,
     [userId, groupId],
   );
-  if (!rows[0]) throw new AppError("group_not_found", 404);
-  if (!rows[0].creator) throw new AppError("not_creator", 403);
+  if (!rows[0]) throw new AppError("group_not_found", STATUS.notFound);
+  if (!rows[0].creator) throw new AppError("not_creator", STATUS.forbidden);
 }
 
 export async function renameGroup(db: Db, userId: string, groupId: string, name: string): Promise<void> {
   await checkCreator(db, userId, groupId);
   try {
     const { rowCount } = await db.query("update private.player_group set name = $3 where id = $2 and creator_id = $1", [userId, groupId, name]);
-    if (rowCount === 0) throw new AppError("not_creator", 403);
+    if (rowCount === 0) throw new AppError("not_creator", STATUS.forbidden);
   } catch (err) {
     throw groupError(err);
   }
@@ -142,7 +143,7 @@ export async function resetGroupInvite(db: Db, userId: string, groupId: string):
     "update private.player_group set invite_code = $3 where id = $2 and creator_id = $1 returning invite_code as code",
     [userId, groupId, newInviteCode()],
   );
-  if (!rows[0]) throw new AppError("not_creator", 403);
+  if (!rows[0]) throw new AppError("not_creator", STATUS.forbidden);
   return rows[0].code;
 }
 
@@ -154,23 +155,23 @@ export async function removeMember(db: Db, userId: string, groupId: string, memb
      where g.id = locked.id and g.creator_id = $1 and m.group_id = g.id and m.user_id = $3::uuid and m.user_id <> $1`,
     [userId, groupId, memberId],
   );
-  if (rowCount === 0) throw new AppError("member_not_found", 404);
+  if (rowCount === 0) throw new AppError("member_not_found", STATUS.notFound);
 }
 
 export async function deleteGroup(db: Db, userId: string, groupId: string): Promise<void> {
   await checkCreator(db, userId, groupId);
   const { rowCount } = await db.query("delete from private.player_group where id = $2 and creator_id = $1", [userId, groupId]);
-  if (rowCount === 0) throw new AppError("not_creator", 403);
+  if (rowCount === 0) throw new AppError("not_creator", STATUS.forbidden);
 }
 
 // Maps the rule a rejected write broke to the player-facing error; anything else is rethrown as is.
 function groupError(err: unknown): unknown {
   if (!(err instanceof DatabaseError)) return err;
-  if (err.code === "23514" && err.constraint === "player_group_name_format") return new AppError("group_name_invalid", 400);
-  if (err.code === "23505" && err.constraint === "group_member_pkey") return new AppError("already_member", 409);
+  if (err.code === "23514" && err.constraint === "player_group_name_format") return new AppError("group_name_invalid", STATUS.badRequest);
+  if (err.code === "23505" && err.constraint === "group_member_pkey") return new AppError("already_member", STATUS.conflict);
   // The group was deleted between the join's read and its insert (19b): the group page's 404.
-  if (err.code === "23503" && err.constraint === "group_member_group_id_fkey") return new AppError("group_not_found", 404);
-  if (err.code === "OB009") return new AppError("group_full", 409);
-  if (err.code === "OB010") return new AppError("too_many_groups", 409);
+  if (err.code === "23503" && err.constraint === "group_member_group_id_fkey") return new AppError("group_not_found", STATUS.notFound);
+  if (err.code === "OB009") return new AppError("group_full", STATUS.conflict);
+  if (err.code === "OB010") return new AppError("too_many_groups", STATUS.conflict);
   return err;
 }

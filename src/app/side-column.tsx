@@ -18,7 +18,7 @@ export function SideColumn({ label, inPlace, className, hidden = false, children
   hidden?: boolean;
   children: ReactNode;
 }) {
-  const wide = useMinWidth(1200);
+  const wide = useMinWidth(1200); // docs/milestones/M14-14b-2b-1-shell.md, Numbers (1200px)
   useBodyFlag("column", wide && !hidden);
   // One box for the column's life, moved between <body> and its place in the page, so crossing 1200px moves the
   // column rather than remounting it, and a comment draft in it stays (docs/milestones/M14-14b-2c-review-items.md,

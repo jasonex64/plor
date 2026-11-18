@@ -87,8 +87,8 @@ export function AdminArea({ page, admin }: { page: AdminPage; admin: boolean }) 
 
 function Area({ page }: { page: AdminPage }) {
   const { counts, error, refresh } = useCounts();
-  const wide = useMinWidth(768);
-  const column = useMinWidth(1200);
+  const wide = useMinWidth(768); // docs/milestones/M14-14a-1-shell.md, Numbers (768px)
+  const column = useMinWidth(1200); // docs/milestones/M14-14b-2b-1-shell.md, Numbers (1200px)
   return (
     <div className={styles.area}>
       <div className={styles.head}>

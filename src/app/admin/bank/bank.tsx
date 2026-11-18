@@ -15,6 +15,9 @@ import { Line, Skeleton } from "../../skeleton";
 import pool from "../pool.module.css";
 import { AnswerPool } from "../pool";
 
+// The table's columns, so a row spanning them stays right when one is added (docs/milestones/PROCESS-lint-rules.md, answer 21).
+const COLUMNS = ["Question", "Category", "Themes", "Added by", "Runs (caught)"];
+
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
   const [filter, setFilter] = useState("");
@@ -51,11 +54,11 @@ export function Bank() {
           <table className={admin.table} role="table">
             <thead role="rowgroup" className="sr-only-on-phones">
               <tr role="row">
-                <th role="columnheader">Question</th>
-                <th role="columnheader">Category</th>
-                <th role="columnheader">Themes</th>
-                <th role="columnheader">Added by</th>
-                <th role="columnheader">Runs (caught)</th>
+                {COLUMNS.map((c) => (
+                  <th key={c} role="columnheader">
+                    {c}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody role="rowgroup">
@@ -114,7 +117,7 @@ export function Bank() {
                 </tr>
                 {pools.includes(q.id) && (
                   <tr role="row">
-                    <td role="cell" colSpan={5}>
+                    <td role="cell" colSpan={COLUMNS.length}>
                       <AnswerPool category={q.category} taken={[]} />
                     </td>
                   </tr>

@@ -28,10 +28,13 @@ import { tomorrowOf } from "../tomorrow";
 import { slotDates } from "../puzzle-dates";
 import { SubstringDay } from "./substring-days";
 
+// The table's columns, so a row spanning them stays right when one is added (docs/milestones/PROCESS-lint-rules.md, answer 21).
+const COLUMNS = ["#", "Question", "Steals", "Host answers"];
+
 type DaysResponse = { today: string; days: DayView[]; substringDays: SubstringDayView[] };
 
 // Host answers shown before "+N more": round 10's five, the checked ones always among them.
-const SHOWN = 5;
+const SHOWN = 5; // kept as built (human, 2026-11-17, docs/milestones/PROCESS-lint-rules.md answer 24)
 
 function stateOf(day: DayView): { label: string; tone: string } {
   if (day.started) return { label: "Live", tone: kit.chip };
@@ -221,10 +224,11 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
       <table className={admin.table} role="table">
         <thead role="rowgroup" className="sr-only-on-phones">
           <tr role="row">
-            <th role="columnheader">#</th>
-            <th role="columnheader">Question</th>
-            <th role="columnheader">Steals</th>
-            <th role="columnheader">Host answers</th>
+            {COLUMNS.map((c) => (
+              <th key={c} role="columnheader">
+                {c}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody role="rowgroup">
@@ -275,7 +279,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
             </tr>
             {pools.includes(i) && (
               <tr role="row">
-                <td role="cell" colSpan={4}>
+                <td role="cell" colSpan={COLUMNS.length}>
                   {/* The letters taken by this question's turn, its own included, as the host chips count them. */}
                   <AnswerPool key={q.category} category={q.category} taken={shown.slice(0, i + 1).flatMap((x) => (x.steals ? [x.steals] : []))} />
                 </td>

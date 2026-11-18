@@ -1,5 +1,6 @@
 import { authFailure, createAuthClient } from "@/lib/auth";
 import { AppError, checkProtocol, handle } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // Starts Google sign-in with the PKCE flow (supabase.com/docs/guides/auth/social-login/auth-google).
 // signInWithOAuth stores the code verifier in a cookie, which this response carries; the client then
@@ -9,7 +10,7 @@ import { AppError, checkProtocol, handle } from "@/lib/http";
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const origin = request.headers.get("origin");
-  if (!origin || !URL.canParse(origin)) throw new AppError("bad_request", 400, "missing or invalid Origin header");
+  if (!origin || !URL.canParse(origin)) throw new AppError("bad_request", STATUS.badRequest, "missing or invalid Origin header");
   const supabase = await createAuthClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

@@ -12,6 +12,7 @@ import { AppError } from "@/lib/http";
 import { buildRun, type PlayedWord } from "./substring-runs";
 import type { SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
+import { STATUS } from "@/lib/status";
 
 export type SubstringTestMoves = { words: (string | null)[]; open: boolean; text: string | null };
 
@@ -43,7 +44,7 @@ async function judge(db: Db, userId: string, letters: string, used: Set<string>,
 
 export async function substringTestRun(db: Db, userId: string, day: SubstringDay, moves: SubstringTestMoves): Promise<{ run: SubstringRun; outcome?: TryOutcome; word?: string }> {
   const total = day.rounds.length;
-  if (moves.words.length > total) throw new AppError("bad_request", 400, "words");
+  if (moves.words.length > total) throw new AppError("bad_request", STATUS.badRequest, "words");
   const played: PlayedWord[] = [];
   const used = new Set<string>();
   const take = (index: number, key: string, word: string) => {
@@ -54,14 +55,14 @@ export async function substringTestRun(db: Db, userId: string, day: SubstringDay
   for (const [index, typed] of moves.words.entries()) {
     if (typed === null) continue;
     const verdict = await judge(db, userId, day.rounds[index], used, typed);
-    if (verdict.outcome !== "accepted") throw new AppError("bad_request", 400, "words");
+    if (verdict.outcome !== "accepted") throw new AppError("bad_request", STATUS.badRequest, "words");
     take(index, verdict.key, verdict.word!);
   }
   let done = moves.words.length;
   let open = moves.open && done < total;
   let tried: { outcome: TryOutcome; word?: string } | undefined;
   if (moves.text !== null) {
-    if (!open) throw new AppError("not_open", 409);
+    if (!open) throw new AppError("not_open", STATUS.conflict);
     const verdict = await judge(db, userId, day.rounds[done], used, moves.text);
     tried = { outcome: verdict.outcome, word: verdict.word };
     if (verdict.outcome === "accepted") {

@@ -2,6 +2,7 @@ import { authFailure, createAuthClient } from "@/lib/auth";
 import { clientIp, emailKey, takeAttempt } from "@/lib/auth-limits";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // The player types the code from the sign-in email, and verifyOtp exchanges it for a session, whose cookies this
 // response carries (supabase.com/docs/guides/auth/auth-email-passwordless, "With OTP", step 2). `type: "email"`
@@ -13,8 +14,8 @@ import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const { email, code } = await readJsonObject(request);
-  if (typeof email !== "string" || email.trim() === "") throw new AppError("email_invalid", 400);
-  if (typeof code !== "string" || code.replace(/\s/g, "") === "") throw new AppError("code_invalid", 400);
+  if (typeof email !== "string" || email.trim() === "") throw new AppError("email_invalid", STATUS.badRequest);
+  if (typeof code !== "string" || code.replace(/\s/g, "") === "") throw new AppError("code_invalid", STATUS.badRequest);
 
   const db = getPool();
   await takeAttempt(db, "check_ip", clientIp(request));

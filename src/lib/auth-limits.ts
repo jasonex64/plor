@@ -7,6 +7,7 @@ import { AUTH_LIMITS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
+import { STATUS } from "@/lib/status";
 
 export type AuthLimitKind = keyof typeof AUTH_LIMITS;
 
@@ -43,8 +44,8 @@ export async function takeAttempt(db: Db, kind: AuthLimitKind, value: string): P
     windowSeconds,
   ]);
   if (rows[0].taken) return;
-  log.warn("attempt refused", { kind, key: key.slice(0, 8) });
-  throw new AppError("too_many_attempts", 429);
+  log.warn("attempt refused", { kind, key: key.slice(0, 8) }); // docs/milestones/M12-12e-sign-in-limits.md: the first 8 characters of the hashed key
+  throw new AppError("too_many_attempts", STATUS.tooManyRequests);
 }
 
 // Takes back the attempt just counted, for a request that went no further

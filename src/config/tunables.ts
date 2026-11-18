@@ -26,7 +26,7 @@ export const TYPED_ANSWER_MAX_LENGTH = 40;
 // Username length (human, 2026-10-18; docs/milestones/M02-sign-in-and-play.md, Numbers). The database's check
 // constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).
 export const USERNAME_MIN_LENGTH = 3;
-export const USERNAME_MAX_LENGTH = 20;
+export const USERNAME_MAX_LENGTH = 20; // docs/milestones/M02-sign-in-and-play.md, Numbers: "3–20 characters" (human, 2026-10-18)
 // A username changes at most once every this many days, the first change at once (human, 2026-10-23,
 // docs/milestones/M12-account.md, A2). The trigger in supabase/migrations/20261028140000_baseline.sql enforces
 // the same 30: supabase/tests/profile.test.sql checks it on both sides, and src/lib/profile.db.test.ts that the two agree.
@@ -46,8 +46,8 @@ export const INVITE_CODE_LENGTH = 10;
 // characters; 50 members per group and 10 groups per player. The database judges all three (player_group_name_format
 // and private.group_member_guard); the groups route test sends each limit through it.
 export const GROUP_NAME_MAX_LENGTH = 24;
-export const GROUP_MAX_MEMBERS = 50;
-export const GROUPS_PER_PLAYER = 10;
+export const GROUP_MAX_MEMBERS = 50; // docs/milestones/M10-groups.md, Numbers: "Members per group: 50" (human, 2026-10-22)
+export const GROUPS_PER_PLAYER = 10; // docs/milestones/M10-groups.md, Numbers: "Groups per player: 10" (human, 2026-10-22)
 
 // Comment length (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md, D1). The database's check
 // constraint comment_body_format enforces it; the comments route test posts both lengths through it.
@@ -73,7 +73,7 @@ export const FRIENDS_PER_PLACE = 3;
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
 // "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;
-export const TYPO_MIN_LETTERS = 4;
+export const TYPO_MIN_LETTERS = 4; // docs/milestones/M02-sign-in-and-play.md, Numbers, "Did you mean"
 
 // Learning from misses (human, 2026-10-24; docs/milestones/M13-answer-lists-and-content.md, D4): a text becomes an
 // answer once at least this many distinct players typed it for a category, and at least this share (in percent) of the
@@ -91,15 +91,15 @@ export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
 // some common, uncommon or rare answer to a question, before play has counted any.
 export const FIRST_GUESS_SHARES = { common: 0.4, uncommon: 0.4, rare: 0.2 } as const;
 // N1: the first guess weighs as this many players against the pooled counts.
-export const RARITY_EXPECTATION_WEIGHT = 10;
+export const RARITY_EXPECTATION_WEIGHT = 10; // docs/milestones/M09-points-and-leaderboard.md, N1
 // N4: a question's real counts are used once at least this many players answered it (as INSIGHTS_MIN_PLAYERS).
-export const RARITY_MIN_PLAYERS = 5;
+export const RARITY_MIN_PLAYERS = 5; // docs/milestones/M09-points-and-leaderboard.md, N4
 // N2: an answer earns up to this fraction of its question's points, shrinking to 0 at RARITY_ZERO_SHARE of players.
 // Up to half keeps the human's rule without the cap ever cutting: getting further always beats rarer answers.
-export const RARITY_BONUS_FRACTION = 0.5;
-export const RARITY_ZERO_SHARE = 0.2;
+export const RARITY_BONUS_FRACTION = 0.5; // docs/milestones/M09-points-and-leaderboard.md, N2
+export const RARITY_ZERO_SHARE = 0.2; // docs/milestones/M09-points-and-leaderboard.md, N2
 // N3: the most bonus a perfect run can earn (a missed question caps the others).
-export const PERFECT_RUN_BONUS_CAP = 500;
+export const PERFECT_RUN_BONUS_CAP = 500; // docs/milestones/M09-points-and-leaderboard.md, N3
 
 // How many players gave each of your answers (docs/milestones/M11-home-screen.md, H5, Numbers): a question's share
 // shows once at least this many players answered it; fewer is "too few players yet" (human, 2026-10-22).
@@ -121,9 +121,9 @@ export const LETTER_SCHEDULE: (keyof typeof LETTER_TIERS | null)[] = [null, "med
 export const INSIGHTS_MIN_PLAYERS = 5;
 // A later question that catches at least this many percentage points fewer players than an earlier one breaks the
 // day's gently rising shape (DECISIONS.md: Game 1).
-export const INSIGHTS_SHAPE_DROP_POINTS = 10;
+export const INSIGHTS_SHAPE_DROP_POINTS = 10; // docs/milestones/M03-puzzle-insights.md, Numbers
 // How many of a question's most common answers the report lists.
-export const INSIGHTS_TOP_ANSWERS = 5;
+export const INSIGHTS_TOP_ANSWERS = 5; // docs/milestones/M03-puzzle-insights.md, Numbers (human, 2026-10-19)
 
 // The answer database's imports (docs/milestones/M13-13a-the-base.md; scripts/base.ts).
 // BASE_REVIEW_SAMPLE: random members shown in an import's review (human, 2026-10-24: "Summary + flags (Recommended)",
@@ -131,7 +131,7 @@ export const INSIGHTS_TOP_ANSWERS = 5;
 // their names), as the import reads the animal tree by key (13e-4c; human, 2026-10-26: "5,000 (Recommended)", after
 // 5,000 took 3.3 s and 2.1 s against the query service's 60 s limit).
 export const BASE_REVIEW_SAMPLE = 20;
-export const BASE_BATCH_IDS = 5_000;
+export const BASE_BATCH_IDS = 5_000; // docs/milestones/M13-13e-4-subsets.md: "5,000 (Recommended)"
 // The places 13b's facts check knows: Wikidata items with a population figure of at least this many people (human,
 // 2026-10-24: "100,000+ people (Recommended)"; docs/milestones/M13-13b-learning-from-misses.md).
 export const BASE_PLACES_MIN_POPULATION = 100_000;
@@ -181,7 +181,7 @@ export const UNDO_SECONDS = 5;
 // English Speller Database's size (human, 2026-11-05: "About 239,000 words (Recommended)"). DICTIONARY_MIN_LETTERS: the
 // shortest word (human, 2026-11-05: "3 letters or more (Recommended)").
 export const DICTIONARY_MAX_SIZE = 85;
-export const DICTIONARY_MIN_LETTERS = 3;
+export const DICTIONARY_MIN_LETTERS = 3; // docs/milestones/M16-16a-the-dictionary.md, answer 3
 // A word is everyday from this size down, which is what keeps a round fair: players never see it (human, 2026-11-06,
 // M16 S21: the everyday list, "Yes, use that").
 export const DICTIONARY_EVERYDAY_SIZE = 35;
@@ -213,8 +213,8 @@ export const SUBSTRING_SAMPLE_WORDS = 4;
 // and the bonus letter's points for each word holding it, are Claude's so a typical run splits about a third each,
 // approved with their tables and worked runs ("Approve these sizes").
 export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25 } as const;
-export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const;
-export const SUBSTRING_BONUS_LETTER_POINTS = 120;
+export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const; // docs/milestones/M16-16e-points-and-boards.md, answers 10, 12 and 13
+export const SUBSTRING_BONUS_LETTER_POINTS = 120; // docs/milestones/M16-16e-points-and-boards.md, answers 12 and 13
 
 // A game's par, by its permanent ID: the day's points that count as a full 100 on the overall board
 // (docs/milestones/M15-15i-par-scores.md; each game's own board is in points since issue #265; human, 2026-11-15: Offbeat "1,250: perfect plus half the bonus", Fragments

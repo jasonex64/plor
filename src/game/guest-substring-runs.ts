@@ -13,6 +13,7 @@ import { guestStandingToday } from "./substring-places";
 import { buildRun, ROUND_RUNNING, OUT_OF_ORDER, RUN_OVER, todaysDay, type PlayedWord } from "./substring-runs";
 import type { SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
+import { STATUS } from "@/lib/status";
 
 // The state of the token's run on a date, as substring-runs.ts's stateOf builds it. A run that is over is not ended by a
 // read: its rows stay until the day's purge, so every read gives the result. The status, the words and the examples are one
@@ -52,7 +53,7 @@ export async function guestSubstringState(db: Db, tokenHash: string | null): Pro
 export async function startGuestSubstringRun(db: Db, tokenHash: string): Promise<SubstringRun> {
   await db.query("select private.purge_guest_days()");
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   const open = await stateOf(db, tokenHash, today.date, today.day);
   if (open.status !== "not_started") return open;
   await db.query(
@@ -66,26 +67,26 @@ export async function startGuestSubstringRun(db: Db, tokenHash: string): Promise
 // One try at the open round. No run today is 409 run_over: its day closed.
 export async function tryGuestWord(db: Db, tokenHash: string, typed: string): Promise<{ outcome: TryOutcome; word?: string; run: SubstringRun }> {
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   const clean = cleanedTry(typed);
   const { rows } = await db.query<{ result: { outcome: TryOutcome | "no_run"; word?: string } }>(
     "select private.guest_judge_word($1, $2::date, $3, $4, $5) as result",
     [tokenHash, today.date, tryKey(typed), clean, plainText(clean)],
   );
   const { outcome, word } = rows[0].result;
-  if (outcome === "no_run") throw new AppError("run_over", 409);
+  if (outcome === "no_run") throw new AppError("run_over", STATUS.conflict);
   return { outcome, word, run: await stateOf(db, tokenHash, today.date, today.day) };
 }
 
 // Opens the next round. A second tap returns the same state; the database refuses it while a round's clock runs.
 export async function nextGuestRound(db: Db, tokenHash: string): Promise<SubstringRun> {
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   const { rows } = await db.query<{ answered: number }>(
     "select answered from private.guest_run_status where token_hash = $1 and game_id = $2 and puzzle_date = $3::date",
     [tokenHash, SUBSTRINGS_ID, today.date],
   );
-  if (rows.length === 0) throw new AppError("run_over", 409);
+  if (rows.length === 0) throw new AppError("run_over", STATUS.conflict);
   try {
     await db.query(
       `insert into private.guest_question_open (token_hash, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)
@@ -95,10 +96,10 @@ export async function nextGuestRound(db: Db, tokenHash: string): Promise<Substri
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
     // The purge took the run between our read and our insert, at the day's close: its rows, and the foreign key, are gone.
-    if (err.code === RUN_OVER || err.code === "23503") throw new AppError("run_over", 409);
-    if (err.code === ROUND_RUNNING || err.code === OUT_OF_ORDER) throw new AppError("round_running", 409);
+    if (err.code === RUN_OVER || err.code === "23503") throw new AppError("run_over", STATUS.conflict);
+    if (err.code === ROUND_RUNNING || err.code === OUT_OF_ORDER) throw new AppError("round_running", STATUS.conflict);
     // question_idx must be over 0: round 1 opens with Start, so Next during it has nothing to open.
-    if (err.code === "23514" && err.constraint === "guest_question_open_question_idx_check") throw new AppError("round_running", 409);
+    if (err.code === "23514" && err.constraint === "guest_question_open_question_idx_check") throw new AppError("round_running", STATUS.conflict);
     throw err;
   }
   return stateOf(db, tokenHash, today.date, today.day);

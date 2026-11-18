@@ -28,13 +28,14 @@ export function writeShown(name: string, value: string): void {
 // cubic-bezier(0.2, 0.8, 0.2, 1), the motion's one curve (globals.css --ease; answer 26), as a function of time 0 to 1:
 // x(s) is solved for s by Newton's method, then y(s) is the progress.
 const X1 = 0.2, Y1 = 0.8, X2 = 0.2, Y2 = 1;
-const bezier = (a: number, b: number, s: number) => 3 * a * s * (1 - s) ** 2 + 3 * b * s ** 2 * (1 - s) + s ** 3;
-const slope = (a: number, b: number, s: number) => 3 * a * (1 - s) ** 2 + 6 * (b - a) * s * (1 - s) + 3 * (1 - b) * s ** 2;
+const bezier = (a: number, b: number, s: number) => 3 * a * s * (1 - s) ** 2 + 3 * b * s ** 2 * (1 - s) + s ** 3; // the cubic's explicit form, https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+const slope = (a: number, b: number, s: number) => 3 * a * (1 - s) ** 2 + 6 * (b - a) * s * (1 - s) + 3 * (1 - b) * s ** 2; // its derivative, https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 export function ease(t: number): number {
   if (t <= 0) return 0;
   if (t >= 1) return 1;
   let s = t;
-  for (let i = 0; i < 8; i++) {
+  // 4 steps (human, 2026-11-17, docs/milestones/PROCESS-lint-rules.md answer 27).
+  for (let i = 0; i < 4; i++) {
     const d = slope(X1, X2, s);
     if (d === 0) break;
     s -= (bezier(X1, X2, s) - t) / d;

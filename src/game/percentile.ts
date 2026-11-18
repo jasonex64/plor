@@ -7,6 +7,6 @@ const oneDecimal = (x: number) => Math.round(x * 10) / 10;
 
 export function percentile(score: number, others: number[]): number {
   if (others.length === 0) return 100;
-  const beaten = others.reduce((sum, other) => sum + (other < score ? 1 : other === score ? 0.5 : 0), 0);
+  const beaten = others.reduce((sum, other) => sum + (other < score ? 1 : other === score ? 0.5 : 0), 0); // a tie counts half (human, 2026-11-17, docs/milestones/PROCESS-lint-rules.md answer 23)
   return oneDecimal((beaten / others.length) * 100);
 }

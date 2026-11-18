@@ -21,7 +21,7 @@ export function StreakRanks({ days }: { days: number }) {
       <ol className={styles.ranks}>
         {RANKS.map((rank) => (
           <li key={rank.name} className={rank === current ? `${kit.card} ${styles.rank} ${styles.current}` : `${kit.card} ${styles.rank}`} aria-current={rank === current || undefined}>
-            <RankFlower rank={rank} size={96} />
+            <RankFlower rank={rank} size={96 /* docs/milestones/M14-14b-2a-streak-ranks.md, Numbers */} />
             <span className={styles.name}>{rank.name}</span>
             <span className={styles.days}>{rankDays(rank)}</span>
             {rank === current && <span className={styles.yours}>Your rank</span>}

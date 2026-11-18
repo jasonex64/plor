@@ -11,6 +11,7 @@ import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { friendsSql } from "./circle";
 import type { Friend } from "./friends";
+import { STATUS } from "@/lib/status";
 
 
 // How the viewer stands to the player: "sent", the viewer's request waits; "received", theirs does; "blocked", the
@@ -44,7 +45,7 @@ export async function getPlayer(db: Db, viewerId: string, name: string): Promise
   );
   const them = rows[0];
   if (!them?.self && !them?.friend) await takeAttempt(db, "lookup", viewerId);
-  if (!them || them.hidden) throw new AppError("player_not_found", 404);
+  if (!them || them.hidden) throw new AppError("player_not_found", STATUS.notFound);
   const relation: Relation = them.self ? "self" : them.friend ? "friend" : them.blocking ? "blocked" : them.sent ? "sent" : them.received ? "received" : "none";
   const { me, recent } = await getPlayerStats(db, them.user_id);
   const short = { username: them.username, name: them.name, relation, totals: me.totals, offbeat: me.offbeat };

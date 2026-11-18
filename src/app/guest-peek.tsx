@@ -6,7 +6,7 @@ import { SIGN_IN_HREF } from "./sign-in-open";
 import { BACK } from "./slide";
 
 // The calendar's four shades, in a fixed order: a drawing, not anyone's days.
-const DAYS = [1, 3, 2, 4, 2, 1, 3, 4, 2, 3, 1, 4, 3, 2];
+const DAYS = [1, 3, 2, 4, 2, 1, 3, 4, 2, 3, 1, 4, 3, 2]; // kept as built (human, 2026-11-17, docs/milestones/PROCESS-lint-rules.md answer 25)
 
 // Under a guest's result, in both games: what an account adds, as words over a drawn stand-in, blurred, of a streak, a
 // friends board and a calendar (docs/milestones/M18-guest-play.md, answers 2 and 15; Design, "The peek and pages"). The

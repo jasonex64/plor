@@ -11,6 +11,7 @@ import { standingToday } from "./substring-places";
 import { bonusPoints, scoreRun, wordPoints } from "./substring-scoring";
 import type { PlayedRound, Standing, SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
+import { STATUS } from "@/lib/status";
 
 export const OUT_OF_ORDER = "OB002";
 export const RUN_OVER = "OB003";
@@ -93,7 +94,7 @@ export async function todaysRun(db: Db, userId: string): Promise<SubstringRun | 
 // Starting twice returns the same run.
 export async function startSubstringRun(db: Db, userId: string): Promise<SubstringRun> {
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   await db.query(
     `insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)
      on conflict (user_id, game_id, puzzle_date) do nothing`,
@@ -104,26 +105,26 @@ export async function startSubstringRun(db: Db, userId: string): Promise<Substri
 
 export async function tryWord(db: Db, userId: string, typed: string): Promise<{ outcome: TryOutcome; word?: string; run: SubstringRun }> {
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   const clean = cleanedTry(typed);
   const { rows } = await db.query<{ result: { outcome: TryOutcome | "no_run"; word?: string } }>(
     "select private.judge_word($1, $2::date, $3, $4, $5) as result",
     [userId, today.date, tryKey(typed), clean, plainText(clean)],
   );
   const { outcome, word } = rows[0].result;
-  if (outcome === "no_run") throw new AppError("no_run", 404);
+  if (outcome === "no_run") throw new AppError("no_run", STATUS.notFound);
   return { outcome, word, run: await stateOf(db, userId, today.date, today.day) };
 }
 
 // Opens the next round. A second tap returns the same state; the database refuses it while a round's clock runs.
 export async function nextRound(db: Db, userId: string): Promise<SubstringRun> {
   const today = await todaysDay(db);
-  if (!today) throw new AppError("no_puzzle_today", 404);
+  if (!today) throw new AppError("no_puzzle_today", STATUS.notFound);
   const { rows } = await db.query<{ answered: number }>(
     "select answered from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
     [userId, SUBSTRINGS_ID, today.date],
   );
-  if (rows.length === 0) throw new AppError("no_run", 404);
+  if (rows.length === 0) throw new AppError("no_run", STATUS.notFound);
   try {
     await db.query(
       `insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)
@@ -132,10 +133,10 @@ export async function nextRound(db: Db, userId: string): Promise<SubstringRun> {
     );
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
-    if (err.code === RUN_OVER) throw new AppError("run_over", 409);
-    if (err.code === ROUND_RUNNING || err.code === OUT_OF_ORDER) throw new AppError("round_running", 409);
+    if (err.code === RUN_OVER) throw new AppError("run_over", STATUS.conflict);
+    if (err.code === ROUND_RUNNING || err.code === OUT_OF_ORDER) throw new AppError("round_running", STATUS.conflict);
     // question_idx must be over 0: round 1 opens with Start, so Next during it has nothing to open.
-    if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("round_running", 409);
+    if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("round_running", STATUS.conflict);
     throw err;
   }
   return stateOf(db, userId, today.date, today.day);

@@ -5,6 +5,7 @@ import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { createProfile, getProfile } from "@/lib/profile";
 import { getStreak } from "@/game/streak";
 import { msToReset } from "@/game/runs";
+import { STATUS } from "@/lib/status";
 
 // Who is signed in, whether they have picked a username yet, and whether they're an admin, for the sidebar's Admin
 // link (docs/milestones/M14-14a-1-shell.md). The admin pages check again on every request. With a profile, its display
@@ -29,7 +30,7 @@ export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const { username } = await readJsonObject(request);
-  if (typeof username !== "string" || username.includes("\0")) throw new AppError("username_invalid", 400);
+  if (typeof username !== "string" || username.includes("\0")) throw new AppError("username_invalid", STATUS.badRequest);
   await createProfile(getPool(), userId, username);
-  return Response.json({ ok: true, username }, { status: 201 });
+  return Response.json({ ok: true, username }, { status: STATUS.created });
 });

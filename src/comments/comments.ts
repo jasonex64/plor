@@ -10,6 +10,7 @@ import type { BoardGame } from "@/friends/leaderboard";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { NO_REACTIONS, commentReactions, type Reactions } from "@/reactions/reactions";
+import { STATUS } from "@/lib/status";
 
 // username identifies the author (the page offers Delete on the viewer's own); name is the display name if set,
 // else the username (M07 7a). reactions are the viewer's own and their friends' (8b).
@@ -22,13 +23,13 @@ export type Thread = { date: string; canPost: boolean; comments: Comment[] | nul
 // The text as sent by the browser, trimmed, the form the database requires. Anything that isn't text gets 400, and so
 // does text with a NUL character, which Postgres text can't hold (it fails with 22021; 19b).
 export function readCommentBody(input: unknown): string {
-  if (typeof input !== "string" || input.includes("\0")) throw new AppError("comment_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("comment_invalid", STATUS.badRequest);
   return input.trim();
 }
 
 // A comment ID as the API gives it: a bigint, written in decimal. Anything else is refused before the database.
 export function readCommentId(input: unknown): string {
-  if (typeof input !== "string" || !/^[1-9]\d{0,17}$/.test(input)) throw new AppError("bad_request", 400, "id");
+  if (typeof input !== "string" || !/^[1-9]\d{0,17}$/.test(input)) throw new AppError("bad_request", STATUS.badRequest, "id");
   return input;
 }
 
@@ -48,8 +49,8 @@ export async function getThread(db: Db, viewerId: string, game: BoardGame, date:
     [viewerId, game, date, group],
   );
   const { today, future, status, member } = day[0];
-  if (!member) throw new AppError("group_not_found", 404);
-  if (future) throw new AppError("bad_request", 400, "date");
+  if (!member) throw new AppError("group_not_found", STATUS.notFound);
+  if (future) throw new AppError("bad_request", STATUS.badRequest, "date");
   const finished = status !== null && FINISHED.includes(status);
   // Today's thread waits for the viewer's run to end. So does a past day's while the viewer's run that day is still
   // going, since a run started before midnight can be played to its end after it (DECISIONS.md, Game 1, Timer); a
@@ -96,26 +97,26 @@ export async function postComment(db: Db, userId: string, game: BoardGame, date:
     ));
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "23514" && err.constraint === "comment_body_format") {
-      throw new AppError("comment_invalid", 400);
+      throw new AppError("comment_invalid", STATUS.badRequest);
     }
     if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "comment_group_member") {
-      throw new AppError("group_not_found", 404);
+      throw new AppError("group_not_found", STATUS.notFound);
     }
     throw err;
   }
   const row = rows[0];
   if (row.id !== null) return toComment(row, NO_REACTIONS);
-  if (!row.member) throw new AppError("group_not_found", 404);
-  if (row.past) throw new AppError("day_past", 409);
-  if (date !== row.today) throw new AppError("bad_request", 400, "date");
-  throw new AppError("not_finished", 409);
+  if (!row.member) throw new AppError("group_not_found", STATUS.notFound);
+  if (row.past) throw new AppError("day_past", STATUS.conflict);
+  if (date !== row.today) throw new AppError("bad_request", STATUS.badRequest, "date");
+  throw new AppError("not_finished", STATUS.conflict);
 }
 
 // Deletes the signed-in player's own comment, for everyone and for good (D4). Someone else's is the same 404 as a
 // missing one.
 export async function deleteComment(db: Db, userId: string, id: string): Promise<void> {
   const { rowCount } = await db.query("delete from private.comment where id = $1 and user_id = $2", [id, userId]);
-  if (rowCount === 0) throw new AppError("comment_not_found", 404);
+  if (rowCount === 0) throw new AppError("comment_not_found", STATUS.notFound);
 }
 
 // Reports someone else's comment that the player can see now: a friend's, or one in a group they're in, on a day whose
@@ -144,13 +145,13 @@ export async function reportComment(db: Db, userId: string, id: string): Promise
   } catch (err) {
     // The comment was deleted between the read and the insert (19b): the same reply as a comment that was already gone.
     if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "comment_report_comment_id_fkey") {
-      throw new AppError("comment_not_found", 404);
+      throw new AppError("comment_not_found", STATUS.notFound);
     }
     throw err;
   }
   // A comment the player can't see is the same 404 as a missing one, like deleting.
-  if (!rows[0]?.visible) throw new AppError("comment_not_found", 404);
-  if (rows[0].own) throw new AppError("report_own", 409);
+  if (!rows[0]?.visible) throw new AppError("comment_not_found", STATUS.notFound);
+  if (rows[0].own) throw new AppError("report_own", STATUS.conflict);
 }
 
 export function toComment(r: CommentRow, reactions: Reactions): Comment {

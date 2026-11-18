@@ -5,6 +5,7 @@ import { normalize } from "@/content/puzzle";
 import { shownName } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 export type ThingView = {
   id: string;
@@ -18,13 +19,13 @@ export type ThingView = {
 // The typed text is user input: anything that normalizes to nothing is refused.
 export async function lookupThings(db: Db, adminId: string, text: unknown): Promise<ThingView[]> {
   const alias = typeof text === "string" ? normalize(text) : "";
-  if (!alias) throw new AppError("bad_request", 400, "q");
+  if (!alias) throw new AppError("bad_request", STATUS.badRequest, "q");
   try {
     const { rows } = await db.query<{ things: ThingView[] }>("select private.base_lookup($1, $2) as things", [adminId, alias]);
     return rows[0].things.map((t) => ({ ...t, name: shownName(t.name) }));
   } catch (err) {
     // private.base_lookup's own admin check (supabase/migrations/20261028140000_baseline.sql).
-    if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", 403);
+    if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", STATUS.forbidden);
     throw err;
   }
 }

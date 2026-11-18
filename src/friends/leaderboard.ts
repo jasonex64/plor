@@ -28,6 +28,7 @@ import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { circleSql, groupCircleSql } from "./circle";
 import { ranked } from "./rank";
+import { STATUS } from "@/lib/status";
 
 // The games a board can be for.
 export type BoardGame = typeof GAME_ID | typeof SUBSTRINGS_ID;
@@ -37,7 +38,7 @@ export type BoardChoice = BoardGame | typeof OVERALL.id;
 // A request names its game, as each game has its own board, thread and reactions (comments and reactions: M16 16f-3).
 export function readGame(input: unknown): BoardGame {
   if (input === GAME_ID || input === SUBSTRINGS_ID) return input;
-  throw new AppError("unknown_game", 400);
+  throw new AppError("unknown_game", STATUS.badRequest);
 }
 
 // A board names its game, as each game's board counts differently, or asks for the overall one.
@@ -70,19 +71,19 @@ export type TodayBoard = { date: string; games: BoardGame[]; open: boolean; entr
 // weekday can't shift with the server's time zone.
 export function weekStart(day: string): string {
   const d = new Date(`${day}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
-  return d.toISOString().slice(0, 10);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // docs/DECISIONS.md, Log 2026-10-22: weeks run Monday to Sunday
+  return d.toISOString().split("T")[0];
 }
 
 function daysBefore(day: string, n: number): string {
   const d = new Date(`${day}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - n);
-  return d.toISOString().slice(0, 10);
+  return d.toISOString().split("T")[0];
 }
 
 // How many days from one calendar date to a later one.
 function daysFrom(from: string, day: string): number {
-  return (Date.parse(`${day}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000;
+  return (Date.parse(`${day}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / (24 * 60 * 60 * 1000);
 }
 
 // A player's ledger points by puzzle day ("2026-10-22" → points).
@@ -108,7 +109,7 @@ export async function getLeaderboard(db: Db, viewerId: string, game: BoardChoice
 // A group's board, for its members only; anyone else gets the group page's 404 (10b).
 export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: string, game: BoardChoice): Promise<Leaderboard | OverallBoard> {
   const board = await weeklyBoard(db, viewerId, game, groupCircleSql("$1", "$2"), [viewerId, groupId], groupId);
-  if (!board) throw new AppError("group_not_found", 404);
+  if (!board) throw new AppError("group_not_found", STATUS.notFound);
   return board;
 }
 
@@ -121,7 +122,7 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
     groupId === null
       ? await circleOf(db, circleSql("$1"), [viewerId])
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
-  if (!circle) throw new AppError("group_not_found", 404);
+  if (!circle) throw new AppError("group_not_found", STATUS.notFound);
   const yesterday = daysBefore(circle.today, 1);
   if (game === OVERALL.id) {
     const both = await bothGames(db, viewerId, circle.ids, groupId, yesterday, circle.today);
@@ -141,7 +142,7 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
     groupId === null
       ? await circleOf(db, circleSql("$1"), [viewerId])
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
-  if (!circle) throw new AppError("group_not_found", 404);
+  if (!circle) throw new AppError("group_not_found", STATUS.notFound);
   const asked: BoardGame[] = game === OVERALL.id ? [GAME_ID, SUBSTRINGS_ID] : [game];
   const { rows: days } = await db.query<{ game_id: BoardGame; content: ApprovedPuzzle }>(
     "select game_id, content from private.puzzle where puzzle_date = $1::date and game_id = any($2::text[])",
@@ -233,8 +234,8 @@ async function weeklyBoard(
   if (!circle) return null;
   const today = circle.today;
   const thisWeek = weekStart(today);
-  const lastWeek = daysBefore(thisWeek, 7);
-  const nextWeek = daysBefore(thisWeek, -7);
+  const lastWeek = daysBefore(thisWeek, 7); // docs/DECISIONS.md, Log 2026-10-22: weeks run Monday to Sunday
+  const nextWeek = daysBefore(thisWeek, -7); // docs/DECISIONS.md, Log 2026-10-22: weeks run Monday to Sunday
   const rowsOf = (g: BoardGame) => gameRows(db, g, viewerId, circle.ids, groupId, lastWeek, nextWeek);
   if (game === OVERALL.id) {
     const both = await bothGames(db, viewerId, circle.ids, groupId, lastWeek, nextWeek);
@@ -260,7 +261,7 @@ async function weeklyBoard(
       byTotal,
     ),
   });
-  return { thisWeek: week(thisWeek, nextWeek, daysFrom(thisWeek, today)), lastWeek: week(lastWeek, thisWeek, 7) };
+  return { thisWeek: week(thisWeek, nextWeek, daysFrom(thisWeek, today)), lastWeek: week(lastWeek, thisWeek, 7) }; // docs/DECISIONS.md, Log 2026-10-22: weeks run Monday to Sunday
 }
 
 // A game's rows for a board, from (included) to (excluded), and the days the viewer is still playing, which hold

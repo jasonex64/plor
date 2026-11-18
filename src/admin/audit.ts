@@ -8,6 +8,7 @@ import { withinTypo } from "@/game/matching";
 import { shownName } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 export type Named = { id: string; name: string };
 export type Review = {
@@ -38,8 +39,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 // The functions' own admin check (OB007), and a decision that doesn't fit the text's state (OB012).
 function mapError(err: unknown): never {
-  if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", 403);
-  if (err instanceof DatabaseError && err.code === "OB012") throw new AppError("audit_invalid", 409, err.message);
+  if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", STATUS.forbidden);
+  if (err instanceof DatabaseError && err.code === "OB012") throw new AppError("audit_invalid", STATUS.conflict, err.message);
   throw err;
 }
 
@@ -78,10 +79,10 @@ export async function openCount(db: Db, adminId: string): Promise<number> {
 // The request body is user input: a review ID, one of ACTIONS, and a thing ID for the actions that name one.
 export async function decide(db: Db, adminId: string, body: Record<string, unknown>): Promise<void> {
   const { id, action, thing } = body;
-  if (typeof id !== "number" || !Number.isSafeInteger(id) || id < 1) throw new AppError("bad_request", 400, "id");
-  if (typeof action !== "string" || !(ACTIONS as readonly string[]).includes(action)) throw new AppError("bad_request", 400, "action");
+  if (typeof id !== "number" || !Number.isSafeInteger(id) || id < 1) throw new AppError("bad_request", STATUS.badRequest, "id");
+  if (typeof action !== "string" || !(ACTIONS as readonly string[]).includes(action)) throw new AppError("bad_request", STATUS.badRequest, "action");
   const needsThing = NEEDS_THING.includes(action as Action);
-  if (needsThing ? typeof thing !== "string" || !UUID.test(thing) : thing !== undefined) throw new AppError("bad_request", 400, "thing");
+  if (needsThing ? typeof thing !== "string" || !UUID.test(thing) : thing !== undefined) throw new AppError("bad_request", STATUS.badRequest, "thing");
   try {
     await db.query("select private.audit_decide($1, $2, $3, $4)", [adminId, id, action, needsThing ? thing : null]);
   } catch (err) {
