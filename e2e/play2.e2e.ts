@@ -407,7 +407,8 @@ test("the friends leaderboard switches to game 2", async ({ page }) => {
   await games.getByText(SUBSTRINGS.name).click();
   await expect(games.getByRole("radio", { name: SUBSTRINGS.name })).toBeChecked();
   await expect(board.getByText(/score out of 100/)).toHaveCount(0);
-  // A new player's week: their own row, in points.
+  // A new player's week: their own row, in points, on This week (one period at a time since M20 20i).
+  await board.getByRole("radio", { name: "This week", exact: true }).check();
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).toContainText("(you)");
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).toContainText("0 points");
 });

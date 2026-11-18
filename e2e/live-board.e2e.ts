@@ -101,7 +101,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(yesterday.getByRole("listitem")).toHaveText([`${playerName}: 0 points`, `${watcherName} (you): 0 points`]);
   await openBoard(watcher);
   // The friends leaderboard (M09 9b; weekly since M10 10a) lists both with no points yet this week, since today's
-  // count once the day is over (D9). Tied on 0, they go by name: the player's "p…" before the watcher's "w…".
+  // count once the day is over (D9). Tied on 0, they go by name: the player's "p…" before the watcher's "w…". One
+  // period shows at a time, Today on load (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
+  await watcher.getByRole("region", { name: "Friends leaderboard" }).getByRole("radio", { name: "This week", exact: true }).check();
   await expect(watcher.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem")).toHaveText([
     `${playerName}: 0 points`,
     `${watcherName} (you): 0 points`,

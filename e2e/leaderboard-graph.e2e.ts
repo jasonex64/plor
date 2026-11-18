@@ -112,6 +112,8 @@ async function withFriends(page: Page, tag: string): Promise<string> {
 
 const board = (page: Page) => page.getByRole("region", { name: "Friends leaderboard" });
 const week = (page: Page, name: "This week" | "Last week") => board(page).getByRole("region", { name });
+// One period shows at a time, Today on load (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
+const pick = (page: Page, name: "This week" | "Last week") => board(page).getByRole("radiogroup", { name: "Period" }).getByRole("radio", { name, exact: true }).check();
 const texts = (graph: Locator) => graph.locator("text").allTextContents();
 // Each line's stroke colour and width, as drawn.
 const lines = (graph: Locator) =>
@@ -125,6 +127,7 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   test.slow();
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
   await withFriends(page, "gv");
+  await pick(page, "Last week");
 
   // List on load; Graph beside it (answer 3).
   const view = board(page).getByRole("radiogroup", { name: "View" });
@@ -146,11 +149,15 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   expect(await noSidewaysScroll(page)).toBe(true);
 
   // This week: today marked, or on a Monday the first points' note (answer 5).
+  await pick(page, "This week");
   if (thisOver > 0) {
+    await expect(week(page, "This week").getByRole("img")).toBeVisible();
     expect(await texts(week(page, "This week").getByRole("img"))).toContain("Today");
   } else {
     await expect(week(page, "This week")).toContainText("The first points arrive Tuesday, once Monday is over.");
   }
+  await pick(page, "Last week");
+  await expect(last).toHaveAccessibleName(`Last week, day by day: Ana leads with 36; you have 35.`);
 
   // A tap anywhere picks the nearest line on that day's column: just above Ben's Sunday point (answer 24).
   const ben = await last.locator("polyline").evaluateAll((all, edge) => {
@@ -191,8 +198,12 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   // Found in both weeks (answer 18).
   if (thisOver > 0) {
     const benThisWeek = THIS.Ben.slice(0, thisOver).reduce((a, b) => a + b, 0);
+    await pick(page, "This week");
+    await expect(week(page, "This week").getByRole("img")).toBeVisible();
     // Named last on its label, alone or after a tie ("You & Ben 20").
     expect(await texts(week(page, "This week").getByRole("img"))).toEqual(expect.arrayContaining([expect.stringMatching(new RegExp(`Ben ${benThisWeek}$`))]));
+    await pick(page, "Last week");
+    await expect(last).toBeVisible();
   }
   // Escape closes the list, then clears the field.
   await find.fill("c");
@@ -252,6 +263,7 @@ test("a name typed in full that starts others picks it and still lists them all"
   await withFriends(page, "gf");
   await DB.query("update private.profile set display_name = 'Be' where username = $1", [`gfcleo${RUN}`]);
   await page.reload();
+  await pick(page, "Last week");
   await board(page).getByRole("radiogroup", { name: "View" }).getByText("Graph", { exact: true }).click();
   const find = board(page).getByRole("combobox", { name: "Find a player" });
   await find.fill("Be");
@@ -284,6 +296,7 @@ test("a day the viewer is still playing is flat, struck through and noted, and '
     );
   });
   await page.reload();
+  await pick(page, "Last week");
   await board(page).getByRole("radiogroup", { name: "View" }).getByText("Graph", { exact: true }).click();
 
   // Wednesday adds nothing for anyone: Ana 33 (36 less 3), you 29 (35 less 6).
