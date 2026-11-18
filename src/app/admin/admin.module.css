@@ -225,7 +225,7 @@ span.decide {
   font-weight: 700;
 }
 
-/* The kit's small buttons in the admin area, without the base button's margin. */
+/* The admin area's buttons, without the base button's margin. */
 .area .button {
   margin: 0;
 }

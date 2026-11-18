@@ -38,7 +38,9 @@ test("signed out, an unknown address answers 404 with Plor's page, in its theme 
 
     const home = main.getByRole("link", { name: "Go to Today" });
     await expect(home).toHaveAttribute("href", "/");
-    expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    // The main button: a 40px face on its 4px edge, 44px in all (docs/milestones/M20-design-rules-and-clean-up.md, answer 11).
+    const [face, edge] = await home.evaluate((el) => [el.getBoundingClientRect().height, getComputedStyle(el).boxShadow]);
+    expect(face + parseFloat(edge.replace(/^rgba?\([^)]*\)\s*/, "").split(/\s+/)[1])).toBeGreaterThanOrEqual(44);
     await home.click();
     await expect(page).toHaveURL("/");
     await page.context().close();

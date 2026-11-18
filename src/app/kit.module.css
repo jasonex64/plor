@@ -110,8 +110,8 @@
 
   .row:hover,
   .hover:not(.primary):hover {
-    background: var(--soft);
-    color: var(--text);
+    background: var(--flat-hover, var(--soft));
+    color: var(--flat-text, var(--text));
   }
 
   /* A warning keeps its danger text under the pointer: the rule changes the fill, not the warning (20a's review). */

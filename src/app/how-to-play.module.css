@@ -60,7 +60,7 @@
   margin: 0;
 }
 
-/* 14px, as a note under the answer box (game.module.css, .note) and the kit's small button. */
+/* 14px, as a note under the answer box (game.module.css, .note) and a flat button. */
 .place {
   color: var(--muted);
   font-size: 0.875rem;

@@ -304,12 +304,13 @@ export function PlayFirst() {
   return (
     <>
       <p>
-        <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={kit.primary}>
+        {/* The page's one raised button: the first game's, or the sign-in form's once it's open
+            (docs/milestones/M20-design-rules-and-clean-up.md, answer 47). */}
+        <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={open ? undefined : kit.primary}>
           Play {GAME.name} without an account
         </ButtonLink>
       </p>
       <p>
-        {/* One raised button on the page: the first game's (docs/milestones/M20-design-rules-and-clean-up.md, answer 47). */}
         <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD}>
           Play {SUBSTRINGS.name} without an account
         </ButtonLink>

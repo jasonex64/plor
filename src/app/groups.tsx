@@ -197,8 +197,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   );
   return (
     <>
-      {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the accent small button and the rest
-          minor ones, those that can't be undone in the danger colour. */}
+      {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the main button and the rest flat, those that can't be undone in the danger colour. */}
       <section aria-label="Group" className={kit.card}>
         <LiveStatus channel={channel} />
         {group && link && (

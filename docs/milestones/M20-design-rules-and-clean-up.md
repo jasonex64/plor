@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below); next 20b (answer 40).
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is built (answers 45 to 50, below), in its PR; next 20e or 20f, each with its own questions, or 20h to 20j.
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
@@ -83,6 +83,8 @@ The pill's height is the avatar's 1.875rem (answer 40).
 | 46 | Which screens does 20b change? | "Every screen (Recommended)": the tabs, a group's page, profiles, settings, sign-in, both game screens and the admin pages; a button is flat unless it is the main action |
 | 47 | How is each screen's main action picked? | "I pick, you review in the PR (Recommended)": the action the screen is for, at most one raised button in view; every pick listed in the PR |
 | 48 | The Settings gear has no solid version for the hover swap (answer 37) | "Draw a solid gear (Recommended)": a filled gear in the tab icons' style, swapped as the tabs' are |
+| 49 | 20b's review: flat buttons on a game card (How to play, Result, the back card's Play) had dark text on the card's dark colour (WCAG 2.2 1.4.3). How do they look there? | "Like the card's chips (Recommended)": the card's white text and a see-through white edge, the chips' 50%, and the chips' 12% white fill under the pointer |
+| 50 | 20b's review: the admin's Puzzles shows each game's day with its Approve, two raised buttons | "Allow both on admin pages (Recommended)": one raised button in view is the player screens' rule |
 
 Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), 20e's four questions.
 
