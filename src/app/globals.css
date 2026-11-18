@@ -400,6 +400,10 @@ label {
      and 26). */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --quick: 200ms;
+  /* The moments' motions, picked by eye on /admin/kit (docs/milestones/M20-design-rules-and-clean-up.md): the pop at
+     Connections' 300ms (answer 35), the fade at Atlassian's xlong 400ms (answer 36). */
+  --pop: 300ms;
+  --fade: 400ms;
 }
 
 /* The comment box and the pickers take the page's font (M14 14b-6d: one font for all text) at the inputs' 16px, so iOS

@@ -181,7 +181,7 @@ export function Board({
             <li key={f.username} className={`${kit.row} ${kit.board} ${styles.friend}`}>
               <Avatar name={f.name} />
               <b className={styles.name}>{f.name}</b>
-              <span className="sr-only">:</span> <span className={`${toneOf(f)} ${styles.status}`}>{describe(f, shownBoard.rounds)}</span>
+              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds)} className={`${toneOf(f)} ${styles.status}`} />
               {f.reactions && (
                 <div className={styles.reactions}>
                   <Reactions reactions={f.reactions} below />
@@ -268,5 +268,23 @@ function WhereEveryoneEnded({ username, mine, friends }: { username: string; min
         ))}
       </ul>
     </section>
+  );
+}
+
+// A friend's status that fades in each time it changes, not when the board first shows it (docs/milestones/
+// M20-design-rules-and-clean-up.md, answers 57 and 59): only the chip moves, so a reaction menu open on the row stays
+// open. Keyed by how often it has changed, so each change plays the fade again. The state follows the value as React's
+// "adjusting some state when a prop changes" does, in render.
+function FadeIn({ value, className }: { value: string; className: string }) {
+  const [shown, setShown] = useState(value);
+  const [changes, setChanges] = useState(0);
+  if (value !== shown) {
+    setShown(value);
+    setChanges((n) => n + 1);
+  }
+  return (
+    <span key={changes} className={changes > 0 ? `${className} ${kit.fade}` : className}>
+      {value}
+    </span>
   );
 }

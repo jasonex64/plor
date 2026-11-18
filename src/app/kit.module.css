@@ -310,10 +310,24 @@ button.link {
   }
 }
 
-/* Something new comes in from 90% of its size (14b-10, answers 12, 14 and 26): a reaction you add, a comment that
-   arrives, a new streak rank. Still under reduced motion. */
+/* Something new comes in from 90% of its size (14b-10, answers 12, 14 and 26), over --pop (M20 answers 35, 57 and 58): a
+   reaction you add, a new streak rank, a reaction menu opening. Still under reduced motion. */
 .pop {
-  animation: pop var(--quick) var(--ease);
+  animation: pop var(--pop) var(--ease);
+}
+
+/* Something new fades in from 95% of its size over --fade, Atlassian's entrance (docs/research/research_notes/2026-11-17
+   calm frame, loud moments.md; M20 answers 36, 57 and 59): a comment that arrives, a friend's status on a board that
+   changed. Still under reduced motion. */
+.fade {
+  animation: fade var(--fade) var(--ease);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes pop {
@@ -323,7 +337,8 @@ button.link {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pop {
+  .pop,
+  .fade {
     animation: none;
   }
 }
