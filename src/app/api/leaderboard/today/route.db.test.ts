@@ -73,7 +73,8 @@ async function playFragments() {
     if (i < ROUNDS.length - 1) expect((await call(fragmentsNext(apiRequest("/api/substrings/next", { method: "POST" })))).status).toBe(200);
   }
 }
-const fragmentsPar = parScore(scoreRun(WORDS, "j").total, PAR_POINTS.substrings);
+const fragmentsPoints = scoreRun(WORDS, "j").total;
+const fragmentsPar = parScore(fragmentsPoints, PAR_POINTS.substrings);
 
 beforeAll(async () => {
   useLocalStack();
@@ -176,13 +177,13 @@ describe("today's board", () => {
     expect(await board("overall")).toEqual({ date: today, games: [GAME_ID, SUBSTRINGS_ID], open: false, entries: [], rest: [] });
   });
 
-  it("shows Fragments as par scores, and Overall as both games' par scores, with a one-game player's one", async () => {
+  it("shows Fragments as points (issue #265), and Overall as both games' par scores, with a one-game player's one", async () => {
     useSession(V.session);
     await playFragments();
     const fragments = await board(SUBSTRINGS_ID);
     expect(rows(fragments)).toEqual([
-      [F.username, fragmentsPar, false],
-      [V.username, fragmentsPar, true],
+      [F.username, fragmentsPoints, false],
+      [V.username, fragmentsPoints, true],
     ].sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
     expect(waiting(fragments)).toEqual([[P.username, "playing"]]);
 

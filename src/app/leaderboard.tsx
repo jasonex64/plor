@@ -10,7 +10,6 @@
 import { useEffect, useId, useState, type CSSProperties } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallEntry, OverallWeek, TodayBoard, Week } from "@/friends/leaderboard";
 import { ranked } from "@/friends/rank";
-import { PAR_POINTS } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
@@ -63,7 +62,6 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
   // Switching games faster than the answers come back shows only the newest game's (M11 H6).
   const [latest] = useState(latestOnly);
   const [latestToday] = useState(latestOnly);
-  const places = game === SUBSTRINGS.id;
   const overall = game === OVERALL.id;
 
   useEffect(() => {
@@ -111,9 +109,8 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
       )}
       {graph && !overall && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
       <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
-      {/* A game 2 week adds up par scores, not points; these notes are Claude's words, approved with the ticket
+      {/* The overall board adds up par scores, not points; these notes are Claude's words, approved with the ticket
           (docs/milestones/M15-15i-par-scores.md). */}
-      {places && <p className={styles.note}>Each day adds your score out of 100. {PAR_POINTS.substrings.toLocaleString("en-US")} points is a full 100.</p>}
       {overall && <p className={styles.note}>{average ? "Your average score out of 100, per game played." : "Each day adds your score out of 100 in each game."}</p>}
       {today && (
         <section aria-label="Today" className={styles.week}>
@@ -132,8 +129,8 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
       )}
       {board && !overall && (
         <>
-          <Standings label="This week" week={(board as Board).thisWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
-          <Standings label="Last week" week={(board as Board).lastWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
+          <Standings label="This week" week={(board as Board).thisWeek} graph={graph} picked={picked} onPick={setPicked} />
+          <Standings label="Last week" week={(board as Board).lastWeek} graph={graph} picked={picked} onPick={setPicked} />
         </>
       )}
       {!board && !error && (
@@ -232,8 +229,8 @@ export function LeaderboardCard() {
       </label>
       <section aria-label={label}>
         {today && <TodayStandings board={today} game={game} average={false} />}
-        {day && <Entries entries={day.entries} places={game !== GAME.id} />}
-        {week && <Entries entries={week.entries} places={game !== GAME.id} />}
+        {day && <Entries entries={day.entries} places={game === OVERALL.id} />}
+        {week && <Entries entries={week.entries} places={game === OVERALL.id} />}
         {!today && !day && !week && !error && (
           <Skeleton label="Loading scores">
             <Line />
@@ -261,7 +258,7 @@ function TodayStandings({ board, game, average }: { board: TodayBoard; game: (ty
     game === OVERALL.id && average ? ranked((board.entries as OverallEntry[]).map((e) => ({ ...e, points: e.average })), (e) => e.points) : board.entries;
   return (
     <>
-      <Entries entries={entries} places={game !== GAME.id} />
+      <Entries entries={entries} places={game === OVERALL.id} />
       {board.rest.length > 0 && (
         <ul className={kit.rows}>
           {board.rest.map((r) => (
@@ -282,8 +279,8 @@ function TodayStandings({ board, game, average }: { board: TodayBoard; game: (ty
 }
 
 // A week as its rows or, in Graph, its race (answers 5 and 15), with Show table beside its chip (answers 17 and 25).
-function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void; places: boolean }) {
-  const { label, week, graph, picked, onPick, places } = props;
+function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void }) {
+  const { label, week, graph, picked, onPick } = props;
   const [table, setTable] = useState(false);
   // Last week's friends board is empty for a viewer who joined this week with no older friends (M19 19c): no race.
   const empty = week.entries.length === 0;
@@ -301,7 +298,7 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
           )}
         </div>
       </div>
-      {(!graph || empty) && <Entries entries={week.entries} places={places} />}
+      {(!graph || empty) && <Entries entries={week.entries} />}
       {graph && week.days === 0 && <p className={raceStyles.empty}>The first points arrive Tuesday, once Monday is over.</p>}
       {drawn && <Race label={label} week={week} picked={picked} onPick={onPick} />}
       {drawn && week.hidden.length > 0 && <p className={styles.note}>{hiddenText(week.hidden)}</p>}
@@ -311,7 +308,7 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
 }
 
 // An overall week (answer 29): its rows by Sum, as the server ranks them, or by Average, ranked again here, each a
-// plain number like game 2's (answer 24).
+// plain number (answer 24).
 function OverallStandings({ label, week, average }: { label: string; week: OverallWeek; average: boolean }) {
   const entries = average ? ranked(week.entries.map((e) => ({ ...e, points: e.average })), (e) => e.points) : week.entries;
   return (
@@ -327,8 +324,8 @@ function OverallStandings({ label, week, average }: { label: string; week: Overa
 
 // Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
 // is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
-// the row's text; a hidden ": " keeps the row read as "name: 3 points". A game 2 week's number is its par scores added
-// up, the plain total the note explains (M16 16e, answer 24; M15 15i).
+// the row's text; a hidden ": " keeps the row read as "name: 3 points". The overall board's number is its par scores
+// added up, the plain total the note explains (M16 16e, answer 24; M15 15i).
 function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; places?: boolean }) {
   return (
     <ol className={kit.rows}>
