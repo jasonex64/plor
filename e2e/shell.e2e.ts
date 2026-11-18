@@ -5,6 +5,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { answerBox } from "./game";
+import { fixedWidth } from "./fixed-width";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
@@ -52,23 +53,10 @@ const sections = (page: Page) =>
     .locator("main section")
     .evaluateAll((all) => all.filter((s) => s.checkVisibility() && !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
 
-// The width a bar fixed to both edges of the window gets (the shell's bars and the right column are fixed).
-const fixedWidth = (page: Page) =>
-  page.evaluate(() => {
-    const probe = document.createElement("div");
-    probe.style.cssText = "position: fixed; left: 0; right: 0; top: 0; height: 1px";
-    document.body.append(probe);
-    const width = probe.getBoundingClientRect().width;
-    probe.remove();
-    return width;
-  });
-
 test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ browser }) => {
   const { page, requests, nav } = await player(browser, "sa", { width: 360, height: 800 });
   await expect(nav.getByRole("link")).toHaveText(TABS.map((t) => t.name));
-  // Along the bottom edge and the full width: a tab bar, not a sidebar. The full width is what a bar fixed to both edges
-  // gets: the window's, less the scrollbar's room the page keeps (M20 answer 43), which Chromium keeps for fixed bars
-  // here though it hides its scrollbars.
+  // Along the bottom edge and the full width a fixed bar gets (fixed-width.ts): a tab bar, not a sidebar.
   const box = (await nav.boundingBox())!;
   expect([box.x, box.width, box.y + box.height]).toEqual([0, await fixedWidth(page), 800]);
   for (const tab of TABS) {

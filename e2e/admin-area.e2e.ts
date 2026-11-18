@@ -6,6 +6,7 @@ import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { caughtToCards } from "./game";
+import { fixedWidth } from "./fixed-width";
 import { removePuzzle, todayPuzzle, tomorrowWarning, type TodayPuzzle } from "./puzzle";
 import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { localStack } from "../scripts/slot.ts";
@@ -48,7 +49,8 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
   // Tomorrow isn't approved here, so its warning stands in for the days-ahead row, first (14b-6f).
   const warning = await tomorrowWarning(DB);
   await expect(needs.getByRole("link")).toHaveText([new RegExp(warning.what), /to approve/, /to review/, /reported comment/]);
-  expect(await needs.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
+  // At the right edge of the width a fixed bar gets (fixed-width.ts).
+  expect(await needs.boundingBox()).toEqual({ x: (await fixedWidth(page)) - 360, y: 0, width: 360, height: 900 });
 
   // Insights: today's day, the chart against the Gentle target, said in full for screen readers.
   await tabs.getByRole("link", { name: "Insights" }).click();
