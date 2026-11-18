@@ -22,7 +22,7 @@ Each holds in the code today, and the check proves it in every order of steps:
   `round_open_rule` refuses a round whose predecessor's clock runs (OB014). Removing either one alone breaks nothing,
   because the other still holds; the check fails only when both go (found while proving this check, 2026-11-17).
 
-The code breaks these today. They are findings (docs/ROADMAP.md, "Next revision", For the agent rules), not to be
+The code breaks these today. They are findings (docs/ROADMAP.md, "Next revision", For M16, "A retry of round k's word…"), not to be
 fixed without the human's word, and the check fails if they ever start to hold:
 
 - **TryJudgedOnItsRound.** A try is judged against the round its tab showed. *Broken:* `tryWord` sends no round, so a
