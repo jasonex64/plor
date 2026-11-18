@@ -108,7 +108,10 @@ function useStartRun() {
 
 // Offbeat on Today: Play opens the game screen, or with skip starts the run there; a run in play is continued there;
 // after it, the score, how it ended, the result and the time to the next puzzle.
-export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
+// main: this card is the one in front on Today (src/app/today-games.ts), so its Play or Continue is the screen's one
+// raised button (docs/milestones/M20-design-rules-and-clean-up.md, answers 45 and 47).
+export function TodayBanner({ skip, main, ...hooks }: DayHooks & { skip: boolean; main: boolean }) {
+  const play = main ? `${kit.primary} ${styles.play}` : styles.play;
   const { run, noPuzzle, error, over } = useRun(hooks);
   const starting = useStartRun();
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
@@ -119,10 +122,10 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "not_started" && !skip && (
           <>
             <Facts facts={[`${run.total} questions`, "Don't match the host"]} />
-            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={play}>
               Play
             </ButtonLink>
-            <HowToPlay steps={GAME_1_STEPS} className={kit.small} />
+            <HowToPlay steps={GAME_1_STEPS} />
           </>
         )}
         {/* Skipping the game screen skips its rules line too, so the time limit is said here before it runs (WCAG 2.2
@@ -131,18 +134,18 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "not_started" && skip && (
           <>
             <Facts facts={[`${run.total} questions`, "20 seconds each", "Don't match the host"]} />
-            <button type="button" className={`${kit.primary} ${styles.play}`} disabled={starting.busy} onClick={() => void starting.start()}>
+            <button type="button" className={play} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
             {/* Under Play, smaller, before the run, with or without Skip the game screen (14c-6 answers 30 and 40). */}
-            <HowToPlay steps={GAME_1_STEPS} className={kit.small} />
+            <HowToPlay steps={GAME_1_STEPS} />
             {starting.error && <p role="alert">{starting.error}</p>}
           </>
         )}
         {run.status === "in_progress" && (
           <>
             <Facts facts={["Your run is still going"]} />
-            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`} onClick={markToPlay}>
+            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={play} onClick={markToPlay}>
               Continue
             </ButtonLink>
           </>
@@ -510,7 +513,7 @@ function Score({ run }: { run: RunState }) {
   return (
     <>
       <Facts facts={[earnsBonus(run) ? `${pointsText(run.points)} + about ${run.bonus} bonus` : pointsText(run.points), endedText(run)]} />
-      <ButtonLink href={`${GAME.path}#result`} onClick={toDrawn} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+      <ButtonLink href={`${GAME.path}#result`} onClick={toDrawn} transitionTypes={FORWARD} className={styles.play}>
         Result
       </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />

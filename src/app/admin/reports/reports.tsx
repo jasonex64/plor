@@ -142,19 +142,19 @@ function Reported({ report: r, busy, onKeep, onDelete }: { report: ReportedComme
       {asking ? (
         <div role="group" aria-label="Confirm delete" className={styles.confirm}>
           <strong className={styles.confirmText}>Delete for everyone? This can&apos;t be undone.</strong>
-          <button type="button" className={`${kit.small} ${admin.button} ${kit.danger}`} disabled={busy} onClick={onDelete}>
+          <button type="button" className={`${admin.button} ${kit.danger}`} disabled={busy} onClick={onDelete}>
             Delete
           </button>
-          <button type="button" ref={cancel} className={`${kit.small} ${admin.button}`} onClick={() => swap(false)}>
+          <button type="button" ref={cancel} className={admin.button} onClick={() => swap(false)}>
             Cancel
           </button>
         </div>
       ) : (
         <div className={kit.chips}>
-          <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={onKeep}>
+          <button type="button" className={admin.button} disabled={busy} onClick={onKeep}>
             Keep comment
           </button>
-          <button type="button" ref={ask} className={`${kit.small} ${admin.button} ${kit.danger}`} onClick={() => swap(true)}>
+          <button type="button" ref={ask} className={`${admin.button} ${kit.danger}`} onClick={() => swap(true)}>
             Delete…
           </button>
         </div>

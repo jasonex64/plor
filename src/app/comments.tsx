@@ -311,7 +311,7 @@ export function Comments({
           </label>
           <Count text={draft} />
           {refused && <p role="alert">{refused}</p>}
-          <button type="submit" className={`${kit.primary} ${kit.small}`}>
+          <button type="submit">
             Post
           </button>
         </form>

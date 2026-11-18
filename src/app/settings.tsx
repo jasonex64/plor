@@ -138,7 +138,7 @@ function Field({ name, value, action, editing, onEdit, children }: {
         ) : (
           <>
             <strong>{value}</strong>{" "}
-            <button type="button" className={`${kit.small} ${styles.inline}`} onClick={onEdit}>
+            <button type="button" className={styles.inline} onClick={onEdit}>
               {action}
               <span className="sr-only"> {name.toLowerCase()}</span>
             </button>
@@ -250,7 +250,7 @@ function DisplayName({ name, onChanged }: { name: string | null; onChanged: () =
           Display name (optional; friends see it instead of your username)
           <input value={draft} onChange={(e) => setDraft(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={kit.primary} disabled={busy}>
           Save
         </button>{" "}
         {name !== null && (
@@ -467,7 +467,7 @@ function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
         <div role="alert">
           <p>Your post didn&apos;t send. Try again, or sign out without it.</p>
           <p className={kit.chips}>
-            <button type="button" className={kit.small} onClick={() => void signOut(true)}>
+            <button type="button" onClick={() => void signOut(true)}>
               Try again
             </button>
             <button type="button" className={kit.link} onClick={() => void signOut(false)}>

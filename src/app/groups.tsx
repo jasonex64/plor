@@ -90,7 +90,7 @@ export function Groups() {
           New group&apos;s name
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <button type="submit" className={`${kit.primary} ${kit.small}`} disabled={busy}>
+        <button type="submit" className={kit.primary} disabled={busy}>
           Create group
         </button>
       </form>
@@ -197,8 +197,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   );
   return (
     <>
-      {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the accent small button and the rest
-          minor ones, those that can't be undone in the danger colour. */}
+      {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the main button and the rest flat, those that can't be undone in the danger colour. */}
       <section aria-label="Group" className={kit.card}>
         <LiveStatus channel={channel} />
         {group && link && (
@@ -215,7 +214,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                   Group name
                   <input value={draft} onChange={(e) => setDraft(e.target.value)} />
                 </label>
-                <button type="submit" className={kit.small} disabled={busy}>
+                <button type="submit" disabled={busy}>
                   Rename
                 </button>
               </form>
@@ -265,7 +264,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                 clipboard where there's none; shown only when the clipboard refuses it (14b-18, answer 9). */}
             <button
               type="button"
-              className={`${kit.primary} ${kit.small}`}
+              className={kit.primary}
               disabled={busy}
               onClick={() =>
                 act(async () => {

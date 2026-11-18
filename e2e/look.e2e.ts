@@ -42,6 +42,8 @@ const look = (el: Locator) =>
     return { border: `${s.borderTopWidth} ${s.borderTopColor}`, corners: s.borderTopLeftRadius, shadow: s.boxShadow };
   });
 
+// Since M20 20b (docs/milestones/M20-design-rules-and-clean-up.md, answers 6 and 45) only the main action is raised; a
+// link drawn as a button is flat, a 1.5px ink outline (which Chromium draws 1px wide on this 1x screen) and no shadow.
 test("buttons, button links and fields take the ink border, corners and shadow, in each theme", async ({ browser }) => {
   for (const colorScheme of ["light", "dark"] as const) {
     const page = await (await browser.newContext({ colorScheme })).newPage();
@@ -54,11 +56,7 @@ test("buttons, button links and fields take the ink border, corners and shadow, 
       corners: "5px",
       shadow: `${color} 0px 4px 0px 0px`,
     });
-    expect(await look(page.getByRole("link", { name: "About Plor" }))).toEqual({
-      border: `2px ${color}`,
-      corners: "5px",
-      shadow: `${color} 0px 4px 0px 0px`,
-    });
+    expect(await look(page.getByRole("link", { name: "About Plor" }))).toEqual({ border: `1px ${color}`, corners: "4px", shadow: "none" });
     expect(await look(page.getByLabel("Email"))).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
   }
 });

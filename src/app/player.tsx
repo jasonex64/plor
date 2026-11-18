@@ -64,7 +64,7 @@ export function PlayerPage({ username, onRequestsChanged }: { username: string; 
     );
   }
   const action = (label: string, path: string, question?: string) => (
-    <button type="button" className={kit.small} disabled={busy} onClick={() => void change(path, question)}>
+    <button type="button" disabled={busy} onClick={() => void change(path, question)}>
       {label}
     </button>
   );
@@ -76,7 +76,7 @@ export function PlayerPage({ username, onRequestsChanged }: { username: string; 
       </>
     ),
     none: (
-      <button type="button" className={`${kit.primary} ${kit.small}`} disabled={busy} onClick={() => void change("/api/friends/requests")}>
+      <button type="button" className={kit.primary} disabled={busy} onClick={() => void change("/api/friends/requests")}>
         Add friend
       </button>
     ),

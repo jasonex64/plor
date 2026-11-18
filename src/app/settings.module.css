@@ -75,8 +75,7 @@
   color: var(--muted);
 }
 
-/* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), the kit's
-   small ones. */
+/* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), flat. */
 .field .inline {
   margin: 0 0 0 6px;
 }
@@ -250,7 +249,7 @@
   color: var(--danger);
 }
 
-/* The kit's danger kind, with a small button's padding. */
+/* The kit's danger kind, 12px in from each side. */
 .dangerButton {
   padding: 0 12px;
 }
