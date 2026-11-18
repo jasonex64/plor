@@ -344,3 +344,35 @@ button.link {
   color: var(--text);
   white-space: normal;
 }
+
+/* Each game's colour on the things that are its own, for the rows below to read (globals.css, --offbeat and --fragments;
+   docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34). On a board, set once on the board. */
+.offbeat {
+  --game: var(--offbeat);
+}
+
+.fragments {
+  --game: var(--fragments);
+}
+
+/* The Balanced look (answers 34 and 56; src/app/admin/kit/looks.module.css, .balanced). A friend's result in the feed
+   keeps its box and carries its game's 4px edge inside its left (20h). A board's row is a hairline in --line with its
+   game's edge, none on the overall board, which is no one game's; your own row the accent edge, in bold. A comment has
+   no box, so the card's ink edge is the one strong line. */
+.edge {
+  box-shadow: inset 4px 0 0 var(--game);
+}
+
+.board {
+  border-color: var(--line);
+  box-shadow: inset 4px 0 0 var(--game, transparent);
+}
+
+.board.you {
+  box-shadow: inset 4px 0 0 var(--accent);
+  font-weight: 700;
+}
+
+.bare {
+  border-color: transparent;
+}

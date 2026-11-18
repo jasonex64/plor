@@ -15,6 +15,7 @@ import { latestOnly } from "@/lib/latest";
 import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
+import { gameColour } from "./game-colour";
 import styles from "./leaderboard.module.css";
 import { dayText } from "./day-text";
 import { FindPlayer } from "./find-player";
@@ -78,7 +79,7 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
 
   const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
   return (
-    <section aria-label={title} className={kit.card}>
+    <section aria-label={title} className={`${kit.card} ${gameColour(game) ?? ""}`}>
       <h2>{title}</h2>
       <GameSwitch
         choices={GAMES}
@@ -221,7 +222,7 @@ export function LeaderboardCard() {
 
   const label = PERIODS[period];
   return (
-    <section aria-label="Leaderboard" className={kit.card}>
+    <section aria-label="Leaderboard" className={`${kit.card} ${gameColour(game) ?? ""}`}>
       {/* Mockup 3's card: the heading with the day it shows as a chip (M14 14b-8b). */}
       <div className={kit.head}>
         <h2>Leaderboard</h2>
@@ -283,7 +284,7 @@ function TodayStandings({ board, game, average }: { board: TodayBoard; game: (ty
       {board.rest.length > 0 && (
         <ul className={kit.rows}>
           {board.rest.map((r) => (
-            <li key={r.username} className={r.you ? `${kit.row} ${kit.you} ${styles.entry}` : `${kit.row} ${styles.entry}`}>
+            <li key={r.username} className={r.you ? `${kit.row} ${kit.board} ${kit.you} ${styles.entry}` : `${kit.row} ${kit.board} ${styles.entry}`}>
               <Avatar name={r.name} />
               <span className={`${kit.grow} ${styles.name}`}>
                 {r.name}
@@ -351,7 +352,7 @@ function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; pla
   return (
     <ol className={kit.rows}>
       {entries.map((e, i) => (
-        <li key={e.username} className={e.you ? `${kit.row} ${kit.you} ${styles.entry}` : `${kit.row} ${styles.entry}`}>
+        <li key={e.username} className={e.you ? `${kit.row} ${kit.board} ${kit.you} ${styles.entry}` : `${kit.row} ${kit.board} ${styles.entry}`}>
           <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
           <Avatar name={e.name} />
           <span className={`${kit.grow} ${styles.name}`}>
