@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). **Plan step 4, video on CI, in review** on `process-lint-rules` (#284; rounds 9 and 10 below: no screenshots, answer 33); the dropped rules (step 5) wait.
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Thirty-three questions answered (below, quoted). All five rules merged (#275, #276, #278, #280, #282). Plan step 4, video on CI, merged (#284; rounds 9 and 10 below: no screenshots, answer 33). **Step 5, the dropped rules, next** on `process-lint-rules`.
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -184,7 +184,7 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Hypothesis 3: run as CI would (`CI=1`), a test on the `page` fixture leaves a `.png` and a `.webm` at each size, and a test that opens its own contexts (`not-found.e2e.ts:18`) leaves screenshots but no video (DECISIONS, 2026-11-10). → `3 passed`; `test-finished-1.png` and `video.webm` in the tagged test's `-chromium` and `-phone` folders, measured 1280 × 720 and 390 × 844; `test-finished-1.png` and `test-finished-2.png` (one per browser), no `.webm`, for the other. Held. The pictures were looked at and sent to the human in the app; the tag and `test-results/` were removed after.
 - Missed, then fixed (the `reviewer` agent, blocking): `npm run test:e2e`, the command CI runs, was `playwright test --project=chromium`, so `phone` would never have run on CI; hypotheses 1 and 2 had been checked with `npx playwright test --list`, not CI's command. The script is now `playwright test` (every project). Rechecked with `npm run test:e2e -- --list`: `212   [chromium]`, no `[phone]`; with the tag, `Total: 213` and the one `[phone]` line. Held.
 - Hypothesis 4: CI's run uploads about 212 screenshots, one per test. Run 44239502367 (#284, green): artifact `e2e-screenshots-and-videos`, 471,252,481 bytes; 9,553 `.png`, 62 `.webm`, nothing else, in 214 test folders. Disproved: a late test held over 100 `test-finished-N.png`, mostly earlier tests' pages (the e2e files call `newContext` 116 times and `.close()` 9 times). Asked the human (answer 33): video only.
-- CI's half after answer 33 (the run uploads `e2e-videos`): below, once the run is done. No test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
+- Hypothesis 5, after answer 33: the run uploads only videos, about 62 and 15 MB. Run 44243101548 (#284's last commit, green): artifact `e2e-videos`, 14,525,699 bytes, expires 2026-12-02 (14 days); 62 `.webm`, nothing else, in 62 folders. Held. One video (a guest plays game 1 to the result) was sent to the human in the app. No `-phone` folder: no test is tagged yet (answer 29), so CI shows the phone size with the first tagged test.
 
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
