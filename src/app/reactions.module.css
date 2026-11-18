@@ -34,8 +34,7 @@
 }
 
 /* Faint at rest, the text's colour under the pointer (answer 5), at the buttons' one 44px (14b-10, answers 7 and 18). No
-   shadow, lift or press: it's a mark on every row, not one of the kit's buttons (the lift and press are in :where(), so
-   these classes outrank them; globals.css). */
+   border: it's a mark on every row. */
 .more {
   display: grid;
   place-items: center;
@@ -44,9 +43,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: none;
-  box-shadow: none;
-  transform: none;
   color: var(--muted);
 }
 
@@ -84,9 +80,6 @@
   margin: 0;
   border: 0;
   border-radius: 0;
-  background: none;
-  box-shadow: none;
-  transform: none;
   color: var(--text);
 }
 

@@ -97,11 +97,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 22px;
-  background: transparent;
-  /* An icon, not one of the kit's buttons: no shadow and no press. */
-  box-shadow: none;
-  transform: none;
+  border-radius: var(--r-small);
 }
 
 .tabs {
@@ -257,13 +253,15 @@
 }
 
 /* A tab under the pointer takes the kit's hover rule (kit.hover, M20 20a) and, from 768px, its icon's solid version,
-   held while the pointer stays (14b-10, answers 8 and 30). */
+   held while the pointer stays (14b-10, answers 8 and 30); so does the sidebar's Settings (M20, answers 37 and 48). */
 @media (min-width: 768px) and (hover: hover) {
-  .tab:hover .solid {
+  .tab:hover .solid,
+  .settings:hover .solid {
     opacity: 1;
   }
 
-  .tab:hover .outline {
+  .tab:hover .outline,
+  .settings:hover .outline {
     opacity: 0;
   }
 
@@ -294,9 +292,6 @@
     padding: 0 12px;
     border: 0;
     border-radius: var(--r-small);
-    background: transparent;
-    box-shadow: none;
-    transform: none;
     font-size: 1rem;
     font-weight: 700;
   }

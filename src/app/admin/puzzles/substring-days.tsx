@@ -71,7 +71,7 @@ function Day({ day, onApproved }: { day: SubstringDayView; onApproved: () => voi
             Play test
           </ButtonLink>
           {editable && (
-            <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy} onClick={approve}>
+            <button type="button" className={`${kit.primary} ${admin.button}`} disabled={busy} onClick={approve}>
               {day.live ? "Approve again" : "Approve day"}
             </button>
           )}

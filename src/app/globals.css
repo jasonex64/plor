@@ -396,7 +396,6 @@ label {
   --r-small: 4px;
   --r-cell: 2px;
   --shadow-button: 0 4px 0 var(--ink);
-  --shadow-button-small: 0 3px 0 var(--ink);
   /* 14b-10b's motion: 200ms, quick out with a soft settle (docs/milestones/M14-14b-10-calm-and-alive.md, answers 14
      and 26). */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -448,50 +447,45 @@ input {
   margin: 8px 0;
 }
 
-/* Buttons: a 2px ink border, a hard shadow below, and a press that drops them onto it (mockup 3's .btn; 14b-8,
-   answer 9). The press is in :where(), so a button with its own class (the gear) can opt out of it. */
+/* Buttons are flat: a 1.5px ink outline, the small corners, no shadow and no press, 14px 700, at the buttons' one 44px
+   height (mockup 3's .link; 14b-10, answer 7). The raised look is the main action's alone, the kit's .primary, and
+   the hover rule is the kit's (docs/milestones/M20-design-rules-and-clean-up.md, answers 6, 37 and 45). */
 button {
   min-height: 44px;
   margin: 8px 0;
-  padding: 0 16px;
+  padding: 0 10px;
   color: var(--text);
-  background: var(--surface);
-  border: 2px solid var(--ink);
-  border-radius: var(--r-button);
-  box-shadow: var(--shadow-button);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
   cursor: pointer;
-  /* The lift takes --quick; the press sets --move to its own 80ms (below). */
-  transition:
-    transform var(--move, var(--quick)) var(--ease),
-    box-shadow var(--move, var(--quick)) var(--ease);
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
-/* On a device that hovers, a button lifts 2px toward the pointer, its shadow 2px longer so its foot stays put (14b-10,
-   answers 12 and 14). In :where(), like the press, so a button with its own class (the gear) can opt out; the shadow
-   changes through --shadow-button, which the rule above reads, as a box-shadow here would lose to it. */
+/* No fill, at no specificity, so the hover rule below, a button's own class and the main button's fill each win. */
+:where(button) {
+  background: none;
+}
+
+/* The hover rule (kit.module.css) on every button: the soft fill and the text colour under the pointer, over --quick
+   with --ease, at once under reduced motion (docs/milestones/M20-design-rules-and-clean-up.md, answer 37). In :where(),
+   so the main button's own fill and lift (kit.module.css .primary), and a button's own class, win over it. */
 @media (hover: hover) {
+  :where(button) {
+    transition:
+      background-color var(--quick) var(--ease),
+      color var(--quick) var(--ease);
+  }
+
   :where(button:hover:not(:disabled)) {
-    --shadow-button: 0 6px 0 var(--ink);
-    transform: translateY(-2px);
+    background: var(--soft);
+    color: var(--text);
   }
 }
 
-:where(button:active:not(:disabled)) {
-  --shadow-button: 0 0 0 var(--ink);
-  --move: 80ms;
-  transform: translateY(4px);
-}
-
-/* Players who ask for less motion get no press (WCAG 2.2, 2.3.3; answer 9). */
 @media (prefers-reduced-motion: reduce) {
-  button {
+  :where(button) {
     transition: none;
-  }
-
-  :where(button:hover:not(:disabled)),
-  :where(button:active:not(:disabled)) {
-    --shadow-button: 0 4px 0 var(--ink);
-    transform: none;
   }
 }
 

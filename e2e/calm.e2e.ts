@@ -35,31 +35,37 @@ const slot = (page: Page, name: string) =>
     return color;
   }, name);
 
-// What's drawn with a shadow: the buttons and links among it counted (so a page with none shows nothing was measured),
-// anything else listed. A disabled button can't be pressed, so it's flat too and listed if it isn't
-// (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 6); checked counts the controls looked at, pressable
-// or disabled, so a page whose only buttons are disabled (Insights with one day) is still measured.
+// What's drawn with a shadow, anything that isn't an enabled button or a link listed: only the main action is raised
+// (docs/milestones/M20-design-rules-and-clean-up.md, answers 6 and 45), and a disabled button can't be pressed, so it's
+// flat too and listed if it isn't (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 6). checked counts
+// the buttons and links drawn as buttons looked at, raised, flat or disabled, so a page with no raised one is still
+// measured.
 const shadowed = (page: Page) =>
   page.evaluate(() => {
     const shown = [...document.querySelectorAll("body *")].filter((el) => el.getClientRects().length > 0);
     const all = shown.filter((el) => getComputedStyle(el).boxShadow !== "none");
     const pressable = all.filter((el) => (el.tagName === "BUTTON" && !(el as HTMLButtonElement).disabled) || el.tagName === "A");
-    const disabled = shown.filter((el) => el.tagName === "BUTTON" && (el as HTMLButtonElement).disabled);
     const stray = all.filter((el) => !pressable.includes(el)).map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? "").trim().slice(0, 40)}"`);
-    return { checked: pressable.length + disabled.length, stray };
+    const controls = shown.filter((el) => el.tagName === "BUTTON" || (el.tagName === "A" && /button|primary/.test(String(el.className))));
+    return { checked: controls.length, stray };
   });
 
-// Buttons, links drawn as buttons (the ones with a shadow), text fields and selects under 44px tall.
+// Buttons, links drawn as buttons (button-link.tsx, or the main action's), text fields and selects under 44px tall,
+// counting a raised button's edge below its face: a 40px face on a 4px edge is 44px in all (M20 answer 11).
 const short = (page: Page) =>
   page.evaluate(() => {
     const controls = [...document.querySelectorAll("button, a, input, select")].filter((el) => {
       if (el.getClientRects().length === 0) return false;
-      if (el.tagName === "A") return getComputedStyle(el).boxShadow !== "none";
+      if (el.tagName === "A") return /button|primary/.test(String(el.className));
       if (el.tagName === "INPUT") return !["checkbox", "radio", "hidden"].includes((el as HTMLInputElement).type);
       return true;
     });
+    const drop = (el: Element) => {
+      const shadow = getComputedStyle(el).boxShadow;
+      return shadow === "none" ? 0 : parseFloat(shadow.replace(/^rgba?\([^)]*\)\s*/, "").split(/\s+/)[1]);
+    };
     const low = controls
-      .map((el) => ({ el, height: el.getBoundingClientRect().height }))
+      .map((el) => ({ el, height: el.getBoundingClientRect().height + drop(el) }))
       .filter(({ height }) => height < 43.5)
       .map(({ el, height }) => `${el.tagName.toLowerCase()} "${(el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 30)}" ${height}px`);
     return { measured: controls.length, low };

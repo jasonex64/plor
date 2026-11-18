@@ -90,7 +90,7 @@ export function Groups() {
           New group&apos;s name
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <button type="submit" className={`${kit.primary} ${kit.small}`} disabled={busy}>
+        <button type="submit" className={kit.primary} disabled={busy}>
           Create group
         </button>
       </form>
@@ -215,7 +215,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                   Group name
                   <input value={draft} onChange={(e) => setDraft(e.target.value)} />
                 </label>
-                <button type="submit" className={kit.small} disabled={busy}>
+                <button type="submit" disabled={busy}>
                   Rename
                 </button>
               </form>
@@ -265,7 +265,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                 clipboard where there's none; shown only when the clipboard refuses it (14b-18, answer 9). */}
             <button
               type="button"
-              className={`${kit.primary} ${kit.small}`}
+              className={kit.primary}
               disabled={busy}
               onClick={() =>
                 act(async () => {

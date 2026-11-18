@@ -76,6 +76,14 @@ Measured by a temporary Playwright script on slot 2's built app (`next start`, C
 
 The pill's height is the avatar's 1.875rem (answer 40).
 
+## 20b's answers (2026-11-17, night)
+| # | Asked | Answer |
+|---|---|---|
+| 45 | A screen's main action today is sometimes the blue (accent) raised button, sometimes the white raised one: which? | "Always the blue raised one (Recommended)": every main action is `.primary`, raised; everything else is flat |
+| 46 | Which screens does 20b change? | "Every screen (Recommended)": the tabs, a group's page, profiles, settings, sign-in, both game screens and the admin pages; a button is flat unless it is the main action |
+| 47 | How is each screen's main action picked? | "I pick, you review in the PR (Recommended)": the action the screen is for, at most one raised button in view; every pick listed in the PR |
+| 48 | The Settings gear has no solid version for the hover swap (answer 37) | "Draw a solid gear (Recommended)": a filled gear in the tab icons' style, swapped as the tabs' are |
+
 Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), 20e's four questions.
 
 ## What the team found (2026-11-16; four Sonnet subagents, read from code and the web, **nothing measured in a browser**)

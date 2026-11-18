@@ -78,7 +78,7 @@ export function AnswerPool({ category, taken }: { category: string; taken: strin
               <span className="sr-only">Part of an answer&rsquo;s name</span>
               <input value={typed} placeholder="Part of any name" onChange={(e) => setTyped(e.target.value)} />
             </label>
-            <button type="submit" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy}>
+            <button type="submit" className={admin.button} disabled={busy}>
               Search
             </button>
           </form>

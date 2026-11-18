@@ -35,19 +35,12 @@ export function Kit() {
           <button type="button" className={kit.primary} disabled>Play</button>
         </div>
       </Piece>
-      <Piece name="Raised button" when="As built on about 25 main actions and 50 minor ones; 20b keeps it for main actions only.">
+      <Piece name="Flat button" when="Every action that isn't the main one, a button or a link drawn as one: the hover rule, no shadow, no press.">
         <div className={kit.chips}>
-          <button type="button">Next</button>
-          <button type="button" disabled>Next</button>
-          <button type="button" className={kit.small}>How to play</button>
-          <button type="button" className={kit.small} disabled>How to play</button>
+          <button type="button">How to play</button>
+          <button type="button" disabled>How to play</button>
           <ButtonLink href="/admin/kit">A link drawn as a button</ButtonLink>
-        </div>
-      </Piece>
-      <Piece name="Flat button" when="Every action that isn't the main one: the hover rule, no shadow, no press.">
-        <div className={kit.chips}>
           <button type="button" className={kit.link}>Profile</button>
-          <button type="button" className={kit.link} disabled>Profile</button>
         </div>
       </Piece>
       <Piece name="Danger" when="A warning or a step that can't be undone: the danger colour on a button's edge and text, or a chip's.">
@@ -56,7 +49,7 @@ export function Kit() {
           <span className={`${kit.chip} ${kit.danger}`}>Not drafted</span>
         </div>
       </Piece>
-      <Piece name="Close button" when="The one round × for a frame, a dialog or a sheet.">
+      <Piece name="Close button" when="The one × for a frame, a dialog or a sheet: no border, the hover rule's square fill.">
         <div className={kit.chips}>
           <button type="button" className={kit.close} aria-label="Close">
             ×

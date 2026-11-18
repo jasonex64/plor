@@ -309,7 +309,8 @@ export function PlayFirst() {
         </ButtonLink>
       </p>
       <p>
-        <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={kit.primary}>
+        {/* One raised button on the page: the first game's (docs/milestones/M20-design-rules-and-clean-up.md, answer 47). */}
+        <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD}>
           Play {SUBSTRINGS.name} without an account
         </ButtonLink>
       </p>
@@ -317,7 +318,7 @@ export function PlayFirst() {
         <SignIn onSignedIn={loadMe} />
       ) : (
         <p>
-          <ButtonLink href={SIGN_IN_HREF} className={kit.small}>
+          <ButtonLink href={SIGN_IN_HREF}>
             Sign in
           </ButtonLink>
         </p>
@@ -513,7 +514,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
           Code
           <input required inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={kit.primary} disabled={busy}>
           Sign in
         </button>{" "}
         {/* Back to the email step, to fix a mistyped address (docs/milestones/M12-account.md, A6). */}
@@ -544,7 +545,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
           Email
           <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={kit.primary} disabled={busy}>
           Email me a sign-in code
         </button>
       </form>
@@ -586,7 +587,7 @@ function PickUsername({ onDone }: { onDone: () => void }) {
           onChange={(e) => setUsername(e.target.value.toLowerCase())}
         />
       </label>
-      <button type="submit" disabled={busy}>
+      <button type="submit" className={kit.primary} disabled={busy}>
         Save
       </button>
       {error && <p role="alert">{error}</p>}

@@ -192,7 +192,7 @@ function Row({ q }: { q: QuestionInsights }) {
         <td role="cell" data-label="Most typed">{q.topAnswers.length > 0 ? q.topAnswers.map((t) => `${t.answer.name} ${t.count}`).join(", ") : "—"}</td>
         <td role="cell" data-label="Not in list">
           {q.misses.length > 0 ? (
-            <button type="button" className={`${kit.small} ${admin.button}`} aria-expanded={open} onClick={() => setOpen(!open)}>
+            <button type="button" className={admin.button} aria-expanded={open} onClick={() => setOpen(!open)}>
               {q.misses.length} <span className="sr-only">not in the list</span>
               <span aria-hidden="true">{open ? " ▴" : " ▾"}</span>
             </button>

@@ -84,7 +84,7 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
             Their exact username
             <input value={find} onChange={(e) => setFind(e.target.value)} autoCapitalize="none" autoCorrect="off" spellCheck={false} />
           </label>
-          <button type="submit" className={kit.small}>
+          <button type="submit">
             Find
           </button>
         </form>

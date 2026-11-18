@@ -97,35 +97,33 @@
 /* The hover rule (docs/milestones/M20-design-rules-and-clean-up.md, 20a): anything pressable that isn't the main
    button takes the soft fill and the text colour under the pointer, over --quick with --ease, as the sidebar tabs did
    (the human, 2026-11-16: "I want that to be something that's like a design rule"); a state still changes under
-   reduced motion, at once. Written once: rows (14b-10, answer 12), the minor button, and .hover on anything else, such
-   as the tabs. */
+   reduced motion, at once. Written once here for rows (14b-10, answer 12) and .hover on anything else, such as the tabs
+   and the links drawn as buttons (button-link.tsx); every button but the main one takes it from globals.css, as a
+   module can't name an element alone (answer 37). */
 @media (hover: hover) {
   .row,
-  .hover,
-  button.link {
+  .hover:not(.primary) {
     transition:
       background-color var(--quick) var(--ease),
       color var(--quick) var(--ease);
   }
 
   .row:hover,
-  .hover:hover,
-  button.link:hover:not(:disabled) {
+  .hover:not(.primary):hover {
     background: var(--soft);
     color: var(--text);
   }
 
   /* A warning keeps its danger text under the pointer: the rule changes the fill, not the warning (20a's review). */
   .row.danger:hover,
-  button.link.danger:hover:not(:disabled) {
+  .danger:not(.primary):hover:not(:disabled) {
     color: var(--danger);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .row,
-  .hover,
-  button.link {
+  .hover {
     transition: none;
   }
 }
@@ -228,38 +226,55 @@ form.chips {
 /* The button kinds below are written on button and a (a link drawn as a button), so they outrank a module's own one
    class (the button-link's .button) whatever order the CSS loads in. */
 
-/* The main action, filled in the accent (mockup 3's .btn). */
+/* A screen's one main action, and the only raised button (docs/milestones/M20-design-rules-and-clean-up.md, answers 6
+   and 45): filled in the accent, with the ink border and a hard 4px edge below (mockup 3's .btn; 14b-8, answer 9). The
+   face is 40px and the edge 4px, 44px in all (answer 11); the edge's room is kept as margin below it, so in a row it
+   ends with a field, not 4px below it. On a device that hovers it lifts 2px, its edge 2px longer so its foot stays
+   put; pressed, it drops onto its edge in 80ms (14b-10, answers 12 and 14); neither under reduced motion (WCAG 2.2,
+   2.3.3). Josh Comeau's build: the face moves by transform, so the box never does. */
 :is(button, a).primary {
+  min-height: 40px;
+  margin-bottom: 4px;
   padding: 0 18px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-button);
   background: var(--accent);
+  box-shadow: var(--shadow-button);
   color: var(--on-accent);
   font-size: 1.0625rem;
   font-weight: 700;
+  transition:
+    transform var(--quick) var(--ease),
+    box-shadow var(--quick) var(--ease);
 }
 
-/* A smaller button (mockup 3's .btn.small): a 3px drop, small corners and 14px text, at the buttons' one 44px height
-   (14b-10, answer 7). */
-:is(button, a).small {
-  padding: 0 12px;
-  border-radius: var(--r-small);
-  box-shadow: var(--shadow-button-small);
-  font-size: 0.875rem;
-  font-weight: 700;
+/* A button keeps the base button's 8px below (globals.css) and adds its edge's 4px. */
+button.primary {
+  margin-bottom: 12px;
+}
+
+/* Disabled, it is flat, as every disabled button is (globals.css), so its face takes the edge's room: 44px. */
+button.primary:disabled {
+  min-height: 44px;
+  margin-bottom: 8px;
 }
 
 @media (hover: hover) {
-  :is(button, a).small:hover:not(:disabled) {
-    box-shadow: 0 5px 0 var(--ink);
+  :is(button, a).primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--ink);
   }
 }
 
-:is(button, a).small:active:not(:disabled) {
+:is(button, a).primary:active:not(:disabled) {
+  transform: translateY(4px);
   box-shadow: 0 0 0 var(--ink);
+  /* The transform's and the edge's. */
+  transition-duration: 80ms, 80ms;
 }
 
-/* A round 44px close button, moved here from the settings sheet (M14 L44), so its ×, the play frame's
-   and How to play's take one definition (docs/milestones/M14-14c-8-plain-game-1.md). Written with the kit's button kinds below
-   it, so it outranks the base button whatever order the CSS loads in. */
+/* The one × for a frame, a dialog or a sheet (M14 L44; docs/milestones/M14-14c-8-plain-game-1.md): the × alone, with no
+   border, in a 44px square that takes the hover rule's fill (answer 38). */
 button.close {
   display: inline-flex;
   align-items: center;
@@ -268,27 +283,12 @@ button.close {
   height: 44px;
   margin: 0;
   padding: 0;
-  border-radius: 22px;
+  border: 0;
 }
 
-/* A minor action (mockup 3's .link): a thin ink outline, no shadow and no press, at the buttons' one 44px height
-   (14b-10, answer 7). */
+/* A flat button set into a row or a line, without the buttons' 8px above and below (mockup 3's .link). */
 button.link {
   margin: 0;
-  padding: 0 10px;
-  border: 1.5px solid var(--ink);
-  border-radius: var(--r-small);
-  background: none;
-  box-shadow: none;
-  transform: none;
-  color: var(--text);
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
-button.link:active:not(:disabled) {
-  transform: none;
-  box-shadow: none;
 }
 
 /* A warning drawn as a button or a chip, in the danger colour: the admin's "Tomorrow has no puzzle" (M14 14b-6f), its
@@ -299,9 +299,14 @@ button.link:active:not(:disabled) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(button, a).small:hover:not(:disabled),
-  :is(button, a).small:active:not(:disabled) {
-    box-shadow: var(--shadow-button-small);
+  :is(button, a).primary {
+    transition: none;
+  }
+
+  :is(button, a).primary:hover:not(:disabled),
+  :is(button, a).primary:active:not(:disabled) {
+    transform: none;
+    box-shadow: var(--shadow-button);
   }
 }
 

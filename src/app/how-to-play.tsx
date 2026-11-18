@@ -34,9 +34,8 @@ export const GAME_2_STEPS = [
   `Longer words score more, and each word with the day's bonus letter earns ${SUBSTRING_BONUS_LETTER_POINTS} more. At the end, every different letter you've used adds to your bonus.`,
 ];
 
-// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS). className: the opening button's look where it sits: the kit's small button on Today and in the play frame, a plain
-// button on the game screen.
-export function HowToPlay({ steps, className }: { steps: readonly string[]; className?: string }) {
+// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS).
+export function HowToPlay({ steps }: { steps: readonly string[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
   const [at, setAt] = useState(0);
@@ -48,7 +47,7 @@ export function HowToPlay({ steps, className }: { steps: readonly string[]; clas
   const last = at === steps.length - 1;
   return (
     <>
-      <button type="button" className={className} onClick={open}>
+      <button type="button" onClick={open}>
         How to play
       </button>
       <dialog ref={dialog} aria-labelledby={title} className={styles.dialog}>
@@ -70,13 +69,13 @@ export function HowToPlay({ steps, className }: { steps: readonly string[]; clas
           </div>
           <div className={styles.nav}>
             {/* Unavailable on the first step, and still in its place, so the row doesn't shift. */}
-            <button type="button" className={kit.small} aria-disabled={at === 0} onClick={() => at > 0 && setAt(at - 1)}>
+            <button type="button" aria-disabled={at === 0} onClick={() => at > 0 && setAt(at - 1)}>
               Previous
             </button>
             <span className={styles.place} aria-hidden="true">
               {at + 1} of {steps.length}
             </span>
-            <button type="button" className={`${kit.small} ${kit.primary}`} onClick={last ? close : () => setAt(at + 1)}>
+            <button type="button" className={kit.primary} onClick={last ? close : () => setAt(at + 1)}>
               {last ? "Close" : "Next"}
             </button>
           </div>
