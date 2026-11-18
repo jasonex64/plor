@@ -137,7 +137,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 3. One PR per rule, each from this branch: the rule, its test, the old code fixed, its sentence removed → verify: `npm run lint` and `npm test -- eslint-rules` pass; the test fails with the rule off.
 4. ~~Playwright keeps a video of every test; CI uploads them (answer 33: no screenshots)~~: done, #284 → verify: the PR's e2e run lists the files.
 5. ~~CLAUDE.md's new rule, the dropped rules, the `audit` skill, DECISIONS~~: done → verify: the `grep` in Acceptance criteria prints nothing.
-6. The `reviewer` agent reviews the diff.
+6. ~~The `reviewer` agent reviews the diff~~: done, each step (Review, below).
 
 ## Removes
 The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "retain-on-failure" : "off"` setting, CI's `failed-test-videos` upload and `test:e2e`'s `--project=chromium`, which step 4 replaces; in step 5, the audit's "abstractions with a single use" check (the dropped "Build for today") and the two places that named a dropped rule (DECISIONS' "Hard to reverse" lead-in, a comment in `scripts/base.ts`). The rules' PRs list what each removed.
@@ -151,7 +151,7 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 | ESLint, custom rules: a rule is `meta` plus `create(context)`, reporting by `messageId`; RuleTester runs valid and invalid cases | Four rules in `eslint-rules/`, each with a RuleTester test under Vitest, in a plugin object `local` | None |
 | The human's answer 6: only 0 and 1 need no source | 0, 1, 2, 24, 60, 100, 360 and 1000 need none | Answer 16 added the unit numbers |
 | Playwright, `screenshot` option: `on` keeps a screenshot after every test | No screenshots | Answer 33: `on` took every page still open, and the tests leave their own contexts open, so #284's first run held 9,553 pictures (503 MB), mostly earlier tests' pages |
-| Playwright, `video` option: `on` keeps every test's video | `on` on CI | Only pages Playwright makes are filmed (DECISIONS, 2026-11-10), so the 150 or so tests that open their own contexts have no video; making them use fixtures is outside this ticket |
+| Playwright, `video` option: `on` keeps every test's video | `on` on CI | Only pages Playwright makes are filmed (DECISIONS, 2026-11-10), so the 150 tests without a video (212 run, 62 filmed, run 44243101548) are the ones that open their own contexts; making them use fixtures is outside this ticket |
 | Playwright, tags and a project's `grep` | `@visual` tag; a `phone` project with `grep: /@visual/` | None |
 | upload-artifact, `retention-days` | 14 | None (answer 32) |
 
@@ -217,6 +217,10 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 **Plan step 4, screenshots and video** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking, fixed: `npm run test:e2e` named only the `chromium` project, so CI would never run `phone` (Evidence, above).
 - It checked and found fine: the phone viewport and a test's own size; no trace or network data uploaded; zero files only warns; retry folders kept apart; nothing orphaned. Nothing deferred.
+
+**Step 5, the dropped rules** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking findings: none. It searched CLAUDE.md, `.claude/`, the rule docs and the code and found nothing still acting on the dropped rules; nothing removed beyond answer 7; the acceptance grep prints nothing; the open criterion is described honestly.
+- Non-blocking, nothing deferred: the Status line is updated when the PR merges; a derived count (150) now states its origin.
 
 **Rule 5, `local/no-service-role`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings: none. It re-ran lint (exit 0) and the rule's test (8 passed), and found the key named nowhere in `src`, `scripts`, `e2e` or the root configs.
