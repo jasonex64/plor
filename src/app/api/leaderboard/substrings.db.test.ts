@@ -1,6 +1,6 @@
 // Game 2's weekly boards against the local stack (`npm run test:db`; docs/milestones/M16-16e-points-and-boards.md,
-// 16e-2; docs/milestones/M15-15i-par-scores.md): a board names its game, and game 2's adds up each day's par score,
-// the day's points against 1,500 out of 100. Yesterday's runs are written directly, as yesterday can't be played now,
+// 16e-2): a board names its game, and game 2's adds up each day's points, as game 1's does (the human, 2026-11-17,
+// issue #265: "each individual game leaderboard should just be the raw points"). Yesterday's runs are written directly, as yesterday can't be played now,
 // and the board's read settles them. A is the viewer and B A's friend; C and D are strangers who played too, so they
 // aren't on A's board. C is in A's group only from today.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -84,25 +84,25 @@ describe("game 2's boards", () => {
     expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}`)).body.error).toBe("unknown_game");
   });
 
-  it("adds up par scores, showing only the viewer's circle", async () => {
+  it("adds up points, showing only the viewer's circle", async () => {
     const { body } = await call(friendsBoard, "/api/leaderboard?game=substrings");
-    // Only the circle's rows, and nothing in them but a par score, the days it came from, and who.
+    // Only the circle's rows, and nothing in them but the points, the days they came from, and who.
     expect(Object.keys(body).sort()).toEqual(["lastWeek", "ok", "thisWeek"]);
     for (const e of body[week].entries) expect(Object.keys(e).sort()).toEqual(["daily", "name", "points", "username", "you"]);
-    // B's 125 of 1,500 is 8.3 and A's 65 is 4.3, whoever else played.
+    // B's 125 and A's 65, whoever else played.
     expect(standings(body)).toEqual([
-      [B.username, 8.3],
-      [A.username, 4.3],
+      [B.username, 125],
+      [A.username, 65],
     ]);
     // Settling took the whole day, strangers too.
     const { rows } = await getPool().query("select user_id from private.points_ledger where game_id = $1 and puzzle_date = $2::date and user_id = any($3::uuid[])", [SUBSTRINGS_ID, yesterday, [C.userId, D.userId]]);
     expect(rows).toHaveLength(2);
   });
 
-  it("counts a group member's par scores from the day they joined", async () => {
+  it("counts a group member's points from the day they joined", async () => {
     const { body } = await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=substrings`);
     expect(standings(body)).toEqual([
-      [A.username, 4.3],
+      [A.username, 65],
       [C.username, 0],
     ]);
   });
