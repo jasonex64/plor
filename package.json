@@ -20,6 +20,7 @@
     "base": "node --max-old-space-size=4096 --env-file-if-exists=.env.local scripts/base.ts",
     "draft": "node --env-file-if-exists=.env.local scripts/draft.ts",
     "substrings": "node scripts/substrings.ts",
+    "verify": "node scripts/verify.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -1,0 +1,50 @@
+---
+title: "A new player's first day"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: guest
+    lg1: account
+    lg2: player
+  }
+  class lg0 tan
+  class lg1 purple
+  class lg2 teal
+  s0: Front page
+  s1: Guest game, ready to Start
+  s2: Sign in
+  s3: The bot check
+  s4: Enter your code
+  s5: Pick a username
+  s6: Playing as a guest
+  s7: Today, signed in
+  s8: Guest result, with Make an account
+  s9: Playing for points
+  s10: Result, with Share
+  [*] --> s0
+  s0 --> s1: you press Play without an account
+  s0 --> s2: you press Sign in
+  s1 --> s2: you press Sign in
+  s1 --> s3: you press Start
+  s2 --> s4: you ask for a code by email
+  s2 --> s5: you continue with Google
+  s3 --> s1: the check doesn't pass
+  s3 --> s6: the check passes
+  s4 --> s5: you type the code
+  s5 --> s7: you save a username
+  s6 --> s8: the run ends
+  s7 --> s9: you play today's game for points
+  s8 --> s1: midnight Pacific passes
+  s8 --> s2: you press Make an account
+  s9 --> s10: the run ends
+  class s0 tan
+  class s1 tan
+  class s2 purple
+  class s3 tan
+  class s4 purple
+  class s5 purple
+  class s6 tan
+  class s7 teal
+  class s8 tan
+  class s9 teal
+  class s10 teal
