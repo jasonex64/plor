@@ -1,6 +1,6 @@
 # Process — Formal verification of three state machines; statecharts of three user flows
 
-**Status:** approved (2026-11-17, the human: "Approve it"). Fifteen questions answered (below, quoted). Building: plan step 1.
+**Status:** done (2026-11-17): built, reviewed (three blocking items fixed), `main` merged in; one PR from `process-formal-verification`, for the human to merge. Approved 2026-11-17 (the human: "Approve it"); sixteen questions answered (below, quoted).
 
 ## Goal
 The three state machines where a bug costs players the most and tests reach the least each get a model that checks every order of steps, plus a project skill that tells the next agent when and how to recheck it. Three of the most important user flows get a statechart the human can read without knowing TLA+.
@@ -35,6 +35,7 @@ The human asked: "use /create-formal-verification-skill to model these state mac
 13. **The friends-and-groups chart:** **"Both, chart-only model (Recommended)"**: a small model of friend requests and blocks written only for the picture, beside the groups model; its half of the chart is labelled "not verified".
 14. **If a 7-round, two-tab model takes over a minute:** **"Keep 7, allow longer (Recommended)"**: the measured time goes in the skill.
 15. **Sources:** **"Yes, add all three"**. Then: **"Approve it"**.
+16. **The statechart tests** (2.9 MB, not the ~200 KB Claude had estimated): **"Without tests (Recommended)"**.
 
 ## Source
 New SOURCES.md rows (answer 15):
@@ -43,15 +44,15 @@ New SOURCES.md rows (answer 15):
 - **TLA+ tools**, https://github.com/tlaplus/tlaplus/releases/tag/v1.7.4: `tla2tools.jar` 1.7.4, sha256 `936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88` (pinned in pstack's `statechart/scripts/run.ts:68`).
 
 ## Acceptance criteria
-- [ ] `.claude/skills/statechart/` and `.claude/skills/create-formal-verification-skill/` match pstack at `2f87c85` byte for byte, except the Windows changes listed in Source diff, with pstack's LICENSE beside them.
-- [ ] `statechart`'s own corpus example `Counter` runs on this PC and its `chart.mmd` matches the corpus copy.
-- [ ] Three generated skills, one per target (a Fragments run, an Offbeat run, group membership), each with frontmatter, a coverage record (files and functions) and a sync commit; each is listed by the session's skill list.
-- [ ] Each check runs with one `npm run` command (DECISIONS, Task runner) and passes, or fails only on findings reported in plain words.
-- [ ] Each check is shown catching a scratch break in the real code (a removed check or a reordered step), then passes again once the break is dropped; the output of both runs is in Evidence.
-- [ ] Each finding is in ROADMAP "Next revision" with its counterexample as numbered steps in the app's words, and is not fixed in this PR (CLAUDE.md, Done means 4; the skill's "Findings stay findings").
-- [ ] Three statecharts (a new player's first day; a day's game in each game; friends and groups), each about 20 arrows or fewer, in `docs/statecharts/` with spec, view, Mermaid and SVG, and sent to the human. The friends half of the third is labelled "not verified" (answer 13).
-- [ ] DECISIONS.md has a row for formal verification beside Tests (a second way to check needs an entry), and its Log records this ticket.
-- [ ] The reviewer agent has reviewed the diff.
+- [x] `.claude/skills/statechart/` and `.claude/skills/create-formal-verification-skill/` match pstack at `2f87c85` byte for byte, except the Windows changes listed in Source diff and the statechart tests (answer 16), with pstack's LICENSE beside them.
+- [x] `statechart`'s own corpus example `Counter` runs on this PC and its `chart.mmd` matches the corpus copy.
+- [x] Three generated skills, one per target (a Fragments run, an Offbeat run, group membership), each with frontmatter, a coverage record (files and functions) and a sync commit; each is listed by the session's skill list.
+- [x] Each check runs with one `npm run` command (DECISIONS, Task runner) and passes, or fails only on findings reported in plain words.
+- [x] Each check is shown catching a scratch break in the real code (a removed check or a reordered step), then passes again once the break is dropped; the output of both runs is in Evidence.
+- [x] Each finding is in ROADMAP "Next revision" with its counterexample as numbered steps in the app's words, and is not fixed in this PR (CLAUDE.md, Done means 4; the skill's "Findings stay findings").
+- [x] Three statecharts (a new player's first day; a day's game in each game; friends and groups), each about 20 arrows or fewer, in `docs/statecharts/` with spec, view, Mermaid and SVG, and sent to the human. The friends half of the third is labelled "not verified" (answer 13).
+- [x] DECISIONS.md has a row for formal verification beside Tests (a second way to check needs an entry), and its Log records this ticket.
+- [x] The reviewer agent has reviewed the diff.
 
 ## Out of scope
 - Fixing anything a check finds (answer 5's targets; findings go to ROADMAP).
@@ -172,5 +173,18 @@ The three skills registered: the session's skill list showed `verify-fragments-r
 in two regions. Rendered with pele 1.9.0, no `PeleError`; `a-days-game/chart.svg` looked at in the browser pane.
 
 ## Review
+The `reviewer` agent (sonnet, fresh context), 2026-11-17: no defect in the three models (each action checked against
+the code it cites), the Fragments finding real, the Windows changes correct; reran the three checks (exit 0, the same
+state counts).
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - The handoff's section was a placeholder: rewritten.
+  - This Status line, the unticked criteria and this section: filled in.
+  - `main` had moved again (#276, lint rule 2): merged; lint clean on every tracked file (`local/no-invented-numbers`
+    covers only `src/`, so `scripts/verify.ts` is outside it; `fail-loudly` passes); the statechart ignore sits beside
+    #276's edits to `eslint.config.mjs`.
+  - Not blocking but an acceptance criterion: the finding's path is now numbered steps, and leads with the likelier
+    path (a tab left behind sends its word after the other tab's Next).
+- Deferred to ROADMAP "Next revision" (For the agent rules): `scripts/verify.ts`'s loose ends (no INVARIANTS block,
+  the silent "?", a raw ENOENT, `maxBuffer` without an origin); `TEMP`/`TMP` also set on POSIX and `taskkill /T` after
+  the worker dies; the group skill's 28 s against the reviewer's 10.8 s; rules that hold only by the model's own guards
+  until a guard goes.

@@ -31,8 +31,10 @@ fixed without the human's word, and the check fails if they ever start to hold:
   when it also holds round 2's letters, becomes round 2's word: round 2 is used up by a word typed for round 1, and
   round 1 loses a word sent in time.
 
-  The shortest path (8 steps): tab A starts; A sends a word for round 1; tab B loads the run; round 1's 20 seconds
-  run out; B presses Next and round 2 opens; the server judges A's word on round 2 and accepts it.
+  The likelier path, from a tab left behind:
+  1. Tab A starts the run; 2. tab B loads it; 3. round 1's 20 seconds run out; 4. B presses Next and round 2 opens;
+  5. A, still showing round 1, sends a word; 6. the server judges it on round 2, whose clock runs, and accepts it.
+  TLC's shortest path (8 steps) has A's word arrive before step 4 and wait for the run lock while B's Next commits.
 
 ## Does this change touch it?
 
