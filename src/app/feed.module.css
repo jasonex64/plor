@@ -20,3 +20,18 @@
   font-size: 0.8125rem;
   font-weight: 700;
 }
+
+/* A friend's result carries its game's colour, as the chosen Balanced look draws it: a 4px edge inside the row's left
+   (docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34; src/app/admin/kit/looks.module.css). A comment
+   carries none. */
+.result {
+  box-shadow: inset 4px 0 0 var(--game);
+}
+
+.offbeat {
+  --game: var(--offbeat);
+}
+
+.fragments {
+  --game: var(--fragments);
+}

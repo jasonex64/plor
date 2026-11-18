@@ -351,3 +351,35 @@ test("a group's page lists both games' comments for the day, each tagged, and it
   const stored = await DB.query<{ game_id: string }>("select game_id from private.comment where body = any($1) and group_id is not null order by created_at", [posts.map((p) => p[1])]);
   expect(stored.rows.map((r) => r.game_id)).toEqual(["offbeat", "substrings"]);
 });
+
+// M20 20h (inbox #243; docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34): a friend's result carries
+// its game's colour, as the chosen Balanced look draws it, a 4px edge on its row's left; a comment carries none, so it no
+// longer looks like a result.
+test("a friend's result carries its game's colour on its row, and a comment none", async ({ browser }) => {
+  const page = await viewer(browser, "fh");
+  const friend = await friendOf("fi", "fh");
+  await offbeatCaught(friend);
+  await fragmentsDone(friend);
+  await offbeatCaught(await idOf("fh"));
+  await fragmentsDone(await idOf("fh"));
+  const words = `that last one ${RUN}`;
+  await comment(friend, words, 5);
+  await page.goto("/");
+  const slot = (name: string) =>
+    page.evaluate((name) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(${name})`;
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }, name);
+  const edge = (item: ReturnType<typeof articles>) => item.locator("[class*='row']").first().evaluate((el) => getComputedStyle(el).boxShadow);
+  const name = `fi${RUN}`;
+  const result = (game: string) => articles(page).filter({ hasText: name }).filter({ hasText: game }).filter({ hasNotText: words });
+  await expect(result(GAME.name)).toContainText(/caught on question 1/);
+  await expect(result(SUBSTRINGS.name)).toContainText(/\d+ points/);
+  expect(await edge(result(GAME.name))).toBe(`${await slot("--offbeat")} 4px 0px 0px 0px inset`);
+  expect(await edge(result(SUBSTRINGS.name))).toBe(`${await slot("--fragments")} 4px 0px 0px 0px inset`);
+  expect(await edge(articles(page).filter({ hasText: words }))).toBe("none");
+});
