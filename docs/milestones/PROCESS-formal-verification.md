@@ -106,6 +106,70 @@ Nothing: this adds tooling and skills. Nothing existing becomes unused.
 | statechart: work in a scratch folder outside the repo | Each check's model and view live in its skill folder; the flow charts in `docs/statecharts/` | The checks must be rerun by the next agent (answer 3); the charts' place is answer 12. statechart's own output still goes to a scratch `--out` |
 
 ## Evidence
+All on the Windows PC, 2026-11-17.
+
+**Sources (step 1).** `grep -c "2f87c854" docs/SOURCES.md` → `2`.
+
+**The copied skills (step 2).** Every committed blob's git hash compared with pstack's tree at `2f87c85`
+(`gh api repos/cursor/plugins/git/trees/2f87c85…?recursive=1`, `scripts/test/` left out) → `blob hashes identical`,
+33 distinct files plus the licence twice. The working copy was then checked out again from the commit so the
+`sh` launcher has LF line ends (`file …/scripts/statechart` → `POSIX shell script, ASCII text executable`).
+
+**Installs (step 3).** mise v2026.11.9 from its GitHub release, `sha256sum -c` → `mise-v2026.11.9-windows-x64.zip: OK`;
+`mise install java@temurin-25 "http:tla2tools[…checksum=sha256:936a…]@1.7.4"` → `✓ http:tla2tools@1.7.4`,
+`openjdk version "25.0.5" 2026-10-20 LTS`; mise's folder added to the user PATH; `pele@1.9.0` in
+`%LOCALAPPDATA%\pele` → `import('pele')` lists `render`. TLC's exit codes read from runs: `0` when every rule holds,
+`12` when an invariant breaks.
+
+**statechart on Windows (step 4).** Counter from pstack's corpus, before the changes: `spawn /bin/sh ENOENT`. After the
+first two: exit 0, and `diff --strip-trailing-cr` against the corpus copies → `chart.mmd identical`, `report.md
+identical`. pstack's own test suite, from an LF clone at `2f87c85` with `TLA2TOOLS` and `JAVA` set, TAP output, 25
+minutes each: as published, 59 ok and 134 not ok before the timeout; with the three changes, 87 ok and 91 not ok, and
+no test that passed as published fails (`comm -12` of the two lists is empty). Neither run finished: the signal tests
+wait out their timeouts. The failures left are the tests' own POSIX assumptions: 74 `spawn EFTYPE` (they run the `sh`
+launcher directly, which Windows can't; the skills run it through `sh`), 7 `EPERM` on `symlink` (Windows needs
+Developer Mode), and the SIGINT/SIGTERM tests. The third change: the Fragments findings first read "TLC exited 12 … but its output names no rule that
+broke"; after it, "TryJudgedOnItsRound breaks … The shortest path has 7 steps".
+
+**The checks (steps 5 to 7).** `npm run verify -- <name>`, with the code as committed:
+```
+FragmentsRun.cfg: every rule holds (74756 distinct states, 1.5 s)
+finding WordGoesToItsRound: still breaks, as recorded (0.9 s)
+finding TryJudgedOnItsRound: still breaks, as recorded (0.9 s)
+OffbeatRun.cfg: every rule holds (12043 distinct states, 1.1 s)
+GroupMembership.cfg: every rule holds (97961 distinct states, 27.2 s)
+```
+Before folding history into flags, the Fragments model took `68891751 distinct states … Finished in 08min 19s`;
+before SYMMETRY, the group model took 417 s.
+
+Scratch breaks: each edits the real code and mirrors it in the model, runs the check, and is undone with
+`git checkout` (`git status` clean of them after each batch):
+
+| Break | Check's result |
+|---|---|
+| Fragments: no `run_over` in `round_open_rule` | exit 1, `Invariant NeverPastLast is violated` |
+| Fragments: no `round_running` (OB014) alone | exit 0: the route only asks for the round after a done one |
+| Fragments: OB014 gone and the route asks for `answered + 1` | exit 1, `Invariant RoundsOpenInOrder is violated` |
+| Offbeat: no `time_up` | exit 1, `NoLateAnswer` |
+| Offbeat: no primary key on `run_event` | exit 1, `AnswersInOrder` (alone: `OneAnswerPerQuestion is violated`) |
+| Offbeat: no `run_over` in `open_rule` | exit 1, `NextOnlyAfterReveal` |
+| Offbeat: no `not_open`, route and trigger | exit 1, `OnlyOpenQuestions` |
+| Offbeat: no `out_of_order` alone | exit 0, 36,907 states: `not_open` and the key cover it |
+| Offbeat: no `out_of_order` and no `not_open` | exit 1, `AnswersInOrder` |
+| Offbeat: no `run_over` in `answer_rule` alone | exit 0: no question opens after the end |
+| Offbeat: no `run_over` in either | exit 1, `NextOnlyAfterReveal` (alone: `NoAnswerAfterEnd is violated`) |
+| Groups: no member cap (OB009) | exit 1, `MembersUnderCap` |
+| Groups: no groups cap (OB010) | exit 1, `GroupsUnderCap` |
+| Groups: no group lock in `group_member_guard` | exit 1, `MembersUnderCap` |
+| Groups: no handover and no `player_group_creator_is_member` | exit 1, `CreatorIsMember` |
+| Groups: `removeMember` without `g.creator_id = $1` | exit 1, `OnlyCreatorActs` |
+
+The three skills registered: the session's skill list showed `verify-fragments-run`, `verify-offbeat-run` and
+`verify-group-membership` as each was written.
+
+**The statecharts (step 7).** `/statechart` on each spec: first day "Rules that hold: AccountStartsClean, NoDeadlock",
+15 arrows; a day's game "SevenAtMost, NoDeadlock", 18 arrows; friends and groups "OneRelation, NoDeadlock", 15 arrows
+in two regions. Rendered with pele 1.9.0, no `PeleError`; `a-days-game/chart.svg` looked at in the browser pane.
 
 ## Review
 - Blocking findings and how each was fixed:

@@ -110,21 +110,38 @@ try {
       {
         detached: true,
         stdio: ["ignore", "inherit", "inherit"],
-        env: { ...process.env, TMPDIR: tmp },
+        // Windows' os.tmpdir() reads TEMP and TMP, not TMPDIR (RIFF: PROCESS-formal-verification, Source diff).
+        env: { ...process.env, TMPDIR: tmp, TEMP: tmp, TMP: tmp },
+        windowsHide: true,
       },
     );
-    janitor = spawn(
-      "/bin/sh",
-      [
-        "-c",
-        'while read -r line; do :; done; kill -s KILL -- "-$1"; rm -rf -- "$2" "$3"',
-        "sh",
-        String(worker.pid),
-        stage,
-        tmp,
-      ],
-      { detached: true, stdio: ["pipe", "ignore", "ignore"] },
-    );
+    // Windows has no /bin/sh: the same janitor in Node, ending the tree with taskkill /T (RIFF:
+    // PROCESS-formal-verification, Source diff).
+    janitor =
+      process.platform === "win32"
+        ? spawn(
+            process.execPath,
+            [
+              "-e",
+              'process.stdin.resume(); process.stdin.on("end", () => { require("node:child_process").spawnSync("taskkill", ["/PID", process.argv[1], "/T", "/F"], { stdio: "ignore", windowsHide: true }); for (const d of process.argv.slice(2)) require("node:fs").rmSync(d, { recursive: true, force: true }); });',
+              String(worker.pid),
+              stage,
+              tmp,
+            ],
+            { detached: true, stdio: ["pipe", "ignore", "ignore"], windowsHide: true },
+          )
+        : spawn(
+            "/bin/sh",
+            [
+              "-c",
+              'while read -r line; do :; done; kill -s KILL -- "-$1"; rm -rf -- "$2" "$3"',
+              "sh",
+              String(worker.pid),
+              stage,
+              tmp,
+            ],
+            { detached: true, stdio: ["pipe", "ignore", "ignore"] },
+          );
     const exited = new Promise<number>((resolve) =>
       worker.on("exit", (code) => resolve(code ?? 2)),
     );

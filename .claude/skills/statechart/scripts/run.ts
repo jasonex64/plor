@@ -93,12 +93,14 @@ const runChild = (file: string, args: string[], options: { cwd: string; env: Nod
     );
   });
 
+// Windows has no /bin/sh and no process groups; taskkill /T ends the same tree (RIFF:
+// docs/milestones/PROCESS-formal-verification.md, Source diff).
 export const killGroup = (pid: number) =>
   new Promise((resolve) =>
-    spawn("/bin/sh", ["-c", 'kill -s KILL -- "-$1"', "sh", String(pid)], { stdio: "ignore" }).on(
-      "exit",
-      resolve,
-    ),
+    (process.platform === "win32"
+      ? spawn("taskkill", ["/PID", String(pid), "/T", "/F"], { stdio: "ignore", windowsHide: true })
+      : spawn("/bin/sh", ["-c", 'kill -s KILL -- "-$1"', "sh", String(pid)], { stdio: "ignore" })
+    ).on("exit", resolve),
   );
 
 export const messageOf = (error: unknown) =>
@@ -142,7 +144,8 @@ function* outputLines(output: Output) {
       rest = buf;
       continue;
     }
-    yield* utf8.decode(buf.subarray(0, cut)).split("\n");
+    // TLC on Windows ends its lines with \r\n (RIFF: PROCESS-formal-verification, Source diff).
+    yield* utf8.decode(buf.subarray(0, cut)).split(/\r?\n/);
     rest = buf.subarray(cut + 1);
   }
   yield utf8.decode(rest);
