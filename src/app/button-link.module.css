@@ -12,7 +12,7 @@
   border: 1.5px solid var(--ink);
   border-radius: var(--r-small);
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
   font-weight: 700;
   text-decoration: none;
 }

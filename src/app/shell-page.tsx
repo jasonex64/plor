@@ -21,7 +21,8 @@ export function Shell({ children, lost = false }: { children: ReactNode; lost?: 
       {/* Focusable by the page's code only: where focus goes when the place it should go back to is gone
           (docs/milestones/M14-14b-21-screen-readers.md, answer 5). */}
       <h1 tabIndex={-1}>
-        Plor
+        {/* From 768px with the shell, read and not shown: the sidebar shows "Plor" (globals.css, .site-name; M20 answer 7). */}
+        <span className="site-name">Plor</span>
         <Suspense fallback={null}>
           <PageName lost={lost} />
         </Suspense>

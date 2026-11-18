@@ -2,6 +2,20 @@
    a card, a list of bordered rows, chips and badges, and the button kinds beyond the base one (globals.css). One way
    each: every page takes them from here. Sizes are mockup 3's; colours are the theme's own slots. */
 
+/* The text sizes every screen uses, defined once here and named by the modules (docs/milestones/
+   M20-design-rules-and-clean-up.md, 20f): headings at 30, 24 and 18px (answer 60), the body's 16px, small text at 14, 13
+   and 12px (answer 61); 30px is also a page's name and a big number (answers 55 and 62). On the root, so every module can
+   name them; src/app/font-sizes.test.ts holds the modules to them. */
+:global(:root) {
+  --text-display: 1.875rem;
+  --text-heading: 1.5rem;
+  --text-subheading: 1.125rem;
+  --text-body: 1rem;
+  --text-note: 0.875rem;
+  --text-caption: 0.8125rem;
+  --text-label: 0.75rem;
+}
+
 /* A section as a card (mockup 3's .tile): the ink border and the card's corners, flat, as only what can be pressed has a
    shadow (docs/milestones/M14-14b-10-calm-and-alive.md, answers 3 and 9). */
 .card {

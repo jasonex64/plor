@@ -28,7 +28,7 @@
 /* A card's heading, 24px (kit.module.css, .card > h2). */
 .title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-heading);
 }
 
 /* Every step in one cell, the others hidden, so the panel is as tall as its longest and the buttons don't move. */
@@ -63,5 +63,5 @@
 /* 14px, as a note under the answer box (game.module.css, .note) and a flat button. */
 .place {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-note);
 }

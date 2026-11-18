@@ -17,6 +17,6 @@
 .date {
   margin: 8px 0 6px;
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 700;
 }
