@@ -21,7 +21,7 @@ export function writeShown(name: string, value: string): void {
   try {
     window.localStorage.setItem(PREFIX + name, value);
   } catch {
-    // No copy kept: the next visit shows the number as it is, without counting.
+    // Expected: no copy kept; the next visit shows the number as it is, without counting.
   }
 }
 

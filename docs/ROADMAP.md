@@ -153,6 +153,11 @@ Each item needs its own ticket. Earlier, longer text is in git at commit `4dc43a
 ## Next revision (deferred)
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side. **Keep only what someone will act on:** a cosmetic detail, a test nit, a race milliseconds wide or a comment that can't mislead is closed, not parked. The 2026-10-22 triage (Design review, 4) closed or merged most of the earlier items; the full earlier list is in git at commit `c9d2733`. Items are grouped by where they belong.
 
+**For PROCESS-lint-rules**
+- [ ] `local/fail-loudly` visits `try/catch` only: a promise's `.catch(() => {})` slips past it. One in the app, `src/lib/hold.ts:70` (`sent.catch(() => {})`, deliberate: the failure reaches the caller through `sent`), and one in a mock page (this file, the M20 mocks line). Either the rule also checks `.catch` with an empty or log-only callback, or the ticket says rule 1 is `try/catch` only. Found in rule 1 (review).
+- [ ] The rule counts only `console.*` and `log.*` as logging; `logger.error(...)`, `void log.x()` or `console?.log()` in a catch slip past. Nothing calls those today. Found in rule 1 (review).
+- [ ] DECISIONS.md's "Error handling" row still says "fail loudly", a sentence CLAUDE.md no longer has; harmless, but point it at `local/fail-loudly` when the row is next touched. Found in rule 1 (review).
+
 **For M16**
 - [ ] `e2e/feed.e2e.ts` failed on CI in the 20 minutes after the day's reset (2026-11-15, PRs #214 and #215): its seeded comments carried today's day with yesterday's time, which the app never writes, and the second page came back empty. The helper now takes a comment's day from its time. Left: the date-line test's "today" comment, 5 minutes old, is yesterday's in the first 5 minutes of a day; and `feel.e2e.ts:51`, `live-board.e2e.ts:31` and `controls-and-state.e2e.ts:200` passed only on a retry in the same runs, cause not looked for. Found on CI, 2026-11-15.
 - [ ] The test that no word of the list reaches the player before the run ends (`src/app/api/substrings/route.db.test.ts`, "sends no word of the list…") leans on the test before it having had a word accepted, and reads only the early replies of a run it never ends. Found in M16's close (review).
