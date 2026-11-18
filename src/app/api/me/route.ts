@@ -3,6 +3,7 @@ import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle } from "@/lib/http";
 import { getProfile } from "@/lib/profile";
 import { getMe } from "@/game/me";
+import { STATUS } from "@/lib/status";
 
 // The signed-in player's own stats for the Me tab (docs/milestones/M14-14a-3a-me.md). Only their own runs and answers;
 // the shares beside the rarest answers are the result's, from closed days with enough players (M11 H5). A player who
@@ -11,6 +12,6 @@ export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const db = getPool();
-  if ((await getProfile(db, userId)) === null) throw new AppError("no_profile", 409);
+  if ((await getProfile(db, userId)) === null) throw new AppError("no_profile", STATUS.conflict);
   return Response.json({ ok: true, me: await getMe(db, userId) });
 });

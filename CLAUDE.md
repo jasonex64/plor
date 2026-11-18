@@ -22,7 +22,6 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 5. **Plan as checks.** Write each step as `<step> → verify: <check>`, where the check is a command whose output can fail. Run the check after each step; if it fails, fix and re-run it before the next step. A vague task becomes a check first.
 
 ## Hard rules
-- **No invented numbers.** Every threshold, timeout, limit, rate, cost or tuning value comes from the source, the ticket or a human, and its origin is recorded in the ticket. If none of them gives the value, ask. Never pick a "reasonable default".
 - **No assumptions stated as facts.** Before starting, state the assumptions the work rests on. If the task reads more than one way, list the readings and ask which one. If you didn't read it or run it, mark it *unverified*.
 - **Hypothesis before experiment.** Before you run anything to "see what happens", write down what you expect, why, and what result would prove you wrong.
 - **One way to do each thing.** Use what `docs/DECISIONS.md` specifies for logging, config, errors, tests, debugging and scripts. A second way needs a decision entry, and that same change removes the first way.

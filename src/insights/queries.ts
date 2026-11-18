@@ -6,6 +6,7 @@ import type { Db } from "@/lib/db";
 import { thingNames } from "@/game/payload";
 import { AppError } from "@/lib/http";
 import { buildInsights, type AnswerRow, type DayInsights, type MissRow, type TallyRow } from "./report";
+import { STATUS } from "@/lib/status";
 
 export async function isAdmin(db: Db, userId: string): Promise<boolean> {
   const { rows } = await db.query("select 1 from private.admin where user_id = $1", [userId]);
@@ -33,7 +34,7 @@ export async function dayInsights(db: Db, date: string | null): Promise<DayInsig
          (select max(puzzle_date) from private.puzzle where game_id = $1 and puzzle_date <= private.today()))`,
     [GAME_ID, date],
   );
-  if (rows.length === 0) throw new AppError("not_available", 404);
+  if (rows.length === 0) throw new AppError("not_available", STATUS.notFound);
   const day = rows[0];
   const answers = await db.query<AnswerRow>(
     "select question_idx, entry_id, matched from private.run_event where game_id = $1 and puzzle_date = $2::date",

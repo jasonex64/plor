@@ -5,10 +5,11 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { GUEST_TOKEN_BYTES } from "@/config/tunables";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 const GUEST_COOKIE = "plor_guest";
 // base64url writes 6 bits a character.
-const TOKEN_SHAPE = new RegExp(`^[A-Za-z0-9_-]{${Math.ceil((GUEST_TOKEN_BYTES * 8) / 6)}}$`);
+const TOKEN_SHAPE = new RegExp(`^[A-Za-z0-9_-]{${Math.ceil((GUEST_TOKEN_BYTES * 8) / 6)}}$`); // https://www.rfc-editor.org/rfc/rfc4648.html 4, 5
 
 export function newGuestToken(): string {
   return randomBytes(GUEST_TOKEN_BYTES).toString("base64url");
@@ -23,7 +24,7 @@ export async function readGuestToken(): Promise<string | null> {
 // For the routes that need a run: with no token there is none.
 export async function requireGuestToken(): Promise<string> {
   const token = await readGuestToken();
-  if (!token) throw new AppError("no_run", 404);
+  if (!token) throw new AppError("no_run", STATUS.notFound);
   return token;
 }
 

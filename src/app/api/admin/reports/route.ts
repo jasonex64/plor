@@ -3,6 +3,7 @@ import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle } from "@/lib/http";
 import { isAdmin } from "@/insights/queries";
 import { listDecisions, listReports } from "@/admin/reports";
+import { STATUS } from "@/lib/status";
 
 // Every reported comment, and every admin's decision on one, deleted (M12 12d) or kept (M14 14b-2b-2b), for admins only
 // (docs/milestones/M08-comments-and-reactions.md, 8c and D5): signed out → 401, not in private.admin → 403.
@@ -10,6 +11,6 @@ export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const db = getPool();
-  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", 403);
+  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", STATUS.forbidden);
   return Response.json({ ok: true, reports: await listReports(db), decisions: await listDecisions(db) });
 });

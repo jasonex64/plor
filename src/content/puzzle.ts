@@ -24,7 +24,7 @@ export type Question = {
   // The letter taken at this question (M04 13c-3). It stays gone for the rest of the run.
   steals?: string;
 };
-export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] };
+export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] }; // docs/DECISIONS.md, Puzzle content format
 
 // A day as approval builds it (private.build_puzzle): per question the category's root and member_of as approved, its
 // member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md, Puzzle content format). The stored day
@@ -96,7 +96,7 @@ function isThingIdList(v: unknown): v is string[] {
 export function isCalendarDate(v: unknown): v is string {
   if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
   const d = new Date(`${v}T00:00:00Z`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+  return !Number.isNaN(d.getTime()) && d.toISOString().split("T")[0] === v;
 }
 
 function checkQuestion(errors: string[], where: string, v: unknown) {
@@ -133,7 +133,7 @@ export function parsePuzzle(file: string, text: string): { puzzle: Puzzle; error
   if (!isObject(data)) return { puzzle: null, errors: [`${file}: must be a JSON object`] };
   const errors: string[] = [];
   checkKeys(errors, file, data, ["format", "game_id", "date", "questions"]);
-  if ("format" in data && data.format !== 3) errors.push(`${file}: "format" must be 3`);
+  if ("format" in data && data.format !== 3) errors.push(`${file}: "format" must be 3`); // docs/DECISIONS.md, Puzzle content format
   if ("game_id" in data && data.game_id !== GAME_ID) errors.push(`${file}: "game_id" must be "${GAME_ID}"`);
   if ("date" in data && !isCalendarDate(data.date)) errors.push(`${file}: "date" must be a calendar date YYYY-MM-DD`);
   if ("questions" in data) {

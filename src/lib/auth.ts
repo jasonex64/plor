@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { readServerEnv } from "@/config/env";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
+import { STATUS } from "@/lib/status";
 
 // A new client per request: it reads that request's cookies (same guide, "Do I need to create a new client
 // for every route?"). Route handlers can write cookies, so unlike the guide's Server Component client there is
@@ -35,7 +36,7 @@ export async function currentUserId(supabase: SupabaseClient): Promise<string | 
 
 export async function requireUserId(supabase: SupabaseClient): Promise<string> {
   const userId = await currentUserId(supabase);
-  if (!userId) throw new AppError("not_signed_in", 401);
+  if (!userId) throw new AppError("not_signed_in", STATUS.unauthorized);
   return userId;
 }
 
@@ -47,7 +48,7 @@ export async function requireUserId(supabase: SupabaseClient): Promise<string> {
 export function authFailure(error: AuthError): Error {
   if (isAuthRetryableFetchError(error)) {
     log.error("supabase auth unavailable", { error: error.message, status: error.status });
-    return new AppError("auth_unavailable", 503, error.message);
+    return new AppError("auth_unavailable", STATUS.serviceUnavailable, error.message);
   }
   if (error.code && error.status !== undefined && error.status >= 400 && error.status < 500) {
     return new AppError(error.code, error.status, error.message);
@@ -63,5 +64,5 @@ export function authFailure(error: AuthError): Error {
 export function redirectHome(errorCode?: string): NextResponse {
   const location = errorCode ? `/?${new URLSearchParams({ error: /^[a-z0-9_]+$/.test(errorCode) ? errorCode : "sign_in_failed" })}` : "/";
   // NextResponse, as in the guide's callback route, so the session cookies set through cookies() go with it.
-  return new NextResponse(null, { status: 307, headers: { location } });
+  return new NextResponse(null, { status: STATUS.temporaryRedirect, headers: { location } });
 }

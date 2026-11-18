@@ -3,6 +3,7 @@ import { deleteAccount } from "@/lib/account";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { log } from "@/lib/log";
+import { STATUS } from "@/lib/status";
 
 // The signed-in player deletes their own account, confirmed by typing their username (docs/milestones/M12-account.md,
 // 12c; A4, A7). Then this device signs out (A9 (a)): Auth no longer knows the session, which signOut ignores (auth-js
@@ -14,7 +15,7 @@ export const POST = handle(async (request) => {
   const userId = await requireUserId(supabase);
   const typed = (await readJsonObject(request)).username;
   // A NUL character can't reach Postgres text (22021), and no username holds one (M19 19b).
-  if (typeof typed !== "string" || typed.includes("\0") || !(await deleteAccount(getPool(), userId, typed))) throw new AppError("username_mismatch", 400);
+  if (typeof typed !== "string" || typed.includes("\0") || !(await deleteAccount(getPool(), userId, typed))) throw new AppError("username_mismatch", STATUS.badRequest);
   const { error } = await supabase.auth.signOut({ scope: "local" });
   // The account is gone either way, so the reply says so (M19 19a, answer 6: "Say it's deleted").
   if (error) log.error("account deleted, sign-out failed", { error: String(error) });

@@ -8,7 +8,7 @@ export const dayText = (date: string) =>
 export function shiftDay(date: string, days: number): string {
   const d = new Date(`${date}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
+  return d.toISOString().split("T")[0];
 }
 
 // A moment, "26 Oct, 14:05", in the reader's own time zone: when a comment was reported or a decision made.

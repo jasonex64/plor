@@ -1,6 +1,7 @@
 import { readServerEnv } from "@/config/env";
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { AppError, checkProtocol, handle } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // What the browser's Realtime-only client needs to join its own board (M07 D5): the project URL, the publishable key
 // (both public by design, Supabase API keys), and the player's own access token, which Realtime checks against the
@@ -12,7 +13,7 @@ export const GET = handle(async (request) => {
   const userId = await requireUserId(supabase);
   const { data, error } = await supabase.auth.getSession();
   if (error) throw error;
-  if (!data.session) throw new AppError("not_signed_in", 401);
+  if (!data.session) throw new AppError("not_signed_in", STATUS.unauthorized);
   const { url, publishableKey } = readServerEnv().supabase;
   // userId names the board topic, `board:<user id>`.
   return Response.json({

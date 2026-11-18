@@ -4,6 +4,7 @@
 // automatically. The routes check the admin before calling these.
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // username and name identify the author (name is the display name if set, else the username: M07 7a). reports is
 // how many players reported it since an admin last kept it; firstReportedAt is when the first of them did.
@@ -51,7 +52,7 @@ export async function listDecisions(db: Db): Promise<Decision[]> {
 // Only a reported comment: anything else is the same 404 as a missing one.
 export async function deleteReportedComment(db: Db, adminId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ deleted: boolean }>("select private.delete_reported_comment($1, $2) as deleted", [adminId, id]);
-  if (!rows[0].deleted) throw new AppError("comment_not_found", 404);
+  if (!rows[0].deleted) throw new AppError("comment_not_found", STATUS.notFound);
 }
 
 // Keeps a reported comment for everyone but the players who reported it: its open reports are handled and it leaves
@@ -60,5 +61,5 @@ export async function deleteReportedComment(db: Db, adminId: string, id: string)
 // one.
 export async function keepReportedComment(db: Db, adminId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ kept: boolean }>("select private.keep_reported_comment($1, $2) as kept", [adminId, id]);
-  if (!rows[0].kept) throw new AppError("comment_not_found", 404);
+  if (!rows[0].kept) throw new AppError("comment_not_found", STATUS.notFound);
 }

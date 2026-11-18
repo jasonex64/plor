@@ -8,6 +8,7 @@ import { avoids, normalize } from "@/content/puzzle";
 import { shownName } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // alias: the alias the search found the answer by, when its shown name doesn't hold the typed text. taken: the first
 // taken letter its shown name holds, or null.
@@ -23,9 +24,9 @@ export async function poolView(db: Db, adminId: string, query: URLSearchParams):
   const category = query.get("category");
   const taken = query.get("taken") ?? "";
   const start = query.get("offset") ?? "0";
-  if (!category) throw new AppError("bad_request", 400, "category");
-  if (!/^[a-z]*$/.test(taken)) throw new AppError("bad_request", 400, "taken");
-  if (!/^\d+$/.test(start)) throw new AppError("bad_request", 400, "offset");
+  if (!category) throw new AppError("bad_request", STATUS.badRequest, "category");
+  if (!/^[a-z]*$/.test(taken)) throw new AppError("bad_request", STATUS.badRequest, "taken");
+  if (!/^\d+$/.test(start)) throw new AppError("bad_request", STATUS.badRequest, "offset");
   const letters = [...taken];
   const needle = normalize(query.get("q") ?? "");
   const offset = Number(start);
@@ -44,10 +45,10 @@ export async function poolView(db: Db, adminId: string, query: URLSearchParams):
     found = rows[0].pool;
   } catch (err) {
     // private.category_pool's own admin check (supabase/migrations/20261116051619_answer_pool.sql).
-    if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", 403);
+    if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", STATUS.forbidden);
     throw err;
   }
-  if (!found) throw new AppError("no_category", 404);
+  if (!found) throw new AppError("no_category", STATUS.notFound);
   const all = found.rows.map((r) => ({ ...r, name: shownName(r.name) }));
   return {
     members: found.members,

@@ -4,6 +4,7 @@ import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { isCalendarDate } from "@/content/puzzle";
 import { readGame } from "@/friends/leaderboard";
 import { readEmoji, readTarget, setReaction } from "@/reactions/reactions";
+import { STATUS } from "@/lib/status";
 
 // Sets, replaces or removes (emoji null) the signed-in player's reaction on a comment or a friend's run
 // (docs/milestones/M08-comments-and-reactions.md, 8b): on the day the page shows, which must be today, once the
@@ -13,7 +14,7 @@ export const POST = handle(async (request) => {
   const userId = await requireUserId(await createAuthClient());
   const { game, date, target, emoji } = await readJsonObject(request);
   const gameId = readGame(game);
-  if (!isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
+  if (!isCalendarDate(date)) throw new AppError("bad_request", STATUS.badRequest, "date");
   await setReaction(getPool(), userId, gameId, date, readTarget(target), readEmoji(emoji));
   return Response.json({ ok: true });
 });

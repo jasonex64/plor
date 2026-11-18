@@ -17,6 +17,9 @@ import { dayText } from "../day-text";
 import styles from "./insights.module.css";
 import { Line, Skeleton } from "../skeleton";
 
+// The table's columns, so a row spanning them stays right when one is added (docs/milestones/PROCESS-lint-rules.md, answer 21).
+const COLUMNS = ["Q", "Question", "Caught", "Rate", "vs target", "Most typed", "Not in list"];
+
 type InsightsResponse = { days: string[]; report: DayInsights };
 
 const percent = (share: number | null) => (share === null ? "—" : `${Math.round(share * 100)}%`);
@@ -90,13 +93,11 @@ export function Insights() {
         <table className={admin.table} role="table">
           <thead role="rowgroup" className="sr-only-on-phones">
             <tr role="row">
-              <th role="columnheader">Q</th>
-              <th role="columnheader">Question</th>
-              <th role="columnheader">Caught</th>
-              <th role="columnheader">Rate</th>
-              <th role="columnheader">vs target</th>
-              <th role="columnheader">Most typed</th>
-              <th role="columnheader">Not in list</th>
+              {COLUMNS.map((c) => (
+                <th key={c} role="columnheader">
+                  {c}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody role="rowgroup">
@@ -204,7 +205,7 @@ function Row({ q }: { q: QuestionInsights }) {
       {open && (
         <tr role="row">
           <td role="cell" />
-          <td role="cell" colSpan={6}>
+          <td role="cell" colSpan={COLUMNS.length - 1}>
             <ul className={styles.misses}>
               {q.misses.map((m) => (
                 <li key={m.text}>

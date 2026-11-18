@@ -16,6 +16,7 @@ import { AppError } from "@/lib/http";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { NO_REACTIONS, commentReactions, runReactions, type Reactions } from "@/reactions/reactions";
 import type { BoardGame } from "@/friends/leaderboard";
+import { STATUS } from "@/lib/status";
 
 // The item's own part, whatever its kind. at is when it happened, as the cursor holds it; date is its puzzle day, for
 // the date lines. mine: the viewer's own.
@@ -62,13 +63,15 @@ export function readFeedCursor(input: string | null): Cursor | null {
   try {
     parts = JSON.parse(Buffer.from(input, "base64url").toString("utf8"));
   } catch {
-    throw new AppError("bad_request", 400, "cursor");
+    throw new AppError("bad_request", STATUS.badRequest, "cursor");
   }
-  if (!Array.isArray(parts) || parts.length !== 3) throw new AppError("bad_request", 400, "cursor");
-  const [at, kind, tie] = parts;
-  if (typeof at !== "string" || !AT.test(at) || Number.isNaN(Date.parse(at))) throw new AppError("bad_request", 400, "cursor");
-  if (kind !== 0 && kind !== 1) throw new AppError("bad_request", 400, "cursor");
-  if (typeof tie !== "string" || tie.length === 0 || tie.length > 100 || tie.includes("\0")) throw new AppError("bad_request", 400, "cursor");
+  if (!Array.isArray(parts)) throw new AppError("bad_request", STATUS.badRequest, "cursor");
+  // Exactly these three parts: a missing one fails its own check below, an extra one fails here.
+  const [at, kind, tie, ...extra] = parts;
+  if (extra.length > 0) throw new AppError("bad_request", STATUS.badRequest, "cursor");
+  if (typeof at !== "string" || !AT.test(at) || Number.isNaN(Date.parse(at))) throw new AppError("bad_request", STATUS.badRequest, "cursor");
+  if (kind !== 0 && kind !== 1) throw new AppError("bad_request", STATUS.badRequest, "cursor");
+  if (typeof tie !== "string" || tie.length === 0 || tie.length > 100 || tie.includes("\0")) throw new AppError("bad_request", STATUS.badRequest, "cursor");
   return { at, kind, tie };
 }
 

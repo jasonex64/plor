@@ -5,6 +5,7 @@ import { isCalendarDate } from "@/content/puzzle";
 import { getThread, postComment, readCommentBody } from "@/comments/comments";
 import { readGroupId } from "@/groups/groups";
 import { readGame } from "@/friends/leaderboard";
+import { STATUS } from "@/lib/status";
 
 // A day's comments in the game `?game=` names, which is required: each game has its own thread (M16 16f-3). Today's by
 // default, or a past day's with `?date=YYYY-MM-DD` (docs/milestones/M08-comments-and-reactions.md, 8a and D6). Today's
@@ -16,7 +17,7 @@ export const GET = handle(async (request) => {
   const params = new URL(request.url).searchParams;
   const game = readGame(params.get("game"));
   const date = params.get("date");
-  if (date !== null && !isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
+  if (date !== null && !isCalendarDate(date)) throw new AppError("bad_request", STATUS.badRequest, "date");
   const group = params.get("group");
   return Response.json({ ok: true, thread: await getThread(getPool(), userId, game, date, group === null ? null : readGroupId(group)) });
 });
@@ -29,7 +30,7 @@ export const POST = handle(async (request) => {
   const userId = await requireUserId(await createAuthClient());
   const { game, date, body, group } = await readJsonObject(request);
   const gameId = readGame(game);
-  if (!isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
+  if (!isCalendarDate(date)) throw new AppError("bad_request", STATUS.badRequest, "date");
   const comment = await postComment(getPool(), userId, gameId, date, readCommentBody(body), group === undefined ? null : readGroupId(group));
-  return Response.json({ ok: true, comment }, { status: 201 });
+  return Response.json({ ok: true, comment }, { status: STATUS.created });
 });

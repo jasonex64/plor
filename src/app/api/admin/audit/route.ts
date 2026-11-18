@@ -3,6 +3,7 @@ import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { isAdmin } from "@/insights/queries";
 import { decide, listReviews, openCount } from "@/admin/audit";
+import { STATUS } from "@/lib/status";
 
 // The audit of what was learned from misses, for admins only (docs/milestones/M13-13b-learning-from-misses.md):
 // signed out → 401, not in private.admin → 403. GET lists every text with the count waiting for review, or only the
@@ -11,7 +12,7 @@ export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const db = getPool();
-  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", 403);
+  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", STATUS.forbidden);
   if (new URL(request.url).searchParams.has("count")) return Response.json({ ok: true, open: await openCount(db, userId) });
   return Response.json({ ok: true, ...(await listReviews(db, userId)) });
 });
@@ -21,7 +22,7 @@ export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const db = getPool();
-  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", 403);
+  if (!(await isAdmin(db, userId))) throw new AppError("admins_only", STATUS.forbidden);
   await decide(db, userId, await readJsonObject(request));
   return Response.json({ ok: true });
 });

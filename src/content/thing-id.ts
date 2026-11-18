@@ -5,10 +5,10 @@ import { createHash } from "node:crypto";
 // A name-based UUID (version 5: SHA-1 of a namespace and a name, RFC 4122 §4.3).
 export function uuidV5(namespace: string, name: string): string {
   const hash = createHash("sha1").update(Buffer.from(namespace.replaceAll("-", ""), "hex")).update(name, "utf8").digest();
-  hash[6] = (hash[6] & 0x0f) | 0x50;
-  hash[8] = (hash[8] & 0x3f) | 0x80;
-  const hex = hash.subarray(0, 16).toString("hex");
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  hash[6] = (hash[6] & 0x0f) | 0x50; // version 5 in the top 4 bits: https://www.rfc-editor.org/rfc/rfc4122.html 4.1.3, 4.3
+  hash[8] = (hash[8] & 0x3f) | 0x80; // the variant's bits 1 0: https://www.rfc-editor.org/rfc/rfc4122.html 4.1.1, 4.3
+  const hex = hash.subarray(0, 16).toString("hex"); // 16 octets: https://www.rfc-editor.org/rfc/rfc4122.html 4.1
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`; // 8-4-4-4-12 hex digits: https://www.rfc-editor.org/rfc/rfc4122.html 3
 }
 
 // RFC 4122's URL namespace, with each thing named by a URL of its source entry under plor.app.

@@ -201,7 +201,7 @@ export const removeFixtureBase = (db: Querier) => removeTestBase(db, "fixture\\_
 // only SQL reads: src/content/puzzle.ts).
 export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle & { approved_at: string } {
   return {
-    format: 3,
+    format: 3, // docs/DECISIONS.md, Puzzle content format
     game_id: "offbeat",
     date,
     approved_at: approvedAt,

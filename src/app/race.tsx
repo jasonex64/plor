@@ -17,7 +17,7 @@ const players = (week: Week): RacePlayer[] =>
 
 // The graph's text size: 0.75rem (race.module.css), 12px at the browser's default and more when the player sets a bigger
 // text size (14b-17). Read, like the measuring, only once the graph has a width, so only in the browser.
-const textSize = () => parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.75;
+const textSize = () => parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.75; // docs/milestones/M14-14b-17-lines-and-text-size.md, Numbers: 12px is 0.75rem
 
 // The width of a text in the graph's size, in the page's one font (body's, which the graph inherits).
 let canvas: CanvasRenderingContext2D | null = null;
@@ -43,8 +43,8 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
     observer.observe(box.current!);
     return () => observer.disconnect();
   }, []);
-  const long = useMinWidth(768);
-  const height = long ? 230 : 200;
+  const long = useMinWidth(768); // docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers
+  const height = long ? 230 : 200; // docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers
   useFontLoaded();
   const view = width > 0 ? layout({ players: players(week), days: week.days, hidden: week.hidden, picked, width, height, long, text: textSize(), measure }) : null;
 
@@ -75,7 +75,7 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
           {view.lines.map((l) => (
             <g key={l.key} className={styles[l.role]}>
               <polyline className={styles.line} points={l.points.map((p) => `${p.x},${p.y}`).join(" ")} />
-              <circle className={styles.dot} cx={l.points.at(-1)!.x} cy={l.points.at(-1)!.y} r={l.role === "other" ? 2.5 : 3.5} />
+              <circle className={styles.dot} cx={l.points.at(-1)!.x} cy={l.points.at(-1)!.y} r={l.role === "other" ? 2.5 : 3.5 /* docs/milestones/M14-14b-14-leaderboard-graph.md, Numbers */} />
             </g>
           ))}
           {/* The leader's end carries the List's first-place badge (answer 23). */}

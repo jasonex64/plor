@@ -5,6 +5,7 @@ import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { isCalendarDate } from "@/content/puzzle";
 import { withHostAnswers } from "@/admin/puzzle-entry";
 import { approvePuzzle, draftProblems, isHostAnswerLists, readDrafts } from "@/admin/puzzles";
+import { STATUS } from "@/lib/status";
 
 // Approves a drafted day with the host answers the admin chose (docs/milestones/M06-puzzle-entry.md). The result is
 // checked by the same content rules as a file, then the host answers' names against the stolen letters, then against
@@ -14,17 +15,17 @@ export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   // Checked here too, before anything about drafts or dates is read, so a non-admin learns nothing.
-  if (!(await isAdmin(getPool(), userId))) throw new AppError("admins_only", 403);
+  if (!(await isAdmin(getPool(), userId))) throw new AppError("admins_only", STATUS.forbidden);
   const { date, hostAnswers } = await readJsonObject(request);
-  if (!isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
+  if (!isCalendarDate(date)) throw new AppError("bad_request", STATUS.badRequest, "date");
   const draft = readDrafts().get(date);
-  if (!draft) throw new AppError("no_draft", 404);
-  if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", 400, "hostAnswers");
+  if (!draft) throw new AppError("no_draft", STATUS.notFound);
+  if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", STATUS.badRequest, "hostAnswers");
   const puzzle = withHostAnswers(draft, hostAnswers);
   const db = getPool();
   const problems = await draftProblems(db, date, puzzle);
   const found = problems.length ? problems : await approvePuzzle(db, userId, puzzle);
-  if (found.length) return Response.json({ ok: false, error: "puzzle_invalid", problems: found }, { status: 422 });
+  if (found.length) return Response.json({ ok: false, error: "puzzle_invalid", problems: found }, { status: STATUS.unprocessableContent });
   return Response.json({ ok: true });
 });
 

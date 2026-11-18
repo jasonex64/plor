@@ -2,6 +2,7 @@ import { authFailure, createAuthClient } from "@/lib/auth";
 import { clearAttempts, clientIp, emailKey, giveBackAttempt, takeAttempt } from "@/lib/auth-limits";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
+import { STATUS } from "@/lib/status";
 
 // Emails a 6-digit sign-in code (supabase.com/docs/guides/auth/auth-email-passwordless, "With OTP", step 1); the
 // player types it in and /api/auth/email/verify checks it. A new address signs up on its first code, which is the
@@ -13,7 +14,7 @@ import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const { email } = await readJsonObject(request);
-  if (typeof email !== "string" || email.trim() === "") throw new AppError("email_invalid", 400);
+  if (typeof email !== "string" || email.trim() === "") throw new AppError("email_invalid", STATUS.badRequest);
 
   const db = getPool();
   const ip = clientIp(request);

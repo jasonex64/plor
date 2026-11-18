@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Fourteen questions answered (below, quoted). **Rule 1 of 5, `local/fail-loudly`, in review** on `process-lint-rules` (its PR); the other four rules and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). Rule 1 of 5, `local/fail-loudly`, merged in #275. **Rule 2, `local/no-invented-numbers`, in review** on `process-lint-rules` (its PR); rules 3 to 5 and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -43,6 +43,34 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 14. **A deliberate "do nothing" catch.** The draft rule flagged 3 empty catches, each deliberate with a comment saying why (`src/app/shown.ts`, `src/app/theme.ts`: browser storage blocked; `scripts/base.ts`: a password kept as typed). Padding them to pass would cheat the check.
   - **Answer:** **"Marker comment allows it"**: an empty catch passes only if a comment inside starts with `Expected:`; a bare `catch {}` or `/* ignore */` still fails, and `grep "Expected:"` lists every exception.
 
+**Round 6** (starting rule 2, same day; measured first: of the 516 numbers in app code, 224 are HTTP status codes, 93 are the rank badges' drawing in `src/app/ranks.tsx`, many are units, and 86 have a comment on the line above)
+15. **HTTP status codes.**
+  - **Answer:** **"Named once, with source"**: one file names them (e.g. `STATUS.notFound`) citing the HTTP standard; routes use the names.
+16. **Unit numbers.**
+  - **Answer:** **"Fixed allow-list"**: the rule allows 60, 1000, 24, 360, 100, -1 and 2, as it allows 0 and 1 (the human accepted that an invented 60-second timeout slips through).
+17. **What counts as a source comment.**
+  - **Answer:** **"Must name a source"**: the comment holds a ticket answer, a `docs/` path, a URL, or "human, <date>"; the rule checks the pattern.
+18. **Drawing coordinates.**
+  - **Answer:** **"One comment per drawing"**: one source comment above a drawing function covers every number inside it.
+
+**Round 7** (after three agents traced the 198 numbers left: most to a ticket; the rest below)
+19. **Five values an agent set with no human answer or doc** (the bank's tie-break seed, the count-up's solving steps, the guest peek's pattern, the admin page's 5 shown host answers, a tie counting half):
+  - **Answer:** **"Show me each first"**: asked one by one in round 8.
+20. **Facts of a standard** (UUID layout, base64, a date string's 10 characters, the Bézier formula):
+  - **Answer:** **"Yes, add and cite them"**. Two specs were read and cited (RFC 4122, RFC 4648). The ECMAScript page could not be read past its contents (twice), so the date is now taken by splitting at its "T", with no number left; CSS Easing defines the curve but not its formula (answer 28).
+21. **Counts of something on the page** (three tables' column spans, a cursor's 3 parts):
+  - **Answer:** **"Derive from the code"**: each table's columns are one list, and the wide cell spans its length; the cursor refuses an extra part by destructuring.
+22. **Unit products** (3600, 86,400,000):
+  - **Answer:** **"As products of units"**: `60 * 60` and `24 * 60 * 60 * 1000`.
+
+**Round 8** (answer 19, one by one)
+23. **A tie in "Better than X% of players"** (`src/game/percentile.ts`): **"Keep: a tie counts half"**.
+24. **The admin page's host answers before "+N more"** (`src/app/admin/puzzles/puzzles.tsx`): **"Keep 5"**.
+25. **The guest peek's drawn calendar** (four shades; DESIGN.md said three): **"Keep it; fix DESIGN.md"**.
+26. **The draft's tie-break hash** (31 and 7, `src/content/bank.ts`): **"Keep 31 and 7"**.
+27. **The count-up's solving steps** (`src/app/shown.ts`): **"Fewer steps (4)"**. Measured after: the curve moves by at most 0.000000003; on 5 of 400,000 sampled moments a count to 10,000 or more shows a number 1 off for that moment, at a rounding edge. Claude had predicted no frame would differ: that prediction was wrong, and the human is told.
+28. **The Bézier formula's 3s and 6:** **"Cite Wikipedia's Bezier page"**.
+
 ## Source
 - Playwright (SOURCES.md, M07 D7): the `video` option, https://playwright.dev/docs/test-use-options#video-modes; the GitHub Actions artifact upload already in `.github/workflows/e2e.yml`.
 - Playwright (SOURCES.md, M07 D7): the `screenshot` option, https://playwright.dev/docs/test-use-options ("'off', 'on' and 'only-on-failure'").
@@ -58,7 +86,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 | Rule in CLAUDE.md today | The lint rule fails on | Flags today |
 |---|---|---|
 | Fail loudly | a `catch` that is empty (unless its comment starts with `Expected:`, answer 14), or only logs and carries on | **built**: 3 in `src/`, `e2e/`, `scripts/`, all deliberate, now marked |
-| No invented numbers | a number other than 0 or 1 in app code without a source comment on its line or the line above (answers 6, 10); test files exempt (answer 9) | 516 in 99 files |
+| No invented numbers | a number in app code without a comment naming its source (a ticket answer, a `docs/` path, a URL, "human, <date>"; answer 17) on its line, above it or above what encloses it (answers 10, 18); not 0, 1, 2, 24, 60, 100, 360, 1000 (answers 6, 16) or an array index; test files exempt (answer 9) | **built**: 516 at first; 236 HTTP statuses became `STATUS` names (answer 15), the rest sourced or derived (answers 19 to 28) |
 | Clean only your orphans | unused imports and variables, as an error | to count |
 | Never cheat a check | `.skip`, `.only`, `.fixme` in a test | 0 |
 | Least privilege | `service_role` or `SERVICE_ROLE` in app code | 0 |
@@ -119,7 +147,19 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - `npx tsc --noEmit` → no errors.
 - CLAUDE.md: the header's "Add a rule here only after…" is the new rule; "Fail loudly" is now "Recovery needs a ticket" (its catch half is the lint rule; its "silent fallbacks" and "defaults that hide missing data" were fuzzy, answer 7, and stay on the reviewer's list, `.claude/agents/reviewer.md:23`).
 
+**Rule 2, `local/no-invented-numbers`** (2026-11-17, slot 3):
+- Measured first (ESLint's `no-magic-numbers` on app code): 516; then 198 left after the `STATUS` names. Three agents traced each to its ticket; every quote they gave was checked by grep in the ticket before it went into a comment. The leaderboard graph's unnamed offsets were checked in the approved mockup itself (`project/Card.dc.html` lines 197, 201, 217, 247, 256).
+- `npm test -- eslint-rules` → `Tests  23 passed (23)`; with the rule's `Literal` visitor renamed → `Tests  5 failed | 18 passed (23)`. Restored after. The test caught one bug while building: the file's first comment counted as "above" every number in the file; the search now stops below the file.
+- `npm run lint` → no findings with both rules on. `npx tsc --noEmit` → no errors. `npm test` → `Tests  845 passed (845)`.
+- The cursor change (`src/comments/feed-page.ts`): the feed's db test gains a four-part cursor; `npx vitest run src/app/api/feed/items/route.db.test.ts` → `Tests  11 passed (11)`, and `1 failed | 10 passed` with the new guard removed.
+- Hypothesis for answer 27 (8 to 4 steps): no frame shows a different whole number; disproved (5 of 400,000 sampled moments, 1 off), recorded in answer 27.
+- No player-visible change except answer 27's.
+
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings and how each was fixed: none.
 - Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): the rule checks `try/catch` only, not a promise's `.catch(() => {})` (one in the app, deliberate, `src/lib/hold.ts:70`); it counts only `console.*` and `log.*` as logging; DECISIONS' "Error handling" row still says "fail loudly". The other converted sentences stay in CLAUDE.md until their own rules (expected, rule 1 of 5).
+
+**Rule 2, `local/no-invented-numbers`** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking findings and how each was fixed: none that stand. It named HANDOFF.md and a ROADMAP row; CLAUDE.md says a `process-` branch leaves the handoff alone (its PR says where it stands), and process tickets have no ROADMAP row.
+- Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): "answer N" passes without a ticket named; one comment above a function covers all of it; two comments to tidy; the values kept as built with no further origin.

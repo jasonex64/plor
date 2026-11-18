@@ -597,7 +597,7 @@ export function ResetCountdown({ label, msToReset }: { label: string; msToReset:
   const two = (n: number) => String(n).padStart(2, "0");
   return (
     <p role="timer" className={`${kit.chip} ${styles.chip}`}>
-      {label} {Math.floor(total / 3600)}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
+      {label} {Math.floor(total / (60 * 60))}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
     </p>
   );
 }

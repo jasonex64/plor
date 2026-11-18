@@ -4,6 +4,7 @@
 import { SITEVERIFY_TIMEOUT_MS } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
+import { STATUS } from "@/lib/status";
 
 const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
@@ -15,7 +16,7 @@ const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverif
 export async function verifyTurnstile(token: string | null | undefined, secret: string, allowedHostnames: readonly string[]): Promise<void> {
   if (!token) {
     log.warn("turnstile token missing");
-    throw new AppError("captcha_failed", 400);
+    throw new AppError("captcha_failed", STATUS.badRequest);
   }
 
   let result: unknown;
@@ -29,7 +30,7 @@ export async function verifyTurnstile(token: string | null | undefined, secret: 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     log.error("turnstile siteverify unavailable", { error: message });
-    throw new AppError("captcha_unavailable", 503, message);
+    throw new AppError("captcha_unavailable", STATUS.serviceUnavailable, message);
   } finally {
     clearTimeout(timer);
   }
@@ -37,11 +38,11 @@ export async function verifyTurnstile(token: string | null | undefined, secret: 
   const { success, hostname, "error-codes": errorCodes } = result as { success?: unknown; hostname?: unknown; "error-codes"?: unknown };
   if (success !== true) {
     log.warn("turnstile check failed", { errorCodes });
-    throw new AppError("captcha_failed", 400);
+    throw new AppError("captcha_failed", STATUS.badRequest);
   }
 
   if (typeof hostname !== "string" || !allowedHostnames.includes(hostname)) {
     log.warn("turnstile check was solved on another site", { hostname });
-    throw new AppError("captcha_failed", 400);
+    throw new AppError("captcha_failed", STATUS.badRequest);
   }
 }
