@@ -4,32 +4,32 @@
   "date": "2026-11-29",
   "questions": [
     {
-      "prompt": "Name an animal that starts with K",
-      "category": "animal_k",
+      "prompt": "Name a fighting game",
+      "category": "fighting_game",
       "host_bank": [
-        "89d3a81f-aace-5853-a24b-31f786e8d752",
-        "e182cbf7-d237-539a-9e18-97cb4ecf1042",
-        "a354378a-8a7a-5a42-885a-7c414edb14be",
-        "5cb9267d-9763-59be-af97-e63b354158e8",
-        "d56bb914-d3c2-5dba-965d-4d514ad5763b",
-        "2b8e1d15-685a-51c5-aed4-c377755b7c02"
+        "79141b1c-bee4-5175-9039-0be34da156a1",
+        "c71d55de-a992-5a6c-b2e9-3ccb39ecfee4",
+        "e949084e-ccfe-5a55-a84b-b724d5c24fef",
+        "c19eea3b-2df9-555d-9b81-5df288ab96fc",
+        "a92dfee2-dc6a-573f-ae3d-44257afda2cb",
+        "7174628b-7944-504e-aca9-c509a42aba8a"
       ],
       "host_answers": [
-        "a354378a-8a7a-5a42-885a-7c414edb14be"
+        "e949084e-ccfe-5a55-a84b-b724d5c24fef"
       ],
       "levels": {
-        "3cf2c4ee-c03f-5319-bca8-f31f33ba73f6": "uncommon",
-        "9a857002-e5ed-5cc1-b125-a57d60249037": "uncommon",
-        "730f989c-ba8c-5dc7-8d6f-8f4bcb5ce5d0": "uncommon",
-        "971ad99c-069a-5a9c-8135-e22ce5289a88": "uncommon",
-        "bc5f1ea6-0795-5e40-bbd6-687d53b42f42": "uncommon",
-        "a46bdabd-d8ee-56e4-91da-66229ab2a3c7": "uncommon",
-        "89d3a81f-aace-5853-a24b-31f786e8d752": "common",
-        "e182cbf7-d237-539a-9e18-97cb4ecf1042": "common",
-        "a354378a-8a7a-5a42-885a-7c414edb14be": "common",
-        "5cb9267d-9763-59be-af97-e63b354158e8": "common",
-        "d56bb914-d3c2-5dba-965d-4d514ad5763b": "common",
-        "2b8e1d15-685a-51c5-aed4-c377755b7c02": "common"
+        "99f21355-cc6c-51f8-b296-a5932e8e3a58": "uncommon",
+        "7e90456d-0a39-5eb6-8000-ced3eed90eba": "uncommon",
+        "09447fb9-7622-598f-a17d-15fda9d8a90f": "uncommon",
+        "4ac81f0f-4a52-5d1e-96b8-e1792330dec1": "uncommon",
+        "ce22f718-539f-5e07-b5db-02949775fadc": "uncommon",
+        "5f1205b1-a19e-5668-ab82-169068a8a757": "uncommon",
+        "79141b1c-bee4-5175-9039-0be34da156a1": "common",
+        "c71d55de-a992-5a6c-b2e9-3ccb39ecfee4": "common",
+        "e949084e-ccfe-5a55-a84b-b724d5c24fef": "common",
+        "c19eea3b-2df9-555d-9b81-5df288ab96fc": "common",
+        "a92dfee2-dc6a-573f-ae3d-44257afda2cb": "common",
+        "7174628b-7944-504e-aca9-c509a42aba8a": "common"
       }
     },
     {
@@ -103,7 +103,7 @@
         "f895ca68-3238-5c99-ac20-cfa75a66eb9b"
       ],
       "host_answers": [
-        "dd986026-0026-5e0a-9813-b7a3bb74da28"
+        "7c0f24b9-32fe-51ed-8da1-8620015bb52c"
       ],
       "levels": {
         "556144b3-bc5f-5848-ab80-ba8775c85e66": "uncommon",
@@ -119,38 +119,7 @@
         "7c0f24b9-32fe-51ed-8da1-8620015bb52c": "common",
         "f895ca68-3238-5c99-ac20-cfa75a66eb9b": "common"
       },
-      "steals": "u"
-    },
-    {
-      "prompt": "Name a kind of computer",
-      "category": "computer",
-      "host_bank": [
-        "a7e5dbf7-1c62-5b39-ad36-349257cdc9d5",
-        "48589955-05dc-5590-8a9f-077f19da85ac",
-        "0bc81e03-9948-5cf7-b47d-ea7e709c29fe",
-        "19ba7c75-8555-507a-be7d-0e0586d1a04b",
-        "a13b01e8-19eb-5a38-86e1-643be644c15c",
-        "cac3bc6e-6ee8-5649-a023-c91720faee9e"
-      ],
-      "host_answers": [
-        "cac3bc6e-6ee8-5649-a023-c91720faee9e",
-        "a7e5dbf7-1c62-5b39-ad36-349257cdc9d5"
-      ],
-      "levels": {
-        "535a2d6d-c1ca-5586-af4a-0552e60cbc2f": "uncommon",
-        "67467547-85c7-5cab-9491-f093f3aa6a16": "uncommon",
-        "d32447bf-7236-53c5-9348-fb9ed8dbaeac": "uncommon",
-        "f85dcc4a-819b-5b9f-8886-7e0ebe3f822f": "uncommon",
-        "238300cb-ebbe-5477-b2f9-8c2b11cff4f5": "uncommon",
-        "cd25748c-706a-59ae-bd65-8b17fe1c2dd9": "uncommon",
-        "a7e5dbf7-1c62-5b39-ad36-349257cdc9d5": "common",
-        "48589955-05dc-5590-8a9f-077f19da85ac": "common",
-        "0bc81e03-9948-5cf7-b47d-ea7e709c29fe": "common",
-        "19ba7c75-8555-507a-be7d-0e0586d1a04b": "common",
-        "a13b01e8-19eb-5a38-86e1-643be644c15c": "common",
-        "cac3bc6e-6ee8-5649-a023-c91720faee9e": "common"
-      },
-      "steals": "r"
+      "steals": "p"
     },
     {
       "prompt": "Name an insect",
@@ -179,7 +148,8 @@
         "1e209b54-82fb-5f02-8e0c-f724f431c972": "common",
         "fe15100c-eb80-5079-92d5-58bc23ad8dea": "common",
         "66f1971d-b280-544a-898b-ddf4a77e4898": "common"
-      }
+      },
+      "steals": "r"
     },
     {
       "prompt": "Name a toy",
@@ -194,8 +164,7 @@
       ],
       "host_answers": [
         "57e7e2b7-7942-5881-a20b-d1a0a2ba6077",
-        "a64562c4-02c0-5d8f-aea8-de41fe2e599c",
-        "9699350c-c8a1-5eb8-86bf-725bdeab4582"
+        "a64562c4-02c0-5d8f-aea8-de41fe2e599c"
       ],
       "levels": {
         "0ac90689-6042-5504-b941-9c9ce485b78d": "uncommon",
@@ -210,8 +179,37 @@
         "aa8df5a0-d89d-522f-9cf3-a9c725c441c2": "common",
         "15421ae7-6e4a-5eb7-8b2c-92995647dd8a": "common",
         "9699350c-c8a1-5eb8-86bf-725bdeab4582": "common"
+      }
+    },
+    {
+      "prompt": "Name a religion",
+      "category": "religion",
+      "host_bank": [
+        "b6332504-c8ca-5209-92b1-3d70879ada2d",
+        "5c3090b0-ed96-51a9-9820-1a50767e9777",
+        "e72f680e-ec68-51c2-b973-c59defb24e0d",
+        "bfd4106c-24a0-5084-8819-cb889aab8e21",
+        "d1abea9f-6010-5d7e-8520-6bb87e7b0b91"
+      ],
+      "host_answers": [
+        "5c3090b0-ed96-51a9-9820-1a50767e9777",
+        "e72f680e-ec68-51c2-b973-c59defb24e0d",
+        "bfd4106c-24a0-5084-8819-cb889aab8e21"
+      ],
+      "levels": {
+        "8890167d-e45b-59cb-8825-40a2d82276b5": "uncommon",
+        "8b90f03f-74f1-5439-83ce-140478549ea3": "uncommon",
+        "3450df03-3f52-58e7-98e5-595354567e57": "uncommon",
+        "13415099-c10b-5dd9-8493-8df7a0fcbc31": "uncommon",
+        "df8faecd-e169-5326-89f3-92ab95921e72": "uncommon",
+        "dc704f8d-a5cb-5752-a48e-08621e84b564": "uncommon",
+        "b6332504-c8ca-5209-92b1-3d70879ada2d": "common",
+        "5c3090b0-ed96-51a9-9820-1a50767e9777": "common",
+        "e72f680e-ec68-51c2-b973-c59defb24e0d": "common",
+        "bfd4106c-24a0-5084-8819-cb889aab8e21": "common",
+        "d1abea9f-6010-5d7e-8520-6bb87e7b0b91": "common"
       },
-      "steals": "a"
+      "steals": "o"
     }
   ]
 }

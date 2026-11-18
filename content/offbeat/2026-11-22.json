@@ -4,6 +4,35 @@
   "date": "2026-11-22",
   "questions": [
     {
+      "prompt": "Name a US state capital",
+      "category": "us_state_capital",
+      "host_bank": [
+        "6cbe55aa-7389-59c9-902f-12c5dbfc8004",
+        "eae49f37-90c3-5d21-9c37-a4ff1c7a79ff",
+        "873ec7a3-b6f5-54db-98ed-93d6a907cf41",
+        "d705e80d-6ca2-5c6b-8cf9-d4776c96c6e9",
+        "82dec07e-5098-55c6-af4c-84afc1cf17e0",
+        "decf1668-c583-5971-aaee-a49e7df6854d"
+      ],
+      "host_answers": [
+        "82dec07e-5098-55c6-af4c-84afc1cf17e0"
+      ],
+      "levels": {
+        "a45e2734-0e48-52ef-901d-809a81637551": "uncommon",
+        "7404ca98-5943-5c8b-a0b7-443e93899a35": "uncommon",
+        "75db01e7-a418-58a0-819f-5471d83ff70b": "uncommon",
+        "920f4db3-df44-55a6-9d07-796b7d9fa09a": "uncommon",
+        "ad284914-55ae-5340-a6f9-cb8c420eebc9": "uncommon",
+        "ca92983b-2363-5dac-8952-806b7bc6eb8c": "uncommon",
+        "6cbe55aa-7389-59c9-902f-12c5dbfc8004": "common",
+        "eae49f37-90c3-5d21-9c37-a4ff1c7a79ff": "common",
+        "873ec7a3-b6f5-54db-98ed-93d6a907cf41": "common",
+        "d705e80d-6ca2-5c6b-8cf9-d4776c96c6e9": "common",
+        "82dec07e-5098-55c6-af4c-84afc1cf17e0": "common",
+        "decf1668-c583-5971-aaee-a49e7df6854d": "common"
+      }
+    },
+    {
       "prompt": "Name a tool that starts with W",
       "category": "tool_w",
       "host_bank": [
@@ -15,7 +44,7 @@
         "d0bcb1b4-b3ab-5ad4-863a-efa5af4be91d"
       ],
       "host_answers": [
-        "62e49d9c-b101-5bbc-adca-c8d570fb8b92"
+        "1e58ef17-dcb5-55be-b183-b28e4b39a7e3"
       ],
       "levels": {
         "d568a2c9-b579-5639-9fd7-ad5c4ec98bc2": "uncommon",
@@ -26,33 +55,6 @@
         "33aeaa52-15a3-5b69-ba7d-4a76e9f3856d": "common",
         "62e49d9c-b101-5bbc-adca-c8d570fb8b92": "common",
         "d0bcb1b4-b3ab-5ad4-863a-efa5af4be91d": "common"
-      }
-    },
-    {
-      "prompt": "Name a festival",
-      "category": "festival",
-      "host_bank": [
-        "42b1e56d-2a1f-51f1-9c53-aedcf57d5c8c",
-        "6c9abb0f-6b52-57fc-9e75-359a2c4d76d5",
-        "8b77712a-47da-5602-885f-ee7c4ac679ca",
-        "65430d25-3ea2-5f3f-a5c7-33119d169e68",
-        "ea80621e-adb4-5fe1-b6fc-ed58f74ce948",
-        "2f587178-39ec-55c1-a0a0-52053464613c"
-      ],
-      "host_answers": [
-        "2f587178-39ec-55c1-a0a0-52053464613c"
-      ],
-      "levels": {
-        "31679f65-b419-5db0-920f-12b2139fb643": "uncommon",
-        "64ea4909-a7bb-5a74-be6c-afb82d44cb88": "uncommon",
-        "4dac3043-d4d5-5d4f-95c1-f38779981c83": "uncommon",
-        "69bd395d-a6c6-5f28-be94-3d2d5736a498": "uncommon",
-        "42b1e56d-2a1f-51f1-9c53-aedcf57d5c8c": "common",
-        "6c9abb0f-6b52-57fc-9e75-359a2c4d76d5": "common",
-        "8b77712a-47da-5602-885f-ee7c4ac679ca": "common",
-        "65430d25-3ea2-5f3f-a5c7-33119d169e68": "common",
-        "ea80621e-adb4-5fe1-b6fc-ed58f74ce948": "common",
-        "2f587178-39ec-55c1-a0a0-52053464613c": "common"
       },
       "steals": "b"
     },

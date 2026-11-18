@@ -2617,29 +2617,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-kind-of-car",
-      "prompt": "Name a kind of car",
-      "category": "car",
-      "host_bank": [
-        "sedan",
-        "convertible",
-        "minivan",
-        "hatchback",
-        "limousine",
-        "sports car"
-      ],
-      "uncommon": [
-        "coupe",
-        "roadster",
-        "jeep",
-        "cab",
-        "hot rod",
-        "hybrid car"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-knife",
       "prompt": "Name a kind of knife",
       "category": "knife",
@@ -3415,29 +3392,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-computer",
-      "prompt": "Name a kind of computer",
-      "category": "computer",
-      "host_bank": [
-        "laptop",
-        "tablet",
-        "desktop computer",
-        "supercomputer",
-        "mainframe",
-        "iPad"
-      ],
-      "uncommon": [
-        "server",
-        "notebook",
-        "workstation",
-        "minicomputer",
-        "quantum computer",
-        "home computer"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-door",
       "prompt": "Name a kind of door",
       "category": "door",
@@ -3456,29 +3410,6 @@
         "double door",
         "folding door",
         "car door"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
-      "id": "name-a-flag",
-      "prompt": "Name a kind of flag",
-      "category": "flag",
-      "host_bank": [
-        "#c87ab208-f28f-5eb6-b9f2-9793a9ed51ce",
-        "pennant",
-        "white flag",
-        "Union Jack",
-        "American flag",
-        "national flag"
-      ],
-      "uncommon": [
-        "jack",
-        "standard",
-        "tricolor",
-        "black flag",
-        "battle flag",
-        "Stars and Bars"
       ],
       "themes": [],
       "added_by": "claude"
@@ -4105,27 +4036,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-festival",
-      "prompt": "Name a festival",
-      "category": "festival",
-      "host_bank": [
-        "Mardi Gras",
-        "Oktoberfest",
-        "carnival",
-        "film festival",
-        "jazz festival",
-        "Kwanzaa"
-      ],
-      "uncommon": [
-        "Saturnalia",
-        "Dionysia",
-        "eisteddfod",
-        "sheepshearing"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-grain",
       "prompt": "Name a grain",
       "category": "grain",
@@ -4555,29 +4465,6 @@
         "mortar",
         "cinder block",
         "shingle"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
-      "id": "name-a-coin",
-      "prompt": "Name a coin",
-      "category": "coin",
-      "host_bank": [
-        "penny",
-        "nickel",
-        "dime",
-        "quarter",
-        "half dollar",
-        "silver dollar"
-      ],
-      "uncommon": [
-        "shilling",
-        "doubloon",
-        "guinea",
-        "sixpence",
-        "farthing",
-        "ducat"
       ],
       "themes": [],
       "added_by": "claude"

@@ -63,32 +63,32 @@
       "steals": "m"
     },
     {
-      "prompt": "Name a kind of flag",
-      "category": "flag",
+      "prompt": "Name a kind of palm",
+      "category": "palm",
       "host_bank": [
-        "c87ab208-f28f-5eb6-b9f2-9793a9ed51ce",
-        "3bab2557-b304-5be9-a940-3c0bbab34ceb",
-        "651ba653-acee-5125-9f4f-59734e515b23",
-        "9ad7f21c-d3cf-55e3-9972-517c57f2f687",
-        "0604e15b-13bc-5780-80a4-e3dc729fbe21",
-        "b152f919-2e7e-5ac9-813f-939d7f2b4506"
+        "ba4e0ef9-fa8f-5953-9664-2f7352ec3313",
+        "c2c2a283-99c2-5c3e-9d91-6896faceeff6",
+        "1876955e-b4a7-503b-9a48-5e4e45725115",
+        "fc4e73dd-4517-5186-a5cd-2dbbe599f630",
+        "92dd7a96-9a1d-5cb6-944d-86b914091cf7",
+        "1ef3298b-4cac-5666-843b-fef3fa420c68"
       ],
       "host_answers": [
-        "651ba653-acee-5125-9f4f-59734e515b23"
+        "ba4e0ef9-fa8f-5953-9664-2f7352ec3313"
       ],
       "levels": {
-        "9c880c13-5970-547d-a4e2-ccce9b7ce0b6": "uncommon",
-        "1a0fe765-c5d3-5acd-a7ce-aa71633b1697": "uncommon",
-        "60bfbdc7-9200-5f77-9923-e05812e080e7": "uncommon",
-        "dda884b7-cbc8-5d81-b7b5-ba653021eec6": "uncommon",
-        "ccb6bcdc-5e8b-519a-ae65-62292f4cfcd2": "uncommon",
-        "9c876961-2da8-5e56-8150-7be1f1c85f1d": "uncommon",
-        "c87ab208-f28f-5eb6-b9f2-9793a9ed51ce": "common",
-        "3bab2557-b304-5be9-a940-3c0bbab34ceb": "common",
-        "651ba653-acee-5125-9f4f-59734e515b23": "common",
-        "9ad7f21c-d3cf-55e3-9972-517c57f2f687": "common",
-        "0604e15b-13bc-5780-80a4-e3dc729fbe21": "common",
-        "b152f919-2e7e-5ac9-813f-939d7f2b4506": "common"
+        "400893b4-cdd6-55bb-a424-2c2343e721c2": "uncommon",
+        "2104b15a-28e8-5a4a-9e87-1c324a7acc1a": "uncommon",
+        "f4e565ae-4bdb-584c-b67a-4d1dd28f9b59": "uncommon",
+        "5dfdbe06-af20-5a8f-8414-d617416f43e2": "uncommon",
+        "2a5a0f2b-c182-5e23-b01c-778ee5207575": "uncommon",
+        "44fce4c3-b851-508d-8568-c099ead4e395": "uncommon",
+        "ba4e0ef9-fa8f-5953-9664-2f7352ec3313": "common",
+        "c2c2a283-99c2-5c3e-9d91-6896faceeff6": "common",
+        "1876955e-b4a7-503b-9a48-5e4e45725115": "common",
+        "fc4e73dd-4517-5186-a5cd-2dbbe599f630": "common",
+        "92dd7a96-9a1d-5cb6-944d-86b914091cf7": "common",
+        "1ef3298b-4cac-5666-843b-fef3fa420c68": "common"
       }
     },
     {
