@@ -217,6 +217,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 20b's review: `how-to-play.module.css`'s `.nav button { margin: 0 }` and the kit's `button.primary { margin-bottom: 12px }` tie at (0,1,1), so How to play's Next takes one or the other by CSS load order.
 - [ ] 20b's review: `game.module.css`'s `.play` and `.start` `margin: 0` lose to the kit's `.primary` margin below (4px on a link, 12px on a button), so Start gains 12px under it and Play differs by 4px link or button; `admin.module.css`'s `.area .button { margin: 0 }` beats it, so the admin's Approve and Look up lose the edge's room. Visual only, untested.
 - [ ] 20b's review: `settings.module.css`'s `.dangerButton { padding: 0 12px }` is now 2px wider than a flat button's 10px; keep or drop.
+- [ ] 20h's review: the feed result's game-colour edge is about 1.5:1 against the row in Night, Moonlit and Ink (10.5:1 or more in Paper and Sky), so it mostly tells results from comments in the light themes; the game is also named in the row, so not a WCAG 1.4.11 failure. For the human, with the themes (look audit finding 10).
 - [ ] Friends today's row (`src/app/board.module.css:11`): the reactions line under the name counts toward the name's column, so a friend with a short name and many reactions may get a wrapped status chip that had room to stay on one line; untested and not seen (predicted from the grid spec). If it shows up, give the reactions line its own spanning track. Found in fix `fix-long-status-wraps` (review).
 
 **For M22**

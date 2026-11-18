@@ -158,7 +158,7 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 **Added 2026-11-17 (answer 13), each after 20a, with its own questions where the look is still open:**
 
 **20h — a comment no longer looks like a result** (#243; answer 19). A friend's result in the feed carries its game's colour; a comment carries none.
-- → verify: a component test renders a comment and a result for each game and finds the game colour on the results only.
+- → verify: a component test renders a comment and a result for each game and finds the game colour on the results only. *Built as an e2e (`feed.e2e.ts`): the repo has no component tests (DECISIONS.md, Test runner: Vitest for logic, Playwright for screens).*
 
 **20i — the boards' switch** (#248; answer 27). Today, This week and Last week become one board with a switch, opening on Today every load.
 - → verify: an e2e opens the Friends tab and a group's page, finds one board and the switch on Today, and reaches each period through it.
