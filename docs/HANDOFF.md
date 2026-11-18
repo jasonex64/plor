@@ -2,7 +2,11 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets. Older notes are in git (`git log -p docs/HANDOFF.md`); this file was cut down on 2026-11-11 (audit W10).
 
-**Updated last:** 2026-11-17, late evening, on `fix-fragments-raw-points` (slot 1, `C:/Users/jason/RIFF`), by a session that filed the human's second batch of inbox items and fixed one. **This file is the newest handoff.**
+**Updated last:** 2026-11-17, night, on `process-formal-verification` (slot 1, `C:/Users/jason/RIFF`, switched from `process-lint-rules`, whose PR #274 is pushed and untouched). **This file is the newest handoff.**
+
+**`process-formal-verification` (2026-11-17, night):** the ticket `docs/milestones/PROCESS-formal-verification.md` is drafted from the human's eight answers (quoted there): TLA+ models with a generated verify skill each for a Fragments run, an Offbeat run and group membership; statecharts of three flows; pstack's two skills copied into `.claude/skills` at commit `2f87c85`. **Waits on the human:** approval of the ticket and its open questions A to D (model bounds, where charts live, the friends chart, adding the sources). Nothing is installed or built; the branch is not pushed. **Next:** on approval, plan step 1 (sources), then the installs the human already OKed (mise, Java Temurin 25, TLC 1.7.4, pele 1.9.0).
+
+The note below is the previous session's, on `fix-fragments-raw-points`, by a session that filed the human's second batch of inbox items and fixed one.
 
 **Latest (2026-11-17, late evening):**
 - **Inbox:** nine new items are issues #262 to #270. #262 (tap a name to open a profile) is closed into M20's 20e. #263 to #270 stay in the inbox, unsorted: the default group page with favourite groups, favourite friends, the feed's "loading more" motion, too much information (show or hide details), the top three standing out, posting like X, and the reaction ⋯ shown on hover. #265 is the urgent one and is fixed here.
