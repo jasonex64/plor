@@ -9,9 +9,9 @@
   gap: 6px;
   min-height: 44px;
   padding: 0 10px;
-  border: 1.5px solid var(--flat-edge, var(--ink));
+  border: 1.5px solid var(--ink);
   border-radius: var(--r-small);
-  color: var(--flat-text, var(--text));
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;

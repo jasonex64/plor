@@ -3,7 +3,7 @@
 // only one game has a day) and side by side from 768px. Fragments' day and words are this file's own, as the real list
 // isn't in git (as play2.e2e.ts); its runs are put in their states in the database, as each state's screens are other
 // files' (play2.e2e.ts plays a whole day).
-import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { expect, test, type Browser, type BrowserContext, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { PERCENTILE_MIN_PLAYERS, SUBSTRING_ROUNDS } from "../src/config/tunables";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
@@ -240,4 +240,46 @@ test("side by side the cards are the same height before and after the runs, both
   await expect(fragments(page).getByRole("timer")).toContainText("Next puzzle in");
   const after = await heights();
   expect(after[1]).toBeCloseTo(after[0], 0);
+});
+
+// M20 20k-3 (docs/milestones/M20-design-rules-and-clean-up.md, answers 54, 55 and 57): each game's card is a white card
+// with a band in its game's colour holding its name and date; once played its score is the big number (30px), popping in
+// over 300ms. The top of each game's own screen, once its run is over, is the same card.
+test("each game's card is a white card with its game's band, and once played the score is big and pops in", async ({ browser }) => {
+  test.slow();
+  await addDay();
+  const page = await player(browser, "gck", ROOMY);
+  const slot = (name: string) =>
+    page.evaluate((name) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(${name})`;
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }, name);
+  const cardOf = (region: Locator) => region.locator("[class*='banner']").first();
+  const band = (region: Locator) => region.getByRole("heading", { level: 2, name: /^(Offbeat|Fragments)$/ }).locator("..");
+  const score = (region: Locator) => region.locator("[class*='score']").first();
+  const fill = (el: Locator) => el.evaluate((e) => getComputedStyle(e).backgroundColor);
+  // Before playing: white cards, each with its band.
+  for (const [region, game] of [[offbeat(page), "--offbeat"], [fragments(page), "--fragments"]] as const) {
+    await expect(band(region)).toBeVisible();
+    expect(await fill(cardOf(region))).toBe(await slot("--surface"));
+    expect(await fill(band(region))).toBe(await slot(game));
+  }
+  // Once played: the score big and popping in, on Today's card and at the top of the game's own screen.
+  await finishOffbeat(page);
+  await finishFragments(await idOf("gck"));
+  await page.goto("/");
+  for (const region of [offbeat(page), fragments(page)]) {
+    await expect(score(region)).toBeVisible();
+    expect(await score(region).evaluate((e) => [getComputedStyle(e).fontSize, /pop/.test(getComputedStyle(e).animationName), getComputedStyle(e).animationDuration])).toEqual(["30px", true, "0.3s"]);
+  }
+  for (const [path, region, game] of [[GAME.path, offbeat(page), "--offbeat"], [SUBSTRINGS.path, fragments(page), "--fragments"]] as const) {
+    await page.goto(path);
+    await expect(score(region)).toBeVisible();
+    expect(await fill(band(region))).toBe(await slot(game));
+    expect(await score(region).evaluate((e) => getComputedStyle(e).fontSize)).toBe("30px");
+  }
 });

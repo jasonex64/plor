@@ -458,16 +458,13 @@ button {
   min-height: 44px;
   margin: 8px 0;
   padding: 0 10px;
-  color: var(--flat-text, var(--text));
-  border: 1.5px solid var(--flat-edge, var(--ink));
+  color: var(--text);
+  border: 1.5px solid var(--ink);
   border-radius: var(--r-small);
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 700;
 }
-
-/* --flat-text, --flat-edge and --flat-hover: a flat button's colours where the page under it isn't the theme's, as on
-   a game card (game.module.css .banner; M20 answer 49); the theme's text, ink and soft elsewhere. */
 
 /* No fill, at no specificity, so the hover rule below, a button's own class and the main button's fill each win. */
 :where(button) {
@@ -485,8 +482,8 @@ button {
   }
 
   :where(button:hover:not(:disabled)) {
-    background: var(--flat-hover, var(--soft));
-    color: var(--flat-text, var(--text));
+    background: var(--soft);
+    color: var(--text);
   }
 }
 

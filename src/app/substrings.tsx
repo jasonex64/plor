@@ -14,6 +14,8 @@ import { SUBSTRINGS } from "@/platform/game";
 import { Countdown } from "./countdown-bar";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
+import { Band, BigScore } from "./game";
+import { gameColour } from "./game-colour";
 import { errorText } from "./messages";
 import { ordinal } from "./ordinal";
 import { startBody, substringRoutes, type RunFamily } from "./run-routes";
@@ -135,8 +137,17 @@ export function SubstringsScreen({
   const over = run?.status === "finished";
   useEffect(() => onOver?.(over), [onOver, over]);
   const card = (
-    <section aria-label={SUBSTRINGS.name} className={kit.card}>
-      <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
+    <section aria-label={SUBSTRINGS.name} className={`${kit.card} ${gameColour(SUBSTRINGS.id)}`}>
+      {/* Once the run is over, the top of the card is Today's: the band and the big score, as Offbeat's screen is
+          (docs/milestones/M20-design-rules-and-clean-up.md, answer 55). */}
+      {over && !inFrame ? (
+        <>
+          <Band game={SUBSTRINGS} date={run!.date} />
+          <BigScore points={run!.score!.total} />
+        </>
+      ) : (
+        <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
+      )}
       {error && <p role="alert">{error}</p>}
       {run === undefined ? (
         !error && <LoadingStatus>Loading the game</LoadingStatus>

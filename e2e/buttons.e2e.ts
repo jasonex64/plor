@@ -125,7 +125,7 @@ test("the sign-in form, How to play, the settings sheet, the game screen and a r
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   await page.goto("/");
   await signInAndPick(page, "bs");
-  // On the game's card a flat button takes the card's text colour, as its chips do (answer 49).
+  // On the game's card a flat button takes the card's text colour (answer 49; since 20k-3 the card is white, so the theme's text).
   const howToPlay = page.getByRole("region", { name: GAME.name, exact: true }).getByRole("button", { name: "How to play" });
   const [own, card] = await howToPlay.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el.closest("[class*='banner']")!).color]);
   expect(own).toBe(card);

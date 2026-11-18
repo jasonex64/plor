@@ -1,50 +1,43 @@
-/* Offbeat's banner (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour, 230px tall on
-   phones and 240px from 768px (the approved mockups), drawn as mockup 3's banner (M14 14b-8b): the
-   ink border and corners 2px rounder than a card's, flat as a card is (M14 14b-10, answer 3). */
+/* A game's card (docs/milestones/M14-14a-2a-today.md; since M20 20k-3 the Balanced look, answers 34 and 54; src/app/admin/
+   kit/looks.module.css .balanced): the kit's white card, centred, with a band in the game's colour across its top
+   holding its name and date (the game's colour from kit .offbeat or .fragments). The band reaches the card's edges
+   through its 14px padding and sits inside its 2px border. */
 .banner {
-  /* The game's colour and its text: Offbeat's, or Fragments' with .fragments (M16 16f-2). */
-  --game: var(--offbeat);
-  --on-game: var(--on-offbeat);
-  /* A flat button on the card (How to play, Result, the card behind's Play) as the card's chips are drawn below: its
-     white text, the white at 50% for the edge and at 12% for the fill under the pointer (globals.css, the flat
-     button's colours; docs/milestones/M20-design-rules-and-clean-up.md, answer 49). */
-  --flat-text: var(--on-game);
-  --flat-edge: color-mix(in srgb, var(--on-game) 50%, transparent);
-  --flat-hover: color-mix(in srgb, var(--on-game) 12%, transparent);
-  box-sizing: border-box;
-  min-height: 230px;
-  padding: 24px 16px 20px;
-  border: 2px solid var(--ink);
-  border-radius: calc(var(--r-card) + 2px);
-  background: var(--game);
-  color: var(--on-game);
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   text-align: center;
 }
 
-.banner.fragments {
-  --game: var(--fragments);
-  --on-game: var(--on-fragments);
-}
-
-.title {
-  margin: 0;
-  font-size: 2.5rem;
-  line-height: 1;
-}
-
-/* The banner's chips (mockup 3's .banner .chip): the banner's white at 12% for the fill and 50% for the edge, so they
-   sit on the game's colour in every theme. Scoped to the banner, so they outrank the kit's .chip whatever order the CSS
-   loads in. */
-.banner .chip {
-  margin: 0;
-  border-color: color-mix(in srgb, var(--on-game) 50%, transparent);
-  background: color-mix(in srgb, var(--on-game) 12%, transparent);
+.band {
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 6px;
+  margin: -14px -14px 0;
+  padding: 10px 14px;
+  border-radius: calc(var(--r-card) - 2px) calc(var(--r-card) - 2px) 0 0;
+  background: var(--game);
   color: var(--on-game);
+  font-weight: 700;
+}
+
+.band > * {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* The score once played: the big number, at the game prompt's 1.875rem (the Balanced look's; answer 55), its unit at
+   the text's size, popping in (kit .pop; answer 57). */
+.score {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.score > span {
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .banner .facts {
@@ -52,27 +45,11 @@
   margin: 0;
 }
 
-/* Play, Continue and Result: the kit's main button (kit.module.css's .primary), centred at the bottom of the banner
-   (L25), at least 140px wide (M14 14b-8b). Play is a link, or a button with Skip the game screen on (M14 14a-3b). */
+/* Play, Continue and Result, centred at the bottom of the card (L25), at least 140px wide (M14 14b-8b). Play is a
+   link, or a button with Skip the game screen on (M14 14a-3b). */
 .play {
   min-width: 140px;
   margin: 0;
-}
-
-/* On the game's colour the accent ring would fade (Paper's is 1.75:1 on it), so focus there is white: 10.8:1, the
-   pairing src/app/colors.test.ts checks, as it does for Fragments' (WCAG 2.2 1.4.11). */
-.banner :focus-visible {
-  outline-color: var(--on-game);
-}
-
-@media (min-width: 768px) {
-  .banner {
-    min-height: 240px;
-  }
-
-  .title {
-    font-size: 2.875rem;
-  }
 }
 
 /* The game screen (docs/milestones/M14-14a-2b-game-screen.md; round 5): the banner, then the stakes, Start and How to
