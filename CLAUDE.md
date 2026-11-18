@@ -1,7 +1,7 @@
 # Agent Rules
 
 This file is kept short on purpose. Read all of it before every task, and open the linked docs when a step tells you to.
-Add a rule here only after an agent has actually made that mistake, or when the human asks for one. Rules for problems nobody has hit yet are bloat too.
+**A mistake in code becomes a lint rule, not a sentence here:** a rule in `eslint-rules/` with a test that shows the mistake failing, switched on in `eslint.config.mjs` (`npm run lint`, run by CI). Only a mistake in what an agent *does* gets a line here, and only after an agent has made it or the human asks. *(Human, 2026-11-17; `docs/milestones/PROCESS-lint-rules.md`.)*
 
 ## Sessions are independent
 Every session starts with no memory of earlier ones. Everything the next session needs is in the repo. *(Human, 2026-10-21.)*
@@ -29,7 +29,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Keep the diff surgical.** Every changed line traces back to the ticket. Don't refactor, reformat or rename what isn't broken; record it under "Next revision" in ROADMAP.md instead.
 - **Clean only your orphans.** Remove what your change made unused: imports, variables, functions, paths, flags, config, fields. Dead code that was already there is flagged under "Next revision", not deleted. Every commit lists what it removes, or why it removes nothing. *(Human, 2026-11-10.)*
 - **Build for today.** Add no option, flag, field or stored data without a current caller, and no abstraction for code with a single use. The only exceptions are the items under "Hard to reverse" in DECISIONS.md.
-- **Fail loudly.** Don't swallow errors, add silent fallbacks, write a catch that only logs and continues, or use defaults that hide missing data. Recovery such as reconnect or retry is allowed only when the ticket specifies it, and it must be logged and counted.
+- **Recovery needs a ticket.** Reconnect or retry is allowed only when the ticket specifies it, and it must be logged and counted. (Swallowed errors are the `local/fail-loudly` lint rule.)
 - **No defensive bloat.** Validate at the boundaries: network, disk, user input and third-party APIs. Trust internal code, and don't guard against states that can't happen.
 - **Never cheat a check.** Don't weaken, skip or delete a test or assertion, and don't mock the thing under test, just to get a green result. If a check is wrong, say so and fix it as its own change.
 - **Comments explain why, not what.** When a source section or ticket explains the reason, link to it.

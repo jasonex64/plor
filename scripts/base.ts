@@ -1159,7 +1159,7 @@ export function hostedFailure(err: unknown, raw: string): string {
   if (typedPassword) {
     secrets.push(typedPassword);
     // A password that isn't valid percent-encoding is already in the list as typed.
-    try { secrets.push(decodeURIComponent(typedPassword)); } catch { /* as typed, above */ }
+    try { secrets.push(decodeURIComponent(typedPassword)); } catch { /* Expected: kept as typed, above. */ }
   }
   let text = failureText(err);
   for (const secret of secrets.filter(Boolean)) text = text.replaceAll(secret, "[hidden]");

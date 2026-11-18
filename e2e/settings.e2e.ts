@@ -6,6 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { answerBox } from "./game";
+import { fixedWidth } from "./fixed-width";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
@@ -47,8 +48,8 @@ test("on a phone the gear opens the settings sheet, which closes with Close, Esc
 
   const gear = page.getByRole("banner").getByRole("button", { name: "Settings" });
   await expect(gear).toHaveAttribute("aria-haspopup", "dialog");
-  // The top bar runs along the top, the full width, 56px tall (round 7).
-  expect(await page.getByRole("banner").boundingBox()).toEqual({ x: 0, y: 0, width: 360, height: 56 });
+  // The top bar runs along the top, the full width a fixed bar gets (fixed-width.ts), 56px tall (round 7).
+  expect(await page.getByRole("banner").boundingBox()).toEqual({ x: 0, y: 0, width: await fixedWidth(page), height: 56 });
 
   await gear.click();
   const sheet = sheetOf(page);
@@ -56,9 +57,9 @@ test("on a phone the gear opens the settings sheet, which closes with Close, Esc
   expect(await isModal(page)).toBe(true);
   // Focus starts on Close, the first thing in it that takes focus (MDN <dialog>, Accessibility).
   await expect(sheet.getByRole("button", { name: "Close settings" })).toBeFocused();
-  // Along the bottom, the full width.
+  // Along the bottom, the full width a fixed bar gets (fixed-width.ts).
   const box = (await sheet.boundingBox())!;
-  expect([box.x, box.width, Math.round(box.y + box.height)]).toEqual([0, 360, 800]);
+  expect([box.x, box.width, Math.round(box.y + box.height)]).toEqual([0, await fixedWidth(page), 800]);
   // The page behind is inert: a point on it hits the dialog (its backdrop), and focus never leaves the sheet.
   expect(await page.evaluate(() => document.elementFromPoint(180, 28)?.tagName)).toBe("DIALOG");
   for (let i = 0; i < 30; i++) {
@@ -91,7 +92,8 @@ test("from 768px the sidebar's Settings opens a side panel", async () => {
   const sheet = sheetOf(page);
   await expect(sheet).toBeVisible();
   expect(await isModal(page)).toBe(true);
-  expect(await sheet.boundingBox()).toEqual({ x: 1000, y: 0, width: 440, height: 900 });
+  // At the right edge of the width a fixed bar gets (fixed-width.ts).
+  expect(await sheet.boundingBox()).toEqual({ x: (await fixedWidth(page)) - 440, y: 0, width: 440, height: 900 });
   await expect(sheet.getByRole("link", { name: "Privacy policy" })).toBeVisible();
   await page.mouse.click(500, 450);
   await expect(sheet).toBeHidden();

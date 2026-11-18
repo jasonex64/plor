@@ -21,8 +21,9 @@ const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1
 const PHONE = { width: 390, height: 844 };
 // The app's tablet width (src/app/min-width.ts): Today shows the board from here, its cards still a carousel.
 const TABLET = { width: 768, height: 1024 };
-// Wide enough that Today's cards sit side by side (e2e/today-games.e2e.ts).
-const WIDE = { width: 1440, height: 900 };
+// Wide enough that Today's cards sit side by side (e2e/today-games.e2e.ts), beside the right column. At 1440px their row
+// was exactly 768px, the least, and the scrollbar's room the page keeps (M20 answer 43) leaves it 753px.
+const WIDE = { width: 1920, height: 900 };
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 // A word for each round, as the keys score: the run's score is the scoring function's, from them.
 const WORDS = ["aqkb", "aqmb", "aqnpb", "aqrsb", "aqtvb", "aqwxb", "aqyzb"];

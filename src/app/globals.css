@@ -299,6 +299,33 @@ body[data-game] main > h1 {
   }
 }
 
+/* The page keeps its scrollbar's room whether it scrolls or not, so a centred page's content doesn't move 7.5px between
+   one that scrolls and one that doesn't (docs/milestones/M20-design-rules-and-clean-up.md, answer 43; MDN
+   scrollbar-gutter). Overlay scrollbars, as on phones, take no room, so it changes nothing there. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* A detail page's Back (src/app/shell-page.tsx; M20 answer 44): at the right end of the heading's line, floated beside
+   the h1 and as far down as the h1's own top margin (the browser's 0.67em of its 2em, so 1.34em here). Below 768px the
+   heading isn't shown, so Back takes the top bar's wordmark's place: at its 16px left padding, centred in its 56px
+   ((56 - 44) / 2), above the bar (z-index 10, shell.module.css .top). */
+.page-back {
+  float: right;
+  margin-top: 1.34em;
+}
+
+@media (max-width: 767px) {
+  body[data-shell] .page-back:not(:empty) {
+    position: fixed;
+    top: 6px;
+    left: 16px;
+    z-index: 11;
+    float: none;
+    margin: 0;
+  }
+}
+
 /* A page's content: one column, at most 960px wide when there's no side column (M14 L43). */
 main {
   box-sizing: border-box;

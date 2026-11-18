@@ -23,6 +23,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
 import { FINISHED, type RunStatus } from "@/game/status";
@@ -53,6 +54,7 @@ import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
 import { BACK, FORWARD } from "./slide";
+import { PAGE_BACK } from "./page-back";
 import kit from "./kit.module.css";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 
@@ -379,15 +381,16 @@ export function GameTab() {
 }
 
 // The detail pages' way back up, which slides back (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6e, answer 25),
-// as the game screen's "‹ Today" does.
+// as the game screen's "‹ Today" does. Drawn in the shell's place for it, on the heading's line, so the page's first card
+// starts where every tab's does (docs/milestones/M20-design-rules-and-clean-up.md, answer 44). Only signed in, so only
+// in the browser, where that place is already in the document.
 function BackTo({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <p>
-      <ButtonLink href={href} transitionTypes={BACK}>
-        <span aria-hidden="true">‹ </span>
-        {children}
-      </ButtonLink>
-    </p>
+  return createPortal(
+    <ButtonLink href={href} transitionTypes={BACK}>
+      <span aria-hidden="true">‹ </span>
+      {children}
+    </ButtonLink>,
+    document.getElementById(PAGE_BACK)!,
   );
 }
 
