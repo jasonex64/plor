@@ -1,0 +1,37 @@
+---
+title: "Friends and groups"
+---
+stateDiagram-v2
+  direction LR
+  state "At the same time" as all {
+    state "Friends (not verified)" as r0 {
+      s0: Not friends
+      s1: Request to you
+      s2: Request sent
+      s3: Blocked
+      s4: Friends
+      [*] --> s0
+      s0 --> s1: they send you a request
+      s0 --> s2: you press Add friend
+      s1 --> s0: you press Decline
+      s1 --> s3: you press Decline and block
+      s1 --> s4: you press Accept
+      s2 --> s0: they decline or you press Cancel request
+      s2 --> s4: they accept or they send a request too
+      s3 --> s0: you press Unblock
+      s4 --> s0: one of you presses Remove
+      s4 --> s3: you press Block
+    }
+    --
+    state "Groups" as r1 {
+      s5: In no group
+      s6: Creator of a group
+      s7: Member of a group
+      [*] --> s5
+      s5 --> s6: you press Create group
+      s5 --> s7: you join from an invite link
+      s6 --> s5: you press Delete group or you press Leave group
+      s7 --> s5: the creator removes you or deletes the group or you press Leave group
+      s7 --> s6: the creator leaves and you have been in longest
+    }
+  }

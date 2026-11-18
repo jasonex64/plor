@@ -1,0 +1,63 @@
+---
+title: "A day's game, Offbeat and Fragments"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: today
+    lg1: Offbeat
+    lg2: Fragments
+  }
+  class lg0 tan
+  class lg1 blue
+  class lg2 teal
+  s0: Today
+  state "Fragments" as s1 {
+    s2: Ready to Start
+    s3: A round, 20 seconds
+    s4: You played a word
+    s5: Time's up
+    s6: Results
+    [*] --> s2
+  }
+  state "Offbeat" as s7 {
+    s8: Ready to Start
+    s9: A question, 20 seconds
+    s10: Caught
+    s11: Safe!
+    s12: Time's up
+    s13: Results
+    s14: You survived all 7!
+    [*] --> s8
+  }
+  [*] --> s0
+  s0 --> s1: you press Play on Fragments
+  s0 --> s7: you press Play on Offbeat
+  s2 --> s3: you press Start
+  s8 --> s9: you press Start
+  s3 --> s4: your word is accepted
+  s3 --> s5: the 20 seconds run out
+  s9 --> s10: the host takes your answer
+  s9 --> s11: your answer is safe
+  s9 --> s12: the 20 seconds run out
+  s4 --> s3: you press Next [rounds 1 to 6]
+  s5 --> s3: you press Next [rounds 1 to 6]
+  s10 --> s13: you press See results
+  s11 --> s9: you press Next
+  s12 --> s13: you press See results
+  s9 --> s14: your seventh answer is safe
+  s4 --> s6: you press See results [after round 7]
+  s5 --> s6: you press See results [after round 7]
+  s14 --> s13: you press See results
+  class s0 tan
+  class s2 teal
+  class s3 teal
+  class s4 teal
+  class s5 teal
+  class s6 teal
+  class s8 blue
+  class s9 blue
+  class s10 blue
+  class s11 blue
+  class s12 blue
+  class s13 blue
+  class s14 blue

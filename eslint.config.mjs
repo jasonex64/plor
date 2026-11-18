@@ -4,6 +4,7 @@ import nextTs from "eslint-config-next/typescript";
 import failLoudly from "./eslint-rules/fail-loudly.mjs";
 import noInventedNumbers from "./eslint-rules/no-invented-numbers.mjs";
 import noSkippedTests from "./eslint-rules/no-skipped-tests.mjs";
+import noServiceRole from "./eslint-rules/no-service-role.mjs";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -12,7 +13,14 @@ const eslintConfig = defineConfig([
   // the project as a plugin object, ESLint's "Runtime Rules" (docs/SOURCES.md).
   {
     plugins: {
-      local: { rules: { "fail-loudly": failLoudly, "no-invented-numbers": noInventedNumbers, "no-skipped-tests": noSkippedTests } },
+      local: {
+        rules: {
+          "fail-loudly": failLoudly,
+          "no-invented-numbers": noInventedNumbers,
+          "no-skipped-tests": noSkippedTests,
+          "no-service-role": noServiceRole,
+        },
+      },
     },
     rules: {
       "local/fail-loudly": "error",
@@ -26,7 +34,7 @@ const eslintConfig = defineConfig([
   {
     files: ["src/**/*.{ts,tsx}"],
     ignores: ["**/*.test.{ts,tsx}"],
-    rules: { "local/no-invented-numbers": "error" },
+    rules: { "local/no-invented-numbers": "error", "local/no-service-role": "error" },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([
@@ -37,6 +45,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Another session's worktree, with its own build output: linted from its own checkout.
     ".claude/worktrees/**",
+    // pstack's statechart, copied at its commit with only the Windows changes its ticket records
+    // (docs/milestones/PROCESS-formal-verification.md, Source diff): third-party code, not rewritten to our rules.
+    ".claude/skills/statechart/**",
   ]),
 ]);
 

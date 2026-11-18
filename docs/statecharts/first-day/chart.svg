@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pele pele-state" viewBox="0 0 793 1430" width="793" height="1430" style="max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)" fill="var(--_fg)" role="graphics-document document" aria-roledescription="state"><style>.pele {
+  --pele-bg: #ffffff;
+  --pele-fg: #1c1c1c;
+  --pele-muted: #656565;
+  --pele-line: #808080;
+  --pele-surface: #fcfcfc;
+  --pele-surface-alt: #f1f1f1;
+  --pele-border: #c9c9c9;
+}
+.pele .blue rect { fill: #c3e0ff; }
+.pele .orange rect { fill: #f0d3bf; }
+.pele .purple rect { fill: #e3d5ff; }
+.pele .yellow rect { fill: #f0dcbf; }
+.pele .teal rect { fill: #bfe3df; }
+.pele .tan rect { fill: #e5d9ce; }
+.pele .pink rect { fill: #ffcbe6; }
+.pele .breaks rect {
+  fill: #ffecee !important;
+  stroke: #e72e3b !important;
+  stroke-width: 2.5px !important;
+}
+.pele .breaks text {
+  fill: #cd2834 !important;
+}
+.pele .mayBreak rect {
+  fill: #fff3e6 !important;
+  stroke: #e8730c !important;
+  stroke-width: 2.5px !important;
+}
+.pele .mayBreak text {
+  fill: #b85a06 !important;
+}
+.pele .bugPath rect {
+  stroke: #1680f3 !important;
+  stroke-width: 2.5px !important;
+}
+.pele .repeats rect {
+  stroke: #9b35d6 !important;
+  stroke-width: 2.5px !important;
+  stroke-dasharray: 6 3;
+}
+@media (prefers-color-scheme: dark) {
+  .pele {
+    --pele-bg: #1f1f1f;
+    --pele-fg: #f5f5f5;
+    --pele-muted: #acacac;
+    --pele-line: #939393;
+    --pele-surface: #121212;
+    --pele-surface-alt: #2c2c2c;
+    --pele-border: #4e4e4e;
+  }
+  .pele .blue rect { fill: #1b3857; }
+  .pele .orange rect { fill: #573117; }
+  .pele .purple rect { fill: #3c2e57; }
+  .pele .yellow rect { fill: #573d17; }
+  .pele .teal rect { fill: #174641; }
+  .pele .tan rect { fill: #3d3127; }
+  .pele .pink rect { fill: #57233e; }
+  .pele .breaks rect {
+    fill: #2e2021 !important;
+    stroke: #cf2b35 !important;
+  }
+  .pele .breaks text {
+    fill: #ff6463 !important;
+  }
+  .pele .mayBreak rect {
+    fill: #2e2619 !important;
+    stroke: #d0700f !important;
+  }
+  .pele .mayBreak text {
+    fill: #ffa257 !important;
+  }
+  .pele .bugPath rect {
+    stroke: #116dd2 !important;
+  }
+  .pele .repeats rect {
+    stroke: #9a3fcf !important;
+  }
+}
+</style><text class="pele-title" font-weight="var(--_tw)" text-anchor="middle" xml:space="preserve"><tspan x="396.5" y="25.6">A new player's first day</tspan></text><g transform="translate(0,36)"><g class="pele-clusters"><g class="pele-cluster pele-state-composite" data-id="legend"><rect x="437.84" y="8" width="346.74" height="112" rx="10" fill="var(--_a)" fill-opacity="0.5" stroke="var(--_b)"/><path d="M437.84,44H784.58" fill="none" stroke="var(--_b)"/><text class="pele-cluster-label" x="611.21" y="31.6" text-anchor="middle">Legend</text></g></g><g class="pele-edges" fill="none" stroke="var(--_l)" stroke-linecap="round"><g class="pele-edge pele-transition" data-id="edge0"><path d="M390.84,120L390.84,157"/><path class="pele-marker" d="M390.84,164L387.48,156L394.2,156Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge1"><path d="M382.84,208C382.84,217.25 257.31,217.25 257.31,226.5L257.31,285"/><path class="pele-marker" d="M257.31,292L253.95,284L260.67,284Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge2"><path d="M398.84,208C398.84,250 533.66,250 533.66,292L533.66,730.25C533.66,737.78 347,741.47 347,749L347,755"/><path class="pele-marker" d="M347,762L343.64,754L350.36,754Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge3"><path d="M176.7,336L176.7,348.31C176.7,356.28 67.69,356.28 67.69,364.25L67.69,730.25C67.69,735.94 315,743.31 315,749L315,755"/><path class="pele-marker" d="M315,762L311.64,754L318.36,754Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge4"><path d="M192.7,336L192.7,345.63C192.7,351.81 163.72,351.81 163.72,358L163.72,383C163.72,388.63 222.5,388.63 222.5,394.25L222.5,398"/><path class="pele-marker" d="M222.5,405L219.14,397L225.86,397Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge5"><path d="M319.83,806C319.83,815.25 219.29,815.25 219.29,824.5L219.29,868"/><path class="pele-marker" d="M219.29,875L215.93,867L222.65,867Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge6"><path d="M335.83,806C335.83,840.5 404.36,840.5 404.36,875L404.36,919C404.36,947 345.07,947 345.07,975L345.07,981"/><path class="pele-marker" d="M345.07,988L341.71,980L348.43,980Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge7"><path d="M251,405L251,395.38C251,389.19 309.78,389.19 309.78,383L309.78,343"/><path class="pele-marker" d="M309.78,336L313.14,344L306.42,344Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge8"><path d="M236.75,449L236.75,511"/><path class="pele-marker" d="M236.75,518L233.39,510L240.11,510Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge9"><path d="M219.29,919L219.29,962.5C219.29,969.44 297.92,969.44 297.92,976.38L297.92,981"/><path class="pele-marker" d="M297.92,988L294.56,980L301.28,980Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge10"><path d="M321.49,1032L321.49,1094"/><path class="pele-marker" d="M321.49,1101L318.13,1093L324.85,1093Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge11"><path d="M236.75,562L236.75,624"/><path class="pele-marker" d="M236.75,631L233.39,623L240.11,623Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge12"><path d="M321.49,1145L321.49,1222"/><path class="pele-marker" d="M321.49,1229L318.13,1221L324.85,1221Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge13"><path d="M425.25,631L425.25,364.25C425.25,356.28 325.78,356.28 325.78,348.31L325.78,343"/><path class="pele-marker" d="M325.78,336L329.14,344L322.42,344Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge14"><path d="M331,693L331,755"/><path class="pele-marker" d="M331,762L327.64,754L334.36,754Z" fill="var(--_l)" stroke="none"/></g><g class="pele-edge pele-transition" data-id="edge15"><path d="M321.49,1273L321.49,1335"/><path class="pele-marker" d="M321.49,1342L318.13,1334L324.85,1334Z" fill="var(--_l)" stroke="none"/></g></g><g class="pele-edge-labels" font-size="14"><g class="pele-edge-label" data-id="edge1"><rect x="173.55" y="228.5" width="167.52" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="257.31" y="242.4">you press Play without an</tspan><tspan x="257.31" y="260.4">account</tspan></text></g><g class="pele-edge-label" data-id="edge2"><rect x="475.97" y="416.5" width="115.38" height="21" rx="3" fill="var(--_bg)"/><text x="533.66" y="431.9" text-anchor="middle">you press Sign in</text></g><g class="pele-edge-label" data-id="edge3"><rect x="10" y="529.5" width="115.38" height="21" rx="3" fill="var(--_bg)"/><text x="67.69" y="544.9" text-anchor="middle">you press Sign in</text></g><g class="pele-edge-label" data-id="edge4"><rect x="112.64" y="360" width="102.15" height="21" rx="3" fill="var(--_bg)"/><text x="163.72" y="375.4" text-anchor="middle">you press Start</text></g><g class="pele-edge-label" data-id="edge5"><rect x="130.09" y="826.5" width="178.41" height="21" rx="3" fill="var(--_bg)"/><text x="219.29" y="841.9" text-anchor="middle">you ask for a code by email</text></g><g class="pele-edge-label" data-id="edge6"><rect x="321.76" y="886.5" width="165.19" height="21" rx="3" fill="var(--_bg)"/><text x="404.36" y="901.9" text-anchor="middle">you continue with Google</text></g><g class="pele-edge-label" data-id="edge7"><rect x="234.79" y="360" width="149.97" height="21" rx="3" fill="var(--_bg)"/><text x="309.78" y="375.4" text-anchor="middle">the check doesn't pass</text></g><g class="pele-edge-label" data-id="edge8"><rect x="178.67" y="469.5" width="116.16" height="21" rx="3" fill="var(--_bg)"/><text x="236.75" y="484.9" text-anchor="middle">the check passes</text></g><g class="pele-edge-label" data-id="edge9"><rect x="160.03" y="939.5" width="118.52" height="21" rx="3" fill="var(--_bg)"/><text x="219.29" y="954.9" text-anchor="middle">you type the code</text></g><g class="pele-edge-label" data-id="edge10"><rect x="250.57" y="1052.5" width="141.84" height="21" rx="3" fill="var(--_bg)"/><text x="321.49" y="1067.9" text-anchor="middle">you save a username</text></g><g class="pele-edge-label" data-id="edge11"><rect x="193.83" y="582.5" width="85.83" height="21" rx="3" fill="var(--_bg)"/><text x="236.75" y="597.9" text-anchor="middle">the run ends</text></g><g class="pele-edge-label" data-id="edge12"><rect x="237.95" y="1165.5" width="167.08" height="36" rx="3" fill="var(--_bg)"/><text text-anchor="middle" xml:space="preserve"><tspan x="321.49" y="1179.4">you play today's game for</tspan><tspan x="321.49" y="1197.4">points</tspan></text></g><g class="pele-edge-label" data-id="edge13"><rect x="348.12" y="529.5" width="154.27" height="21" rx="3" fill="var(--_bg)"/><text x="425.25" y="544.9" text-anchor="middle">midnight Pacific passes</text></g><g class="pele-edge-label" data-id="edge14"><rect x="241.4" y="713.5" width="179.19" height="21" rx="3" fill="var(--_bg)"/><text x="331" y="728.9" text-anchor="middle">you press Make an account</text></g><g class="pele-edge-label" data-id="edge15"><rect x="278.58" y="1293.5" width="85.83" height="21" rx="3" fill="var(--_bg)"/><text x="321.49" y="1308.9" text-anchor="middle">the run ends</text></g></g><g class="pele-nodes"><g class="pele-node pele-state tan" data-id="s0" transform="translate(390.84,186)"><rect x="-54.69" y="-22" width="109.38" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Front page</text></g><g class="pele-node pele-state tan" data-id="s1" transform="translate(257.31,314)"><rect x="-112.05" y="-22" width="224.1" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Guest game, ready to Start</text></g><g class="pele-node pele-state purple" data-id="s2" transform="translate(327.83,784)"><rect x="-40.46" y="-22" width="80.91" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Sign in</text></g><g class="pele-node pele-state tan" data-id="s3" transform="translate(236.75,427)"><rect x="-66.25" y="-22" width="132.5" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">The bot check</text></g><g class="pele-node pele-state purple" data-id="s4" transform="translate(219.29,897)"><rect x="-72.47" y="-22" width="144.94" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Enter your code</text></g><g class="pele-node pele-state purple" data-id="s5" transform="translate(321.49,1010)"><rect x="-75.58" y="-22" width="151.15" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Pick a username</text></g><g class="pele-node pele-state tan" data-id="s6" transform="translate(236.75,540)"><rect x="-81.37" y="-22" width="162.74" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Playing as a guest</text></g><g class="pele-node pele-state teal" data-id="s7" transform="translate(321.49,1123)"><rect x="-74.7" y="-22" width="149.39" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Today, signed in</text></g><g class="pele-node pele-state tan" data-id="s8" transform="translate(331,662)"><rect x="-110.7" y="-31" width="221.41" height="62" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" text-anchor="middle" xml:space="preserve"><tspan x="0" y="-4.9">Guest result, with Make an</tspan><tspan x="0" y="16.1">account</tspan></text></g><g class="pele-node pele-state teal" data-id="s9" transform="translate(321.49,1251)"><rect x="-77.36" y="-22" width="154.72" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Playing for points</text></g><g class="pele-node pele-state teal" data-id="s10" transform="translate(321.49,1364)"><rect x="-80.91" y="-22" width="161.82" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">Result, with Share</text></g><g class="pele-node pele-state-start" data-id="root_start" transform="translate(390.84,113)"><circle r="7" fill="var(--_l)"/></g><g class="pele-node pele-state tan" data-id="lg0" transform="translate(489.41,82)"><rect x="-35.57" y="-22" width="71.14" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">guest</text></g><g class="pele-node pele-state purple" data-id="lg1" transform="translate(609,82)"><rect x="-44.02" y="-22" width="88.03" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">account</text></g><g class="pele-node pele-state teal" data-id="lg2" transform="translate(730.8,82)"><rect x="-37.78" y="-22" width="75.57" height="44" rx="10" fill="var(--_s)" stroke="var(--_b)"/><text class="pele-label" x="0" y="5.6" text-anchor="middle">player</text></g></g></g></svg>
