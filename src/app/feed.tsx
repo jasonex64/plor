@@ -345,7 +345,15 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
                 className={item.kind === "comment" && arrived.has(item.id) ? `${styles.item} ${kit.pop}` : styles.item}
               >
                 {line && <p className={styles.date}>{line}</p>}
-                <div className={`${kit.row} ${commentStyles.comment}`}>
+                {/* A result carries its game's colour and a comment none, so the two don't look alike (inbox #243;
+                    docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34). */}
+                <div
+                  className={
+                    item.kind === "comment"
+                      ? `${kit.row} ${commentStyles.comment}`
+                      : `${kit.row} ${commentStyles.comment} ${styles.result} ${item.game === GAME_ID ? styles.offbeat : styles.fragments}`
+                  }
+                >
                   {item.kind === "comment" ? (
                     <CommentContent
                       comment={{ id: item.id, username: item.username, name: item.name, body: item.body, createdAt: instant(item.at), reactions: item.reactions }}
