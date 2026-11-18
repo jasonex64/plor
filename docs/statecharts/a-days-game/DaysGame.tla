@@ -1,6 +1,6 @@
 ---- MODULE DaysGame ----
 \* A signed-in player's day of each game, Offbeat and Fragments, from Today to the result. Drawn from the code as of
-\* commit d3c2c62 (each action cites it); a picture of the flow, not a check of it. The checks of the runs underneath
+\* commit 4f9c441 (each action cites it); a picture of the flow, not a check of it. The checks of the runs underneath
 \* are verify-offbeat-run and verify-fragments-run.
 EXTENDS Naturals
 

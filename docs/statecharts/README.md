@@ -1,6 +1,6 @@
 # Statecharts
 
-Three of the app's most important user flows, drawn from the code as of commit `d3c2c62` (the human, 2026-11-17,
+Three of the app's most important user flows, drawn from the code as of commit `4f9c441` (the human, 2026-11-17,
 `docs/milestones/PROCESS-formal-verification.md` answers 4, 12 and 13). Each folder holds the flow as a small TLA+ spec
 (each step cites its code), the `/statechart` view that words it, the Mermaid chart and its SVG.
 

@@ -1,6 +1,6 @@
 ---- MODULE FirstDay ----
 \* A new player's first day: they open plor.app with no account, play as a guest, and may make an account. Drawn
-\* from the code as of commit d3c2c62 (each action cites it); a picture of the flow, not a check of it.
+\* from the code as of commit 4f9c441 (each action cites it); a picture of the flow, not a check of it.
 EXTENDS Naturals
 
 VARIABLES
@@ -11,7 +11,7 @@ vars == <<page, accountRun>>
 
 Init == page = "front" /\ accountRun = "none"
 
-\* "Play Offbeat without an account" / "Play Fragments without an account" (src/app/home.tsx:306, 311).
+\* "Play Offbeat without an account" / "Play Fragments without an account" (src/app/home.tsx:308, 313).
 PlayWithoutAccount == page = "front" /\ page' = "guestReady" /\ UNCHANGED accountRun
 \* Start runs the bot check first (src/app/guest-game.tsx:94-103).
 GuestStart == page = "guestReady" /\ page' = "botCheck" /\ UNCHANGED accountRun
@@ -23,16 +23,16 @@ CheckFails == page = "botCheck" /\ page' = "guestReady" /\ UNCHANGED accountRun
 GuestRunEnds == page = "guestPlaying" /\ page' = "guestResult" /\ UNCHANGED accountRun
 \* After midnight Pacific the guest's cookie finds today not started (src/app/api/guest/run/route.ts:16-17).
 Midnight == page = "guestResult" /\ page' = "guestReady" /\ UNCHANGED accountRun
-\* The peek's "Make an account" (src/app/guest-peek.tsx:39-42), or a "Sign in" link (home.tsx:319).
+\* The peek's "Make an account" (src/app/guest-peek.tsx:39-42), or a "Sign in" link (home.tsx:321).
 MakeAccount == page = "guestResult" /\ page' = "signIn" /\ UNCHANGED accountRun
 SignInLink == page \in {"front", "guestReady"} /\ page' = "signIn" /\ UNCHANGED accountRun
-\* "Email me a sign-in code" (home.tsx:453-520); a new address signs up on its first code.
+\* "Email me a sign-in code" (home.tsx:456-553, SignIn); a new address signs up on its first code.
 EmailCode == page = "signIn" /\ page' = "code" /\ UNCHANGED accountRun
 \* The right code from the email; a new account has no username yet.
 CodeRight == page = "code" /\ page' = "username" /\ UNCHANGED accountRun
 \* "Continue with Google", then /auth/callback (src/app/auth/callback/route.ts:21).
 Google == page = "signIn" /\ page' = "username" /\ UNCHANGED accountRun
-\* "Pick a username", Save (home.tsx:553-585).
+\* "Pick a username", Save (home.tsx:556-593, PickUsername).
 SaveUsername == page = "username" /\ page' = "today" /\ UNCHANGED accountRun
 \* Today's game for points: the guest's run is not carried over (e2e/guest-play.e2e.ts:176-177, 200-219).
 PlayForPoints == page = "today" /\ accountRun = "none" /\ page' = "playing" /\ accountRun' = "playing"

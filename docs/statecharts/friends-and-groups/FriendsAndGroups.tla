@@ -1,5 +1,5 @@
 ---- MODULE FriendsAndGroups ----
-\* You and one other player as friends, and you in a group, side by side. Drawn from the code as of commit d3c2c62
+\* You and one other player as friends, and you in a group, side by side. Drawn from the code as of commit 4f9c441
 \* (each action cites it); a picture of the flow, not a check of it. The group half follows the rules that
 \* verify-group-membership checks; the friends half has no check (the human, 2026-11-17, answer 13).
 EXTENDS Naturals

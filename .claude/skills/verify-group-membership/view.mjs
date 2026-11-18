@@ -13,7 +13,7 @@ export const state = (v) => {
     .join(" | ");
 };
 
-export const step = (action, from, to) => {
+export const step = (action) => {
   switch (action) {
     case "Create":
       return "a player creates a group";

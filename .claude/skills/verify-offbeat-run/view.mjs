@@ -1,6 +1,4 @@
 // The /statechart view of OffbeatRun.tla: states and steps in the player's words.
-const None = -1;
-
 export const title = "An Offbeat run, two tabs";
 
 export const state = (v) => {
