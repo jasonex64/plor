@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** approved (2026-11-17, the human: "Approve it"), ticket and sources in PR #274 on `process-lint-rules`. Thirteen questions answered (below, quoted); the sources are read (plan step 2); no rule is built. The desktop size of a visual test is still to confirm (Numbers).
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Fourteen questions answered (below, quoted). **Rule 1 of 5, `local/fail-loudly`, in review** on `process-lint-rules` (its PR); the other four rules and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -39,6 +39,10 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 13. **Q4, the sources; and "No defensive bloat".** May ESLint's custom rules page (https://eslint.org/docs/latest/extend/custom-rules), its `RuleTester` (https://eslint.org/docs/latest/integrate/nodejs-api#ruletester), `no-magic-numbers` (https://eslint.org/docs/latest/rules/no-magic-numbers) and Playwright's `screenshot` option (https://playwright.dev/docs/test-use-options) be added to SOURCES.md and read before building? Is "No defensive bloat" fuzzy and dropped?
   - **Answer:** **"Add them; keep bloat rule"**: the four pages go into SOURCES.md; "No defensive bloat" stays a sentence in CLAUDE.md.
 
+**Round 5** (while building rule 1, same day)
+14. **A deliberate "do nothing" catch.** The draft rule flagged 3 empty catches, each deliberate with a comment saying why (`src/app/shown.ts`, `src/app/theme.ts`: browser storage blocked; `scripts/base.ts`: a password kept as typed). Padding them to pass would cheat the check.
+  - **Answer:** **"Marker comment allows it"**: an empty catch passes only if a comment inside starts with `Expected:`; a bare `catch {}` or `/* ignore */` still fails, and `grep "Expected:"` lists every exception.
+
 ## Source
 - Playwright (SOURCES.md, M07 D7): the `video` option, https://playwright.dev/docs/test-use-options#video-modes; the GitHub Actions artifact upload already in `.github/workflows/e2e.yml`.
 - Playwright (SOURCES.md, M07 D7): the `screenshot` option, https://playwright.dev/docs/test-use-options ("'off', 'on' and 'only-on-failure'").
@@ -53,7 +57,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 
 | Rule in CLAUDE.md today | The lint rule fails on | Flags today |
 |---|---|---|
-| Fail loudly | a `catch` that is empty, or only logs and carries on | to count: 86 `catch` blocks in `src/` to check |
+| Fail loudly | a `catch` that is empty (unless its comment starts with `Expected:`, answer 14), or only logs and carries on | **built**: 3 in `src/`, `e2e/`, `scripts/`, all deliberate, now marked |
 | No invented numbers | a number other than 0 or 1 in app code without a source comment on its line or the line above (answers 6, 10); test files exempt (answer 9) | 516 in 99 files |
 | Clean only your orphans | unused imports and variables, as an error | to count |
 | Never cheat a check | `.skip`, `.only`, `.fixme` in a test | 0 |
@@ -108,7 +112,14 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 |---|---|---|
 
 ## Evidence
+**Rule 1, `local/fail-loudly`** (2026-11-17, slot 3):
+- Hypothesis before running it: fewer than 10 of the 86 `catch` blocks are empty or log-only; more than 20 would prove the reading of the code wrong. Result: 3, all empty, all deliberate (answer 14).
+- `npm test -- eslint-rules` → `Tests  10 passed (10)`. With the rule's `CatchClause` visitor renamed so it never runs → `Tests  5 failed | 5 passed (10)`: each bad example fails without the rule. Restored after.
+- `npm run lint` → no findings, with `local/fail-loudly` on as an error.
+- `npx tsc --noEmit` → no errors.
+- CLAUDE.md: the header's "Add a rule here only after…" is the new rule; "Fail loudly" is now "Recovery needs a ticket" (its catch half is the lint rule; its "silent fallbacks" and "defaults that hide missing data" were fuzzy, answer 7, and stay on the reviewer's list, `.claude/agents/reviewer.md:23`).
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking findings and how each was fixed: none.
+- Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): the rule checks `try/catch` only, not a promise's `.catch(() => {})` (one in the app, deliberate, `src/lib/hold.ts:70`); it counts only `console.*` and `log.*` as logging; DECISIONS' "Error handling" row still says "fail loudly". The other converted sentences stay in CLAUDE.md until their own rules (expected, rule 1 of 5).

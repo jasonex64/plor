@@ -30,6 +30,6 @@ export function applyTheme(theme: Theme | null): void {
     if (picked) window.localStorage.setItem(THEME_KEY, picked);
     else window.localStorage.removeItem(THEME_KEY);
   } catch {
-    // No copy can be kept: the next load paints the device's theme until the profile loads, as on a new device.
+    // Expected: no copy can be kept; the next load paints the device's theme until the profile loads, as on a new device.
   }
 }
