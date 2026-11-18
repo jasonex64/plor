@@ -69,10 +69,15 @@ export function Kit() {
         <label htmlFor="kit-field">Your answer</label>
         <input id="kit-field" placeholder="Type here" />
         <input aria-label="Disabled field" placeholder="Disabled" disabled />
-        <select aria-label="A choice" defaultValue="Offbeat">
-          <option>Offbeat</option>
-          <option>Fragments</option>
-        </select>
+      </Piece>
+      <Piece name="Dropdown" when="A choice among many, with the kit's own arrow; a choice of two or three is the Game switch.">
+        <label className={kit.select}>
+          <span className="sr-only">A choice</span>
+          <select defaultValue="Friends">
+            <option>Friends</option>
+            <option>Book Club</option>
+          </select>
+        </label>
       </Piece>
       <Piece name="Card" when="A section of a page. The soft card is the one tinted card on a screen.">
         <div className={`${kit.card} ${kit.soft}`}>

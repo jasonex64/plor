@@ -237,7 +237,7 @@ export function LeaderboardCard() {
         ))}
       </div>
       <GameSwitch choices={GAMES} value={game} onChange={(id) => choose({ game: id })} />
-      <label className={styles.board}>
+      <label className={`${styles.board} ${kit.select}`}>
         {/* Named for screen readers; mockup 3 shows the picker alone. */}
         <span className="sr-only">Board</span>
         <select value={group ?? ""} onChange={(e) => choose({ group: e.target.value === "" ? null : e.target.value })}>

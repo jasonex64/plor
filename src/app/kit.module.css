@@ -393,3 +393,30 @@ button.link {
 .bare {
   border-color: transparent;
 }
+
+/* A dropdown with the kit's own arrow, not the browser's (docs/milestones/M20-design-rules-and-clean-up.md, answer 39):
+   on the label around a select. The arrow is a chevron drawn as the app's icons are (22px, a 2px round stroke;
+   src/app/shell.tsx), in the theme's text colour as the select's own text is (not the label's, which may be muted), inside the field's 12px padding and centred on its
+   44px height; the select leaves the chevron and the tabs' 8px gap clear on its right. */
+.select {
+  position: relative;
+  display: block;
+}
+
+.select::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 11px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--text);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+.select select {
+  appearance: none;
+  width: 100%;
+  padding-right: 42px;
+}

@@ -254,12 +254,16 @@ test("the comment box posts to a game the writer has finished today, chosen in t
   await expect(section.getByLabel("Comment to your friends")).toBeVisible();
   await expect(section.getByLabel("Game")).toHaveCount(0);
 
-  // Both: the box offers each, by its shown name.
+  // Both: the box offers each, by its shown name, as a switch like the boards' (docs/milestones/
+  // M20-design-rules-and-clean-up.md, answer 39), not the browser's dropdown.
   await fragmentsDone(await idOf("fi"));
   await page.goto("/");
-  const game = section.getByLabel("Game");
-  await expect(game.locator("option")).toHaveText([GAME.name, SUBSTRINGS.name]);
-  await game.selectOption({ label: SUBSTRINGS.name });
+  const game = section.getByRole("radiogroup", { name: "Game" });
+  await expect(game.getByRole("radio")).toHaveCount(2);
+  await expect(section.locator("select")).toHaveCount(0);
+  await expect(game.getByRole("radio", { name: GAME.name })).toBeChecked();
+  await game.getByText(SUBSTRINGS.name, { exact: true }).click();
+  await expect(game.getByRole("radio", { name: SUBSTRINGS.name })).toBeChecked();
   const body = `to fragments ${RUN}`;
   await section.getByLabel("Comment to your friends").fill(body);
   await section.getByRole("button", { name: "Post" }).click();
@@ -329,13 +333,16 @@ test("a group's page lists both games' comments for the day, each tagged, and it
   await fragmentsDone(await idOf("fn"));
   await page.goto(group);
   const thread = page.getByRole("region", { name: "Comments" });
-  await expect(thread.getByLabel("Game").locator("option")).toHaveText([GAME.name, SUBSTRINGS.name]);
+  // The game as a switch (answer 39).
+  const games = thread.getByRole("radiogroup", { name: "Game" });
+  await expect(games.getByRole("radio")).toHaveCount(2);
+  await expect(thread.locator("select")).toHaveCount(0);
   const posts = [
     [GAME.name, `owls offbeat ${RUN}`],
     [SUBSTRINGS.name, `owls fragments ${RUN}`],
   ];
   for (const [game, body] of posts) {
-    await thread.getByLabel("Game").selectOption({ label: game });
+    await games.getByText(game, { exact: true }).click();
     await thread.getByLabel("Comment", { exact: true }).fill(body);
     await thread.getByRole("button", { name: "Post" }).click();
     await sent(page, "/api/comments");
