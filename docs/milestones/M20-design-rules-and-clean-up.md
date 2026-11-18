@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is built (answers 45 to 50, below), in its PR; next 20e or 20f, each with its own questions, or 20h to 20j.
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is merged (#277, 2026-11-17, on green checks, the human's "Merge when green"; answers 45 to 50, below). 20h is built, in its PR (the feed's results carry their game's 4px edge, the Balanced look's; a comment none); next 20e or 20f, each with its own questions, or 20h to 20j.
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
@@ -158,7 +158,7 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 **Added 2026-11-17 (answer 13), each after 20a, with its own questions where the look is still open:**
 
 **20h — a comment no longer looks like a result** (#243; answer 19). A friend's result in the feed carries its game's colour; a comment carries none.
-- → verify: a component test renders a comment and a result for each game and finds the game colour on the results only.
+- → verify: a component test renders a comment and a result for each game and finds the game colour on the results only. *Built as an e2e (`feed.e2e.ts`): the repo has no component tests (DECISIONS.md, Test runner: Vitest for logic, Playwright for screens).*
 
 **20i — the boards' switch** (#248; answer 27). Today, This week and Last week become one board with a switch, opening on Today every load.
 - → verify: an e2e opens the Friends tab and a group's page, finds one board and the switch on Today, and reaches each period through it.

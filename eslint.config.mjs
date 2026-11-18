@@ -3,6 +3,7 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import failLoudly from "./eslint-rules/fail-loudly.mjs";
 import noInventedNumbers from "./eslint-rules/no-invented-numbers.mjs";
+import noSkippedTests from "./eslint-rules/no-skipped-tests.mjs";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -10,9 +11,12 @@ const eslintConfig = defineConfig([
   // A code mistake becomes a rule here, not a sentence in CLAUDE.md (docs/milestones/PROCESS-lint-rules.md). Kept in
   // the project as a plugin object, ESLint's "Runtime Rules" (docs/SOURCES.md).
   {
-    plugins: { local: { rules: { "fail-loudly": failLoudly, "no-invented-numbers": noInventedNumbers } } },
+    plugins: {
+      local: { rules: { "fail-loudly": failLoudly, "no-invented-numbers": noInventedNumbers, "no-skipped-tests": noSkippedTests } },
+    },
     rules: {
       "local/fail-loudly": "error",
+      "local/no-skipped-tests": "error",
       // CLAUDE.md's "Clean only your orphans" for imports and variables (PROCESS-lint-rules, rule 3): ESLint's own
       // check, a warning in eslint-config-next, made an error so CI stops on it.
       "@typescript-eslint/no-unused-vars": "error",

@@ -39,11 +39,13 @@ const slot = (page: Page, name: string) =>
 // (docs/milestones/M20-design-rules-and-clean-up.md, answers 6 and 45), and a disabled button can't be pressed, so it's
 // flat too and listed if it isn't (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 6). checked counts
 // the buttons and links drawn as buttons looked at, raised, flat or disabled, so a page with no raised one is still
-// measured.
+// measured. A shadow here is one cast below or around an element; an inset one draws a flat stripe inside it, as a
+// feed result's game-colour edge does (M20 20h, answers 19 and 34), and isn't counted.
 const shadowed = (page: Page) =>
   page.evaluate(() => {
     const shown = [...document.querySelectorAll("body *")].filter((el) => el.getClientRects().length > 0);
-    const all = shown.filter((el) => getComputedStyle(el).boxShadow !== "none");
+    const cast = (shadow: string) => shadow !== "none" && shadow.split(/,(?![^(]*\))/).some((layer) => !layer.includes("inset"));
+    const all = shown.filter((el) => cast(getComputedStyle(el).boxShadow));
     const pressable = all.filter((el) => (el.tagName === "BUTTON" && !(el as HTMLButtonElement).disabled) || el.tagName === "A");
     const stray = all.filter((el) => !pressable.includes(el)).map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? "").trim().slice(0, 40)}"`);
     const controls = shown.filter((el) => el.tagName === "BUTTON" || (el.tagName === "A" && /button|primary/.test(String(el.className))));
