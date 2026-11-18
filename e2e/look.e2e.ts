@@ -117,8 +117,8 @@ test("a card and a chip take the kit's border and corners, flat", async ({ brows
   expect(await look(chip)).toEqual({ border: `1px ${color}`, corners: "4px", shadow: "none" });
 });
 
-// Signed in, Today starts with the game: the introduction is gone (answer 12); the banner's chips are its white on the
-// game's colour, not the kit's plain chip (a production CSS order once let the kit's win: 14b-8b review); and with no
+// Signed in, Today starts with the game: the introduction is gone (answer 12); since M20 20k-3 the game's card is white
+// with its colour in a band (answer 54), so its chips are the kit's plain chip, in the ink; and with no
 // friends Today says nothing of it, on a phone or from 768px: "Plor is better with friends" went from Today with the
 // invite link (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
 test("signed-in Today: no introduction, the banner's own chips, and no words about friends", async ({ browser }) => {
@@ -129,9 +129,8 @@ test("signed-in Today: no introduction, the banner's own chips, and no words abo
   const chip = banner.getByText("7 questions", { exact: true });
   await expect(chip).toBeVisible();
   await expect(page.getByText("Plor is a small site with a daily word game.")).toBeHidden();
-  expect(await chip.evaluate((el) => getComputedStyle(el).color)).toBe("rgb(255, 255, 255)");
   const color = await ink(page);
-  expect(await chip.evaluate((el) => getComputedStyle(el).borderTopColor)).not.toBe(color);
+  expect(await chip.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el).borderTopColor])).toEqual([color, color]);
 
   // The feed has loaded, so a card that came after it would be there by now.
   await expect(page.getByRole("region", { name: "Feed" })).toBeVisible();

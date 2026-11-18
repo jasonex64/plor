@@ -27,6 +27,7 @@ import { AnswerSearch } from "./answer-search";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
+import { gameColour } from "./game-colour";
 import { ShareResult } from "./share";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { GAME_1_STEPS, HowToPlay } from "./how-to-play";
@@ -512,7 +513,8 @@ function Score({ run }: { run: RunState }) {
   }
   return (
     <>
-      <Facts facts={[earnsBonus(run) ? `${pointsText(run.points)} + about ${run.bonus} bonus` : pointsText(run.points), endedText(run)]} />
+      <BigScore points={run.points} />
+      <Facts facts={[...(earnsBonus(run) ? [`+ about ${run.bonus} bonus`] : []), endedText(run)]} />
       <ButtonLink href={`${GAME.path}#result`} onClick={toDrawn} transitionTypes={FORWARD} className={styles.play}>
         Result
       </ButtonLink>
@@ -532,7 +534,7 @@ export function Facts({ facts }: { facts: string[] }) {
   return (
     <p className={`${kit.chips} ${styles.facts}`}>
       {facts.map((f) => (
-        <span key={f} className={`${kit.chip} ${styles.chip}`}>
+        <span key={f} className={kit.chip}>
           {f}
         </span>
       ))}
@@ -567,11 +569,39 @@ export function BannerSkeleton() {
 // game: Fragments' card is this banner in its own colour (src/app/today-fragments.tsx; M16 16f-2).
 export function Banner({ date, game = GAME, children }: { date?: string; game?: typeof GAME | typeof SUBSTRINGS; children?: ReactNode }) {
   return (
-    <div className={game === SUBSTRINGS ? `${styles.banner} ${styles.fragments}` : styles.banner}>
-      {date && <p className={`${kit.chip} ${styles.chip}`}>{longDate(date)}</p>}
-      <h2 className={styles.title}>{game.name}</h2>
+    <div className={`${kit.card} ${styles.banner} ${gameColour(game.id)}`}>
+      <Band game={game} date={date} />
       {children}
     </div>
+  );
+}
+
+// A game's band, the first thing in its card: its name, the card's heading, and the day (M20 20k-3, answers 54 and 55).
+// The card's own game class colours it (kit .offbeat, .fragments).
+export function Band({ game, date }: { game: typeof GAME | typeof SUBSTRINGS; date?: string }) {
+  return (
+    <div className={styles.band}>
+      <h2>{game.name}</h2>
+      {/* "Offbeat · Tuesday 17 November", as the Balanced sample's band reads; the dot is seen, not read, and is its own
+          element so the day's is the day alone. */}
+      {date && (
+        <>
+          <span aria-hidden="true">·</span>
+          <p>{longDate(date)}</p>
+        </>
+      )}
+    </div>
+  );
+}
+
+// A finished run's score, the card's big number, popping in when the card or result shows it (M20 answers 55 and 57).
+// Its unit is in the same line, so it reads "120 points".
+export function BigScore({ points }: { points: number }) {
+  return (
+    <p className={`${styles.score} ${kit.pop}`}>
+      {points}
+      <span> {points === 1 ? "point" : "points"}</span>
+    </p>
   );
 }
 
@@ -599,7 +629,7 @@ export function ResetCountdown({ label, msToReset }: { label: string; msToReset:
   const total = Math.ceil(useCountdown(msToReset, NOTHING) / 1000);
   const two = (n: number) => String(n).padStart(2, "0");
   return (
-    <p role="timer" className={`${kit.chip} ${styles.chip}`}>
+    <p role="timer" className={kit.chip}>
       {label} {Math.floor(total / (60 * 60))}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
     </p>
   );

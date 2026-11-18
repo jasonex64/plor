@@ -110,8 +110,8 @@
 
   .row:hover,
   .hover:not(.primary):hover {
-    background: var(--flat-hover, var(--soft));
-    color: var(--flat-text, var(--text));
+    background: var(--soft);
+    color: var(--text);
   }
 
   /* A warning keeps its danger text under the pointer: the rule changes the fill, not the warning (20a's review). */
@@ -364,10 +364,12 @@ button.link {
    docs/milestones/M20-design-rules-and-clean-up.md, answers 19 and 34). On a board, set once on the board. */
 .offbeat {
   --game: var(--offbeat);
+  --on-game: var(--on-offbeat);
 }
 
 .fragments {
   --game: var(--fragments);
+  --on-game: var(--on-fragments);
 }
 
 /* The Balanced look (answers 34 and 56; src/app/admin/kit/looks.module.css, .balanced). A friend's result in the feed

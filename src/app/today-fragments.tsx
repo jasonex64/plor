@@ -7,7 +7,7 @@
 import type { SubstringRun } from "@/game/substring-state";
 import { SUBSTRINGS } from "@/platform/game";
 import { ButtonLink } from "./button-link";
-import { Banner, Facts, pointsText, ResetCountdown } from "./game";
+import { Banner, BigScore, Facts, ResetCountdown } from "./game";
 import styles from "./game.module.css";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
@@ -40,7 +40,8 @@ export function FragmentsBanner({ run, msToReset, main }: { run: SubstringRun; m
       )}
       {run.status === "finished" && (
         <>
-          <Facts facts={[pointsText(run.score!.total), ...(run.standing!.percent === null ? [] : [`better than ${run.standing!.percent}% of players`])]} />
+          <BigScore points={run.score!.total} />
+          {run.standing!.percent !== null && <Facts facts={[`better than ${run.standing!.percent}% of players`]} />}
           <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={styles.play}>
             Result
           </ButtonLink>
