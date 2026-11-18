@@ -27,6 +27,7 @@ import { endedText } from "./ended-text";
 import { dateLine, gameName, instant, itemKey, mergeFirstPage, neighbourComment, postableGames } from "./feed-logic";
 import styles from "./feed.module.css";
 import kit from "./kit.module.css";
+import { GameSwitch } from "./leaderboard";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { Line, Skeleton } from "./skeleton";
@@ -293,18 +294,9 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
       {shown && games.length === 0 && <p>Finish today&apos;s game to join in.</p>}
       {shown && postTo && (
         <form onSubmit={post} className={commentStyles.compose}>
-          {games.length > 1 && (
-            <label>
-              Game
-              <select value={postTo.id} onChange={(e) => setPicked(e.target.value)}>
-                {games.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          {/* The game as the boards' switch, not the browser's dropdown (docs/milestones/M20-design-rules-and-clean-up.md,
+              answer 39). */}
+          {games.length > 1 && <GameSwitch choices={games} value={postTo.id} onChange={setPicked} />}
           <label>
             {/* The box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
             Comment to your friends

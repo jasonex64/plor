@@ -92,6 +92,10 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await expect(card.getByRole("heading")).not.toContainText(GAME.name);
   await expect(card.getByRole("radiogroup", { name: "Game" }).getByRole("radio", { name: GAME.name })).toBeChecked();
   await expect(card.getByLabel("Board").locator("option")).toHaveText(["Friends", "Owls"]);
+  // A dropdown with the kit's own arrow, in the text's colour, not the browser's (M20 answer 39).
+  const picker = card.getByLabel("Board");
+  expect(await picker.evaluate((el) => getComputedStyle(el).appearance)).toBe("none");
+  expect(await picker.evaluate((el) => getComputedStyle(el.parentElement!, "::after").backgroundColor)).toBe(await picker.evaluate((el) => getComputedStyle(el).color));
 
   const friendsWeek = page.waitForRequest((r) => path(r.url()) === "/api/leaderboard");
   await card.getByRole("radio", { name: "This week" }).check();

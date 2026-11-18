@@ -63,7 +63,7 @@ export function Insights() {
         <button type="button" aria-label="Previous day" disabled={at >= days.length - 1} onClick={() => setDate(days[at + 1])}>
           ‹
         </button>
-        <label className={styles.day}>
+        <label className={`${styles.day} ${kit.select}`}>
           <span className="sr-only">Day</span>
           <select value={report.date} onChange={(e) => setDate(e.target.value)}>
             {days.map((d) => (

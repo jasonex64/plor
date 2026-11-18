@@ -18,6 +18,7 @@ import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
+import { GameSwitch } from "./leaderboard";
 import styles from "./comments.module.css";
 import { dayText, shiftDay } from "./day-text";
 import { errorText } from "./messages";
@@ -286,17 +287,10 @@ export function Comments({
       )}
       {shownThread && postTo && (
         <form onSubmit={post} className={styles.compose}>
+          {/* The game as the boards' switch, not the browser's dropdown (docs/milestones/M20-design-rules-and-clean-up.md,
+              answer 39). */}
           {shownThread.canPost.length > 1 && (
-            <label>
-              Game
-              <select value={postTo} onChange={(e) => setPicked(e.target.value as BoardGame)}>
-                {shownThread.canPost.map((game) => (
-                  <option key={game} value={game}>
-                    {gameName(game)}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <GameSwitch choices={shownThread.canPost.map((id) => ({ id, name: gameName(id) }))} value={postTo} onChange={setPicked} />
           )}
           <label>
             {/* The friends thread's box says so (M11 H2 (a); M12 12f, F5). */}
