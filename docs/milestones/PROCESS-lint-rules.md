@@ -184,3 +184,7 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 **Rule 4, `local/no-skipped-tests`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings: none. It found no false positive on the repo (`test.describe.configure`, `test.use` pass) and judged the acceptance grep's edit justified by answer 1, not a weakening.
 - Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): the forms it misses, none used here; three more test cases.
+
+**Rule 5, `local/no-service-role`** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking findings: none. It re-ran lint (exit 0) and the rule's test (8 passed), and found the key named nowhere in `src`, `scripts`, `e2e` or the root configs.
+- Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): spellings and forms it misses (camelCase, kebab, regex, split strings), none used here; `scripts/` and `e2e/` are outside its reach by answer 9.
