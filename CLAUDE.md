@@ -30,7 +30,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Build for today.** Add no option, flag, field or stored data without a current caller, and no abstraction for code with a single use. The only exceptions are the items under "Hard to reverse" in DECISIONS.md.
 - **Recovery needs a ticket.** Reconnect or retry is allowed only when the ticket specifies it, and it must be logged and counted. (Swallowed errors are the `local/fail-loudly` lint rule.)
 - **No defensive bloat.** Validate at the boundaries: network, disk, user input and third-party APIs. Trust internal code, and don't guard against states that can't happen.
-- **Never cheat a check.** Don't weaken, skip or delete a test or assertion, and don't mock the thing under test, just to get a green result. If a check is wrong, say so and fix it as its own change.
+- **Never cheat a check.** Don't weaken or delete a test or assertion, and don't mock the thing under test, just to get a green result. If a check is wrong, say so and fix it as its own change. (Skipping or focusing a test is the `local/no-skipped-tests` lint rule.)
 - **Comments explain why, not what.** When a source section or ticket explains the reason, link to it.
 - **Repeated procedures are scripts.** If a multi-step procedure gets run twice, it becomes a script in `scripts/`, called through the task runner in DECISIONS.md. Don't hand-type a procedure that already has a script.
 - **Leave no scraps.** Before you call a task done, remove temp files, debug code, experiment branches, stale artifacts and any processes you started.
