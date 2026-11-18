@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). Rules 1 to 3 merged (#275, #276, #278). **Rule 4, `local/no-skipped-tests`, in review** on `process-lint-rules` (its PR); rule 5 and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). Rules 1 to 4 merged (#275, #276, #278, #280). **Rule 5, `local/no-service-role`, in review** on `process-lint-rules` (its PR); the screenshots and video (plan step 4) and the dropped rules (step 5) wait. The desktop size of a visual test is still to confirm (Numbers).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -89,7 +89,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 | No invented numbers | a number in app code without a comment naming its source (a ticket answer, a `docs/` path, a URL, "human, <date>"; answer 17) on its line, above it or above what encloses it (answers 10, 18); not 0, 1, 2, 24, 60, 100, 360, 1000 (answers 6, 16) or an array index; test files exempt (answer 9) | **built**: 516 at first; 236 HTTP statuses became `STATUS` names (answer 15), the rest sourced or derived (answers 19 to 28) |
 | Clean only your orphans | unused imports and variables, as an error | **built**: 0 (ESLint's own `@typescript-eslint/no-unused-vars`, a warning before); the bullet keeps what lint can't see |
 | Never cheat a check | `.skip`, `.only`, `.fixme` in a test (built with `.todo`, `.skipIf`, `.runIf`, `.fail` and `xit`/`fit`-style names, the other ways Vitest and Playwright switch a test off) | **built**: 0; the bullet keeps its weaken, delete and mock half |
-| Least privilege | `service_role` or `SERVICE_ROLE` in app code | 0 |
+| Least privilege | `service_role` or `SERVICE_ROLE` in app code | **built**: 0 (a name or a string, any case; comments may mention it); the bullet keeps its `postgres` half |
 
 **Dropped** (answer 7): "Keep the diff surgical", "Comments explain why, not what", "Build for today". The `audit` skill names some of these rules: it changes in the same PR.
 
@@ -163,6 +163,10 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Hypothesis: no test is skipped, focused or marked to fail today. `grep` for every form in `src`, `e2e`, `scripts`, `eslint-rules` → nothing. Held.
 - `npx vitest run eslint-rules` → `Tests  37 passed (37)`; with both visitors renamed → `Tests  10 failed | 4 passed (14)` for this rule. Restored after.
 - `npm run lint` → exit 0. `npx tsc --noEmit` → no errors.
+
+**Rule 5, `local/no-service-role`** (2026-11-17, slot 3):
+- Hypothesis: no app code names the key today. `grep -rniE "service_?role"` in `src` (tests aside), `scripts`, `e2e` → nothing; it appears only in `supabase/` (migrations, SQL tests, config), which lint doesn't read. `npm run lint` with the rule on → exit 0. Held.
+- `npx vitest run eslint-rules` → `Tests  45 passed (45)`; with the report switched off → `Failed Tests 5` for this rule (every bad example). Restored after: `Tests  8 passed (8)`.
 
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
