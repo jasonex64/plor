@@ -38,7 +38,7 @@ export function AnswerBase() {
           <span className="sr-only">Name or alias</span>
           <input value={query} placeholder="Name or alias" onChange={(e) => setQuery(e.target.value)} />
         </label>
-        <button type="submit" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || query.trim() === ""}>
+        <button type="submit" className={`${kit.primary} ${admin.button}`} disabled={busy || query.trim() === ""}>
           Look up
         </button>
       </form>

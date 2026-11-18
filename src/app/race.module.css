@@ -125,7 +125,7 @@
   padding-right: 44px;
 }
 
-/* No border, shadow, lift or press: a mark inside the field (the lift and press are in :where(); globals.css). */
+/* No border: a mark inside the field. */
 .clear {
   position: absolute;
   top: 0;
@@ -137,9 +137,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: none;
-  box-shadow: none;
-  transform: none;
   color: var(--muted);
 }
 

@@ -5,6 +5,12 @@
   /* The game's colour and its text: Offbeat's, or Fragments' with .fragments (M16 16f-2). */
   --game: var(--offbeat);
   --on-game: var(--on-offbeat);
+  /* A flat button on the card (How to play, Result, the card behind's Play) as the card's chips are drawn below: its
+     white text, the white at 50% for the edge and at 12% for the fill under the pointer (globals.css, the flat
+     button's colours; docs/milestones/M20-design-rules-and-clean-up.md, answer 49). */
+  --flat-text: var(--on-game);
+  --flat-edge: color-mix(in srgb, var(--on-game) 50%, transparent);
+  --flat-hover: color-mix(in srgb, var(--on-game) 12%, transparent);
   box-sizing: border-box;
   min-height: 230px;
   padding: 24px 16px 20px;

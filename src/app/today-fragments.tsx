@@ -15,22 +15,25 @@ import { FORWARD } from "./slide";
 
 // msToReset: the time to the next reset, which Fragments' state doesn't carry; Offbeat's does (src/app/today-cards.tsx), and the
 // reset is the one for both games.
-export function FragmentsBanner({ run, msToReset }: { run: SubstringRun; msToReset: number }) {
+// main: this card is the one in front on Today, so its Play or Continue is the screen's one raised button (M20, answers
+// 45 and 47); Result is flat.
+export function FragmentsBanner({ run, msToReset, main }: { run: SubstringRun; msToReset: number; main: boolean }) {
+  const play = main ? `${kit.primary} ${styles.play}` : styles.play;
   return (
     <Banner date={run.date} game={SUBSTRINGS}>
       {run.status === "not_started" && (
         <>
           <Facts facts={[`${run.total} rounds`, "20 seconds each"]} />
-          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={play}>
             Play
           </ButtonLink>
-          <HowToPlay steps={GAME_2_STEPS} className={kit.small} />
+          <HowToPlay steps={GAME_2_STEPS} />
         </>
       )}
       {run.status === "in_progress" && (
         <>
           <Facts facts={["Your run is still going"]} />
-          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={play}>
             Continue
           </ButtonLink>
         </>
@@ -38,7 +41,7 @@ export function FragmentsBanner({ run, msToReset }: { run: SubstringRun; msToRes
       {run.status === "finished" && (
         <>
           <Facts facts={[pointsText(run.score!.total), ...(run.standing!.percent === null ? [] : [`better than ${run.standing!.percent}% of players`])]} />
-          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={styles.play}>
             Result
           </ButtonLink>
           <ResetCountdown label="Next puzzle in" msToReset={msToReset} />

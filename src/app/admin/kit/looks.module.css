@@ -1,6 +1,6 @@
 /* The moments in four looks (docs/milestones/M20-design-rules-and-clean-up.md, 20a; answers 18 to 24). Every value is
    one already in the app: the games' colours (globals.css, --offbeat and --fragments with their on- colours), the 4px
-   edge of the raised button (--shadow-button), the card's 14px padding, the stat's 10px 14px, the row's 8px 10px and
+   edge of the main button (--shadow-button), the card's 14px padding, the stat's 10px 14px, the row's 8px 10px and
    1.5px border, and type sizes in use (1.5rem the card heading, 1.875rem the game prompt, 2.5rem the largest heading;
    the M20 audit). Which look the moments take is the human's pick (20k). */
 .about {

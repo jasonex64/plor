@@ -11,7 +11,12 @@ const eslintConfig = defineConfig([
   // the project as a plugin object, ESLint's "Runtime Rules" (docs/SOURCES.md).
   {
     plugins: { local: { rules: { "fail-loudly": failLoudly, "no-invented-numbers": noInventedNumbers } } },
-    rules: { "local/fail-loudly": "error" },
+    rules: {
+      "local/fail-loudly": "error",
+      // CLAUDE.md's "Clean only your orphans" for imports and variables (PROCESS-lint-rules, rule 3): ESLint's own
+      // check, a warning in eslint-config-next, made an error so CI stops on it.
+      "@typescript-eslint/no-unused-vars": "error",
+    },
   },
   // App code only; tests are full of example values (answer 9).
   {

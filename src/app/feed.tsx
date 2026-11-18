@@ -317,7 +317,7 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
           </label>
           <Count text={draft} />
           {refused && <p role="alert">{refused}</p>}
-          <button type="submit" className={`${kit.primary} ${kit.small}`}>
+          <button type="submit">
             Post
           </button>
         </form>
@@ -379,7 +379,7 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
       {error && (
         <p role="alert">
           {error}{" "}
-          <button type="button" className={kit.small} onClick={() => (feed ? addPage() : void readFirst("replace"))}>
+          <button type="button" onClick={() => (feed ? addPage() : void readFirst("replace"))}>
             Try again
           </button>
         </p>
@@ -409,7 +409,7 @@ function ResultContent({ item, ids, reactable, react }: { item: FeedResultItem; 
         </div>
         {item.blurred ? (
           <p id={`${ids}-body`}>
-            <ButtonLink href={game.path} transitionTypes={FORWARD} className={kit.small}>
+            <ButtonLink href={game.path} transitionTypes={FORWARD}>
               Play to see
             </ButtonLink>
           </p>

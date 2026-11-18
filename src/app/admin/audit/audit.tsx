@@ -100,7 +100,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
           <Table head={ADDED}>
             {added.map((r) => (
               <Row key={r.id} head={ADDED} review={r} cells={[<span key="t">{r.thing?.name ?? "—"}</span>]}>
-                <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
                   Undo
                 </button>
                 <LinkTo review={r} busy={busy} decide={decide} label="Same as another answer…" />
@@ -142,7 +142,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
                     {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
                     {r.decision === "accepted" || r.decision === "linked" ? (
                       <div className={admin.actions}>
-                        <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
                           Undo
                         </button>
                       </div>
@@ -209,13 +209,13 @@ function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; d
       {/* A test run's refused text is decided as a held one when it names nothing, and as a rejected one, per meaning,
           when it names things outside the category (docs/milestones/M14-14b-11c-test-misses-to-audit.md). */}
       {(r.outcome === "held" || r.outcome === "held_subset" || (r.outcome === "reported" && r.named.length === 0)) && (
-        <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept")}>
+        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept")}>
           {r.outcome === "held_subset" ? "Accept for this category only" : "Accept"}
         </button>
       )}
       {(r.outcome === "rejected" || r.outcome === "reported") &&
         r.named.map((t) => (
-          <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
+          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
             Accept {t.name}
             {t.kinds.length > 0 && ` (${t.kinds.join(", ")})`} as {r.category_name}
           </button>
@@ -223,12 +223,12 @@ function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; d
       {/* A near-typo links to the answer it's a typo of in one click; the search is for any other (round 10, board 3). */}
       {r.outcome === "near_typo" &&
         r.near.map((t) => (
-          <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
             Link to {t.name}
           </button>
         ))}
       {r.outcome === "near_typo" && <LinkTo review={r} busy={busy} decide={decide} label={r.near.length > 0 ? "Different answer…" : "Same as…"} />}
-      <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
+      <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
         Dismiss
       </button>
     </>
@@ -256,7 +256,7 @@ function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: bool
 
   if (!open) {
     return (
-      <button type="button" className={`${kit.small} ${admin.button}`} onClick={() => setOpen(true)}>
+      <button type="button" className={admin.button} onClick={() => setOpen(true)}>
         {label}
       </button>
     );
@@ -267,13 +267,13 @@ function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: bool
         <span className="sr-only">Same as</span>
         <input value={query} placeholder="Same as…" onChange={(e) => setQuery(e.target.value)} />
       </label>
-      <button type="submit" className={`${kit.small} ${admin.button}`} disabled={busy || query.trim() === ""}>
+      <button type="submit" className={admin.button} disabled={busy || query.trim() === ""}>
         Find
       </button>
       {error && <p role="alert">{error}</p>}
       {found && found.length === 0 && <p>No {r.category_name} goes by that name.</p>}
       {found?.map((t) => (
-        <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+        <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
           Link to {t.name}
         </button>
       ))}

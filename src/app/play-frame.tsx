@@ -25,7 +25,7 @@ export function PlayFrame({ steps, out, onLeave, children }: { steps: readonly s
     <div ref={root} className={styles.frame}>
       <div className={styles.inner}>
         <div className={styles.top}>
-          <HowToPlay steps={steps} className={kit.small} />
+          <HowToPlay steps={steps} />
           <button ref={leave} type="button" className={kit.close} aria-label={out} onClick={onLeave}>
             ×
           </button>

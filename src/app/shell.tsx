@@ -200,13 +200,20 @@ export function PageName({ lost }: { lost: boolean }) {
   );
 }
 
-// Round 7's gear, 22px at stroke 2.
-const GEAR = icon(
-  <>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
-  </>,
-);
+// Round 7's gear, 22px at stroke 2, and its solid version for the sidebar's Settings, swapped under the pointer as a tab's
+// is: the gear filled, its middle cut out (docs/milestones/M20-design-rules-and-clean-up.md, answers 37 and 48).
+const GEAR_PATH = "M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z";
+const GEAR_ART: TabArt = {
+  outline: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d={GEAR_PATH} />
+    </>
+  ),
+  fill: <path d={GEAR_PATH} />,
+  cut: <circle cx="12" cy="12" r="3" />,
+};
+const GEAR = icon(GEAR_ART.outline);
 
 // Rendered into <body>, beside the page's <main>, so the navigation isn't inside the main landmark (M14 14a-1
 // review). The frame (Frame, src/app/home.tsx), which renders it, runs only on the client (it reads the address bar
@@ -282,12 +289,12 @@ export function Shell({ lost, admin, profile, streak, requests, onChanged, onSet
           })}
         </ul>
         {admin && (
-          <Link href="/admin" className={styles.admin} aria-current={!lost && (path === "/admin" || path.startsWith("/admin/")) ? "true" : undefined}>
+          <Link href="/admin" className={`${styles.admin} ${kit.hover}`} aria-current={!lost && (path === "/admin" || path.startsWith("/admin/")) ? "true" : undefined}>
             Admin
           </Link>
         )}
         <button type="button" className={styles.settings} aria-haspopup="dialog" onClick={open}>
-          <span className={styles.icon}>{GEAR}</span>
+          <TabIcon art={GEAR_ART} />
           Settings
         </button>
       </nav>

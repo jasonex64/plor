@@ -90,7 +90,7 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
           const offbeatDay = offbeat.find((o) => o.date === d);
           const { label, tone } = offbeatDay ? stateOf(offbeatDay) : { label: "Not drafted", tone: `${kit.chip} ${kit.danger}` };
           return (
-            <button key={d} type="button" className={picked ? `${kit.small} ${styles.day} ${styles.chosen}` : `${kit.small} ${styles.day}`} aria-pressed={picked} onClick={() => setChosen(d)}>
+            <button key={d} type="button" className={picked ? `${styles.day} ${styles.chosen}` : styles.day} aria-pressed={picked} onClick={() => setChosen(d)}>
               <span>{dayText(d)}</span>
               <span className={tone}>{label}</span>
             </button>
@@ -201,7 +201,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
           </ButtonLink>
           {editable && (
             <>
-              <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
+              <button type="button" className={`${kit.primary} ${admin.button}`} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
                 {day.live ? "Approve again" : "Approve day"}
               </button>
               {toFix > 0 && (

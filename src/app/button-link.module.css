@@ -1,6 +1,6 @@
-/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: the buttons' one 44px height
-   (M14 14b-10, answer 7), on the surface colour, with the buttons' ink border, corners, hard shadow and press
-   (globals.css; M14 14b-8). */
+/* A link drawn as a button, as the buttons are (globals.css): flat, a 1.5px ink outline, the small corners, 14px 700, at
+   the buttons' one 44px height (M14 14b-10, answer 7; docs/milestones/M20-design-rules-and-clean-up.md, answers 6 and
+   45). The main action's link takes the kit's .primary, raised. */
 .button {
   box-sizing: border-box;
   display: inline-flex;
@@ -8,42 +8,11 @@
   justify-content: center;
   gap: 6px;
   min-height: 44px;
-  padding: 0 16px;
-  border: 2px solid var(--ink);
-  border-radius: var(--r-button);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow-button);
+  padding: 0 10px;
+  border: 1.5px solid var(--flat-edge, var(--ink));
+  border-radius: var(--r-small);
+  color: var(--flat-text, var(--text));
+  font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
-  transition:
-    transform var(--quick) var(--ease),
-    box-shadow var(--quick) var(--ease);
 }
-
-/* Lifts on hover as a button does (globals.css; 14b-10, answers 12 and 14). */
-@media (hover: hover) {
-  .button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 0 var(--ink);
-  }
-}
-
-.button:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 var(--ink);
-  transition-duration: 80ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .button {
-    transition: none;
-  }
-
-  .button:hover,
-  .button:active {
-    transform: none;
-    box-shadow: var(--shadow-button);
-  }
-}
-

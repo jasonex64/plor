@@ -38,7 +38,7 @@ export function GuestPeek() {
       <div className={`${kit.card} ${styles.ask}`}>
         <p id={words}>Make an account to keep your streak, see your friends and play today&apos;s game for points</p>
         <p>
-          <ButtonLink href={SIGN_IN_HREF} transitionTypes={BACK} className={kit.primary}>
+          <ButtonLink href={SIGN_IN_HREF} transitionTypes={BACK}>
             Make an account
           </ButtonLink>
         </p>

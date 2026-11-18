@@ -1,6 +1,6 @@
 # Process — Mistakes become lint rules; visible changes come with screenshots and video
 
-**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). Rule 1 of 5, `local/fail-loudly`, merged in #275. **Rule 2, `local/no-invented-numbers`, in review** on `process-lint-rules` (its PR); rules 3 to 5 and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
+**Status:** in progress (approved 2026-11-17, the human: "Approve it"; ticket and sources merged in #274). Twenty-eight questions answered (below, quoted). Rule 1, `local/fail-loudly`, merged in #275; rule 2, `local/no-invented-numbers`, merged in #276. **Rule 3, unused imports and variables, in review** on `process-lint-rules` (its PR); rules 4 and 5 and the screenshots wait. The desktop size of a visual test is still to confirm (Numbers).
 
 ## Goal
 A mistake an agent makes in code is caught by a lint rule every time, not by a sentence the next agent has to remember. Every change a player can see comes with screenshots and a video, taken by CI.
@@ -87,7 +87,7 @@ The human asked: "if there's a mistake, instead of [adding rules to a document] 
 |---|---|---|
 | Fail loudly | a `catch` that is empty (unless its comment starts with `Expected:`, answer 14), or only logs and carries on | **built**: 3 in `src/`, `e2e/`, `scripts/`, all deliberate, now marked |
 | No invented numbers | a number in app code without a comment naming its source (a ticket answer, a `docs/` path, a URL, "human, <date>"; answer 17) on its line, above it or above what encloses it (answers 10, 18); not 0, 1, 2, 24, 60, 100, 360, 1000 (answers 6, 16) or an array index; test files exempt (answer 9) | **built**: 516 at first; 236 HTTP statuses became `STATUS` names (answer 15), the rest sourced or derived (answers 19 to 28) |
-| Clean only your orphans | unused imports and variables, as an error | to count |
+| Clean only your orphans | unused imports and variables, as an error | **built**: 0 (ESLint's own `@typescript-eslint/no-unused-vars`, a warning before); the bullet keeps what lint can't see |
 | Never cheat a check | `.skip`, `.only`, `.fixme` in a test | 0 |
 | Least privilege | `service_role` or `SERVICE_ROLE` in app code | 0 |
 
@@ -155,6 +155,10 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 - Hypothesis for answer 27 (8 to 4 steps): no frame shows a different whole number; disproved (5 of 400,000 sampled moments, 1 off), recorded in answer 27.
 - No player-visible change except answer 27's.
 
+**Rule 3, unused imports and variables** (2026-11-17, slot 3):
+- Hypothesis: the check is already on as a warning and lint shows no warnings, so 0 places. `npx eslint --print-config` → `"@typescript-eslint/no-unused-vars": [1]`; `npm run lint` with it at error → exit 0. Held.
+- It is ESLint's own rule, so no test file (CLAUDE.md, Testing: "Don't test … framework behaviour"). Shown on a throwaway `src/orphan-probe.ts` (an unused import, an unused variable) → `'readFileSync' is defined but never used` and `'unused' is assigned a value but never used`, both `error`; the probe deleted after.
+
 ## Review
 **Rule 1, `local/fail-loudly`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings and how each was fixed: none.
@@ -163,3 +167,7 @@ The converted and dropped sentences in CLAUDE.md; the `video: process.env.CI ? "
 **Rule 2, `local/no-invented-numbers`** (the `reviewer` agent, 2026-11-17, fresh context):
 - Blocking findings and how each was fixed: none that stand. It named HANDOFF.md and a ROADMAP row; CLAUDE.md says a `process-` branch leaves the handoff alone (its PR says where it stands), and process tickets have no ROADMAP row.
 - Deferred to ROADMAP "Next revision" (For PROCESS-lint-rules): "answer N" passes without a ticket named; one comment above a function covers all of it; two comments to tidy; the values kept as built with no further origin.
+
+**Rule 3, unused imports and variables** (the `reviewer` agent, 2026-11-17, fresh context):
+- Blocking findings: none. It confirmed the error level on .ts, .tsx and .mjs files in src, e2e, scripts and eslint-rules.
+- Non-blocking, nothing to defer: the rule has no committed test and the probe is described, not re-runnable; both follow from it being ESLint's own rule.

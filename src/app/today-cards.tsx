@@ -17,7 +17,6 @@ import { FINISHED, type RunStatus } from "@/game/status";
 import { api } from "@/lib/api-client";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { BannerSkeleton, TodayBanner } from "./game";
-import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { runRoutes, substringRoutes } from "./run-routes";
 import { todayCards } from "./today-games";
@@ -79,14 +78,14 @@ export function TodayCards({
     return () => clearTimeout(timer);
   }, [msToReset, onDayOver]);
 
-  const shown = cards.map((card) =>
+  const shown = cards.map((card, i) =>
     card === GAME.id ? (
       <section key={card} id="offbeat" aria-label={GAME.name}>
-        <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} onOver={onOver} onDayOver={onDayOver} />
+        <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} main={i === front} onOver={onOver} onDayOver={onDayOver} />
       </section>
     ) : (
       <section key={card} aria-label={SUBSTRINGS.name}>
-        <FragmentsBanner run={days!.fragments!} msToReset={days!.offbeat.run ? days!.offbeat.run.msToReset : days!.offbeat.msToReset} />
+        <FragmentsBanner run={days!.fragments!} msToReset={days!.offbeat.run ? days!.offbeat.run.msToReset : days!.offbeat.msToReset} main={i === front} />
       </section>
     ),
   );
@@ -138,13 +137,13 @@ function Carousel({ front, onPlace, children }: { front: number; onPlace: (place
           </p>
           <div className={styles.nav}>
             {/* Unavailable at an end, and still in its place, so the row doesn't shift (as How to play's Previous). */}
-            <button type="button" className={kit.small} aria-label="Previous game" aria-disabled={at === 0} onClick={() => go(at - 1)}>
+            <button type="button" aria-label="Previous game" aria-disabled={at === 0} onClick={() => go(at - 1)}>
               ‹
             </button>
             <span className={styles.place} aria-hidden="true">
               {at + 1} of {children.length}
             </span>
-            <button type="button" className={kit.small} aria-label="Next game" aria-disabled={at === children.length - 1} onClick={() => go(at + 1)}>
+            <button type="button" aria-label="Next game" aria-disabled={at === children.length - 1} onClick={() => go(at + 1)}>
               ›
             </button>
           </div>

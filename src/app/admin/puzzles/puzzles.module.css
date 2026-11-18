@@ -1,6 +1,6 @@
 /* Puzzles (round 10, board 1): the days as a row of buttons, the chosen one marked; host answers as chips 30px tall
-   (44px on phones), the checked ones filled in the accent with a tick. In the new look (M14 14b-8d) the days are the
-   kit's small buttons, the chosen one in the soft fill as the sidebar's current item is, and the answers the kit's
+   (44px on phones), the checked ones filled in the accent with a tick. In the new look (M14 14b-8d) the days are flat
+   buttons, the chosen one in the soft fill as the sidebar's current item is, and the answers the kit's
    chips; the rules below are scoped above the kit's one class, so the CSS load order can't decide (14b-8b review). */
 .days {
   display: flex;
