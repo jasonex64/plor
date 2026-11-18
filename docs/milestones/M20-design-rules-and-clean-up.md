@@ -155,7 +155,7 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 
 **20b — buttons** (answers 6 and 11).
 - The raised look only on a screen's main action; every other button and button-drawn link becomes the flat kit button with the hover rule. The raised button no longer stands taller than a field beside it.
-- Since 2026-11-17 evening: the hover rule on everything pressable, Settings and Admin included (answer 37); the round Close becomes a bare icon with the square fill (answer 38); the comment's game picker becomes a switch and the group picker a dropdown with the kit's arrow (answer 39).
+- Since 2026-11-17 evening: the hover rule on everything pressable, Settings and Admin included (answer 37); the round Close becomes a bare icon with the square fill (answer 38); the comment's game picker becomes a switch and the group picker a dropdown with the kit's arrow (answer 39). **Answer 39 was not built in 20b's PR (#277)** (found on 20k-3's screenshots, 2026-11-18): the feed's and comments' Game picker and the leaderboard card's Friends / group picker still draw the browser's own arrow. It waits for its own PR.
 - → verify: `e2e/look.e2e.ts` gains a check that, in each of the four rows above, the button's and the field's painted tops and bottoms match; and that each of the main tabs has at most one raised button in view.
 
 **20c — spacing and alignment.**

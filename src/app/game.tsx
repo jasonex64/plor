@@ -582,7 +582,13 @@ export function Band({ game, date }: { game: typeof GAME | typeof SUBSTRINGS; da
   return (
     <div className={styles.band}>
       <h2>{game.name}</h2>
-      {date && <p>{longDate(date)}</p>}
+      {/* "Offbeat · Tuesday 17 November", as the Balanced sample's band reads; the dot is seen, not read. */}
+      {date && (
+        <p>
+          <span aria-hidden="true">· </span>
+          {longDate(date)}
+        </p>
+      )}
     </div>
   );
 }
