@@ -262,7 +262,7 @@ export function Comments({
               <li
                 key={c.id}
                 data-comment={c.id}
-                className={arrived.has(c.id) ? `${kit.row} ${kit.bare} ${styles.comment} ${kit.pop}` : `${kit.row} ${kit.bare} ${styles.comment}`}
+                className={arrived.has(c.id) ? `${kit.row} ${kit.bare} ${styles.comment} ${kit.fade}` : `${kit.row} ${kit.bare} ${styles.comment}`}
               >
                 <CommentContent
                   comment={c}

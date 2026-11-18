@@ -68,6 +68,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await player.goto("/");
   await play(player);
   await expect(row).toHaveText(started);
+  // The status that changed fades in over 400ms (M20 20k-2, answers 57 and 58); the name beside it doesn't move.
+  const status = row.locator("span[class*='status']");
+  expect(await status.evaluate((el) => [/fade/.test(getComputedStyle(el).animationName), getComputedStyle(el).animationDuration])).toEqual([true, "0.4s"]);
+  expect(await row.locator("b").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   await caughtToCards(player, hostAnswer);
   await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
   // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent

@@ -343,7 +343,7 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
                 aria-describedby={`${id}-body`}
                 aria-posinset={i + 1}
                 aria-setsize={items.length}
-                className={item.kind === "comment" && arrived.has(item.id) ? `${styles.item} ${kit.pop}` : styles.item}
+                className={item.kind === "comment" && arrived.has(item.id) ? `${styles.item} ${kit.fade}` : styles.item}
               >
                 {line && <p className={styles.date}>{line}</p>}
                 {/* A result carries its game's colour and a comment no box, so the two don't look alike (inbox #243;

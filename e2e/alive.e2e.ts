@@ -148,6 +148,8 @@ test("a number counts up from what this browser last showed, within 600ms, and n
   }
 });
 
+// Since M20 20k-2 (docs/milestones/M20-design-rules-and-clean-up.md, answers 35, 36, 57 and 58) a comment that arrives fades
+// in over 400ms and a reaction you add pops in over 300ms.
 test("a friend's row takes the tint under the pointer, and a reaction you add and a comment that arrives pop in", async ({ browser }) => {
   test.slow();
   const friend = await (await browser.newContext({ viewport: WIDE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
@@ -160,6 +162,9 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await caught(friend);
   await caught(page);
   const popping = (el: Locator) => el.evaluate((e) => getComputedStyle(e).animationName !== "none");
+  // Which motion, by its keyframes' name (a CSS Module adds a prefix), and how long.
+  const motion = (el: Locator) =>
+    el.evaluate((e) => ({ kind: /fade/.test(getComputedStyle(e).animationName) ? "fade" : /pop/.test(getComputedStyle(e).animationName) ? "pop" : "none", ms: getComputedStyle(e).animationDuration }));
 
   // A friend's row on the leaderboard (not the player's own, which is tinted already) takes the tint under the pointer.
   await page.goto("/");
@@ -177,7 +182,7 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await page.getByLabel("Comment to your friends").fill("First, mine.");
   await page.getByRole("button", { name: "Post" }).click();
   await expect(mine).toBeVisible();
-  expect(await popping(mine)).toBe(true);
+  expect(await motion(mine)).toEqual({ kind: "fade", ms: "0.4s" });
   await sent(page, "/api/comments");
   await expect(mine.getByRole("button", { name: /^Actions for / })).toBeVisible();
   expect(await popping(mine)).toBe(false);
@@ -189,7 +194,7 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await sent(friend, "/api/comments");
   const theirs = feed.getByRole("article").filter({ hasText: "Then, theirs." });
   await expect(theirs).toBeVisible();
-  expect(await popping(theirs)).toBe(true);
+  expect(await motion(theirs)).toEqual({ kind: "fade", ms: "0.4s" });
   expect(await popping(mine)).toBe(false);
 
   // A reaction added pops its emoji in, in the comment's summary (14b-13: picked from its ⋯); one already shown when the
@@ -207,6 +212,6 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   const laugh = theirs.getByText(/^😂 1/);
   await expect(laugh).toBeVisible();
   // The count shows a render before useGrown's effect adds the pop, so one read can land between them (PR #155's CI).
-  await expect.poll(() => popping(laugh.locator("span").first())).toBe(true);
+  await expect.poll(() => motion(laugh.locator("span").first())).toEqual({ kind: "pop", ms: "0.3s" });
   expect(await popping(thumbs.locator("span").first())).toBe(false);
 });
