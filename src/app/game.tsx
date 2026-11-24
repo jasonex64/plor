@@ -511,8 +511,8 @@ function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
 }
 
 // A finished run in the banner: the score, how it ended, the result's details and the time to the next puzzle. The
-// details are on the game screen, under #result. With the result already drawn and shown (the game screen's own
-// banner; a game screen visited before stays in the document, hidden, under Today), Result scrolls to it without
+// details are on the game screen, under #result, in its one card (M20 20n-4), which has no Result of its own. With the
+// result already drawn and shown (a game screen visited before stays in the document, hidden, under Today), Result scrolls to it without
 // putting #result in the address, as Result does once it's drawn (docs/milestones/M14-14b-23-small-jumps-and-finds.md,
 // answer 2).
 function Score({ run }: { run: RunState }) {
