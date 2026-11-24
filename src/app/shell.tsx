@@ -26,7 +26,7 @@ import { CountUp } from "./count-up";
 import { useNew } from "./shown";
 import kit from "./kit.module.css";
 import styles from "./shell.module.css";
-import { GAME } from "@/platform/game";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 import { FORWARD } from "./slide";
 import { markToPlay } from "./to-play";
 
@@ -168,7 +168,7 @@ function TabIcon({ art }: { art: TabArt }) {
 function current(path: string, href: string, sidebar: boolean): "page" | "true" | undefined {
   if (path === href) return "page";
   // The game screen is opened from Today (docs/milestones/M14-14a-2b-game-screen.md).
-  if (href === "/" && path === GAME.path) return "true";
+  if (href === "/" && (path === GAME.path || path === SUBSTRINGS.path)) return "true";
   // On phones Admin is reached from the Me tab (MeAdminLink), so the admin pages sit under it; the sidebar has its own
   // Admin (round 10).
   if (href === "/me" && !sidebar && (path === "/admin" || path.startsWith("/admin/"))) return "true";

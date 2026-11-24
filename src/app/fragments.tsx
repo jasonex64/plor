@@ -7,9 +7,12 @@
 import { useCallback, useState } from "react";
 import { SUBSTRINGS, SUBSTRINGS_ID } from "@/platform/game";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { ButtonLink } from "./button-link";
 import { Comments } from "./comments";
 import { LiveStatus } from "./live-status";
+import styles from "./offbeat.module.css";
 import { SideColumn } from "./side-column";
+import { BACK } from "./slide";
 import { SubstringsScreen } from "./substrings";
 
 const FRAGMENTS_ONLY = [SUBSTRINGS_ID] as const;
@@ -30,12 +33,21 @@ export function FragmentsScreen({ username, name }: { username: string; name: st
     },
   });
   return (
-    <>
-      <SubstringsScreen onOver={reportOver} onPlaying={setPlaying} />
-      <SideColumn label={`${SUBSTRINGS.name} comments`} inPlace hidden={playing}>
+    // Offbeat's screen's layout (offbeat.module.css): Back to Today, the game, then the thread, 16px apart (M20 20n-4,
+    // answer 83; the second look audit's finding 6: the card and the comments touched).
+    <div className={styles.screen}>
+      <p className={styles.back} hidden={playing}>
+        <ButtonLink href="/" transitionTypes={BACK}>
+          <span aria-hidden="true">‹ </span>Today
+        </ButtonLink>
+      </p>
+      <div className={styles.game}>
+        <SubstringsScreen onOver={reportOver} onPlaying={setPlaying} />
+      </div>
+      <SideColumn label={`${SUBSTRINGS.name} comments`} inPlace className={styles.feed} hidden={playing}>
         <LiveStatus channel={channel} />
         <Comments username={username} name={name} runOver={runOver} nudge={commentsNudge} games={FRAGMENTS_ONLY} title={`${SUBSTRINGS.name} comments`} />
       </SideColumn>
-    </>
+    </div>
   );
 }

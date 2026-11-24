@@ -293,3 +293,48 @@ test("each game's card is a white card with its game's band, and once played the
     expect(await score(region).evaluate((e) => getComputedStyle(e).fontSize)).toBe("30px");
   }
 });
+
+// M20 20n-4 (the second look audit's findings 6 and 8; answers 83 and 84): each game's start screen has Back to Today
+// above one card that holds the game's band, the rules, Start and How to play, with Today marked; each result is one
+// card, the band and the score over the details, with no Result button leading to where the player already is.
+test("each game's start is Back to Today and one card with its band, the rules, Start and How to play; each result is one card", { tag: "@visual" }, async ({ page }) => {
+  test.slow();
+  await addDay();
+  await page.goto("/");
+  await signInAndPick(page, "gcs");
+  const main = page.getByRole("main");
+  const tab = page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: /^Today/ }).filter({ visible: true });
+  // The card an element is in: its band's heading, whether the band has the day, and the card's buttons on show (How to
+  // play's closed dialog is in the card too).
+  // The kit's card: a class that ends in "_card", as the build names kit.module.css's .card.
+  const CARD = "[class$='_card'], [class*='_card ']";
+  const cardOf = (el: Locator) =>
+    el.evaluate((node, CARD) => {
+      const card = node.closest(CARD);
+      const band = card?.querySelector("h2");
+      if (!card || !band) return { band: null, day: false, buttons: [] };
+      return { band: band.textContent, day: band.parentElement!.querySelector("p") !== null, buttons: [...card.querySelectorAll("button")].filter((b) => b.checkVisibility()).map((b) => b.textContent) };
+    }, CARD);
+  for (const game of [GAME, SUBSTRINGS]) {
+    await page.goto(game.path);
+    const start = main.getByRole("button", { name: "Start", exact: true }).filter({ visible: true });
+    await expect(start).toBeVisible();
+    await expect(main.getByRole("link", { name: "Today", exact: true }).filter({ visible: true })).toHaveAttribute("href", "/");
+    await expect(tab).toHaveAttribute("aria-current", "true");
+    expect(await cardOf(start), game.name).toEqual({ band: game.name, day: true, buttons: ["Start", "How to play"] });
+    // The rules are in the card too, above Start.
+    expect(await start.evaluate((b, CARD) => /\d+ (questions|rounds)/.test(b.closest(CARD)!.textContent!), CARD), game.name).toBe(true);
+  }
+
+  await page.goto("/");
+  await finishOffbeat(page);
+  await finishFragments(await idOf("gcs"));
+  for (const [game, detail] of [[GAME, "You survived 0 of 7 questions"], [SUBSTRINGS, "Your score"]] as const) {
+    await page.goto(game.path);
+    const words = main.getByText(detail).filter({ visible: true });
+    await expect(words).toBeVisible();
+    expect((await cardOf(words)).band, game.name).toBe(game.name);
+    await expect(main.getByRole("link", { name: "Result", exact: true }).filter({ visible: true })).toHaveCount(0);
+    await expect(main.getByRole("link", { name: "Today", exact: true }).filter({ visible: true })).toHaveAttribute("href", "/");
+  }
+});
