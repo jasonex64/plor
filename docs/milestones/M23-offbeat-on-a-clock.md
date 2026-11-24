@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is built, in its PR; 23c and 23b-2 are approved, not started. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c is approved and next; 23b-2 is approved, not started. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
@@ -101,7 +101,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 
 ## Sub-tickets, in order (one PR each)
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
-- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 built, in its PR; 23b-2 not started): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
+- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 not started): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens.** The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
