@@ -172,7 +172,8 @@
   gap: 6px;
 }
 
-.answered > :first-child {
+/* The question's line and the open search take the row's width; the closed Search answers button keeps its own. */
+.answered > div {
   align-self: stretch;
 }
 

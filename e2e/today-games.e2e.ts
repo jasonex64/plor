@@ -379,4 +379,8 @@ test("Offbeat's result rows are stacked: the question in bold with a Safe or Cau
   await expect(rows.nth(0)).toContainText("+25 points, bonus +0");
   await expect(rows.nth(1)).toContainText("You: apple · Host: apple");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  // Opened, the search is the row's width, not a narrow box at its left (20n-5's review).
+  await rows.nth(0).getByRole("button", { name: "Search answers", exact: true }).click();
+  const [box, row] = await Promise.all([rows.nth(0).getByRole("searchbox").or(rows.nth(0).getByRole("textbox")).boundingBox(), rows.nth(0).boundingBox()]);
+  expect(box!.width).toBeGreaterThan(row!.width * 0.6);
 });

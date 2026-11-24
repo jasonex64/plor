@@ -825,6 +825,7 @@ function Result({ run, share, search, focus }: { run: RunState; share: boolean; 
             <div className={`${kit.grow} ${styles.answered}`}>
               <div className={kit.head}>
                 <strong>{a.prompt}</strong>
+                <span className="sr-only">: </span>
                 <span className={a.matched ? `${kit.chip} ${kit.caught}` : `${kit.chip} ${kit.safe}`}>{a.matched ? "Caught" : "Safe"}</span>
               </div>
               <span>
