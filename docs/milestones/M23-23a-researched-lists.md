@@ -1,6 +1,6 @@
 # M23 23a — A researched list's format and its way into the database
 
-**Status:** designed 2026-11-23 from answers 17 to 24 in `M23-offbeat-on-a-clock.md`; **not approved to build**. Nothing is built.
+**Status:** approved 2026-11-23 (the human: "Approve 23a"), from answers 17 to 24 in `M23-offbeat-on-a-clock.md`. Being built on `m23-offbeat-on-a-clock`.
 
 ## Goal
 An everyday question's answers come from one file in git that a person can read and edit, and the game judges against exactly that file.
@@ -46,7 +46,7 @@ An everyday question's answers come from one file in git that a person can read 
 
 **Into the database, through the tree that already exists.** Membership today is "every thing under the category's root". A researched category gets a root of its own and each answer becomes a thing directly under it, so judging, typo matching, search, the admin's pool and the miss audit all work unchanged, with no second membership rule.
 - `data/categories.json`: the category's entry changes from `"source": "oewn", "root": "<synset>"` to `"source": "research", "root": "<key>"`.
-- `npm run base -- load research` reads every file in `content/lists/` and loads it through `private.import_source`, like any other set; `load all` includes it. Aliases are stored with origin `ai`.
+- `npm run base -- load research` reads every file in `content/lists/` and loads it through `private.import_source`, like any other set; `load all` includes it. Aliases are stored with origin `source` and the ref `research:<snapshot>`, as `import_source` stores every set's (corrected at step 1; the draft said `ai`).
 - One migration: `'research'` joins the allowed values of `private.thing_source.source`. No grant, role or policy changes, so this is not a security change.
 - The hosted database gets it the usual way, by the human's own `npm run base -- hosted load`, and not before the switch (23f).
 
@@ -88,5 +88,11 @@ Hypothesis for step 5: a category whose root is a research thing needs no change
 |---|---|---|
 
 ## Evidence
+**Step 1, read by the main session, 2026-11-23** (`supabase/migrations/20261028140000_baseline.sql`, `…_test_runs.sql`):
+- `private.import_source(p_source, p_snapshot, p_items)` (baseline 1521) takes any source name; the only gate on a new one is `thing_source`'s check (`'wikidata','col','oewn','usda'`), which the migration widens. It needs no manifest or snapshot file itself: `p_snapshot` is a label kept in `source_ref`. It writes aliases with origin `source`. In a full load, a name or fact the files no longer give is ended by `load_finish`, so deleting a line from a list removes the answer.
+- `private.define_category(p_key, p_name, p_source, p_root, p_member_of)` (baseline 1309) resolves the root with `thing_by_ref(p_source, p_root)`: a `research` root works once the list's root item is loaded.
+- `category_members` (baseline 1392) and `resolve_in` (test_runs 12) walk `kind_of` from the root and read no source. The hypothesis holds on reading; step 5's tests are what prove it.
+- `resolve_in` judges by the root frozen in the approved day's question, so an old day keeps its old root (criterion 4).
+- Found, not designed for: `category_extra` rows (answers an admin accepted for bed, acid or cake) still count beside the researched list. Left as it is; the conversion checks each is on the list or says which is not.
 
 ## Review
