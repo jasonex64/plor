@@ -53,6 +53,12 @@ The game:
 27. 23c, a guest's run: "The same full run (Recommended)".
 28. 23c, a lost connection or closed tab: "Clock keeps running (Recommended)". The server's clock never stops; coming back before zero carries on with what is left.
 
+Second round (2026-11-24):
+29. 23b, where a strike on the admin page lives: "In the database, folded into the file later (Recommended)". It takes effect at the next midnight; a later Claude session copies strikes into the list files, so git stays the full record.
+30. 23b, where the review happens: "On plor.app's admin (Recommended)". The researched lists are loaded into plor.app's database before the switch, by the human's own load command (and the migration by `npx supabase db push`). This changes the earlier "nothing to the hosted database until the switch" for the lists alone; the beta is paused, so no player sees it.
+31. 23c, the least time an answer adds: "Never less than 1 second". Not the recommended option: its stated cost is that a fast typist can keep a run going a long time. Commons reach the floor after about 22 accepted answers, rares after about 41.
+32. 23c, a second tab or device on a running run: "Both show the same run (Recommended)".
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
@@ -115,7 +121,7 @@ What it showed: most of the gain is short forms ("king", "citric", "chocolate");
 | 2 | Research passes a question needs | Human, 2026-11-23, answer 3 |
 | 21 | Questions researched before the first week can be drafted | 7 days of 3 (answer 5) |
 | | Offbeat's new par | Blank: the human picks after the first week of real runs (answer 14) |
-| | Whether the shrink has a floor (a least time an answer adds) | Blank: ask in 23c |
+| 1 s | The least time an accepted answer adds | Human, 2026-11-24, answer 31 |
 | | How many days must be ready before the switch | Blank: ask in 23f |
 
 ## Still to ask (each in its sub-ticket, before that part is designed)
