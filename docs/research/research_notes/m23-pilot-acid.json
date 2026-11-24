@@ -1,0 +1,2278 @@
+{
+ "prompt": "Name an acid",
+ "rules": [
+  "Individual amino acids: accept those with 'acid' in the usual name (glutamic, aspartic, GABA); the other 18 standard ones (glycine, lysine, ...) are listed borderline/rare, default refuse, because the player named an amino acid rather than something called an acid. The class 'amino acid' is accepted.",
+  "DNA/RNA: accept deoxyribonucleic acid and ribonucleic acid with DNA and RNA as aliases; 'nucleic acid' accepted as a class.",
+  "Everyday acidic things: accept vinegar and lemon juice as borderline everyday acids; battery acid and stomach/gastric acid are aliases of sulfuric and hydrochloric. Refuse bare 'stomach', 'soda', 'soap', 'bleach' (alkaline hypochlorite), 'acid rain', 'cyclic'. 'Carbonated water' is not accepted; 'carbonic' is.",
+  "Slang: bare 'acid' refused (it echoes the prompt); 'LSD' and 'lysergic acid diethylamide' borderline-accept as the slang pun; 'lysergic acid' is a real acid, accepted.",
+  "Classes (carboxylic, fatty, amino, nucleic, mineral, organic, alpha hydroxy) accepted; 'strong acid' and 'weak acid' refused as they name no acid.",
+  "Salts, esters and bases named alone (citrate, sodium hydroxide) refused."
+ ],
+ "answers": [
+  {
+   "name": "sulfuric acid",
+   "aliases": [
+    "sulfuric",
+    "sulphuric acid",
+    "sulphuric",
+    "H2SO4",
+    "battery acid",
+    "oil of vitriol"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.sciencefocus.com/science/most-powerful-acid",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "hydrochloric acid",
+   "aliases": [
+    "hydrochloric",
+    "HCl",
+    "muriatic acid",
+    "muriatic",
+    "hydrogen chloride",
+    "stomach acid",
+    "gastric acid",
+    "gastric juice"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "note": "Stomach acid accepted as alias because it is hydrochloric acid; bare 'stomach' is not.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "citric acid",
+   "aliases": [
+    "citric"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "nitric acid",
+   "aliases": [
+    "nitric",
+    "HNO3",
+    "aqua fortis"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "acetic acid",
+   "aliases": [
+    "acetic",
+    "ethanoic acid",
+    "CH3COOH"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "hydrofluoric acid",
+   "aliases": [
+    "hydrofluoric",
+    "HF",
+    "hydrogen fluoride"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.chm.bris.ac.uk/motm/HF/HFh.htm"
+   ]
+  },
+  {
+   "name": "phosphoric acid",
+   "aliases": [
+    "phosphoric",
+    "H3PO4"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.wikipedia.com/wiki/Food_acid",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "ascorbic acid",
+   "aliases": [
+    "ascorbic",
+    "vitamin C"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "lactic acid",
+   "aliases": [
+    "lactic"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "carbonic acid",
+   "aliases": [
+    "carbonic",
+    "H2CO3"
+   ],
+   "tier": "first10",
+   "fit": "yes",
+   "note": "Fizzy drinks; textbook standard weak acid.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "salicylic acid",
+   "aliases": [
+    "salicylic",
+    "BHA",
+    "beta hydroxy acid"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "glycolic acid",
+   "aliases": [
+    "glycolic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "hyaluronic acid",
+   "aliases": [
+    "hyaluronic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "note": "Skincare; a polysaccharide, not a classic acid, but universally called one.",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "boric acid",
+   "aliases": [
+    "boric",
+    "H3BO3"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "oxalic acid",
+   "aliases": [
+    "oxalic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/14%3A_Acids_and_Bases/14.02%3A_Acids-_Properties_and_Examples"
+   ]
+  },
+  {
+   "name": "formic acid",
+   "aliases": [
+    "formic",
+    "methanoic acid"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "benzoic acid",
+   "aliases": [
+    "benzoic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "tartaric acid",
+   "aliases": [
+    "tartaric"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "malic acid",
+   "aliases": [
+    "malic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://www.wikipedia.com/wiki/Food_acid",
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "hydrobromic acid",
+   "aliases": [
+    "hydrobromic",
+    "HBr"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "hydroiodic acid",
+   "aliases": [
+    "hydroiodic",
+    "hydriodic acid",
+    "hydriodic",
+    "HI"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "perchloric acid",
+   "aliases": [
+    "perchloric",
+    "HClO4"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "chloric acid",
+   "aliases": [
+    "chloric",
+    "HClO3"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Listed as strong in some textbooks.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://byjus.com/chemistry/list-of-strong-acids"
+   ]
+  },
+  {
+   "name": "hypochlorous acid",
+   "aliases": [
+    "hypochlorous",
+    "HOCl"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "chromic acid",
+   "aliases": [
+    "chromic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "folic acid",
+   "aliases": [
+    "folic",
+    "folate",
+    "vitamin B9"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "uric acid",
+   "aliases": [
+    "uric"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "acetylsalicylic acid",
+   "aliases": [
+    "aspirin",
+    "acetylsalicylic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "note": "Aspirin accepted by its common name.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "amino acid",
+   "aliases": [
+    "amino acids",
+    "aminoacid"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "fatty acid",
+   "aliases": [
+    "fatty acids"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "nucleic acid",
+   "aliases": [
+    "nucleic acids"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Acid",
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "deoxyribonucleic acid",
+   "aliases": [
+    "DNA",
+    "deoxyribonucleic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "ribonucleic acid",
+   "aliases": [
+    "RNA",
+    "ribonucleic"
+   ],
+   "tier": "common",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "carboxylic acid",
+   "aliases": [
+    "carboxylic",
+    "carboxylic acids"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Acid",
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "sorbic acid",
+   "aliases": [
+    "sorbic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "stearic acid",
+   "aliases": [
+    "stearic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "oleic acid",
+   "aliases": [
+    "oleic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "palmitic acid",
+   "aliases": [
+    "palmitic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "linoleic acid",
+   "aliases": [
+    "linoleic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "omega-3 fatty acid",
+   "aliases": [
+    "omega-3",
+    "omega 3",
+    "omega-3 fatty acids"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Fatty-acid class; familiar from fish oil.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "mineral acid",
+   "aliases": [
+    "inorganic acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "organic acid",
+   "aliases": [
+    "organic acids"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Recognised class.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "alpha hydroxy acid",
+   "aliases": [
+    "AHA",
+    "alpha hydroxy",
+    "hydroxy acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Skincare class.",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "mandelic acid",
+   "aliases": [
+    "mandelic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "azelaic acid",
+   "aliases": [
+    "azelaic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "kojic acid",
+   "aliases": [
+    "kojic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "ferulic acid",
+   "aliases": [
+    "ferulic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "lipoic acid",
+   "aliases": [
+    "alpha-lipoic acid",
+    "lipoic",
+    "alpha lipoic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging"
+   ]
+  },
+  {
+   "name": "trichloroacetic acid",
+   "aliases": [
+    "TCA",
+    "trichloroacetic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "gluconic acid",
+   "aliases": [
+    "gluconic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "trifluoroacetic acid",
+   "aliases": [
+    "TFA",
+    "trifluoroacetic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "fluoroantimonic acid",
+   "aliases": [
+    "fluoroantimonic",
+    "magic acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Famous as strongest superacid; 'magic acid' is a related superacid kept as alias.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://www.sciencefocus.com/science/most-powerful-acid"
+   ]
+  },
+  {
+   "name": "triflic acid",
+   "aliases": [
+    "trifluoromethanesulfonic acid",
+    "triflic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "methanesulfonic acid",
+   "aliases": [
+    "methanesulfonic",
+    "MSA"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "p-toluenesulfonic acid",
+   "aliases": [
+    "tosylic acid",
+    "tosic acid",
+    "toluenesulfonic acid",
+    "pTSA"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "sulfonic acid",
+   "aliases": [
+    "sulfonic",
+    "sulphonic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "hydrocyanic acid",
+   "aliases": [
+    "hydrocyanic",
+    "prussic acid",
+    "prussic",
+    "hydrogen cyanide",
+    "HCN"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Poison; recognised as an acid.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "nitrous acid",
+   "aliases": [
+    "nitrous",
+    "HNO2"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "sulfurous acid",
+   "aliases": [
+    "sulfurous",
+    "sulphurous acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Not in the current list; add.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "chlorous acid",
+   "aliases": [
+    "chlorous"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "hypofluorous acid",
+   "aliases": [
+    "hypofluorous"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "fluorosulfuric acid",
+   "aliases": [
+    "fluorosulfuric",
+    "fluorosulphuric acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "fluoroboric acid",
+   "aliases": [
+    "fluoroboric",
+    "tetrafluoroboric acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "hexafluorophosphoric acid",
+   "aliases": [
+    "hexafluorophosphoric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "hydrazoic acid",
+   "aliases": [
+    "hydrazoic",
+    "hydrogen azide"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "perbromic acid",
+   "aliases": [
+    "perbromic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "periodic acid",
+   "aliases": [
+    "periodic",
+    "HIO4"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "phosphorous acid",
+   "aliases": [
+    "phosphorous"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "hydrogen sulfide",
+   "aliases": [
+    "hydrosulfuric acid",
+    "hydrosulfuric",
+    "H2S"
+   ],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "Weak acid in water; usually called a gas. Borderline.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "silicic acid",
+   "aliases": [
+    "silicic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "chloroacetic acid",
+   "aliases": [
+    "chloroacetic",
+    "monochloroacetic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "dichloroacetic acid",
+   "aliases": [
+    "dichloroacetic",
+    "DCA"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "fluoroacetic acid",
+   "aliases": [
+    "fluoroacetic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_acids"
+   ]
+  },
+  {
+   "name": "propionic acid",
+   "aliases": [
+    "propionic",
+    "propanoic acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "butyric acid",
+   "aliases": [
+    "butyric",
+    "butanoic acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "Smell of rancid butter.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "valeric acid",
+   "aliases": [
+    "valeric",
+    "pentanoic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "caproic acid",
+   "aliases": [
+    "caproic",
+    "hexanoic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "caprylic acid",
+   "aliases": [
+    "caprylic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "capric acid",
+   "aliases": [
+    "capric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "lauric acid",
+   "aliases": [
+    "lauric"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "myristic acid",
+   "aliases": [
+    "myristic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "arachidic acid",
+   "aliases": [
+    "arachidic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "behenic acid",
+   "aliases": [
+    "behenic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "lignoceric acid",
+   "aliases": [
+    "lignoceric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "cerotic acid",
+   "aliases": [
+    "cerotic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "alpha-linolenic acid",
+   "aliases": [
+    "linolenic",
+    "alpha linolenic acid",
+    "linolenic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "arachidonic acid",
+   "aliases": [
+    "arachidonic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "docosahexaenoic acid",
+   "aliases": [
+    "DHA",
+    "docosahexaenoic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "note": "DHA known from supplements.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "eicosapentaenoic acid",
+   "aliases": [
+    "EPA",
+    "eicosapentaenoic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "omega-6 fatty acid",
+   "aliases": [
+    "omega-6",
+    "omega 6"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "saturated fatty acid",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "Subclass; 'fatty acid' covers it.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "unsaturated fatty acid",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "Subclass; 'fatty acid' covers it.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "trans fatty acid",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "Accept only the full phrase, not 'trans fat'.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "pyruvic acid",
+   "aliases": [
+    "pyruvic",
+    "pyruvate"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "oxaloacetic acid",
+   "aliases": [
+    "oxalacetic acid",
+    "oxaloacetic",
+    "oxaloacetate"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "alpha-ketoglutaric acid",
+   "aliases": [
+    "ketoglutaric",
+    "alpha ketoglutaric acid",
+    "alpha-ketoglutarate"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "isocitric acid",
+   "aliases": [
+    "isocitric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "aconitic acid",
+   "aliases": [
+    "aconitic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "succinic acid",
+   "aliases": [
+    "succinic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "fumaric acid",
+   "aliases": [
+    "fumaric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "maleic acid",
+   "aliases": [
+    "maleic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "malonic acid",
+   "aliases": [
+    "malonic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "adipic acid",
+   "aliases": [
+    "adipic",
+    "hexanedioic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+    "https://www.wikipedia.com/wiki/Food_acid"
+   ]
+  },
+  {
+   "name": "glutaric acid",
+   "aliases": [
+    "glutaric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "phthalic acid",
+   "aliases": [
+    "phthalic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "terephthalic acid",
+   "aliases": [
+    "terephthalic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "cinnamic acid",
+   "aliases": [
+    "cinnamic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "acrylic acid",
+   "aliases": [
+    "acrylic",
+    "propenoic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "methacrylic acid",
+   "aliases": [
+    "methacrylic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "pivalic acid",
+   "aliases": [
+    "pivalic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "isobutyric acid",
+   "aliases": [
+    "isobutyric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/List_of_carboxylic_acids"
+   ]
+  },
+  {
+   "name": "gallic acid",
+   "aliases": [
+    "gallic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "tannic acid",
+   "aliases": [
+    "tannic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "carbolic acid",
+   "aliases": [
+    "phenol"
+   ],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "Old name for phenol, weakly acidic.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "picric acid",
+   "aliases": [
+    "picric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "pantothenic acid",
+   "aliases": [
+    "pantothenic",
+    "vitamin B5"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "nicotinic acid",
+   "aliases": [
+    "niacin",
+    "nicotinic",
+    "vitamin B3"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "retinoic acid",
+   "aliases": [
+    "retinoic",
+    "tretinoin"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "folinic acid",
+   "aliases": [
+    "folinic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "glutamic acid",
+   "aliases": [
+    "glutamate",
+    "glutamic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "aspartic acid",
+   "aliases": [
+    "aspartate",
+    "aspartic"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid",
+    "https://en.wikipedia.org/wiki/Acid"
+   ]
+  },
+  {
+   "name": "gamma-aminobutyric acid",
+   "aliases": [
+    "GABA"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "lysergic acid",
+   "aliases": [
+    "lysergic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "lysergic acid diethylamide",
+   "aliases": [
+    "LSD"
+   ],
+   "tier": "common",
+   "fit": "borderline",
+   "note": "Slang 'acid' but chemically an amide. Accept as borderline pun; never accept bare 'acid'.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "vinegar",
+   "aliases": [
+    "white vinegar",
+    "apple cider vinegar"
+   ],
+   "tier": "common",
+   "fit": "borderline",
+   "note": "About 5% acetic acid; not a named acid but everyday acid people name first.",
+   "sources": [
+    "https://sciencenotes.org/household-acids-and-bases/"
+   ]
+  },
+  {
+   "name": "lemon juice",
+   "aliases": [
+    "lemon",
+    "lemons"
+   ],
+   "tier": "uncommon",
+   "fit": "borderline",
+   "note": "Contains citric acid; an everyday acid. Borderline.",
+   "sources": [
+    "https://sciencenotes.org/household-acids-and-bases/"
+   ]
+  },
+  {
+   "name": "aqua regia",
+   "aliases": [],
+   "tier": "uncommon",
+   "fit": "borderline",
+   "note": "Mix of nitric and hydrochloric acids; widely called an acid.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "cyanuric acid",
+   "aliases": [
+    "cyanuric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "note": "Pool chemical.",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "barbituric acid",
+   "aliases": [
+    "barbituric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "sulfanilic acid",
+   "aliases": [
+    "sulfanilic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "humic acid",
+   "aliases": [
+    "humic",
+    "fulvic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "peracetic acid",
+   "aliases": [
+    "peracetic",
+    "peroxyacetic acid"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "sebacic acid",
+   "aliases": [
+    "sebacic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "suberic acid",
+   "aliases": [
+    "suberic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "itaconic acid",
+   "aliases": [
+    "itaconic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "mucic acid",
+   "aliases": [
+    "mucic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "saccharic acid",
+   "aliases": [
+    "saccharic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "ricinoleic acid",
+   "aliases": [
+    "ricinoleic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "elaidic acid",
+   "aliases": [
+    "elaidic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "undecylenic acid",
+   "aliases": [
+    "undecylenic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "carbamic acid",
+   "aliases": [
+    "carbamic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "fulminic acid",
+   "aliases": [
+    "fulminic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "cyanic acid",
+   "aliases": [
+    "cyanic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "thiocyanic acid",
+   "aliases": [
+    "thiocyanic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "selenic acid",
+   "aliases": [
+    "selenic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "arsenic acid",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "yes",
+   "note": "Do not alias bare 'arsenic' (the element).",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "manganic acid",
+   "aliases": [
+    "manganic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "permanganic acid",
+   "aliases": [
+    "permanganic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "tungstic acid",
+   "aliases": [
+    "tungstic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "dichromic acid",
+   "aliases": [
+    "dichromic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "iodic acid",
+   "aliases": [
+    "iodic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "bromic acid",
+   "aliases": [
+    "bromic"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "hypophosphorous acid",
+   "aliases": [
+    "hypophosphorous"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "pyrophosphoric acid",
+   "aliases": [
+    "pyrophosphoric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "metaphosphoric acid",
+   "aliases": [
+    "metaphosphoric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "polyphosphoric acid",
+   "aliases": [
+    "polyphosphoric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "glyceric acid",
+   "aliases": [
+    "glyceric"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "beta-hydroxybutyric acid",
+   "aliases": [
+    "hydroxybutyric acid",
+    "BHB"
+   ],
+   "tier": "rare",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "para-aminobenzoic acid",
+   "aliases": [
+    "PABA",
+    "aminobenzoic acid",
+    "para aminobenzoic acid"
+   ],
+   "tier": "uncommon",
+   "fit": "yes",
+   "sources": [
+    "unverified"
+   ]
+  },
+  {
+   "name": "alanine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "arginine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "asparagine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "cysteine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "glutamine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "glycine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "histidine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "isoleucine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "leucine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "lysine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "methionine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "phenylalanine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "proline",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "serine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "threonine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "tryptophan",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "tyrosine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  },
+  {
+   "name": "valine",
+   "aliases": [],
+   "tier": "rare",
+   "fit": "borderline",
+   "note": "One of the 20 standard amino acids; the name does not say 'acid'. Default refuse; accept only if the designer wants biology-leaning answers.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amino_acid"
+   ]
+  }
+ ],
+ "other_readings": [
+  {
+   "name": "LSD / acid (slang)",
+   "why": "Prompt could be read as drug slang."
+  },
+  {
+   "name": "acid music (acid house, acid jazz, acid rock)",
+   "why": "Genre use of the word."
+  },
+  {
+   "name": "acid rain",
+   "why": "A phenomenon, not an acid."
+  },
+  {
+   "name": "bleach, soap, baking soda, ammonia, antacid",
+   "why": "Bases or alkaline cleaners, not acids."
+  },
+  {
+   "name": "acidic foods (lime, orange, tomato, coffee)",
+   "why": "Acidic, not acids; only vinegar and lemon juice kept as borderline."
+  }
+ ],
+ "current_list_verdicts": [
+  {
+   "name": "lansoprazole",
+   "verdict": "remove",
+   "why": "Acid-reducing drug, not an acid."
+  },
+  {
+   "name": "vanadium pentoxide",
+   "verdict": "remove",
+   "why": "An oxide, not an acid."
+  },
+  {
+   "name": "cyanamide",
+   "verdict": "remove",
+   "why": "Not an acid."
+  },
+  {
+   "name": "alkapton",
+   "verdict": "remove",
+   "why": "Urine pigment term; no player expects it."
+  },
+  {
+   "name": "acetum",
+   "verdict": "remove",
+   "why": "Latin for vinegar; nobody types it."
+  },
+  {
+   "name": "camphorated phenol",
+   "verdict": "remove",
+   "why": "A mixture, not an acid."
+  },
+  {
+   "name": "gamma acid",
+   "verdict": "remove",
+   "why": "Dye-industry jargon."
+  },
+  {
+   "name": "titanic acid",
+   "verdict": "remove",
+   "why": "Not a real isolable acid; also collides with the ship."
+  },
+  {
+   "name": "hydroxynervonic acid",
+   "verdict": "remove",
+   "why": "Extremely obscure lipid."
+  },
+  {
+   "name": "juniperic acid",
+   "verdict": "borderline",
+   "why": "Real but obscure."
+  },
+  {
+   "name": "xanthic acid",
+   "verdict": "borderline",
+   "why": "Obscure."
+  },
+  {
+   "name": "dibasic acid, monobasic acid, tribasic acid, tetrabasic acid",
+   "verdict": "remove",
+   "why": "Descriptive terms, not names of acids."
+  },
+  {
+   "name": "oxyacid, dicarboxylic acid, monounsaturated fatty acid, polyunsaturated fatty acid, hydroxy acid",
+   "verdict": "borderline",
+   "why": "Class terms; keep only the useful ones as aliases (hydroxy acid kept via alpha hydroxy acid)."
+  },
+  {
+   "name": "hyponitrous acid, ferricyanic acid, ferrocyanic acid, manganic acid",
+   "verdict": "borderline",
+   "why": "Real but unlikely."
+  },
+  {
+   "name": "vinegar, battery acid, hydrogen chloride, aqua regia, lysergic acid diethylamide",
+   "verdict": "borderline",
+   "why": "Not named acids; kept as everyday or alias entries."
+  },
+  {
+   "name": "all others",
+   "verdict": "keep",
+   "why": "All others keep."
+  }
+ ],
+ "refused_verdicts": [
+  {
+   "typed": "bleach",
+   "verdict": "correctly refused",
+   "why": "Sodium hypochlorite solution is alkaline; not an acid."
+  },
+  {
+   "typed": "citric",
+   "verdict": "should accept as citric acid",
+   "why": "Short form."
+  },
+  {
+   "typed": "cyclic",
+   "verdict": "correctly refused",
+   "why": "An adjective; no acid is named 'cyclic'."
+  },
+  {
+   "typed": "hydrocloric",
+   "verdict": "should accept as hydrochloric acid",
+   "why": "One-letter slip; the game's own typo forgiveness should cover it."
+  },
+  {
+   "typed": "nitric",
+   "verdict": "should accept as nitric acid",
+   "why": "Short form."
+  },
+  {
+   "typed": "soap",
+   "verdict": "correctly refused",
+   "why": "Alkaline salt of fatty acids."
+  },
+  {
+   "typed": "soda",
+   "verdict": "borderline",
+   "why": "Soft drinks contain carbonic and phosphoric acids but soda is not an acid; baking and washing soda are bases. Default refuse."
+  },
+  {
+   "typed": "stomach",
+   "verdict": "correctly refused",
+   "why": "An organ, not an acid."
+  },
+  {
+   "typed": "stomach acid",
+   "verdict": "should accept as hydrochloric acid",
+   "why": "It is hydrochloric acid (gastric acid)."
+  },
+  {
+   "typed": "vinear",
+   "verdict": "should accept as vinegar",
+   "why": "Typo of vinegar, if vinegar is accepted."
+  }
+ ],
+ "search_log": [
+  "WebSearch: list of common acids strong weak mineral organic acids names",
+  "WebSearch: skincare acids list glycolic salicylic lactic hyaluronic azelaic mandelic",
+  "WebSearch: name an acid quiz answers survey family feud (no acid question found)",
+  "WebSearch: name an acid / examples of acids kids quiz household acids vinegar lemon juice battery acid",
+  "WebSearch: food acids additives list citric malic tartaric phosphoric lactic ascorbic sorbic E number",
+  "WebSearch: reddit most famous acid sulfuric hydrochloric hydrofluoric",
+  "WebFetch https://en.wikipedia.org/wiki/List_of_acids",
+  "WebFetch https://en.wikipedia.org/wiki/Acid",
+  "WebFetch https://en.wikipedia.org/wiki/Amino_acid",
+  "WebFetch https://en.wikipedia.org/wiki/List_of_carboxylic_acids",
+  "WebFetch https://www.healthline.com/health/beauty-skin-care/face-acids-types-anti-aging",
+  "WebFetch https://www.stylecraze.com/articles/skin-care-acids-guide/ (HTTP 406, failed)"
+ ],
+ "gaps": "No real 'Name an acid' crowd survey or Family Feud item was found; first10 and tiers rest on search-result consensus (sulfuric, hydrochloric, hydrofluoric the famous ones) and my judgment. About half of the rare entries are unverified (from memory). Uncommon vs rare is subjective. No player-frequency data."
+}
