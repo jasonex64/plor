@@ -153,9 +153,10 @@ Each item needs its own ticket. Earlier, longer text is in git at commit `4dc43a
 ## Next revision (deferred)
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side. **Keep only what someone will act on:** a cosmetic detail, a test nit, a race milliseconds wide or a comment that can't mislead is closed, not parked. The 2026-10-22 triage (Design review, 4) closed or merged most of the earlier items; the full earlier list is in git at commit `c9d2733`. Items are grouped by where they belong.
 
-**For quick fixes** (reviews of #293, 2026-11-23)
+**For quick fixes** (reviews of #293 and #294, 2026-11-23)
 - [ ] The feed's reserved 24px status row (`src/app/feed.tsx:374`, `feed.module.css:28`) is dropped when the last page lands, with the card's 10px gap, so the Feed card shrinks about 34px at the end of the list, on Today and in the right column. Either reserve the row only while a page loads or keep it. Found in #293's review.
 - [ ] The loading dots' sizes and timings (6px dots, a 1.2s cycle, 0.3 to 1 opacity, 0.6 when still) are the builder's, unseen in a browser: the human's look. Found in #293's review.
+- [ ] On a touch laptop that reports `hover: hover`, the reaction ⋯ has no resting cue until its row is tapped or focused (accepted in the human's #270 request; DESIGN.md's ⋯ line could say so). Found in #294's review.
 
 **For PROCESS-lint-rules**
 - [ ] `local/no-service-role` matches `service_role` only, as the ticket asked: not `serviceRoleKey`, `service-role` or `SUPABASE_SERVICE_KEY` (`/service[_-]?role/i` would cost nothing today, 0 hits); not regex literals, JSX text or split strings; it would flag a harmless `service_roles`; it covers `src/` only, not `scripts/` or `e2e/` (none use the key today). Found in rule 5 (review).
@@ -167,9 +168,6 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] One source comment above a function covers every number in it (answer 18, for drawings); a large function can vouch for numbers its comment doesn't justify. Watch in review. Found in rule 2 (review).
 - [ ] `src/app/race-layout.ts` "The 10ⁿ of answer 29" names the answer without its ticket path (the file header names it); `src/app/admin/insights.tsx` `COLUMNS.length - 1` has no comment saying the open row's first cell is empty. Found in rule 2 (review).
 - [ ] The values kept as built with no origin (answers 23 to 26: a tie counting half, 5 shown host answers, the peek's pattern, the draft hash) now cite the human's 2026-11-17 approval; nothing more is known of where they came from. Found in rule 2 (review).
-
-**Quick fixes**
-- [ ] On a touch laptop that reports `hover: hover`, the reaction ⋯ has no resting cue until its row is tapped or focused (accepted in the human's #270 request; DESIGN.md's ⋯ line could say so). Found in #294's review.
 
 **For M16**
 - [ ] `e2e/feed.e2e.ts` failed on CI in the 20 minutes after the day's reset (2026-11-15, PRs #214 and #215): its seeded comments carried today's day with yesterday's time, which the app never writes, and the second page came back empty. The helper now takes a comment's day from its time. Left: the date-line test's "today" comment, 5 minutes old, is yesterday's in the first 5 minutes of a day; and `feel.e2e.ts:51`, `live-board.e2e.ts:31` and `controls-and-state.e2e.ts:200` passed only on a retry in the same runs, cause not looked for. Found on CI, 2026-11-15.
