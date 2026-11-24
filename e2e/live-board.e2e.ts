@@ -116,6 +116,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const more = row.getByRole("button", { name: `React to ${playerName}'s run` });
   await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
   await expect(more).toBeVisible();
+  // Hidden until the row is hovered, anywhere on it, not only over the ⋯'s own cell (inbox #270).
+  const opacity = () => more.evaluate((el) => getComputedStyle(el).opacity);
+  await watcher.mouse.move(0, 0);
+  await expect.poll(opacity).toBe("0");
+  await row.getByText(playerName).first().hover();
+  await expect.poll(opacity).toBe("1");
   // On a phone the ⋯ sits beside the name and how the run stands, not over them (reactions did: 14b-8's critique;
   // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e). Since inbox #250 the order is the name, the ⋯, then the status chip at
   // the row's right edge, so the chips end at one edge whether or not a row has a ⋯.
