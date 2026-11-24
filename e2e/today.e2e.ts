@@ -110,6 +110,16 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await groupYesterday;
 });
 
+// Finding 11 of M20's second look audit (20n-1): the three choices sit on one line, with no empty fourth cell. The card
+// is in the right column from 1200px, so this sets its own 1280px screen.
+test("Today's leaderboard card has its Period's three choices on one line", async ({ browser }) => {
+  const page = await player(browser, "th", { width: 1280, height: 900 });
+  const period = page.getByRole("region", { name: "Leaderboard" }).getByRole("radiogroup", { name: "Period", exact: true });
+  await expect(period.getByRole("radio")).toHaveCount(3);
+  const tops = await period.locator("label").evaluateAll((labels) => labels.map((l) => Math.round(l.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+});
+
 // Criterion 4, as the human's answer 21 changed it (2026-11-13, "The comment shows"): a friend's comment comes whole to a
 // viewer who hasn't played; only a friend's result is blurred (e2e/feed.e2e.ts).
 test("before playing, a friend's comment is in the feed whole, with its game; their result is blurred", async ({ browser }) => {

@@ -4,7 +4,7 @@
 // runs and comments are written in the database with the rules off (as today-games.e2e.ts writes Fragments runs), so
 // each item's time and day are chosen; the viewer is a real signed-in player who plays Offbeat for real where a test
 // needs a finished run of it. Fragments' day and words are this file's own, as play2.e2e.ts's are.
-import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { expect, test, type Browser, type BrowserContext, type Locator, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { FEED_PAGE_SIZE } from "../src/config/tunables";
@@ -304,6 +304,26 @@ test("the comment box posts to a game the writer has finished today, chosen in t
   expect(rows.rows).toEqual([{ game_id: "substrings" }]);
   await page.reload();
   await expect(articles(page).filter({ hasText: body })).toContainText(SUBSTRINGS.name);
+});
+
+// The chosen game in the comment box looks as it does on a board's switch: the composer's label rule must not reach the
+// switch's choices (docs/milestones/M20-design-rules-and-clean-up.md, 20n-1, finding 1). It sets its own 1280px screen.
+const chosenLook = (switchGroup: Locator) =>
+  switchGroup.locator("label:has(input:checked)").evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { color: s.color, background: s.backgroundColor, fontSize: s.fontSize, fontWeight: s.fontWeight };
+  });
+
+test("the chosen game in the comment box looks as it does on the board's switch", async ({ browser }) => {
+  test.slow();
+  const page = await viewer(browser, "fo");
+  await finishOffbeat(page);
+  await fragmentsDone(await idOf("fo"));
+  await page.goto("/");
+  const box = page.getByRole("region", { name: "Feed" }).getByRole("radiogroup", { name: "Game" });
+  const board = page.getByRole("region", { name: "Leaderboard" }).getByRole("radiogroup", { name: "Game" });
+  await expect(box.getByRole("radio")).toHaveCount(2);
+  expect(await chosenLook(box)).toEqual(await chosenLook(board));
 });
 
 test("on phones Today has no leaderboard card; from 768px it does", async ({ browser }) => {

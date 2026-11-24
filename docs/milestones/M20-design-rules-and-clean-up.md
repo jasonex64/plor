@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is merged (#277, 2026-11-17, on green checks, the human's "Merge when green"; answers 45 to 50, below). 20h is merged (#281, on green checks, the human's "Merge when green": the feed's results carry their game's 4px edge, the Balanced look's; a comment none); 20i is merged (#283, by GitHub's auto-merge on green checks, the human's "Yes, merge and go": one Period switch, Today / This week / Last week, Today on every load); 20j is merged (#286, on green checks, the human's "Merge when green": who reacted, answers 51 to 53, below). 20k is settled (answers 54 to 57) and split into 20k-1 to 20k-3; 20k-1 is merged (#288, on green checks, the human's "Yes, merge and go": every board's rows a hairline with their game's edge, your own the accent edge; every comment without a box). 20k-2 is merged (#289: the pop at 300ms everywhere, a comment arriving and a board's changed status fading in over 400ms; answers 58 and 59). 20k-3 is merged (#290: Today's cards and both games' result screens, a white card with the game's band, the score big and popping in; answers 54, 55 and 57), which ends 20k. Answer 39 (the pickers, left out of 20b) is merged (#291). 20f is built, in its PR (answers 60 to 64: one "Plor" on a computer, the page's name its 30px heading; every module's text on the kit's scale). Left in M20: 20e (asks its questions first) and 20g (the logo, on Fable). Answer 49's colours for a flat button on a filled card went with the filled card. Left after 20k: 20e and 20f (each asks its questions first), 20g (the logo, on Fable); next 20e or 20f, each with its own questions, or 20h to 20j.
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. 20c is merged (#273, 2026-11-17, on green checks, the human's "merge 273 when green"; answers 42 to 44, below). 20b is merged (#277, 2026-11-17, on green checks, the human's "Merge when green"; answers 45 to 50, below). 20h is merged (#281, on green checks, the human's "Merge when green": the feed's results carry their game's 4px edge, the Balanced look's; a comment none); 20i is merged (#283, by GitHub's auto-merge on green checks, the human's "Yes, merge and go": one Period switch, Today / This week / Last week, Today on every load); 20j is merged (#286, on green checks, the human's "Merge when green": who reacted, answers 51 to 53, below). 20k is settled (answers 54 to 57) and split into 20k-1 to 20k-3; 20k-1 is merged (#288, on green checks, the human's "Yes, merge and go": every board's rows a hairline with their game's edge, your own the accent edge; every comment without a box). 20k-2 is merged (#289: the pop at 300ms everywhere, a comment arriving and a board's changed status fading in over 400ms; answers 58 and 59). 20k-3 is merged (#290: Today's cards and both games' result screens, a white card with the game's band, the score big and popping in; answers 54, 55 and 57), which ends 20k. Answer 39 (the pickers, left out of 20b) is merged (#291). 20f is merged (#292, on green checks, the human's "Merge when green"; answers 60 to 64: one "Plor" on a computer, the page's name its 30px heading; every module's text on the kit's scale). Left in M20: 20e (asks its questions first) and 20g (the logo, on Fable). Answer 49's colours for a flat button on a filled card went with the filled card.
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
@@ -123,7 +123,7 @@ Measured first: about 100 `font-size` rules in the modules, at 19 sizes (11 to 4
 | 52 | The names' order | "You first, then A to Z (Recommended)" |
 | 53 | How the list shows | "A small box under the reaction (Recommended)": a kit piece, the chip's 1.5px ink border and small corners on the surface, 13px text (the reactions' size in the kit's looks), added to DESIGN.md's Rules and `/admin/kit` |
 
-Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), 20e's four questions.
+Still to ask, in its own sub-ticket: 20e's four questions.
 
 ## What the team found (2026-11-16; four Sonnet subagents, read from code and the web, **nothing measured in a browser**)
 **The audit of `src/app`** (branch `process-parallel-sessions` at `8d76800`, which holds `main` to #226):
@@ -207,6 +207,88 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 - → verify: chosen when the look is: the moments' look e2e matches `/admin/kit`'s chosen version.
 
 **Quick fixes from the same night (answer 22), each its own `fix-` branch off `main` and its own PR, not M20's:** #246 `fix-game-cards-match` (answer 25: Fragments' card gains the next-puzzle line, so both cards hold the same parts and match), #247 `fix-group-board-first` (answer 26), #250 `fix-friends-today-status` (answer 5, as 20d above).
+
+## The human's answers (2026-11-23, a design session on Fable)
+The human: "I want you to be the design agent of the website [...] focus on two components. One, like the overall website floor itself, the UI, the layout, make sure everything looks good there. And then a second agent, that one's going to run the actual individual game design, because I don't want it to look plain. I want it to each game to be stylized. [...] we tried things like pixel art. We tried stuff like low poly. I want you to suggest maybe some alternatives that don't fall under either [...] right now, each game kind of looks exactly the same with no personality."
+
+| # | Asked | Answer |
+|---|---|---|
+| 65 | The pixel themes, the festival and the village were cut as "gone too far": how much of the play screen may a game's style own this time? | "A finish on the whole screen (Recommended)": each game its own background, ink colours, shapes, emblem and motion on the play screen, drawn in code; no scene and no characters. This replaces answer 18's "no art, no new font" inside a game's play screen only |
+| 66 | Which styles, outside pixel art and low poly, are mocked? | All four offered: "Print shop", "Paper cut-out collage", "Game-show hardware", "Marker doodle" |
+| 67 | One art style for both games, or each its own? | "Each its own style (Recommended)": the same layout and controls, a different style per game |
+| 68 | What does the site design agent do first? | "Audit every screen, then fix (Recommended)": screenshots of every page at phone and desktop size, a list of what looks off against the rule book, shown to the human, then fixed in order |
+| 69 | Offbeat is to become one run on a clock (HANDOFF, 2026-11-23): which Offbeat is styled? | "The new one-clock format (Recommended)": the mocks show that format; Offbeat's look is built into the app only once that milestone exists |
+| 70 | Inside a game, do the colours follow the player's theme? | "The game's own colours (Recommended)": one fixed palette per game in every theme, as a drawing has (DECISIONS, Styling) |
+| 71 | May a game use its own lettering for its big moments? | "Yes, one display face per game (Recommended)": the question, the chunk and the score; everything read or typed stays in Baloo 2. Building it into the app changes "one font" and needs its DECISIONS entry then; the mocks need none |
+| 72 | How many mocks? | "My best two per game (Recommended)": Offbeat as game-show hardware and as print shop; Fragments as paper cut-out and as marker doodle; private pages that change nothing in the app |
+| 73 | 20m's ticket, as drafted | "Approve 20m" |
+
+**20l — the second look audit** (answer 68). The first audit (below) read the app as it was before 20b to 20k. This one reads it as built now.
+- Screenshots of every player screen at 390 × 844 and 1280 × 720 (CLAUDE.md's two `@visual` sizes) in the five themes, from a fixture scene on slot 2's local stack; the capture is a kept script this time (it has now run twice: CLAUDE.md, "Repeated procedures are scripts").
+- The design session reads them with the impeccable skill against DESIGN.md's Rules and writes a ranked list under "The second look audit" below; the human picks what is fixed; each fix is then its own sub-ticket or quick fix with its own check.
+- → verify: the capture's run prints one file per screen, size and theme and exits non-zero if a screen fails to load; the local database holds no fixture rows afterwards.
+
+**20m — a style per game, as four private mocks** (answers 65 to 67, 69 to 73): `M20-20m-game-look-mocks.md`. It builds nothing into the app; the look the human picks becomes its own ticket.
+
+## The second look audit
+*2026-11-23 (20l, answer 68).* `npm run look-audit` (with `LOOK_AUDIT_OUT` set) took 354 full-page pictures on slot 2's built app and local stack: 46 screens at 390 × 844 and 1280 × 720 in the five themes (signed-out screens in Paper and Night only: a signed-out page follows the device), 0 failed; the fixture rows were gone afterwards (the capture agent's check). The pictures are in the session's scratch folder, not the repo. The impeccable skill's critique ran as two subagents that did not see each other's output: a design review on Fable from the pictures, DESIGN.md and the code, and a mechanical scan on Sonnet. The lead session looked at `today--1280--paper` and `front--1280--paper` and read the code behind 1, 4 and 11. Not captured: Fragments' time-up and between-round states, Offbeat's caught screen, the Overall board's Average, an error state. The "This week" boards were empty (a Monday). Contrast figures are the reviewer's arithmetic from DESIGN.md's colours, not measured. Nielsen's ten heuristics: 24 of 40; five of eight cognitive-load checks fail (single focus, grouping, hierarchy, choices per decision, progressive disclosure).
+
+**The mechanical scan:** the detector's two findings are both the "you" row's 4px inset edge (`kit.module.css:402`, `admin/kit/looks.module.css:110`), the look the human picked (answer 34): not acted on. On `/`, `/about` and `/?sign-in` at both sizes: no console error, no sideways scroll, lowest text contrast 7.84 to 1; "Play Offbeat without an account" and "Email me a sign-in code" measure 40px tall (the raised button's face, answer 11); About's links inside sentences are 25px tall.
+
+Ranked, most damaging first; **P1** a broken layout or real confusion, **P2** an annoyance, **P3** polish; *left over (n)* is the first audit's number. Nothing here is decided: the human picks.
+1. **P1, new.** The chosen game in the comment box's switch is grey on the ink fill, unreadable in every theme: `comments.module.css:14` (`.compose label`, muted) outranks `leaderboard.module.css:43` (`.on`), since the switch's choices are labels.
+2. **P1, left over (7).** On a phone, Your friends breaks a name one or two letters a line beside Profile, Remove and Block (`friends-list.tsx:150-165`).
+3. **P1, new.** A finished Today has no focal point after the score, the phone has no board, and places 1 to 3 on every board look like place 4 (inbox #268).
+4. **P1, left over (6).** Desktop Today shows half a card and a carousel: the side-by-side layout needs a 768px row (`today-cards.tsx:103`) and at 1280px the row is 592px.
+5. **P1, left over (9).** The signed-out front page is a plain document, headed "Today's game: Offbeat" with two games, five outlined buttons, hugging the left at 1280px.
+6. **P1, left over (5).** Fragments' start and result screens lack what Offbeat's have (the band before a run, Back, the page's name, Today marked); on a phone its card and comments touch.
+7. **P1, left over (4).** Safe and caught are still words; the recap is a sentence with Search answers wrapped into it.
+8. **P1, new.** A game's start screen is the band over an empty strip, with the rules and Start outside the card.
+9. **P2, new.** A chip, a count, a flat button and a row all share the white fill and ink outline, so everything looks pressable; Groups' list of groups is a flat button.
+10. **P2, new.** A leaderboard opens with three stacked switches, a field, two notes and a button before any row; two different "Find a player" fields follow each other.
+11. **P2, left over (7).** Today's Leaderboard period switch leaves an empty fourth cell (`leaderboard.tsx:231` passes no `--choices`).
+12. **P2, new.** At 1280px the page's name sits under 95px of nothing and the three columns start at three heights; "Groups" heads a card headed "Groups"; a group's page is named "Groups", Streak "Me".
+13. **P2, new.** Width is unmanaged on single-card pages: a 928px email field, 900px buttons on not-found, the invite and Offbeat's reveal.
+14. **P2, new.** Me's calendar is 23 blank outlined cells with no dates; each game's card leads with a blank coloured square; "Fragments's", "1 days played".
+15. **P2, new.** A group's page opens on the rename form and ends with five buttons on three ragged lines (their place in Members is answer 41: only the arrangement is in question).
+16. **P2, new.** First-run empties: Friends today a bare heading, a feed with two "nothing yet" lines, a new player's game screen of dashes.
+17. **P2, new.** On a phone "Friends (1)" wraps and drops the tab's label out of line.
+18. **P2, new.** Friends today says each result twice, and the caught chip is three lines in the right column.
+19. **P2, left over (7).** The feed's chip still wraps in the right column.
+20. **P2, new.** Back sits in three places: the top bar, Offbeat's content, nowhere on Fragments (short of answer 44).
+21. **P2, new.** With Fragments' card in front and unplayed, its Play is the flat button (*unverified* whether intended).
+22. **P2, new.** The two cards' bands differ in height on a phone (Fragments' date wraps), and a card's height changes with its state.
+23. **P2, new.** How to play is four paragraphs with no example; Previous looks live on step 1.
+24. **P2, new.** Overall's scores ("2.9") carry no unit; four players on 0 are ranked 1 to 4.
+25. **P3, new.** The × is a small glyph in its 44px target.
+26. **P3, new.** Streak's phone grid has uneven columns.
+27. **P3, new.** About's licence block is a second typeface; Privacy on a phone is one long list.
+28. **P3, new.** The signed-out group invite names neither group nor inviter (*unverified* whether deliberate).
+29. **P3, new.** The graph's grey lines are unnamed; "Ana 36 / You 35" collide.
+30. **P3, new.** Offbeat's question card is the soft tint, Fragments' round card white (moot once a game's own look is built).
+
+**Themes:** the game-colour edge on board and feed rows nearly vanishes in Night, Moonlit and Ink; Moonlit's muted text reads as links and its disabled Answer looks live; Ink's white 2px lines dominate (left over, 10). The first audit's 1, 2, 3, 8 and 11 are fixed; 13 can't be seen in stills; 12 could not be told from this fixture.
+
+**The human's answers to the audit (2026-11-23):**
+
+| # | Asked | Answer |
+|---|---|---|
+| 74 | Thirty findings, eight of them P1: how much is fixed in this pass? | "The top 8, in order (Recommended)": each its own small change with its own check, the one-rule fixes first; the rest wait for a second pass |
+| 75 | Chips, counts, flat buttons and rows share the white fill and ink outline (finding 9): do chips and badges lose the outline? | "Show me on the sample page": the outlined and the soft-filled versions side by side on `/admin/kit` in the five themes; the human picks |
+| 76 | May the site carry drawn character outside a game (answer 18 said no art): a small emblem per game on its card, on Me and on the signed-out front page? | "Yes, simple emblems now": a small vector emblem per game, drawn like the streak's flowers; likely redrawn once a game's own style is chosen (20m) |
+| 77 | When both games are played, what is Today mainly for? | "Where I stand among friends": a strip under the cards says the player's place today and opens the board; the top three stand out; the feed follows |
+
+**20n — the audit's top eight** (answer 74), one PR each, in this order; each that changes a look asks its own questions first:
+- **20n-1:** findings 1 and 11, the two one-rule faults (the comment box's chosen game is readable; the period switch has no empty cell). → verify: an e2e reads the chosen choice's computed colour and background in the comment box and finds the board switch's pair; an e2e finds Today's period switch's three choices on one line at 1280px. Both fail first. **Built 2026-11-23:** `.compose label` became `.compose > label` (`comments.module.css:14`; specificity 0,1,1 had beaten `.on`'s 0,1,0); the Period strip passes `--choices: 3` (`leaderboard.tsx:231`). `feed.e2e.ts:287` failed first (colour `rgb(95, 95, 90)` and 13px where the board's switch has `rgb(250, 250, 248)` and 14px) and `today.e2e.ts:115` failed first (two rows, expected one); then 4 passed, the two new and the two existing composer tests (chromium, targeted). Lint, `npm test` (869 passed) and tsc clean. Reviewed (the `reviewer` agent, with 20l's script): nothing blocking; three items on the script in ROADMAP, For M20. Not asserted directly: the group page's composer (the same one rule). Not run locally: the full e2e suite; CI runs it.
+- **20n-2:** finding 4, desktop Today's two cards side by side. The 768px row width is M16 16f's answers 42 and 43: the new number is asked first.
+- **20n-3:** finding 2, Your friends' rows on a phone (with 20e, which touches the same rows).
+- **20n-4:** findings 6 and 8, one start and result header for both games, and the start screen's rules and Start inside the card.
+- **20n-5:** finding 7, the recap's rows and the reveal's safe or caught colour.
+- **20n-6:** finding 3 with answer 77 and inbox #268: the place strip on Today and the top three on a board; its look is asked first.
+- **20n-7:** finding 5 with answer 76: the signed-out front page as the two game cards, and the two emblems (a design step on Fable, picked by the human as the flowers were).
+- **Beside them, not a fix:** answer 75's two chip versions on `/admin/kit`.
+
+**What works, to keep:** the play frames (one question, one field, one button); Streak's flowers, the only drawn things in the app; the hairline board rows with the "you" row.
 
 ## The look audit
 *Filled in by the overnight session of 2026-11-17 (answer 23).* An Opus subagent built the branch at 20a's start, served it on port 3002 against slot 2's local stack with a fixture scene (the viewer played both games; one friend finished both, one partway, one not yet; a group with comments and reactions), and took 160 full-page screenshots: 16 screens, at 375px and 1280px, in the five themes. It critiqued them with the impeccable skill, in one context (no human to ask), and the local database was checked clean afterwards. The screenshots are outside the repo, in the session's scratch folder (`look-audit/shots/`). A second (Sonnet) subagent did the web research, kept in `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`. Nothing here was measured on plor.app or on a real phone.
