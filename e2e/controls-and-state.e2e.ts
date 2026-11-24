@@ -262,7 +262,7 @@ test("a long name on a board row is cut at the default text size, and shown whol
         range.selectNodeContents(el);
         return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
       };
-      const name = li.querySelector("span[class*='name']") as HTMLElement;
+      const name = li.querySelector("a[class*='name']") as HTMLElement; // the name is a link since M20 20e
       const points = li.querySelector("b")!;
       return {
         cut: name.scrollWidth > name.clientWidth,
