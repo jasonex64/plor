@@ -95,11 +95,11 @@
       "prompt": "Name a kind of cheese",
       "category": "cheese",
       "host_bank": [
-        "#e4e106c3-ec37-53b3-80c0-f62e989c20a5",
-        "#03616c7a-a3f4-55bd-981e-e931b2e9fdf7",
-        "#78185956-a929-50dc-837f-67dcb66d3465",
-        "#fdec4b60-99ec-5312-b50d-684377399926",
-        "#e45e5fc3-2f75-50e0-be38-1f5fd9690bc2"
+        "cheddar",
+        "mozzarella",
+        "Swiss cheese",
+        "Parmesan",
+        "Brie"
       ],
       "uncommon": [
         "Gouda",
@@ -301,10 +301,7 @@
       "uncommon": [
         "torte",
         "babka",
-        "brownie",
-        "cookie",
-        "gateau",
-        "waffle"
+        "gateau"
       ],
       "themes": [],
       "added_by": "claude"
@@ -552,9 +549,9 @@
       "prompt": "Name a tool",
       "category": "tool",
       "host_bank": [
-        "#7660f572-aaa2-5008-951f-afa5db5f311d",
+        "hammer",
         "screwdriver",
-        "#b081e89a-1e32-5a3a-ae28-1d576789c446",
+        "saw",
         "wrench",
         "drill",
         "pliers"
@@ -755,7 +752,7 @@
         "baseball",
         "tennis",
         "golf",
-        "#8483ccda-95a9-5930-be45-660c887c0588"
+        "ice hockey"
       ],
       "uncommon": [
         "polo",
@@ -827,10 +824,10 @@
       ],
       "uncommon": [
         "samba",
-        "#5ee3f522-b8d2-5c55-b724-059cf5c660f7",
+        "rumba",
         "conga",
         "jig",
-        "#c02d8430-f55e-5b56-ba83-77f5de638482",
+        "reel",
         "twist"
       ],
       "themes": [],
@@ -2448,7 +2445,7 @@
       "host_bank": [
         "hamburger",
         "cheeseburger",
-        "hotdog",
+        "hot dog",
         "club sandwich",
         "grilled cheese",
         "Reuben"
@@ -2464,7 +2461,7 @@
         "submarine",
         "open sandwich",
         "western sandwich",
-        "tunaburger",
+        "tuna burger",
         "butty"
       ],
       "themes": [],
@@ -3677,7 +3674,7 @@
         "water bed",
         "double bed",
         "cot",
-        "four-poster"
+        "four-poster bed"
       ],
       "uncommon": [
         "Murphy bed",
@@ -4867,7 +4864,7 @@
         "cowboy hat",
         "sombrero",
         "bowler hat",
-        "sunhat",
+        "sun hat",
         "bonnet"
       ],
       "uncommon": [

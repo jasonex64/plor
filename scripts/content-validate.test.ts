@@ -177,6 +177,18 @@ describe("content:validate on researched lists", () => {
     expect(withList(list())).toEqual({ files: 2, errors: [] });
   });
 
+  // M23 23b: a researched question's own names in the bank are all on its list (23a's review: the cake question still
+  // named brownie, cookie and waffle).
+  it("refuses a bank name that isn't on its question's researched list, and a thing ID there", () => {
+    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["King Bed", "king size", "tempurpedic"], uncommon: ["FLOWER  bed"], themes: [], added_by: "claude" };
+    const withBank = (question: object) => validateRoot(root({ [FILE]: JSON.stringify(valid()), [LIST]: JSON.stringify(list()), "bank.json": JSON.stringify({ format: 1, questions: [question], themes: {} }) }), CATS).errors;
+    expect(withBank(q)).toEqual([]);
+    expect(withBank({ ...q, uncommon: ["cookie"] })).toEqual([`bank.json question "name-a-x": "cookie" is not on ${LIST}`]);
+    expect(withBank({ ...q, host_bank: [...q.host_bank, "#b09d10e2-458c-557b-9e66-92836482b320"] })).toEqual([
+      `bank.json question "name-a-x": "#b09d10e2-458c-557b-9e66-92836482b320" is a thing ID, but ${LIST} is a researched list: name the answer`,
+    ]);
+  });
+
   it("refuses two answers sharing a typed form after normalization, a name being one", () => {
     const l = list();
     l.answers[2].aliases = ["KING!"];
