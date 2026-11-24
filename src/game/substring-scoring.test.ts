@@ -5,7 +5,14 @@ import { lettersPoints, scoreRun, wordPoints } from "./substring-scoring";
 
 describe("the approved tables", () => {
   it("scores each word length as the table says", () => {
-    const table = { 3: 20, 4: 25, 5: 30, 6: 40, 7: 50, 8: 60, 9: 75, 10: 95, 11: 120, 12: 150, 13: 190, 14: 230, 15: 290, 16: 360, 17: 450, 18: 570 };
+    const table = { 3: 20, 4: 25, 5: 30, 6: 40, 7: 50, 8: 60, 9: 75, 10: 95 };
+    for (const [length, points] of Object.entries(table)) expect(wordPoints("a".repeat(Number(length)))).toBe(points);
+  });
+
+  // Issue #253: past 10 letters a word gains a steady 25 a letter, and 18 letters is the most it pays (human,
+  // 2026-11-23: "Steady steps after 10 letters (Recommended)").
+  it("adds 25 a letter past 10 letters and stops at 18", () => {
+    const table = { 11: 120, 12: 145, 13: 170, 14: 195, 15: 220, 16: 245, 17: 270, 18: 295, 19: 295, 34: 295 };
     for (const [length, points] of Object.entries(table)) expect(wordPoints("a".repeat(Number(length)))).toBe(points);
   });
 

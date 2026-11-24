@@ -153,10 +153,12 @@ Each item needs its own ticket. Earlier, longer text is in git at commit `4dc43a
 ## Next revision (deferred)
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side. **Keep only what someone will act on:** a cosmetic detail, a test nit, a race milliseconds wide or a comment that can't mislead is closed, not parked. The 2026-10-22 triage (Design review, 4) closed or merged most of the earlier items; the full earlier list is in git at commit `c9d2733`. Items are grouped by where they belong.
 
-**For quick fixes** (reviews of #293 and #294, 2026-11-23)
+**For quick fixes** (reviews of #293, #294 and #295, 2026-11-23)
 - [ ] The feed's reserved 24px status row (`src/app/feed.tsx:374`, `feed.module.css:28`) is dropped when the last page lands, with the card's 10px gap, so the Feed card shrinks about 34px at the end of the list, on Today and in the right column. Either reserve the row only while a page loads or keep it. Found in #293's review.
 - [ ] The loading dots' sizes and timings (6px dots, a 1.2s cycle, 0.3 to 1 opacity, 0.6 when still) are the builder's, unseen in a browser: the human's look. Found in #293's review.
 - [ ] On a touch laptop that reports `hover: hover`, the reaction ⋯ has no resting cue until its row is tapped or focused (accepted in the human's #270 request; DESIGN.md's ⋯ line could say so). Found in #294's review.
+- [ ] A Fragments score is read two ways: the weekly and overall boards from the ledger, the friends' board for a date and the feed by `scoreRun` on the stored words (`src/game/substring-places.ts:53`, `src/friends/board.ts:95`, `src/comments/feed-page.ts:186`). Any change to the scoring rule makes a past day read differently on the two; #295 did, for runs with a word of 11 or more letters. One reader, or a rule that a scoring change says what past days show. Found in #295's review.
+- [ ] `src/config/tunables.ts:214`'s comment still says each part grows by `growth` a step, no longer true of a word past 10 letters; `M16-16e-points-and-boards.md` keeps the old 11 to 18 table with no pointer to the 2026-11-23 change. Found in #295's review.
 
 **For PROCESS-lint-rules**
 - [ ] `local/no-service-role` matches `service_role` only, as the ticket asked: not `serviceRoleKey`, `service-role` or `SUPABASE_SERVICE_KEY` (`/service[_-]?role/i` would cost nothing today, 0 hits); not regex literals, JSX text or split strings; it would flag a harmless `service_roles`; it covers `src/` only, not `scripts/` or `e2e/` (none use the key today). Found in rule 5 (review).
