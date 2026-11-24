@@ -19,6 +19,7 @@ The main session runs this; the two passes are subagents on `sonnet` that never 
 Give it the prompt, the key, today's members, the refused texts, and these rules, and have it write `content/lists/<key>.json` and nothing else:
 
 - **Aim:** every answer a fair-minded US player might type for the prompt, from the obvious to the obscure. Search the web widely: shops' and makers' category pages, enthusiast and hobby sites, glossaries, quiz and game-show answer boards, regional names. Wikipedia and WordNet are a start, not the list.
+- **As generous as possible** (the human, 2026-11-24, answer 34: "theres no downsides to more answers"). When in doubt, include. **A specific variation is its own answer, not an alias of its parent:** by material (straw cowboy hat, wool beanie), by style or cut (fitted cap, slouchy beanie), by use or wearer (golf visor, fishing hat), by place (Australian bush hat). Work through the common parents and list the variations a shop, maker or enthusiast would name; a variation takes its parent's tier or one rarer. Not variations: colours, sizes, and adjectives nobody sells or names a thing by ("big hat"). An alias is only another way of typing the same thing.
 - **One answer per line**, as `{"name", "aliases", "tier"}`. `name` is how it is shown. `aliases` are the other forms a player would type: the short form without the question's word ("king" for king bed, "bundt" for bundt cake), spellings, hyphen and spacing forms, regional names for the same thing. Plain plurals are not needed. Two answers may not share a typed form: pick the one it most likely means.
 - **Tier:** `common` is what players type first (about the first 30 to 40 a crowd would name), `uncommon` what a keen player gets, `rare` the rest. Put the ten most obvious first in the file.
 - **Brands count** and get a tier like any answer; add `"brand": true`.
@@ -31,6 +32,7 @@ Give it the prompt, the key, today's members, the refused texts, and these rules
 ## 3. Pass 2, the checker (a fresh `general-purpose` agent, `model: sonnet`)
 Give it only the prompt, the rules above and the file. It edits the file in place:
 
+- **Lean to including** (answer 34): add named variations of answers already listed as answers of their own, and split an alias out into its own answer when it names a different variation.
 - **Remove only what is clearly wrong:** not a real thing, or plainly not an answer to the prompt. What it can't confirm stays (the human's answer 24).
 - **Hunt for what is missing, with web searches (at least six; memory alone is not a second route: hat's first checker searched nothing)**, by routes pass 1 likely didn't take: other kinds of page, other regions' words, the short forms of answers already listed, brands.
 - **Fix** two answers sharing a typed form, a tier that is plainly off (an everyday word marked rare), a missing `borderline` or `brand` mark.

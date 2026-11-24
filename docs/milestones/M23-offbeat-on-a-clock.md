@@ -61,6 +61,8 @@ Second round (2026-11-24):
 
 33. 23c, a player who has run dry with time left: "A Finish button, on the last question (Recommended)". On question 3 Finish ends the run at once with the score as it stands; time left is worth nothing.
 
+34. On hat's sample list (226 answers), 2026-11-24, in the human's words: "i want it to be as generous as possible, and specific variations of hats should count as diff types of hats. this must be balanced by the amt of tokens it costs obviously but theres no downsides to more answers". Claude's reading, said back to the human: a named variation (straw cowboy hat, wool beanie, fitted cap) is its own answer with its own time and points, not a typed form of its parent; lists lean to including; the two passes stay two, with no extra agents per question.
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
