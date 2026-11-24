@@ -208,6 +208,28 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 
 **Quick fixes from the same night (answer 22), each its own `fix-` branch off `main` and its own PR, not M20's:** #246 `fix-game-cards-match` (answer 25: Fragments' card gains the next-puzzle line, so both cards hold the same parts and match), #247 `fix-group-board-first` (answer 26), #250 `fix-friends-today-status` (answer 5, as 20d above).
 
+## The human's answers (2026-11-23, a design session on Fable)
+The human: "I want you to be the design agent of the website [...] focus on two components. One, like the overall website floor itself, the UI, the layout, make sure everything looks good there. And then a second agent, that one's going to run the actual individual game design, because I don't want it to look plain. I want it to each game to be stylized. [...] we tried things like pixel art. We tried stuff like low poly. I want you to suggest maybe some alternatives that don't fall under either [...] right now, each game kind of looks exactly the same with no personality."
+
+| # | Asked | Answer |
+|---|---|---|
+| 65 | The pixel themes, the festival and the village were cut as "gone too far": how much of the play screen may a game's style own this time? | "A finish on the whole screen (Recommended)": each game its own background, ink colours, shapes, emblem and motion on the play screen, drawn in code; no scene and no characters. This replaces answer 18's "no art, no new font" inside a game's play screen only |
+| 66 | Which styles, outside pixel art and low poly, are mocked? | All four offered: "Print shop", "Paper cut-out collage", "Game-show hardware", "Marker doodle" |
+| 67 | One art style for both games, or each its own? | "Each its own style (Recommended)": the same layout and controls, a different style per game |
+| 68 | What does the site design agent do first? | "Audit every screen, then fix (Recommended)": screenshots of every page at phone and desktop size, a list of what looks off against the rule book, shown to the human, then fixed in order |
+| 69 | Offbeat is to become one run on a clock (HANDOFF, 2026-11-23): which Offbeat is styled? | "The new one-clock format (Recommended)": the mocks show that format; Offbeat's look is built into the app only once that milestone exists |
+| 70 | Inside a game, do the colours follow the player's theme? | "The game's own colours (Recommended)": one fixed palette per game in every theme, as a drawing has (DECISIONS, Styling) |
+| 71 | May a game use its own lettering for its big moments? | "Yes, one display face per game (Recommended)": the question, the chunk and the score; everything read or typed stays in Baloo 2. Building it into the app changes "one font" and needs its DECISIONS entry then; the mocks need none |
+| 72 | How many mocks? | "My best two per game (Recommended)": Offbeat as game-show hardware and as print shop; Fragments as paper cut-out and as marker doodle; private pages that change nothing in the app |
+| 73 | 20m's ticket, as drafted | "Approve 20m" |
+
+**20l — the second look audit** (answer 68). The first audit (below) read the app as it was before 20b to 20k. This one reads it as built now.
+- Screenshots of every player screen at 390 × 844 and 1280 × 720 (CLAUDE.md's two `@visual` sizes) in the five themes, from a fixture scene on slot 2's local stack; the capture is a kept script this time (it has now run twice: CLAUDE.md, "Repeated procedures are scripts").
+- The design session reads them with the impeccable skill against DESIGN.md's Rules and writes a ranked list under "The second look audit" below; the human picks what is fixed; each fix is then its own sub-ticket or quick fix with its own check.
+- → verify: the capture's run prints one file per screen, size and theme and exits non-zero if a screen fails to load; the local database holds no fixture rows afterwards.
+
+**20m — a style per game, as four private mocks** (answers 65 to 67, 69 to 73): `M20-20m-game-look-mocks.md`. It builds nothing into the app; the look the human picks becomes its own ticket.
+
 ## The look audit
 *Filled in by the overnight session of 2026-11-17 (answer 23).* An Opus subagent built the branch at 20a's start, served it on port 3002 against slot 2's local stack with a fixture scene (the viewer played both games; one friend finished both, one partway, one not yet; a group with comments and reactions), and took 160 full-page screenshots: 16 screens, at 375px and 1280px, in the five themes. It critiqued them with the impeccable skill, in one context (no human to ask), and the local database was checked clean afterwards. The screenshots are outside the repo, in the session's scratch folder (`look-audit/shots/`). A second (Sonnet) subagent did the web research, kept in `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`. Nothing here was measured on plor.app or on a real phone.
 
