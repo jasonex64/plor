@@ -216,7 +216,9 @@ export const SUBSTRING_SAMPLE_WORDS = 4;
 // and the run's different letters at its end, about 15% a letter ("15, but again round to nice numbers"). The sizes,
 // and the bonus letter's points for each word holding it, are Claude's so a typical run splits about a third each,
 // approved with their tables and worked runs ("Approve these sizes").
-export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25 } as const;
+// Past `stepFrom` letters a word gains a steady `step` points a letter, and none past `cap` letters (issue #253; human,
+// 2026-11-23: "Steady steps after 10 letters (Recommended)"): a 34-letter word had scored 21,740 points.
+export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25, stepFrom: 10, step: 25, cap: 18 } as const;
 export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const; // docs/milestones/M16-16e-points-and-boards.md, answers 10, 12 and 13
 export const SUBSTRING_BONUS_LETTER_POINTS = 120; // docs/milestones/M16-16e-points-and-boards.md, answers 12 and 13
 
