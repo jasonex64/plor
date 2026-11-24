@@ -104,7 +104,9 @@ What it showed: most of the gain is short forms ("king", "citric", "chocolate");
 - 23a: where a tier comes from once players' shares exist (today rarity is pooled per category from play); what a brand and an "other reading" do.
 - 23c: guests (the same run, or a shorter one); what a second tab or a lost connection does to a running clock.
 - 23d: what the result screen shows (every answer given with its tier, the answers missed); the share text; what "on question 2 of 3" reads on the live board.
-- 23f: what plor.app shows while the beta is paused; whether the two Fragments runs of 21,740 and 21,120 points stay on the boards (inbox #253 fixes the rule, not the ledger).
+- 23f: what plor.app shows while the beta is paused.
+
+Settled outside the sub-tickets: the two Fragments runs of 21,740 and 21,120 points stay in the ledger. The human, 2026-11-23: "Leave them". #295 changes the rule only; the weekly and overall boards keep those points, while the feed and the friends' board work a past day out again at the new rule (ROADMAP, "For quick fixes").
 
 ## Plan
 Each sub-ticket writes its own steps as `<step> → verify: <check>` once its questions are answered. Order: 23a, then 23b and 23c side by side (different files: content and research against the run's tables), then 23d, 23e, 23f.
