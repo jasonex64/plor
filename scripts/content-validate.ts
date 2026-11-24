@@ -1,7 +1,7 @@
 // Validates every puzzle file under a content root, and its question bank (bank.json at the root, M13 13d):
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
-// A researched list under lists/ (M23 23a) is checked too, and counted.
+// A researched list under lists/ (M23 23a) is checked too, and counted; the bank's names for its question must be on it (23b).
 // Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d), and no day asks two of one family (13e-4a).
 // The bank asks only categories listed in the categories file (data/categories.json from the command; a test passes
 // its own, 13e-1 review; 13f-4c), which is checked too (13e).
@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 import { gapProblems, parseBank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
 import { LISTS_DIR, parseList } from "../src/content/list.ts";
-import { checkPuzzleFile, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
+import { checkPuzzleFile, normalize, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
 import { checkSubstringsFile, parseSubstringDay, substringGapProblems, type SubstringDay } from "../src/content/substrings.ts";
 import { SUBSTRINGS_ID } from "../src/platform/game.ts";
 
@@ -52,7 +52,13 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
   const { categories, errors: categoryErrors } = parseCategories(categoriesFile, readFileSync(categoriesFile, "utf8"));
   errors.push(...categoryErrors);
   const keys = categories && { file: categoriesFile, keys: new Set(categories.map((c) => c.key)) };
-  for (const file of lists) errors.push(...parseList(file, readFileSync(join(root, file), "utf8"), keys).errors);
+  // Each good list's typed forms by its category, for the bank's check below (M23 23b).
+  const typed = new Map<string, { file: string; forms: Set<string> }>();
+  for (const file of lists) {
+    const { list, errors: listErrors } = parseList(file, readFileSync(join(root, file), "utf8"), keys);
+    errors.push(...listErrors);
+    if (list) typed.set(list.category, { file, forms: new Set(list.answers.flatMap((a) => [a.name, ...a.aliases].map(normalize))) });
+  }
   // A broken categories file is reported above, and every family is then its own category.
   errors.push(...gapProblems(days, familyOf(categories ?? [])));
   if (all.includes(BANK)) {
@@ -60,6 +66,15 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
     errors.push(...bankErrors);
     if (bank && categories) {
       for (const q of bank.questions) if (!keys!.keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${categoriesFile}`);
+    }
+    // A researched question's own names are all on its list, by name: a thing ID there is another source's (M23 23b).
+    for (const q of bank?.questions ?? []) {
+      const list = typed.get(q.category);
+      if (!list) continue;
+      for (const name of [...q.host_bank, ...q.uncommon]) {
+        if (name.startsWith("#")) errors.push(`${BANK} question "${q.id}": "${name}" is a thing ID, but ${list.file} is a researched list: name the answer`);
+        else if (!list.forms.has(normalize(name))) errors.push(`${BANK} question "${q.id}": "${name}" is not on ${list.file}`);
+      }
     }
   }
   return { files: files.length + lists.length, errors };

@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is built and reviewed (its PR); nothing else is. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is built, in its PR; 23c and 23b-2 are approved, not started. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
@@ -47,6 +47,24 @@ The game:
 23. How far brands go and what one is worth: "Any real brand, tiered like any answer (Recommended)". A brand the research missed is refused until added, like any missed answer.
 24. What the second pass does with an answer it can't confirm exists: "Keep it unless clearly wrong". The option's stated cost: an answer an agent invented could be accepted in play.
 
+23b's and 23c's first round (2026-11-24, after #298 merged):
+25. 23b, how the human reviews a question's borderline answers and brands: "An admin page with strike buttons (Recommended)". A write from the admin: its security change is proposed in 23b.
+26. 23b, which 21 questions are researched first: "Claude picks everyday ones, you veto (Recommended)". Big sets wait.
+27. 23c, a guest's run: "The same full run (Recommended)".
+28. 23c, a lost connection or closed tab: "Clock keeps running (Recommended)". The server's clock never stops; coming back before zero carries on with what is left.
+
+Second round (2026-11-24):
+29. 23b, where a strike on the admin page lives: "In the database, folded into the file later (Recommended)". It takes effect at the next midnight; a later Claude session copies strikes into the list files, so git stays the full record.
+30. 23b, where the review happens: "On plor.app's admin (Recommended)". The researched lists are loaded into plor.app's database before the switch, by the human's own load command (and the migration by `npx supabase db push`). This changes the earlier "nothing to the hosted database until the switch" for the lists alone; the beta is paused, so no player sees it.
+31. 23c, the least time an answer adds: "Never less than 1 second". Not the recommended option: its stated cost is that a fast typist can keep a run going a long time. Commons reach the floor after about 22 accepted answers, rares after about 41.
+32. 23c, a second tab or device on a running run: "Both show the same run (Recommended)".
+
+33. 23c, a player who has run dry with time left: "A Finish button, on the last question (Recommended)". On question 3 Finish ends the run at once with the score as it stands; time left is worth nothing.
+
+34. On hat's sample list (226 answers), 2026-11-24, in the human's words: "i want it to be as generous as possible, and specific variations of hats should count as diff types of hats. this must be balanced by the amt of tokens it costs obviously but theres no downsides to more answers". Claude's reading, said back to the human: a named variation (straw cowboy hat, wool beanie, fitted cap) is its own answer with its own time and points, not a typed form of its parent; lists lean to including; the two passes stay two, with no extra agents per question.
+
+35. 2026-11-24, asked in chat with 23b-1's PR: "Should checkers keep removing names with no trace at all, or keep everything as you first answered?" The human: "Yes, keep that". So the checker removes a name that leaves no trace at all when searched for; a name it merely can't confirm stays (answer 24).
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
@@ -59,6 +77,16 @@ One sonnet agent per question, about 120,000 tokens and 3 minutes each, 5 to 11 
 | Name a kind of cake | 106 | 138 | 68 (cookies, pancakes, doughnuts, tortilla, tostada, dog biscuit) | bundt, chocolate, vanilla, jello cake, tiramisu, mooncake |
 
 What it showed: most of the gain is short forms ("king", "citric", "chocolate"); the obscure tail is about 60 to 70% complete by the agents' own estimate; a quarter to a half of the rare entries are from memory with no source; no agent found data on what people type first, so the tiers are judgement. The second pass (answer 3) exists for these gaps.
+
+## The first 21 questions (proposed by Claude 2026-11-24, answer 26; the human, 2026-11-24: "Yes, these 18")
+Done in 23a: bed, acid, cake. Proposed next, all everyday questions on WordNet lists today, at most seven per area so each day can take three areas:
+- **Food (7 with cake):** cheese, bread, pasta, soup, candy, sandwich.
+- **Wearing (4):** hat, bag, footwear, fabric.
+- **Home (4 with bed):** kitchen utensil, tool, knot.
+- **Science and body (4 with acid):** bone, gemstone, color.
+- **Doing (2):** sport, dance.
+
+Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag 3, kitchen utensil 1; read from plor.app 2026-11-24) and otherwise for being things most players can name ten of. Left for later: animals, places and games (big sets, answer 26), and book, language and world capital (factual sets with refusals: they need the nickname procedure).
 
 ## Design
 **Why the lists are wrong today** (read by an Explore agent, 2026-11-23): 188 of 231 categories are every word under one WordNet synset (`scripts/base.ts`, `oewnSubtree`), membership is a tree walk (`private.category_members`), and no check compares a list with what players type. The admin pages can only accept a miss after the fact (`/admin/audit`).
@@ -73,8 +101,8 @@ What it showed: most of the gain is short forms ("king", "citric", "chocolate");
 
 ## Sub-tickets, in order (one PR each)
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
-- **23b, the research procedure and the first 21 questions.** A skill or script so each question is researched the same way in two passes; the human's borderline review; the admin's add an answer (#252) and edit or replace a question (#251).
-- **23c, the run on a clock.** Tables and functions for a run, an answer, Next and the end; guests; the TLA+ model of an Offbeat run rebuilt (`verify-offbeat-run`), since this replaces what it models. A security-relevant change only in that it adds functions `plor_app` may execute: proposed in its own questions.
+- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 built, in its PR; 23b-2 not started): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
+- **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens.** The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
@@ -109,7 +137,7 @@ What it showed: most of the gain is short forms ("king", "citric", "chocolate");
 | 2 | Research passes a question needs | Human, 2026-11-23, answer 3 |
 | 21 | Questions researched before the first week can be drafted | 7 days of 3 (answer 5) |
 | | Offbeat's new par | Blank: the human picks after the first week of real runs (answer 14) |
-| | Whether the shrink has a floor (a least time an answer adds) | Blank: ask in 23c |
+| 1 s | The least time an accepted answer adds | Human, 2026-11-24, answer 31 |
 | | How many days must be ready before the switch | Blank: ask in 23f |
 
 ## Still to ask (each in its sub-ticket, before that part is designed)
