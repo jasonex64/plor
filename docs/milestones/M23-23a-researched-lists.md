@@ -1,6 +1,6 @@
 # M23 23a — A researched list's format and its way into the database
 
-**Status:** approved 2026-11-23 (the human: "Approve 23a"), from answers 17 to 24 in `M23-offbeat-on-a-clock.md`. Being built on `m23-offbeat-on-a-clock`.
+**Status:** approved 2026-11-23 (the human: "Approve 23a"), from answers 17 to 24 in `M23-offbeat-on-a-clock.md`. **Built and reviewed, 2026-11-24**, on `m23-offbeat-on-a-clock`; in its PR, not merged. Local stack only: the hosted database has neither the migration nor the lists.
 
 ## Goal
 An everyday question's answers come from one file in git that a person can read and edit, and the game judges against exactly that file.
@@ -123,3 +123,7 @@ Hypothesis for step 5: a category whose root is a research thing needs no change
 **Main session's check of the conversion, 2026-11-24.** The pilot's "other_readings" held two things: other meanings of the word (flower bed, crab cake), which answer 20 accepts as borderline, and plain non-answers (bleach, soap, cookie, brownie). The first conversion kept both, on the main session's wrong brief. 17 non-answers were struck by hand: bed 4 (bedrock, bed linen, box, water), acid 8 (acid music, acid rain, bleach, soap, baking soda, ammonia, antacid, acidic foods), cake 5 (cake donut, brownie, doughnut, cookie, cakewalk). The lists now hold bed 137, acid 177, cake 147. `npm run base -- load all` then printed `ENDING at 2026-11-25T08:00:00+00:00, as the files no longer give them: 34 names, 17 facts`: a struck answer leaves at the next midnight, as every removal from the base does, so a day being played never changes. `npx vitest run scripts/research.db.test.ts scripts/content-validate.test.ts scripts/base.test.ts --no-file-parallelism` passes after it. Pancake, hotcake and johnnycake stay as borderline (other meanings of "cake") though the pilot judged the old pancake members out: the human strikes them or not in 23b's review.
 
 ## Review
+The `reviewer` agent, 2026-11-24, fresh context; it reran the four targeted test files (109 passed) and read the diff.
+- Blocking findings and how each was fixed: all three were docs. (1) The ROADMAP row and both tickets' Status lines said nothing was built: rewritten. (2) The handoff still named the removed pilot files and an unapproved design: rewritten. (3) This section was empty: filled.
+- Deferred to ROADMAP "Next revision", For M23: the cake bank question's `uncommon` names not on the list; a strike needs `load all`; `hosted load` reading lists without the category set; the hosted lines untested and needing the migration first; `review bed`'s "no English name" flag; `checkWithin` skipped for researched categories.
+- Unverified by the reviewer: `npm run test:db`, `supabase test db` and lint were not rerun by it (the builder's Evidence, and CI on the PR).
