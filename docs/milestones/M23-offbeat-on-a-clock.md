@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** planned. Drafted 2026-11-23 from the human's twenty answers below; **not approved to build**. Nothing is built. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 20).
+**Status:** planned. Drafted 2026-11-23 from the human's sixteen answers below; **not approved to build**. Nothing is built. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
