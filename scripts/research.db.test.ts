@@ -64,7 +64,7 @@ describe("typed answers on the researched lists", () => {
     }
   }
 
-  it.each([["bed", "king"], ["bed", "twin"], ["acid", "citric"], ["acid", "nitric"], ["cake", "bundt"], ["cake", "chocolate"]])("accepts %s: %s", async (key, typed) => {
+  it.each([["bed", "king"], ["bed", "twin"], ["acid", "citric"], ["acid", "nitric"], ["cake", "bundt"], ["cake", "chocolate"], ["hat", "beanie"], ["kitchen_utensil", "air fryer"], ["bone", "pelvic"], ["bone", "clavical"], ["bone", "distal metatarsal"], ["bag", "sleeping"], ["bag", "sling"], ["bag", "plastic"], ["knot", "dead"], ["cake", "tirimisu"], ["bed", "water"]])("accepts %s: %s", async (key, typed) => {
     expect(await accepted(key, typed)).toBe(true);
   });
   it.each([["cake", "tortilla"], ["cake", "dog biscuit"], ["acid", "lansoprazole"], ["bed", "couch"]])("refuses %s: %s", async (key, typed) => {

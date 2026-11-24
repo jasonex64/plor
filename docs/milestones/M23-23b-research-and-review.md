@@ -1,6 +1,6 @@
 # M23 23b — The research procedure, the first 21 lists, and the human's review page
 
-**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. 23b-1 is being built; 23b-2 follows it.
+**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; in its PR.** 23b-2 (the review page) is not started.
 
 ## Goal
 Eighteen more questions get researched lists the same way each time, in two passes, and the human can read a list's doubtful answers on plor.app and strike or add one from a phone.
@@ -103,5 +103,26 @@ Hypothesis for step 1: the second pass changes fewer than one answer in five. If
 
 ## Evidence
 **Step 1, the skill proven on hat, 2026-11-24.** `.claude/skills/research-list/SKILL.md`. Pass 1 (about 11 searches and page reads, 129,000 tokens, 3 minutes): 33 old members → 201 answers; "beanie" (refused 3 times last week) is the fifth answer; one old member left out (millinery, the trade). Pass 2 (112,000 tokens, 1.5 minutes): removed nothing, added 24 answers and aliases to 10, re-tiered 2, marked 1 borderline: 37 of 201 changed, about 18%, under the hypothesis's one in five. Final: 226 answers (54 common, 89 uncommon, 83 rare), 27 borderline, 16 brands; `npm run content:validate` → `CONTENT OK content: 33 file(s)`. **Shortfall:** pass 2 searched nothing and added from memory, so its rarer additions are unconfirmed; the skill now requires at least six searches of the checker. Not yet done for hat: `categories.json`, the load, the db test (step 4, with the others).
+
+**The rule changed after hat's sample** (answer 34, 2026-11-24: "as generous as possible, and specific variations of hats should count as diff types of hats"). The skill gained four rules as the batches ran, each from a report: a named variation is its own answer and is split out from the start (pasta's checker split 25); generous is not padded (candy's and cheese's first researchers built rows by script or invented placeholders and stripped them); the checker hunts invented entries first; the checker searches (hat's first checker did not). The hypothesis's "one in five" was restated to count removals and corrections only, since under answer 34 the checker is expected to add much: no list's checker removed or corrected more than 17% (tool); kitchen utensil's reported about a third counting its 92 splits, which the restated measure does not count.
+
+**Criterion 1, 21 lists at two passes.** `npm run content:validate` → `CONTENT OK content: 50 file(s)`. Answers per list after both passes (old members in brackets): acid 308 (145), bag 305 (60), bed 307 (25), bone 219 (118), bread 721 (114), cake 422 (106), candy 910 (71), cheese 636 (48), color 1,355 (147), dance 960 (107), fabric 625 (290), footwear 564 (57), gemstone 586 (59), hat 465 (33), kitchen utensil 516 (121), knot 330 (32), pasta 271 (28), sandwich 682 (18), soup 557 (49), sport 857 (187), tool 908 (400): 12,504 in all, about 1,600 marked borderline and 1,100 brand. bed, acid and cake, written in 23a before answer 34, got a second pass under it.
+
+**Criterion 2, last week's refused answers** (read from plor.app 2026-11-24, 14 texts over 5 of the 18; the others had none):
+| Question | Typed | Now |
+|---|---|---|
+| hat | beanie (3) | accepted, the fifth answer |
+| bag | sleeping, sling, plastic | accepted, as short forms |
+| bone | pelvic (2), clavical, distal metatarsal | accepted (hip bone, clavicle, metatarsal) |
+| kitchen utensil | air fryer | accepted, borderline |
+| knot | dead, deadknot | accepted as dead knot (in wood), borderline; "deadknot" by the one-typo rule, not tested here |
+| knot | ready, real, reddit, tigt | deliberately off: not knots |
+The accepted ones are in `scripts/research.db.test.ts`'s "accepts" cases, with bed's "water" and cake's "tirimisu".
+
+**Criterion 3, the bank's names.** `npx vitest run scripts/content-validate.test.ts` → 27 passed; the new case failed first (`expected [] to deeply equal [ Array(1) ]`). On the real content the check then found 17 problems, fixed in `content/bank.json`: brownie, cookie and waffle off the cake question; hotdog, tunaburger, four-poster and sunhat respelled as their lists have them; ten thing IDs (cheese 5, tool 2, dance 2, sport 1) replaced by the names they stood for.
+
+**Criterion 4, members equal the files.** `npm run base -- load all` → `DEFINED 231 categories`, `ENDING at 2026-11-25T08:00:00+00:00, as the files no longer give them: 126 names, 0 facts`; `npx vitest run scripts/research.db.test.ts --no-file-parallelism` → 43 passed (21 membership cases, 17 accepts, 4 refusals, the old-day case). The two letter subsets on researched bases still have members (`sport_f` 75, `tool_w` 73). `npm test` → 878 passed; `npx tsc --noEmit` and eslint on the changed scripts clean.
+
+**Not verified.** Most rare answers were not confirmed one by one: checkers searched the doubtful ones (cheese's ran 25 searches and removed 2), and gemstone's and dance's additions lean most on memory; by answer 24 what can't be confirmed stays. No list was looked at by the human except hat's sample in chat. The lists are on the local stack only.
 
 ## Review
