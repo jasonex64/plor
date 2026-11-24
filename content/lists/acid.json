@@ -180,14 +180,6 @@
     {"name":"threonine","aliases":[],"tier":"rare","borderline":true},
     {"name":"tryptophan","aliases":[],"tier":"rare","borderline":true},
     {"name":"tyrosine","aliases":[],"tier":"rare","borderline":true},
-    {"name":"valine","aliases":[],"tier":"rare","borderline":true},
-    {"name":"acid music","aliases":[],"tier":"rare","borderline":true},
-    {"name":"acid rain","aliases":[],"tier":"rare","borderline":true},
-    {"name":"bleach","aliases":[],"tier":"rare","borderline":true},
-    {"name":"soap","aliases":[],"tier":"rare","borderline":true},
-    {"name":"baking soda","aliases":[],"tier":"rare","borderline":true},
-    {"name":"ammonia","aliases":[],"tier":"rare","borderline":true},
-    {"name":"antacid","aliases":[],"tier":"rare","borderline":true},
-    {"name":"acidic foods","aliases":[],"tier":"rare","borderline":true}
+    {"name":"valine","aliases":[],"tier":"rare","borderline":true}
   ]
 }

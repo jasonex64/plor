@@ -150,11 +150,6 @@
     {"name":"fish cake","aliases":[],"tier":"rare","borderline":true},
     {"name":"rice cake","aliases":[],"tier":"rare","borderline":true},
     {"name":"urinal cake","aliases":[],"tier":"rare","borderline":true},
-    {"name":"potato cake","aliases":[],"tier":"rare","borderline":true},
-    {"name":"cake donut","aliases":[],"tier":"rare","borderline":true},
-    {"name":"brownie","aliases":[],"tier":"rare","borderline":true},
-    {"name":"doughnut","aliases":[],"tier":"rare","borderline":true},
-    {"name":"cookie","aliases":[],"tier":"rare","borderline":true},
-    {"name":"cakewalk","aliases":[],"tier":"rare","borderline":true}
+    {"name":"potato cake","aliases":[],"tier":"rare","borderline":true}
   ]
 }

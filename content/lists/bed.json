@@ -128,7 +128,6 @@
     {"name":"riverbed","aliases":[],"tier":"rare","borderline":true},
     {"name":"seabed","aliases":["ocean bed"],"tier":"rare","borderline":true},
     {"name":"lakebed","aliases":[],"tier":"rare","borderline":true},
-    {"name":"bedrock","aliases":[],"tier":"rare","borderline":true},
     {"name":"flatbed","aliases":[],"tier":"rare","borderline":true},
     {"name":"truck bed","aliases":[],"tier":"rare","borderline":true},
     {"name":"oyster bed","aliases":[],"tier":"rare","borderline":true},
@@ -140,10 +139,7 @@
     {"name":"sandbed","aliases":[],"tier":"rare","borderline":true},
     {"name":"bed of lettuce","aliases":[],"tier":"rare","borderline":true},
     {"name":"nail bed","aliases":[],"tier":"rare","borderline":true},
-    {"name":"bed linen","aliases":["bedding"],"tier":"rare","borderline":true},
     {"name":"printing bed","aliases":["3D printer bed"],"tier":"rare","borderline":true},
-    {"name":"fluidized bed","aliases":["hospital bed of a reactor"],"tier":"rare","borderline":true},
-    {"name":"box","aliases":[],"tier":"rare","borderline":true},
-    {"name":"water","aliases":[],"tier":"rare","borderline":true}
+    {"name":"fluidized bed","aliases":["hospital bed of a reactor"],"tier":"rare","borderline":true}
   ]
 }
