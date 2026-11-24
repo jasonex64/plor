@@ -59,6 +59,8 @@ Second round (2026-11-24):
 31. 23c, the least time an answer adds: "Never less than 1 second". Not the recommended option: its stated cost is that a fast typist can keep a run going a long time. Commons reach the floor after about 22 accepted answers, rares after about 41.
 32. 23c, a second tab or device on a running run: "Both show the same run (Recommended)".
 
+33. 23c, a player who has run dry with time left: "A Finish button, on the last question (Recommended)". On question 3 Finish ends the run at once with the score as it stands; time left is worth nothing.
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
@@ -95,8 +97,8 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 
 ## Sub-tickets, in order (one PR each)
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
-- **23b, the research procedure and the first 21 questions.** A skill or script so each question is researched the same way in two passes; the human's borderline review; the admin's add an answer (#252) and edit or replace a question (#251).
-- **23c, the run on a clock.** Tables and functions for a run, an answer, Next and the end; guests; the TLA+ model of an Offbeat run rebuilt (`verify-offbeat-run`), since this replaces what it models. A security-relevant change only in that it adds functions `plor_app` may execute: proposed in its own questions.
+- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, designed, not approved): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
+- **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, designed, not approved): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens.** The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
