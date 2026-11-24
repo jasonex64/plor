@@ -371,7 +371,20 @@ export function Feed({ username, name, runOver, nudge }: { username: string; nam
           })}
         </div>
       )}
-      {adding && <p role="status">Loading more</p>}
+      {next !== null && (
+        <div role="status" className={styles.more}>
+          {adding && (
+            <>
+              <span className={styles.dots} aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className="sr-only">Loading more</span>
+            </>
+          )}
+        </div>
+      )}
       {!feed && !error && (
         <Skeleton label="Loading the feed">
           <Line />
