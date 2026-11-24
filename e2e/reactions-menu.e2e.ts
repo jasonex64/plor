@@ -76,6 +76,12 @@ test("reactions sit behind each comment's and run's ⋯, and its popover closes 
   // The ⋯: at the top right, 44px, named for whose comment it is, closed.
   const more = theirs.getByRole("button", { name: `Actions for ra${RUN}'s comment` });
   await expect(more).toHaveAttribute("aria-expanded", "false");
+  // Hidden until its row is hovered (inbox #270): opacity, so it keeps its space and stays named in the tree.
+  const opacity = () => more.evaluate((el) => getComputedStyle(el).opacity);
+  await page.mouse.move(0, 0);
+  await expect.poll(opacity).toBe("0");
+  await theirs.locator("p").hover();
+  await expect.poll(opacity).toBe("1");
   const dots = await box(more);
   const words = await box(theirs.locator("p"));
   const row = await box(theirs);
