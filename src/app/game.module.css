@@ -157,3 +157,8 @@
 .banner.page .facts {
   justify-content: flex-start;
 }
+
+/* The time to the next puzzle stays a chip, its own width, at the card's left. */
+.banner.page > [role="timer"] {
+  align-self: flex-start;
+}
