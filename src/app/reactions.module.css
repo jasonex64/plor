@@ -62,6 +62,20 @@
   .more:hover:not(:disabled) {
     color: var(--text);
   }
+
+  /* Hidden until its row is hovered or has focus, so a list isn't a column of dots (inbox #270). Opacity, so it keeps its
+     space and stays in the accessibility tree; a device that can't hover keeps it showing. */
+  .more {
+    opacity: 0;
+    transition: opacity var(--quick) var(--ease);
+  }
+
+  :hover > .menu > .more,
+  :focus-within > .menu > .more,
+  .more:focus-visible,
+  .more[aria-expanded="true"] {
+    opacity: 1;
+  }
 }
 
 /* The popover: the kit's card, right under the ⋯ with their right edges lined up (approved placement), over the rows

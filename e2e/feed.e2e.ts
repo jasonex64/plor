@@ -155,6 +155,36 @@ test("45 items load 20 at a time as the last comes on screen, and the last is re
   expect(pages).toHaveLength(2);
 });
 
+test("a page loading shows three still or pulsing dots and a status for a screen reader, not the words", async ({ browser }) => {
+  const page = await viewer(browser, "fx");
+  const friend = await friendOf("fy", "fx");
+  for (let i = 0; i < FEED_PAGE_SIZE + 1; i++) await comment(friend, `dots comment ${i}`, i + 1);
+  // Hold the second page until the checks are done.
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/api/feed/items?cursor=*", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("/");
+  const status = feedOf(page).locator("xpath=following-sibling::*[@role='status']");
+  await expect(articles(page)).toHaveCount(FEED_PAGE_SIZE);
+  await expect(status).toHaveCount(1);
+  await expect(status.locator("span[aria-hidden] > span")).toHaveCount(0);
+  await articles(page).last().scrollIntoViewIfNeeded();
+  await expect(status).toHaveText("Loading more");
+  await expect(status.locator("span[aria-hidden] > span")).toHaveCount(3);
+  // The words are for a screen reader only: they take no room beside the dots.
+  expect((await status.getByText("Loading more").boundingBox())!.width).toBeLessThanOrEqual(1);
+  expect(await status.locator("span[aria-hidden] > span").first().evaluate((el) => getComputedStyle(el).animationName)).not.toBe("none");
+  // Under Reduce motion the dots stand still.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await status.locator("span[aria-hidden] > span").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  release();
+  await expect(articles(page)).toHaveCount(FEED_PAGE_SIZE + 1);
+  await expect(status).toHaveCount(0);
+});
+
 test("a friend's result is blurred until the viewer finishes that game, and 'Play to see' opens the game", async ({ browser }) => {
   test.slow();
   const page = await viewer(browser, "fc");

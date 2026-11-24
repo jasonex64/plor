@@ -31,6 +31,13 @@ li.friend {
   justify-self: end;
 }
 
+/* The ⋯ is hidden until its row is hovered or has focus (reactions.module.css, inbox #270); here a cell wraps it, so
+   its own rule would need that 44px cell hovered, not the row. */
+li.friend:hover .menu button,
+li.friend:focus-within .menu button {
+  opacity: 1;
+}
+
 .status {
   grid-column: 4;
   grid-row: 1;
