@@ -2,7 +2,7 @@
 
 // Today's game cards (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2; the human's answers 5, 7, 16, 25, 40 and 42).
 // On phones one card is in front, 82% of the row, with a strip of the next, under a row "Today's games" with Previous and
-// Next and "1 of 2"; once the cards' own row is 768px wide the two sit side by side with no arrows (the human, 2026-11-14:
+// Next and "1 of 2"; once the cards' own row is 560px wide (M20 answer 78) the two sit side by side with no arrows (the human, 2026-11-14:
 // "Side by side only with room": beside the sidebar a tablet's row is too narrow for two names). A day with an approved day in only one game shows
 // that card alone (src/app/today-games.ts). The row follows the WAI-ARIA APG Carousel pattern as How to play's steps do
 // (src/app/how-to-play.tsx): a carousel group, each card a slide named "N of 2", the arrows' state in aria-disabled.
@@ -95,12 +95,12 @@ export function TodayCards({
 }
 
 function Carousel({ front, onPlace, children }: { front: number; onPlace: (place: { wide: boolean; at: number }) => void; children: ReactNode[] }) {
-  // Wide: the row itself, not the window, is at least the app's tablet width (src/app/min-width.ts's 768px).
+  // Wide: the row itself, not the window, has room for two cards.
   const [wide, setWide] = useState(false);
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = row.current!;
-    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 768)); // docs/milestones/M16-16f-the-shared-pieces.md, Numbers (answers 42 and 43)
+    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 560)); // docs/milestones/M20-design-rules-and-clean-up.md, 20n-2 (answer 78), in place of M16 16f's 768px
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
