@@ -230,6 +230,47 @@ The human: "I want you to be the design agent of the website [...] focus on two 
 
 **20m — a style per game, as four private mocks** (answers 65 to 67, 69 to 73): `M20-20m-game-look-mocks.md`. It builds nothing into the app; the look the human picks becomes its own ticket.
 
+## The second look audit
+*2026-11-23 (20l, answer 68).* `npm run look-audit` (with `LOOK_AUDIT_OUT` set) took 354 full-page pictures on slot 2's built app and local stack: 46 screens at 390 × 844 and 1280 × 720 in the five themes (signed-out screens in Paper and Night only: a signed-out page follows the device), 0 failed; the fixture rows were gone afterwards (the capture agent's check). The pictures are in the session's scratch folder, not the repo. The impeccable skill's critique ran as two subagents that did not see each other's output: a design review on Fable from the pictures, DESIGN.md and the code, and a mechanical scan on Sonnet. The lead session looked at `today--1280--paper` and `front--1280--paper` and read the code behind 1, 4 and 11. Not captured: Fragments' time-up and between-round states, Offbeat's caught screen, the Overall board's Average, an error state. The "This week" boards were empty (a Monday). Contrast figures are the reviewer's arithmetic from DESIGN.md's colours, not measured. Nielsen's ten heuristics: 24 of 40; five of eight cognitive-load checks fail (single focus, grouping, hierarchy, choices per decision, progressive disclosure).
+
+**The mechanical scan:** the detector's two findings are both the "you" row's 4px inset edge (`kit.module.css:402`, `admin/kit/looks.module.css:110`), the look the human picked (answer 34): not acted on. On `/`, `/about` and `/?sign-in` at both sizes: no console error, no sideways scroll, lowest text contrast 7.84 to 1; "Play Offbeat without an account" and "Email me a sign-in code" measure 40px tall (the raised button's face, answer 11); About's links inside sentences are 25px tall.
+
+Ranked, most damaging first; **P1** a broken layout or real confusion, **P2** an annoyance, **P3** polish; *left over (n)* is the first audit's number. Nothing here is decided: the human picks.
+1. **P1, new.** The chosen game in the comment box's switch is grey on the ink fill, unreadable in every theme: `comments.module.css:14` (`.compose label`, muted) outranks `leaderboard.module.css:43` (`.on`), since the switch's choices are labels.
+2. **P1, left over (7).** On a phone, Your friends breaks a name one or two letters a line beside Profile, Remove and Block (`friends-list.tsx:150-165`).
+3. **P1, new.** A finished Today has no focal point after the score, the phone has no board, and places 1 to 3 on every board look like place 4 (inbox #268).
+4. **P1, left over (6).** Desktop Today shows half a card and a carousel: the side-by-side layout needs a 768px row (`today-cards.tsx:103`) and at 1280px the row is 592px.
+5. **P1, left over (9).** The signed-out front page is a plain document, headed "Today's game: Offbeat" with two games, five outlined buttons, hugging the left at 1280px.
+6. **P1, left over (5).** Fragments' start and result screens lack what Offbeat's have (the band before a run, Back, the page's name, Today marked); on a phone its card and comments touch.
+7. **P1, left over (4).** Safe and caught are still words; the recap is a sentence with Search answers wrapped into it.
+8. **P1, new.** A game's start screen is the band over an empty strip, with the rules and Start outside the card.
+9. **P2, new.** A chip, a count, a flat button and a row all share the white fill and ink outline, so everything looks pressable; Groups' list of groups is a flat button.
+10. **P2, new.** A leaderboard opens with three stacked switches, a field, two notes and a button before any row; two different "Find a player" fields follow each other.
+11. **P2, left over (7).** Today's Leaderboard period switch leaves an empty fourth cell (`leaderboard.tsx:231` passes no `--choices`).
+12. **P2, new.** At 1280px the page's name sits under 95px of nothing and the three columns start at three heights; "Groups" heads a card headed "Groups"; a group's page is named "Groups", Streak "Me".
+13. **P2, new.** Width is unmanaged on single-card pages: a 928px email field, 900px buttons on not-found, the invite and Offbeat's reveal.
+14. **P2, new.** Me's calendar is 23 blank outlined cells with no dates; each game's card leads with a blank coloured square; "Fragments's", "1 days played".
+15. **P2, new.** A group's page opens on the rename form and ends with five buttons on three ragged lines (their place in Members is answer 41: only the arrangement is in question).
+16. **P2, new.** First-run empties: Friends today a bare heading, a feed with two "nothing yet" lines, a new player's game screen of dashes.
+17. **P2, new.** On a phone "Friends (1)" wraps and drops the tab's label out of line.
+18. **P2, new.** Friends today says each result twice, and the caught chip is three lines in the right column.
+19. **P2, left over (7).** The feed's chip still wraps in the right column.
+20. **P2, new.** Back sits in three places: the top bar, Offbeat's content, nowhere on Fragments (short of answer 44).
+21. **P2, new.** With Fragments' card in front and unplayed, its Play is the flat button (*unverified* whether intended).
+22. **P2, new.** The two cards' bands differ in height on a phone (Fragments' date wraps), and a card's height changes with its state.
+23. **P2, new.** How to play is four paragraphs with no example; Previous looks live on step 1.
+24. **P2, new.** Overall's scores ("2.9") carry no unit; four players on 0 are ranked 1 to 4.
+25. **P3, new.** The × is a small glyph in its 44px target.
+26. **P3, new.** Streak's phone grid has uneven columns.
+27. **P3, new.** About's licence block is a second typeface; Privacy on a phone is one long list.
+28. **P3, new.** The signed-out group invite names neither group nor inviter (*unverified* whether deliberate).
+29. **P3, new.** The graph's grey lines are unnamed; "Ana 36 / You 35" collide.
+30. **P3, new.** Offbeat's question card is the soft tint, Fragments' round card white (moot once a game's own look is built).
+
+**Themes:** the game-colour edge on board and feed rows nearly vanishes in Night, Moonlit and Ink; Moonlit's muted text reads as links and its disabled Answer looks live; Ink's white 2px lines dominate (left over, 10). The first audit's 1, 2, 3, 8 and 11 are fixed; 13 can't be seen in stills; 12 could not be told from this fixture.
+
+**What works, to keep:** the play frames (one question, one field, one button); Streak's flowers, the only drawn things in the app; the hairline board rows with the "you" row.
+
 ## The look audit
 *Filled in by the overnight session of 2026-11-17 (answer 23).* An Opus subagent built the branch at 20a's start, served it on port 3002 against slot 2's local stack with a fixture scene (the viewer played both games; one friend finished both, one partway, one not yet; a group with comments and reactions), and took 160 full-page screenshots: 16 screens, at 375px and 1280px, in the five themes. It critiqued them with the impeccable skill, in one context (no human to ask), and the local database was checked clean afterwards. The screenshots are outside the repo, in the session's scratch folder (`look-audit/shots/`). A second (Sonnet) subagent did the web research, kept in `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`. Nothing here was measured on plor.app or on a real phone.
 
