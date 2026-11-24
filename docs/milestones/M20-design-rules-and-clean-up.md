@@ -269,6 +269,25 @@ Ranked, most damaging first; **P1** a broken layout or real confusion, **P2** an
 
 **Themes:** the game-colour edge on board and feed rows nearly vanishes in Night, Moonlit and Ink; Moonlit's muted text reads as links and its disabled Answer looks live; Ink's white 2px lines dominate (left over, 10). The first audit's 1, 2, 3, 8 and 11 are fixed; 13 can't be seen in stills; 12 could not be told from this fixture.
 
+**The human's answers to the audit (2026-11-23):**
+
+| # | Asked | Answer |
+|---|---|---|
+| 74 | Thirty findings, eight of them P1: how much is fixed in this pass? | "The top 8, in order (Recommended)": each its own small change with its own check, the one-rule fixes first; the rest wait for a second pass |
+| 75 | Chips, counts, flat buttons and rows share the white fill and ink outline (finding 9): do chips and badges lose the outline? | "Show me on the sample page": the outlined and the soft-filled versions side by side on `/admin/kit` in the five themes; the human picks |
+| 76 | May the site carry drawn character outside a game (answer 18 said no art): a small emblem per game on its card, on Me and on the signed-out front page? | "Yes, simple emblems now": a small vector emblem per game, drawn like the streak's flowers; likely redrawn once a game's own style is chosen (20m) |
+| 77 | When both games are played, what is Today mainly for? | "Where I stand among friends": a strip under the cards says the player's place today and opens the board; the top three stand out; the feed follows |
+
+**20n — the audit's top eight** (answer 74), one PR each, in this order; each that changes a look asks its own questions first:
+- **20n-1:** findings 1 and 11, the two one-rule faults (the comment box's chosen game is readable; the period switch has no empty cell). → verify: an e2e reads the chosen choice's computed colour and background in the comment box and finds the board switch's pair; an e2e finds Today's period switch's three choices on one line at 1280px. Both fail first.
+- **20n-2:** finding 4, desktop Today's two cards side by side. The 768px row width is M16 16f's answers 42 and 43: the new number is asked first.
+- **20n-3:** finding 2, Your friends' rows on a phone (with 20e, which touches the same rows).
+- **20n-4:** findings 6 and 8, one start and result header for both games, and the start screen's rules and Start inside the card.
+- **20n-5:** finding 7, the recap's rows and the reveal's safe or caught colour.
+- **20n-6:** finding 3 with answer 77 and inbox #268: the place strip on Today and the top three on a board; its look is asked first.
+- **20n-7:** finding 5 with answer 76: the signed-out front page as the two game cards, and the two emblems (a design step on Fable, picked by the human as the flowers were).
+- **Beside them, not a fix:** answer 75's two chip versions on `/admin/kit`.
+
 **What works, to keep:** the play frames (one question, one field, one button); Streak's flowers, the only drawn things in the app; the hairline board rows with the "you" row.
 
 ## The look audit
