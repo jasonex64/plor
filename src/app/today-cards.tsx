@@ -95,12 +95,12 @@ export function TodayCards({
 }
 
 function Carousel({ front, onPlace, children }: { front: number; onPlace: (place: { wide: boolean; at: number }) => void; children: ReactNode[] }) {
-  // Wide: the row itself, not the window, is at least the app's tablet width (src/app/min-width.ts's 768px).
+  // Wide: the row itself, not the window, has room for two cards.
   const [wide, setWide] = useState(false);
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = row.current!;
-    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 768)); // docs/milestones/M16-16f-the-shared-pieces.md, Numbers (answers 42 and 43)
+    const observer = new ResizeObserver(() => setWide(el.clientWidth >= 560)); // docs/milestones/M20-design-rules-and-clean-up.md, 20n-2 (answer 78), in place of M16 16f's 768px
     observer.observe(el);
     return () => observer.disconnect();
   }, []);

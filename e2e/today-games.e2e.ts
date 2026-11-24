@@ -1,6 +1,6 @@
 // Today's game cards (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2): Fragments' card before, during and after a
 // run, and the cards as a carousel on phones (the card left to play in front, arrows and keyboard, one card a day when
-// only one game has a day) and side by side from 768px. Fragments' day and words are this file's own, as the real list
+// only one game has a day) and side by side once their row is 560px wide. Fragments' day and words are this file's own, as the real list
 // isn't in git (as play2.e2e.ts); its runs are put in their states in the database, as each state's screens are other
 // files' (play2.e2e.ts plays a whole day).
 import { expect, test, type Browser, type BrowserContext, type Locator, type Page } from "@playwright/test";
@@ -18,8 +18,10 @@ const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1
 const PHONE = { width: 390, height: 844 };
 // The app's tablet width (src/app/min-width.ts, used by src/app/today-cards.tsx).
 const TABLET = { width: 768, height: 1024 };
-// Wide enough that the cards' own row, beside the 280px sidebar, is at least 768px.
+// Wide enough that the cards' own row, beside the 280px sidebar, is far past the 560px it needs.
 const ROOMY = { width: 1100, height: 900 };
+// The desktop size every @visual test runs at (CLAUDE.md, Testing): the right column leaves the row 592px.
+const DESKTOP = { width: 1280, height: 720 };
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 let puzzle: TodayPuzzle;
 let today = "";
@@ -158,7 +160,7 @@ test("on a phone Today opens on the game left to play, 82% of the row, with the 
   await expect(place(page, "1 of 2")).toBeVisible();
 });
 
-test("the two cards sit side by side, with no arrows, once their row is 768px wide; a tablet keeps the carousel", async ({ browser }) => {
+test("the two cards sit side by side, with no arrows, once their row is 560px wide; a tablet keeps the carousel", async ({ browser }) => {
   await addDay();
   // At 768px the sidebar leaves the row too narrow for two cards (human, 2026-11-14: "Side by side only with room").
   const tablet = await player(browser, "gcb", TABLET);
@@ -174,6 +176,14 @@ test("the two cards sit side by side, with no arrows, once their row is 768px wi
   expect(right!.x).toBeGreaterThan(left!.x + left!.width - 1);
   expect(right!.y).toBeCloseTo(left!.y, 0);
   await noArrows(page);
+  // M20 20n-2 (the second look audit's finding 4; answer 78, "560px"): at 1280 x 720 the right column leaves the row
+  // 592px, and the two cards still sit side by side, each with its name on one line.
+  await page.setViewportSize(DESKTOP);
+  await noArrows(page);
+  const [l, r] = await Promise.all([offbeat(page).boundingBox(), fragments(page).boundingBox()]);
+  expect(r!.x).toBeGreaterThan(l!.x + l!.width - 1);
+  expect(r!.y).toBeCloseTo(l!.y, 0);
+  for (const card of [offbeat(page), fragments(page)]) expect((await card.getByRole("heading").boundingBox())!.height).toBeLessThan(60);
 });
 
 test("a day with an approved day in only one game shows that card and no arrows", async ({ browser }) => {

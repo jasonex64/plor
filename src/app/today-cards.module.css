@@ -1,6 +1,6 @@
 /* Today's game cards (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2): on phones a row "Today's games" with the
    arrows, then the cards in a scrolling strip, the front one 82% of the row (human, 2026-11-14: "B. Medium, front card
-   82%") so the next shows beside it; once this row is 768px wide (.wide, set by today-cards.tsx) the two sit side by side. */
+   82%") so the next shows beside it; once this row is 560px wide (.wide, set by today-cards.tsx; M20 answer 78) the two sit side by side. */
 .cards {
   display: flex;
   flex-direction: column;
