@@ -72,6 +72,16 @@ One sonnet agent per question, about 120,000 tokens and 3 minutes each, 5 to 11 
 
 What it showed: most of the gain is short forms ("king", "citric", "chocolate"); the obscure tail is about 60 to 70% complete by the agents' own estimate; a quarter to a half of the rare entries are from memory with no source; no agent found data on what people type first, so the tiers are judgement. The second pass (answer 3) exists for these gaps.
 
+## The first 21 questions (proposed by Claude 2026-11-24 for the human's veto, answer 26)
+Done in 23a: bed, acid, cake. Proposed next, all everyday questions on WordNet lists today, at most seven per area so each day can take three areas:
+- **Food (7 with cake):** cheese, bread, pasta, soup, candy, sandwich.
+- **Wearing (4):** hat, bag, footwear, fabric.
+- **Home (4 with bed):** kitchen utensil, tool, knot.
+- **Science and body (4 with acid):** bone, gemstone, color.
+- **Doing (2):** sport, dance.
+
+Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag 3, kitchen utensil 1; read from plor.app 2026-11-24) and otherwise for being things most players can name ten of. Left for later: animals, places and games (big sets, answer 26), and book, language and world capital (factual sets with refusals: they need the nickname procedure).
+
 ## Design
 **Why the lists are wrong today** (read by an Explore agent, 2026-11-23): 188 of 231 categories are every word under one WordNet synset (`scripts/base.ts`, `oewnSubtree`), membership is a tree walk (`private.category_members`), and no check compares a list with what players type. The admin pages can only accept a miss after the fact (`/admin/audit`).
 
