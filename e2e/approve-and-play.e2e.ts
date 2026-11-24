@@ -154,5 +154,5 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
   // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
-  await expect(page.getByText("Name a body part: you said knee, the host said hand, head, leg")).toBeVisible();
+  await expect(page.locator("#result").getByRole("listitem").filter({ hasText: "Name a body part" })).toContainText("You: knee · Host: hand, head, leg");
 });

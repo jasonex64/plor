@@ -7,7 +7,7 @@ import { expect, test, type Browser, type BrowserContext, type Locator, type Pag
 import { Pool } from "pg";
 import { PERCENTILE_MIN_PLAYERS, SUBSTRING_ROUNDS } from "../src/config/tunables";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
-import { asked, caughtToCards } from "./game";
+import { asked, caughtToCards, next as nextQuestion, safe } from "./game";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
@@ -337,4 +337,46 @@ test("each game's start is Back to Today and one card with its band, the rules, 
     await expect(main.getByRole("link", { name: "Result", exact: true }).filter({ visible: true })).toHaveCount(0);
     await expect(main.getByRole("link", { name: "Today", exact: true }).filter({ visible: true })).toHaveAttribute("href", "/");
   }
+});
+
+// M20 20n-5 (the second look audit's finding 7; answer 88): a question's row in Offbeat's result is stacked, not a
+// sentence: the question in bold with a Safe or Caught chip in that colour, "You: … · Host: …" under it, then the points
+// and how many players gave the answer, and Search answers after them.
+test("Offbeat's result rows are stacked: the question in bold with a Safe or Caught chip, then You and Host, then Search answers", { tag: "@visual" }, async ({ page }) => {
+  test.slow();
+  await page.goto("/");
+  await signInAndPick(page, "gcr");
+  await offbeat(page).getByRole("link", { name: "Play", exact: true }).click();
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await asked(page, "Name an animal");
+  await safe(page, puzzle.safeAnswer);
+  await nextQuestion(page, "Name a fruit");
+  await caughtToCards(page, "apple");
+
+  const result = page.locator("#result");
+  await expect(result).not.toContainText("you said");
+  const rows = result.getByRole("listitem");
+  await expect(rows).toHaveCount(2);
+  const read = (row: Locator) =>
+    row.evaluate((li) => {
+      const [question, chip, search] = [li.querySelector("strong")!, li.querySelector("[class*='_chip']")!, [...li.querySelectorAll("button")].find((b) => b.textContent === "Search answers")!];
+      const style = getComputedStyle(chip);
+      return {
+        question: question.textContent,
+        bold: Number(getComputedStyle(question).fontWeight) >= 700,
+        chip: chip.textContent,
+        colours: `${style.color} on ${style.backgroundColor}`,
+        // On the question's line, at its right; Search answers after everything the row says.
+        chipOnLine: Math.abs(chip.getBoundingClientRect().top - question.getBoundingClientRect().top) < 12 && chip.getBoundingClientRect().left > question.getBoundingClientRect().right,
+        searchLast: search.getBoundingClientRect().top > question.getBoundingClientRect().bottom,
+      };
+    });
+  const [first, second] = [await read(rows.nth(0)), await read(rows.nth(1))];
+  expect(first).toMatchObject({ question: "Name an animal", bold: true, chip: "Safe", chipOnLine: true, searchLast: true });
+  expect(second).toMatchObject({ question: "Name a fruit", bold: true, chip: "Caught", chipOnLine: true, searchLast: true });
+  expect(first.colours).not.toBe(second.colours);
+  await expect(rows.nth(0)).toContainText(`You: ${puzzle.safeAnswer} · Host: ${puzzle.hostAnswer}`);
+  await expect(rows.nth(0)).toContainText("+25 points, bonus +0");
+  await expect(rows.nth(1)).toContainText("You: apple · Host: apple");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
