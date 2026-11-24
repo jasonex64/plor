@@ -94,5 +94,11 @@ The old TLA+ model of the seven-question run (replaced by the new one in the sam
 |---|---|---|
 
 ## Evidence
+**Step 1, read by the main session, 2026-11-24** (`20261111120000_guest_play_data.sql` 17-129, `…game_2_rounds.sql` 103-130, baseline 925-943):
+- The rules are plain functions (`answer_rule`, `open_rule`, `round_open_rule`) that `plor_app` may execute, called by invoker triggers (`check_run_event`, `check_question_open`) that read the facts first. The new game follows the same shape: a `clock_answer_rule` and a branch per trigger.
+- `check_question_open` already branches on the game (`substrings`). A format 4 Offbeat day needs its own branch there, chosen by the day's format, since Next on a clock run doesn't wait for an answer: reuse of `question_open` holds, with that one trigger changed.
+- `private.run_status` (a view, `security_invoker`) works a status out per game from `run_event`. A format 4 run needs a third branch: live while the clock is above zero and no Finish, else over. Other code reads `survived` as "finished" (the social gates), so an ended clock run reports `survived`; the design's "live or over" maps onto the existing words, no new status.
+- `question_deadline` is the one home of today's 20 seconds; the clock's numbers get the same kind of home.
+- Nothing read rules the design out. Not yet read: the guest triggers and `settleRuns` (before steps 3 and 6).
 
 ## Review

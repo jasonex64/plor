@@ -102,5 +102,6 @@ Hypothesis for step 1: the second pass changes fewer than one answer in five. If
 |---|---|---|
 
 ## Evidence
+**Step 1, the skill proven on hat, 2026-11-24.** `.claude/skills/research-list/SKILL.md`. Pass 1 (about 11 searches and page reads, 129,000 tokens, 3 minutes): 33 old members → 201 answers; "beanie" (refused 3 times last week) is the fifth answer; one old member left out (millinery, the trade). Pass 2 (112,000 tokens, 1.5 minutes): removed nothing, added 24 answers and aliases to 10, re-tiered 2, marked 1 borderline: 37 of 201 changed, about 18%, under the hypothesis's one in five. Final: 226 answers (54 common, 89 uncommon, 83 rare), 27 borderline, 16 brands; `npm run content:validate` → `CONTENT OK content: 33 file(s)`. **Shortfall:** pass 2 searched nothing and added from memory, so its rarer additions are unconfirmed; the skill now requires at least six searches of the checker. Not yet done for hat: `categories.json`, the load, the db test (step 4, with the others).
 
 ## Review
