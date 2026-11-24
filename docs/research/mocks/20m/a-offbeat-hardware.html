@@ -1,0 +1,203 @@
+<title>Offbeat Hardware Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Barlow+Condensed:wght@700&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:38px;height:38px;flex:none}
+.entry{display:flex;gap:8px;align-items:stretch;flex:none}
+.field{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;width:2px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+.field.off .caret,.field.off .ph{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.note{flex:none;min-height:26px;line-height:1.25}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:60px;bottom:8px;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:16px}
+.over dl{display:grid;grid-template-columns:auto auto;gap:2px 18px;font-size:18px;text-align:left}
+.over dd{font-weight:800;text-align:right}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .o2{font-size:14px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* A: Offbeat as game-show hardware. One housing colour (Offbeat's #2f3d5c), black flaps, bone letters, amber bulbs. */
+:root{--outer:#090c14;--bg:#161c2e;--house:#2f3d5c;--house-hi:#50638f;--house-lo:#1c2640;--flap:#0c1019;--flap-hi:#232c42;--bone:#f6efdc;--amber:#ffb52e;--amber-lo:#b87608;--red:#ff7163;--ink:#eef1f8;--kb-bg:#0c1019;--k:#2a3554;--k-ink:#eef1f8;--disp:'Barlow Condensed','Arial Narrow',sans-serif}
+.phone{background:radial-gradient(#0b0f1a 1.4px,#0000 1.8px) 0 0/9px 9px,radial-gradient(#0b0f1a 1.4px,#0000 1.8px) 4.5px 4.5px/9px 9px,var(--bg)}
+.play{--gap:8px}
+.btn{min-height:44px;padding:0 14px;border-radius:9px;border:2px solid var(--house-hi);background:var(--house);color:#fff;font-weight:700;font-size:15px;box-shadow:inset 0 -4px 0 var(--house-lo)}
+.btn.x{width:44px;padding:0 0 4px;font-size:26px;line-height:1}
+.btn.go{background:var(--amber);border-color:#ffe1a1;color:#1a1305;font-weight:800;box-shadow:inset 0 -4px 0 var(--amber-lo)}
+.btn.pressed{box-shadow:inset 0 3px 0 var(--house-lo);background:var(--house-lo)}
+.panel{background:var(--house);border:2px solid var(--house-hi);border-radius:11px;box-shadow:inset 0 -5px 0 var(--house-lo);flex:none}
+.lab{font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink)}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:5px 12px 9px}
+.score{display:flex;align-items:center;gap:8px}
+.digits{display:flex;gap:2px}
+.cell,.digits i,.count i,.row .c{position:relative;display:grid;place-items:center;background:var(--flap);border-radius:4px;color:var(--bone);box-shadow:inset 0 1px 0 var(--flap-hi);font-style:normal;text-transform:uppercase}
+.cell::after,.digits i::after,.count i::after,.row .c::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:#000;opacity:.7}
+.digits i{width:21px;height:30px;font:700 27px/1 var(--disp);color:var(--amber)}
+.board{position:relative;padding:10px 10px 14px;container-type:inline-size;display:flex;flex-direction:column;gap:9px}
+.board::before{content:"";position:absolute;inset:-2px;border-radius:11px;border:3px solid var(--amber);box-shadow:0 0 18px 2px #ffb52eaa,inset 0 0 22px #ffb52e66;opacity:0;pointer-events:none}
+.q{display:grid;gap:3px}
+.qr{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.cell{aspect-ratio:.7;font:700 10.6cqw/1 var(--disp)}
+.ans{display:grid;gap:4px}
+.row{display:flex;align-items:center;gap:2px;min-height:9.4cqw}.row .c::after{opacity:.45}
+.row .c{flex:none;width:6.2cqw;height:8.6cqw;font:800 5.8cqw/1 'Baloo 2',sans-serif;padding-top:.12em}
+.row .tag{margin-left:auto;padding:3px 7px 1px;border-radius:4px;background:var(--flap);color:var(--bone);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;visibility:hidden}
+.row.on .tag{visibility:visible}
+.row.big .c{width:6.8cqw;height:9.4cqw;font-size:6.4cqw;background:var(--amber);color:#1a1305;box-shadow:0 0 8px #ffb52e88}
+.row.big .tag{background:var(--amber);color:#1a1305;font-size:13px}
+.clock{display:flex;align-items:center;gap:12px;padding:8px 12px 12px}
+.count{display:flex;gap:3px}
+.count i{width:31px;height:44px;font:800 32px/1 'Baloo 2',sans-serif;padding-top:.12em}
+.cl-r{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.cl-t{display:flex;justify-content:space-between;align-items:center;min-height:20px}
+.plus{display:inline-block;padding:1px 7px 0;border-radius:4px;background:var(--amber);color:#1a1305;font-size:14px;font-weight:800;visibility:hidden;transform-origin:50% 0}
+.plus.on{visibility:visible}
+.plus.bigp{font-size:18px}
+.bulbs{display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+.bulbs b{aspect-ratio:1;border-radius:50%;background:#0f1422;box-shadow:inset 0 0 0 1.5px #0008}
+.bulbs b.on{background:radial-gradient(circle at 35% 30%,#fff6d6,var(--amber) 55%,var(--amber-lo));box-shadow:0 0 6px 1px #ffb52e99}
+[data-low="1"] .bulbs b.on{background:radial-gradient(circle at 35% 30%,#ffe0dc,var(--red) 55%,#b33125);box-shadow:0 0 6px 1px #ff716399}
+[data-low="1"] .count i{color:var(--red)}
+.field{padding:0 12px;background:var(--bone);border:2px solid #fff;border-radius:9px;color:#141a2b;font-weight:800;font-size:23px;box-shadow:inset 0 3px 0 #d9d0b8}
+.field .ph{font-weight:400;font-size:16px;color:#4a5165}
+.field .l{transform-origin:50% 0;border-radius:3px;animation:aType .17s cubic-bezier(.2,.8,.2,1) both}
+.field.no{background:#ffd5cf;border-color:var(--red);animation:aShake .42s cubic-bezier(.2,.8,.2,1)}
+.note{display:flex;align-items:center;padding:3px 10px 1px;border-radius:6px;background:var(--flap);color:var(--amber);font-size:14px;font-weight:700}
+.over{background:var(--house);border:2px solid var(--house-hi);border-radius:11px;box-shadow:inset 0 -5px 0 var(--house-lo);color:var(--ink)}
+.over dd{color:var(--amber)}
+@keyframes aType{0%{transform:perspective(90px) rotateX(-90deg) scale(1.5);background:var(--amber)}55%{transform:perspective(90px) rotateX(22deg) scale(1.12);background:var(--amber)}100%{transform:none;background:#0000}}
+@keyframes aFlip{0%{transform:perspective(140px) rotateX(-92deg);filter:brightness(2.2)}55%{transform:perspective(140px) rotateX(16deg)}100%{transform:none;filter:none}}
+.flip{animation:aFlip .24s cubic-bezier(.2,.8,.2,1) both}
+.flipB{animation:aFlip .085s linear 6 both}
+@keyframes aRow{0%{transform:scale(1.05)}100%{transform:none}}
+@keyframes aRowBig{0%{transform:none}35%{transform:scale(1.1)}100%{transform:none}}
+.row.in{animation:aRow .3s cubic-bezier(.2,.8,.2,1) both}
+.row.big.in{animation:aRowBig 1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes aTag{0%{transform:scale(2.4);opacity:0}100%{transform:none;opacity:1}}
+.row.in .tag{animation:aTag .2s cubic-bezier(.2,.8,.2,1) .35s both}
+.row.big.in .tag{animation:aTag .3s cubic-bezier(.2,.8,.2,1) .9s both}
+@keyframes aFlash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+.board.flash::before{animation:aFlash 1.1s ease-out both}
+@keyframes aBulb{0%{transform:scale(.3);filter:brightness(3)}55%{transform:scale(1.6)}100%{transform:none;filter:none}}
+.bulbs b.relit{animation:aBulb .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes aShake{0%,100%{transform:none}14%{transform:translateX(-10px)}30%{transform:translateX(9px)}46%{transform:translateX(-7px)}62%{transform:translateX(5px)}80%{transform:translateX(-3px)}}
+@media (max-height:760px){.play{--gap:6px}.cell{aspect-ratio:.9}.row:nth-child(3){display:none}.count i{height:38px}.clock{padding-block:5px 9px}.hdr{padding-block:3px 7px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">A · Offbeat · Hardware</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<div class="play">
+<div class="top"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="3" width="30" height="16" rx="3" fill="#0c1019" stroke="#50638f" stroke-width="1.5"/><rect x="7" y="21" width="30" height="16" rx="3" fill="#0c1019" stroke="#50638f" stroke-width="1.5"/><path d="M9 19a9 9 0 0 1 18 0" stroke="#ffb52e" stroke-width="5" fill="none"/><path d="M13 21a9 9 0 0 0 18 0" stroke="#ffb52e" stroke-width="5" fill="none"/></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="hdr panel"><span class="lab" id="qn"></span><span class="score"><span class="lab">Score</span><span class="digits" id="score" data-display></span></span></div>
+<div class="board panel" id="board"><div class="q" id="q" data-display></div><div class="ans" id="ans"></div></div>
+<div class="clock panel"><div class="count" id="count"><i></i><i></i></div><div class="cl-r"><div class="cl-t"><span class="lab">Seconds left</span><span class="plus" id="plus"></span></div><div class="bulbs" id="bulbs"></div></div></div>
+<div class="entry"><div class="field" id="field"></div><button class="btn go" type="button">Answer</button><button class="btn" id="next" type="button">Next</button></div>
+<p class="note" id="note" role="status"></p>
+<div class="over" id="over" hidden><p class="o1">Time&rsquo;s up</p><dl><dt>Answers</dt><dd>5</dd><dt>Points</dt><dd>120</dd></dl><p class="o2">Tap anywhere to play the round again.</p></div>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='';
+const field=$('#field'),FB=field.className,note=$('#note'),rmBox=$('#rm');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word){field.innerHTML='<span class="wd"></span><i class="caret"></i>';note.textContent=''}word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s);if(V.typed)V.typed(s,word)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">go</b></div>';
+const GAME='off',PH='Your answer';
+const bulbs=$('#bulbs'),ans=$('#ans'),plus=$('#plus');
+bulbs.innerHTML='<b></b>'.repeat(20);
+let ansN=0,lit=0;
+const rows=()=>{ans.innerHTML=('<div class="row">'+'<span class="c"></span>'.repeat(10)+'<span class="tag"></span></div>').repeat(3);ansN=0};
+const V={
+  reset(){$('#over').hidden=true;plus.className='plus';$('#next').classList.remove('pressed');$('#board').classList.remove('flash');lit=0;[...bulbs.children].forEach(b=>b.className='')},
+  q(text,label){$('#qn').textContent=label;const r=[];let cur='';for(const w of text.toUpperCase().split(' ')){if((cur+' '+w).trim().length<=10)cur=(cur+' '+w).trim();else{r.push(cur);cur=w}}r.push(cur);
+    $('#q').innerHTML=r.map(x=>'<div class="qr">'+[...x.padEnd(10)].map(c=>'<span class="cell">'+c.trim()+'</span>').join('')+'</div>').join('');$('#q').setAttribute('aria-label',text);rows()},
+  score(n){$('#score').innerHTML=[...String(n).padStart(3,'0')].map(c=>'<i>'+c+'</i>').join('')},
+  clock(l,w){const d=String(w).padStart(2,'0'),c=$('#count').children;c[0].textContent=d[0];c[1].textContent=d[1];const n=Math.min(20,w);[...bulbs.children].forEach((b,i)=>{b.classList.toggle('on',i<n);if(i>=n)b.classList.remove('relit')});lit=n},
+  accept(o){const row=ans.children[ansN++],was=lit;if(!row)return;row.className='row on in'+(o.big?' big':'');
+    [...o.w.toUpperCase().padEnd(10)].forEach((ch,i)=>{const c=row.children[i];c.textContent=ch.trim();c.style.animationDelay=i*45+'ms';c.classList.add(o.big?'flipB':'flip');
+      if(o.big&&!RM&&ch.trim()){c.textContent='';for(let k=0;k<6;k++)at(i*45+k*85,()=>{c.textContent=k<5?'XKQZRWJMVH'[(i*3+k*7)%10]:ch})}});
+    row.lastChild.textContent=o.rar+' +'+o.pts;
+    if(o.big)kick($('#board'),'flash');
+    plus.textContent='+'+o.secs.toFixed(1)+' s';plus.className='plus on'+(o.big?' bigp':'');kick(plus,'flip');at(2200,()=>{plus.className='plus'});
+    const n=Math.min(20,Math.ceil(left-1e-9));[...$('#count').children].forEach(c=>kick(c,'flip'));
+    for(let i=Math.max(0,was-1);i<n;i++){const b=bulbs.children[i];b.style.animationDelay=(i-was+1)*(o.big?70:50)+(o.big?500:150)+'ms';kick(b,'relit')}},
+  refuse(msg){note.textContent=msg;kick(field,'no')},
+  next(p){$('#next').classList.toggle('pressed',p)},
+  over(){$('#over').hidden=false}
+};
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);V.clock(RM?w:left,w);root.dataset.low=left<=5?'1':'0'}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0){stopClock();T.forEach(clearTimeout);T=[];V.over();state('over')}},100)}
+function scriptOff(){
+  left=9;V.q('Name a fruit','Question 2 of 3');V.score(60);paint();state('waiting');startClock();
+  let t=typeWord(1400,'apple',130);
+  at(t+250,()=>{left+=2.6;fClear();V.accept({w:'apple',rar:'Common',pts:10,secs:2.6,big:false});V.score(70);paint();state('accepted')});
+  t=typeWord(3700,'bananna',120);
+  at(t+250,()=>{V.refuse('“bananna” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(5900,'mangosteen',120);
+  at(t+300,()=>{left+=6.5;fClear();V.accept({w:'mangosteen',rar:'Rare',pts:50,secs:6.5,big:true});V.score(120);paint();state('accepted-big')});
+  at(9500,()=>V.next(true));
+  at(9750,()=>{V.next(false);V.q('Name a planet','Question 3 of 3');note.textContent='';state('waiting')});
+  t=typeWord(10600,'pluto',140);
+  at(t+250,()=>{V.refuse('“pluto” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  typeWord(15600,'neptu',260);
+}
+function scriptFrag(){
+  left=8;V.q('ock','Round 6 of 7');V.score(135);paint();state('waiting');startClock();
+  let t=typeWord(1300,'pockit',140);
+  at(t+250,()=>{V.refuse('Not in the dictionary.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(3700,'pocket',135);
+  at(t+250,()=>{stopClock();V.accept({w:'pocket',chunk:'ock',pts:40,big:false,n:6});V.score(175);state('accepted')});
+  at(t+1250,()=>{note.textContent='You played pocket: 40 points.';V.btn('Next')});
+  at(7000,()=>V.press(true));
+  at(7250,()=>{V.press(false);V.btn('Try');fClear();left=20;V.q('ant','Round 7 of 7');note.textContent='';paint();state('waiting');startClock()});
+  t=typeWord(8400,'extravagant',115);
+  at(t+300,()=>{stopClock();V.accept({w:'extravagant',chunk:'ant',pts:120,big:true,n:7});V.score(295);state('accepted-big')});
+  at(t+2200,()=>{note.textContent='You played extravagant: 120 points.';V.btn('See results');state('over')});
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();fClear();note.textContent='';V.reset();(GAME=='off'?scriptOff:scriptFrag)()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>

@@ -80,5 +80,19 @@ Nothing: it adds four mock files under `docs/` and no app code.
 |---|---|---|
 
 ## Evidence
+**The four pages** (built 2026-11-23 by a Fable subagent; private, the owner's until shared; sources in `docs/research/mocks/20m/`, which follow the Artifact tool's format and are judged from the links, not from disk):
+
+| | Page | Display face | Clock | Page + fonts transferred |
+|---|---|---|---|---|
+| A Offbeat, game-show hardware | https://claude.ai/artifact/PiNDSTRveEJrcTMPF5oVcp | Barlow Condensed 700 | Two flap digits and 20 bulbs | 76.6 KB |
+| B Offbeat, print shop | https://claude.ai/artifact/MTmc7heeiJ5YfhhaJckSPg | Bowlby One | A printed 0 to 20 ruler | 74.8 KB |
+| C Fragments, paper cut-out | https://claude.ai/artifact/KK2KjoSfb52wbSqoEnBmB5 | Shrikhand | A paper tape that shortens | 71.0 KB |
+| D Fragments, marker doodle | https://claude.ai/artifact/1tAFabYUfFMAA73YEAVFHH | Caveat Brush | A pencil line rubbed out | 122.1 KB |
+
+**Criteria 1 to 5, as the subagent reported them** (a Playwright script against the files on a local server, 118 to 178 samples through each round, the same at 390 × 844 and 1280 × 720; the published links themselves were not measured: *unverified* there): no console error, failed request or sideways scroll; no text in the display face outside the question, chunk and score, and no third face; the lowest text contrast 6.13 (A), 5.53 (B), 6.17 (C), 5.73 (D), none on the texture; 0 running animations at any sample with Reduce motion on (36, 13, 23, 19 at most with it off); requests are the page, one Google Fonts stylesheet and font files only. The four faces' licences (SIL OFL) are from the subagent's memory: *unverified*, to check before any is built in. The lead session looked at one phone screenshot of each mock's rare or long word state.
+
+**What the mocks guessed** (for the build ticket's questions, not decisions): Offbeat opens on question 2 of 3 with 9 s left; "about 5% less an answer" compounds per answer (the 4th, common, adds 2.6 s; the 5th, rare, 6.5 s); several answers a question before Next; the clock in whole seconds, "low" from 5 s; the refusal's wording; Uncommon is never shown. Fragments leaves out the bonus letter, the letters tracker and the cash-in, so its running score is word points only; mock C adds a line under the chunk the app doesn't have. The question changing on Next and the score changing are instant (no fourth motion).
+
+**Criterion 6:** waits for the human.
 
 ## Review

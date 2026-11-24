@@ -1,0 +1,211 @@
+<title>Fragments Cut-out Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Shrikhand&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:38px;height:38px;flex:none}
+.entry{display:flex;gap:8px;align-items:stretch;flex:none}
+.field{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;width:2px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+.field.off .caret,.field.off .ph{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.note{flex:none;min-height:26px;line-height:1.25}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:60px;bottom:8px;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:16px}
+.over dl{display:grid;grid-template-columns:auto auto;gap:2px 18px;font-size:18px;text-align:left}
+.over dd{font-weight:800;text-align:right}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .o2{font-size:14px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* C: Fragments as a paper cut-out collage. Fragments' plum (#5a2f5e) is the backing sheet; every piece is a cut scrap with a hard shadow. */
+:root{--outer:#1d0e20;--bg:#4f2853;--deep:#2c1530;--cream:#f8f1e4;--ink:#25131f;--mustard:#f5b92f;--coral:#f1735d;--teal:#3fb0a7;--pink:#f4c6d4;--kb-bg:#2c1530;--k:#f8f1e4;--k-ink:#25131f;--disp:'Shrikhand','Georgia',serif}
+.phone{background:repeating-linear-gradient(115deg,#ffffff0a 0 1px,#0000 1px 7px),repeating-linear-gradient(24deg,#0000001c 0 2px,#0000 2px 13px),repeating-linear-gradient(78deg,#ffffff07 0 1px,#0000 1px 5px),var(--bg)}
+.play{--gap:9px;color:var(--ink)}
+.sh{filter:drop-shadow(3px 4px 0 #0000006b)}
+.btn{min-height:44px;padding:0 16px;border:0;background:var(--cream);color:var(--ink);font-weight:800;font-size:15px;clip-path:polygon(2% 7%,97% 0,100% 92%,0 100%)}
+.btn.x{width:46px;padding:0 0 4px;font-size:26px;line-height:1;background:var(--coral);clip-path:polygon(8% 0,100% 10%,90% 100%,0 88%)}
+.btn.go{min-width:76px;background:var(--mustard);font-size:17px;clip-path:polygon(0 5%,96% 0,100% 100%,4% 93%)}
+.btn.pressed{background:var(--ink);color:var(--cream)}
+.scrap{display:inline-block;background:var(--cream);color:var(--ink);padding:3px 12px 1px;font-weight:700;font-size:13.5px;clip-path:polygon(0 10%,98% 0,100% 88%,2% 100%)}
+.hdr{flex:none;display:flex;justify-content:space-between;align-items:center}
+.score{display:flex;align-items:center;gap:8px;background:var(--mustard);padding:2px 14px 0;clip-path:polygon(3% 0,100% 8%,97% 100%,0 90%)}
+.score span{font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.score b{font:400 28px/1.25 var(--disp)}
+.chunkw{flex:none;display:flex;flex-direction:column;align-items:center;gap:8px}
+.chunk{display:flex;justify-content:center;gap:5px;padding-top:6px}
+.chunk span{display:grid;place-items:center;width:86px;height:94px;padding-bottom:6px;font:400 68px/1 var(--disp);color:var(--ink);--rest:rotate(0deg);transform:var(--rest)}
+.chunk span:nth-child(1){background:var(--mustard);clip-path:polygon(4% 3%,96% 0,100% 94%,0 100%);--rest:rotate(-6deg) translateY(4px)}
+.chunk span:nth-child(2){background:var(--cream);clip-path:polygon(0 6%,93% 0,100% 100%,7% 95%);--rest:rotate(4deg) translateY(-4px);height:104px}
+.chunk span:nth-child(3){background:var(--teal);clip-path:polygon(6% 0,100% 5%,94% 100%,0 92%);--rest:rotate(-2deg) translateY(6px)}
+.clock{flex:none;display:flex;align-items:center;gap:10px}
+.num{display:flex;align-items:baseline;gap:6px;min-width:128px}
+.num b{min-width:1.3em;font-size:26px;font-weight:800;line-height:1.15;text-align:right}
+.tape{flex:1;height:22px;position:relative;background:var(--deep)}
+.tape i{position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,#0000 1.5px 5%) 0 100%/100% 8px no-repeat,var(--mustard);clip-path:polygon(0 0,calc(var(--f,0)*100%) 0,calc(var(--f,0)*100% - 7px) 25%,calc(var(--f,0)*100%) 50%,calc(var(--f,0)*100% - 7px) 75%,calc(var(--f,0)*100%) 100%,0 100%)}
+[data-low="1"] .tape i{background-color:var(--coral)}
+[data-low="1"] .num{background:var(--coral)}
+.stack{flex:1;min-height:0;display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:6px 8px 0}
+.item{position:relative;--rest:rotate(-1.5deg);transform:var(--rest)}
+.item:nth-child(even){--rest:rotate(1.2deg);align-self:flex-end}
+.paper{display:flex;align-items:baseline;gap:12px;padding:3px 20px 0;background:var(--cream);color:var(--ink);font-weight:800;font-size:19px;clip-path:polygon(0 4%,99% 0,100% 95%,1% 100%)}
+.paper mark{background:var(--mustard);color:var(--ink);padding:0 2px}
+.paper .pt{font-size:14px;font-weight:700}
+.tp{position:absolute;top:-5px;width:26px;height:12px;background:var(--teal);opacity:.92;z-index:2}
+.tp.t1{left:-9px;transform:rotate(-38deg)}
+.tp.t2{right:-9px;transform:rotate(34deg)}
+.item.big{align-self:center;--rest:rotate(-2.5deg);margin:4px 0 6px}
+.item.big .paper{font-size:30px;padding:6px 64px 3px 22px;background:var(--pink)}
+.item.big .tp{width:34px;height:15px;background:var(--mustard)}
+.badge{position:absolute;right:-16px;top:-14px;width:66px;height:66px;display:grid;place-items:center;padding-top:3px;background:var(--coral);color:var(--ink);font-size:17px;font-weight:800;z-index:3;clip-path:polygon(50% 0,61% 14%,79% 7%,80% 26%,98% 30%,88% 46%,100% 62%,82% 68%,82% 88%,64% 84%,52% 100%,40% 85%,21% 92%,20% 72%,2% 66%,13% 49%,0 33%,19% 28%,19% 8%,38% 15%)}
+.cf{position:absolute;left:50%;top:50%;width:12px;height:12px;opacity:0;z-index:4;clip-path:polygon(0 0,100% 30%,40% 100%)}
+.field{padding:0 8px;background:var(--deep);outline:2px dashed #f8f1e466;outline-offset:-5px;color:var(--cream)}
+.field .ph{font-size:16px;color:#e6d7e8;margin-left:4px}
+.field .l{display:inline-grid;place-items:center;min-width:19px;height:32px;padding:1px 3px 0;margin-right:1.5px;background:var(--cream);color:var(--ink);font-weight:800;font-size:20px;--rest:rotate(-3deg);transform:var(--rest);animation:cType .17s cubic-bezier(.2,.8,.2,1) both}
+.field .l:nth-child(3n+2){--rest:rotate(2.5deg) translateY(1px);background:#efe4d0}
+.field .l:nth-child(3n){--rest:rotate(-1deg) translateY(-1px);background:var(--pink)}
+.field .l.hit{background:var(--mustard)}
+.field.no{animation:cShake .34s cubic-bezier(.2,.8,.2,1)}
+.field.no .l{background:var(--coral);animation:cFall .38s cubic-bezier(.5,0,.9,.5) .42s forwards}
+.field.no .l:nth-child(even){--fall:rotate(-28deg)}
+.note{align-self:flex-start;min-height:26px;font-size:15px;padding:3px 12px 1px}
+.note:empty{visibility:hidden}
+.kr b{border-radius:3px}
+@keyframes cType{0%{transform:translateY(-26px) rotate(-16deg) scale(1.6)}60%{transform:translateY(3px) rotate(3deg) scale(.94)}100%{transform:var(--rest)}}
+@keyframes cLift{0%{transform:var(--rest)}55%{transform:translateY(-19px) rotate(-10deg) scale(1.25)}100%{transform:translateY(-14px) rotate(-7deg) scale(1.18)}}
+@keyframes cLiftB{0%{transform:var(--rest)}50%{transform:translateY(-34px) rotate(-14deg) scale(1.6)}100%{transform:translateY(-26px) rotate(-9deg) scale(1.45)}}
+.field .l.lift{animation:cLift .26s cubic-bezier(.2,.8,.2,1) both;z-index:3}
+.field .l.liftB{animation:cLiftB .4s cubic-bezier(.2,.8,.2,1) both;z-index:3}
+@keyframes cHop{0%{transform:var(--rest)}40%{transform:var(--rest) translateY(-16px) scale(1.08)}100%{transform:var(--rest)}}
+.chunk span.hop{animation:cHop .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cLand{0%{transform:translateY(90px) rotate(10deg) scale(1.3);opacity:0}25%{opacity:1}65%{transform:translateY(-4px) rotate(-3deg) scale(.97)}100%{transform:var(--rest)}}
+@keyframes cLandB{0%{transform:translateY(110px) rotate(-14deg) scale(1.7);opacity:0}20%{opacity:1}55%{transform:translateY(-8px) rotate(3deg) scale(.95)}78%{transform:rotate(-4deg) scale(1.04)}100%{transform:var(--rest)}}
+.item.in{animation:cLand .34s cubic-bezier(.2,.8,.2,1) both}
+.item.big.in{animation:cLandB .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cTape{0%{scale:2.6;opacity:0}100%{scale:1;opacity:.92}}
+.item.in .tp{animation:cTape .14s ease-in .3s both}
+.item.in .tp.t2{animation-delay:.4s}
+.item.big.in .tp{animation-delay:.52s}
+.item.big.in .tp.t2{animation-delay:.64s}
+@keyframes cBadge{0%{transform:scale(0) rotate(-200deg)}65%{transform:scale(1.3) rotate(14deg)}100%{transform:none}}
+.item.in .badge{animation:cBadge .5s cubic-bezier(.2,.8,.2,1) .5s both}
+@keyframes cConf{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--dr)) scale(1.1);opacity:0}}
+.item.in .cf{animation:cConf .85s cubic-bezier(.1,.7,.3,1) .42s both}
+@keyframes cShake{0%,100%{transform:none}16%{transform:translateX(-10px) rotate(-1deg)}34%{transform:translateX(9px) rotate(1deg)}52%{transform:translateX(-6px)}72%{transform:translateX(4px)}}
+@keyframes cFall{to{transform:translateY(46px) var(--fall,rotate(24deg));opacity:0}}
+@media (max-height:760px){.play{--gap:6px}.chunk span{width:68px;height:72px;font-size:52px}.chunk span:nth-child(2){height:80px}.chunkw .scrap{display:none}.item:nth-child(n+3){display:none}.item.big .paper{font-size:25px}.badge{width:56px;height:56px;font-size:15px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">C · Fragments · Cut-out</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<div class="play">
+<div class="top sh"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><polygon points="4,6 21,3 18,20 3,22" fill="#f5b92f"/><polygon points="24,5 37,9 35,24 21,19" fill="#3fb0a7"/><polygon points="6,25 19,23 24,37 8,36" fill="#f1735d"/><polygon points="24,24 36,27 33,37 27,36" fill="#f8f1e4"/></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="hdr sh"><span class="scrap" id="qn"></span><span class="score"><span>Score</span><b id="score" data-display></b></span></div>
+<div class="chunkw sh"><div class="chunk" id="q" data-display></div><span class="scrap">Type a word that holds these letters</span></div>
+<div class="clock sh"><span class="scrap num"><b id="secs"></b><span>seconds left</span></span><div class="tape"><i id="tape"></i></div></div>
+<div class="stack sh" id="ans"></div>
+<div class="entry sh"><div class="field" id="field"></div><button class="btn go" id="go" type="button">Try</button></div>
+<p class="note scrap sh" id="note" role="status"></p>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='';
+const field=$('#field'),FB=field.className,note=$('#note'),rmBox=$('#rm');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word){field.innerHTML='<span class="wd"></span><i class="caret"></i>';note.textContent=''}word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s);if(V.typed)V.typed(s,word)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">go</b></div>';
+const GAME='frag',PH='Your word';
+const ans=$('#ans'),go=$('#go');let chunk='';
+const COL=['#f5b92f','#f1735d','#3fb0a7','#f8f1e4','#f4c6d4'];
+function item(o,anim){const i=o.w.indexOf(o.chunk);let conf='';
+  if(o.big)for(let k=0;k<12;k++){const a=k/12*6.283+.3,r=90+(k%3)*38;conf+='<i class="cf" style="--dx:'+Math.round(Math.cos(a)*r)+'px;--dy:'+Math.round(Math.sin(a)*r*.7)+'px;--dr:'+(k%2?320:-260)+'deg;background:'+COL[k%5]+'"></i>'}
+  const it=el('div','item'+(o.big?' big':'')+(anim?' in':''),'<div class="paper"><span>'+o.w.slice(0,i)+'<mark>'+o.chunk+'</mark>'+o.w.slice(i+o.chunk.length)+'</span>'+(o.big?'':'<span class="pt">+'+o.pts+'</span>')+'</div><i class="tp t1"></i><i class="tp t2"></i>'+(o.big?'<span class="badge">+'+o.pts+'</span>'+conf:''));
+  ans.prepend(it);while(ans.children.length>(ans.querySelector('.big')?2:3))ans.lastChild.remove()}
+const V={
+  reset(){ans.innerHTML='';go.textContent='Try';go.classList.remove('pressed');item({w:'throw',chunk:'thr',pts:30});item({w:'blanket',chunk:'nk',pts:50})},
+  q(text,label){chunk=text;$('#qn').textContent=label;$('#q').innerHTML=[...text].map(c=>'<span>'+c+'</span>').join('')},
+  score(n){$('#score').textContent=n},
+  clock(l,w){$('#secs').textContent=w;$('#tape').style.setProperty('--f',Math.min(1,l/20))},
+  typed(s,w){const i=w.indexOf(chunk);if(i>=0)[...field.firstChild.children].forEach((x,k)=>x.classList.toggle('hit',k>=i&&k<i+chunk.length))},
+  accept(o){[...field.querySelectorAll('.l.hit')].forEach((s,i)=>{s.style.animationDelay=i*45+'ms';s.classList.add(o.big?'liftB':'lift')});
+    if(o.big)[...$('#q').children].forEach((s,i)=>{s.style.animationDelay=i*70+'ms';kick(s,'hop')});
+    at(RM?0:o.big?520:300,()=>{fClear();field.classList.add('off');item(o,true)})},
+  refuse(msg){note.textContent=msg;kick(field,'no')},
+  btn(t){go.textContent=t},
+  press(p){go.classList.toggle('pressed',p)}
+};
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);V.clock(RM?w:left,w);root.dataset.low=left<=5?'1':'0'}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0){stopClock();T.forEach(clearTimeout);T=[];V.over();state('over')}},100)}
+function scriptOff(){
+  left=9;V.q('Name a fruit','Question 2 of 3');V.score(60);paint();state('waiting');startClock();
+  let t=typeWord(1400,'apple',130);
+  at(t+250,()=>{left+=2.6;fClear();V.accept({w:'apple',rar:'Common',pts:10,secs:2.6,big:false});V.score(70);paint();state('accepted')});
+  t=typeWord(3700,'bananna',120);
+  at(t+250,()=>{V.refuse('“bananna” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(5900,'mangosteen',120);
+  at(t+300,()=>{left+=6.5;fClear();V.accept({w:'mangosteen',rar:'Rare',pts:50,secs:6.5,big:true});V.score(120);paint();state('accepted-big')});
+  at(9500,()=>V.next(true));
+  at(9750,()=>{V.next(false);V.q('Name a planet','Question 3 of 3');note.textContent='';state('waiting')});
+  t=typeWord(10600,'pluto',140);
+  at(t+250,()=>{V.refuse('“pluto” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  typeWord(15600,'neptu',260);
+}
+function scriptFrag(){
+  left=8;V.q('ock','Round 6 of 7');V.score(135);paint();state('waiting');startClock();
+  let t=typeWord(1300,'pockit',140);
+  at(t+250,()=>{V.refuse('Not in the dictionary.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(3700,'pocket',135);
+  at(t+250,()=>{stopClock();V.accept({w:'pocket',chunk:'ock',pts:40,big:false,n:6});V.score(175);state('accepted')});
+  at(t+1250,()=>{note.textContent='You played pocket: 40 points.';V.btn('Next')});
+  at(7000,()=>V.press(true));
+  at(7250,()=>{V.press(false);V.btn('Try');fClear();left=20;V.q('ant','Round 7 of 7');note.textContent='';paint();state('waiting');startClock()});
+  t=typeWord(8400,'extravagant',115);
+  at(t+300,()=>{stopClock();V.accept({w:'extravagant',chunk:'ant',pts:120,big:true,n:7});V.score(295);state('accepted-big')});
+  at(t+2200,()=>{note.textContent='You played extravagant: 120 points.';V.btn('See results');state('over')});
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();fClear();note.textContent='';V.reset();(GAME=='off'?scriptOff:scriptFrag)()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>

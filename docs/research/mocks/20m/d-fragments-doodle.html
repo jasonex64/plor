@@ -1,0 +1,215 @@
+<title>Fragments Doodle Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Caveat+Brush&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:38px;height:38px;flex:none}
+.entry{display:flex;gap:8px;align-items:stretch;flex:none}
+.field{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;width:2px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+.field.off .caret,.field.off .ph{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.note{flex:none;min-height:26px;line-height:1.25}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:60px;bottom:8px;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:16px}
+.over dl{display:grid;grid-template-columns:auto auto;gap:2px 18px;font-size:18px;text-align:left}
+.over dd{font-weight:800;text-align:right}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .o2{font-size:14px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* D: Fragments as a marker doodle on squared paper. The marker is Fragments' plum; a yellow highlighter, a pencil and a red pen do the rest. */
+:root{--outer:#3b1c40;--paper:#f8f6ee;--card:#fffdf6;--grid:#c3d5ef;--ink:#3f1d44;--hi:#ffe14a;--hi2:#ffa9cd;--pencil:#5e5a55;--red:#c3251c;--kb-bg:#0000;--k:#fffdf6;--k-ink:#3f1d44;--disp:'Caveat Brush','Comic Sans MS',cursive;--wob:255px 15px 225px 15px/15px 225px 15px 255px;--wob2:15px 225px 15px 255px/255px 15px 225px 15px}
+.phone{background:linear-gradient(90deg,#0000 9px,#f0a3ad 9px 11px,#0000 11px),linear-gradient(var(--grid) 1px,#0000 1px) 0 0/100% 18px,linear-gradient(90deg,var(--grid) 1px,#0000 1px) 0 0/18px 100%,var(--paper)}
+.play{--gap:9px;color:var(--ink)}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--wob)}
+.btn{min-height:44px;padding:0 15px;background:var(--card);border:2.5px solid var(--ink);border-radius:var(--wob2);color:var(--ink);font-weight:700;font-size:15px}
+.btn.x{width:46px;padding:0 0 4px;font-size:26px;line-height:1;border-radius:50% 46% 52% 44%/48% 54% 44% 52%}
+.btn.go{min-width:78px;background:var(--hi);font-weight:800;font-size:17px;box-shadow:3px 3px 0 var(--ink)}
+.btn.pressed{box-shadow:none;transform:translate(3px,3px)}
+.lab{font-size:13.5px;font-weight:700}
+.hdr{flex:none;display:flex;justify-content:space-between;align-items:center}
+.hdr .card{padding:2px 12px 0}
+.score{display:flex;align-items:baseline;gap:8px;border-radius:var(--wob2)!important}
+.score b{font:400 30px/1.1 var(--disp);background:linear-gradient(#0000 62%,var(--hi) 62% 92%,#0000 92%)}
+.chunkw{flex:none;display:flex;justify-content:center;padding:4px 0 2px}
+.chunk{position:relative;padding:0 34px 6px;background:var(--card);border:4px solid var(--ink);border-radius:var(--wob);font:400 84px/1.02 var(--disp);letter-spacing:.06em;color:var(--ink);transform:rotate(-2deg)}
+.chunk::after{content:"";position:absolute;inset:-7px -5px -6px -8px;border:3px solid var(--ink);border-radius:var(--wob2);transform:rotate(1.4deg);pointer-events:none}
+.clock{flex:none;display:flex;align-items:center;gap:10px;padding:2px 14px 2px 12px}
+.clock b{min-width:1.3em;font-size:30px;font-weight:800;line-height:1.2;text-align:right}
+.clock .lab{line-height:1.1;font-size:12px}
+.line{flex:1;height:26px;position:relative}
+.line svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.line path{fill:none;stroke:var(--pencil);stroke-width:3.5;stroke-linecap:round}
+.line .ghost{opacity:.2}
+.line .ghost path{stroke-width:7}
+.line .full{clip-path:inset(-4px calc(100% - var(--f,0)*100%) -4px 0)}
+.rub{position:absolute;left:calc(var(--f,0)*100%);top:50%;width:22px;height:13px;background:#f39bb0;border:2px solid var(--ink);border-radius:3px;transform:translate(-20%,-70%) rotate(-24deg)}
+[data-low="1"] .line .full path{stroke:var(--red)}
+[data-low="1"] .clock b{color:var(--red)}
+.list{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:0 14px 2px;border-radius:var(--wob2)}
+.rowd{flex:none;display:flex;align-items:baseline;gap:10px;padding:2px 0 0;border-bottom:1.5px solid var(--grid);font-size:17px;font-weight:700;line-height:1.5}
+.rowd:last-child{border-bottom:0}
+.rowd .n{font-size:13px;font-weight:400;min-width:1.4em}
+.rowd .pt{margin-left:auto;font-size:15px;font-weight:800;position:relative}
+mark{background:linear-gradient(#0000 14%,var(--hi) 14% 88%,#0000 88%);color:var(--ink);padding:0 3px;margin:0 -1px;border-radius:3px 8px 4px 9px}
+.rowd.big{font-size:26px;font-weight:800;padding:5px 0 4px;line-height:1.2}
+.rowd.big .w{border-bottom:6px double var(--ink);border-radius:0 0 30px 8px/0 0 4px 3px}
+.rowd.big mark{background:linear-gradient(#0000 8%,var(--hi) 8% 60%,var(--hi2) 60% 94%,#0000 94%)}
+.rowd.big .pt{font-size:19px;padding:0 9px;border:2.5px solid var(--ink);border-radius:50% 46% 52% 44%/48% 54% 44% 52%;transform:rotate(-4deg)}
+.field{padding:0 14px;color:var(--ink);font-weight:700;font-size:23px;border-radius:var(--wob2)}
+.field .ph{font-weight:400;font-size:16px;color:#5b4660}
+.field .l{animation:dType .15s cubic-bezier(.2,.8,.2,1) both}
+.field .l.hit{font-weight:800}
+.hl{position:absolute;top:12%;bottom:8%;z-index:0;background:var(--hi);border-radius:3px 9px 4px 10px;transform:skewX(-9deg) rotate(-1deg);transform-origin:0 50%}
+.hl.two{top:44%;bottom:-2%;background:var(--hi2);transform:skewX(-9deg) rotate(1.5deg)}
+.pts{margin-left:12px;font-weight:800;font-size:19px;position:relative;z-index:1}
+.field.ok .caret,.field.okbig .caret{visibility:hidden}
+.field.okbig .wd{transform:scale(1.22);transform-origin:0 50%}
+.dsvg{position:absolute;overflow:visible;pointer-events:none;z-index:2}
+.dsvg path{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
+.dsvg.ul{left:-2px;bottom:-5px;height:9px}
+.dsvg.circ{inset:-5px -9px -3px -9px;width:calc(100% + 18px);height:calc(100% + 8px)}
+.dsvg.scr{inset:0 -6px;width:calc(100% + 12px);height:100%}
+.dsvg.scr path{stroke:var(--red);stroke-width:3}
+.field.no{animation:dShake .34s cubic-bezier(.2,.8,.2,1)}
+.field.no .l{color:#6a5a6c}
+.note{align-self:flex-start;min-height:26px;font-size:15px;font-weight:700;padding:2px 12px 0}
+.note:empty{visibility:hidden}
+.kr b{border:2px solid var(--ink);border-radius:12px 5px 11px 6px/6px 11px 5px 12px}
+@keyframes dType{0%{transform:translateY(7px) rotate(-16deg) scale(1.7);clip-path:inset(-20% 100% -20% -20%)}45%{clip-path:inset(-20% -20% -20% -20%)}70%{transform:translateY(-1px) rotate(3deg) scale(.95)}100%{transform:none;clip-path:inset(-20% -20% -20% -20%)}}
+@keyframes dSwipe{0%{transform:skewX(-9deg) rotate(-1deg) scaleX(0)}100%{transform:skewX(-9deg) rotate(-1deg)}}
+@keyframes dSwipe2{0%{transform:skewX(-9deg) rotate(1.5deg) scaleX(0)}100%{transform:skewX(-9deg) rotate(1.5deg)}}
+.hl{animation:dSwipe .2s cubic-bezier(.3,0,.2,1) both}
+.hl.big{animation-duration:.26s}
+.hl.two{animation:dSwipe2 .26s cubic-bezier(.3,0,.2,1) .3s both}
+@keyframes dWrite{0%{clip-path:inset(-30% 100% -30% -30%)}100%{clip-path:inset(-30% -30% -30% -30%)}}
+.pts{animation:dWrite .2s ease-out .24s both}
+.field.okbig .pts{animation-delay:.62s}
+@keyframes dGrow{0%{transform:none}55%{transform:scale(1.34)}100%{transform:scale(1.22)}}
+.field.okbig .wd{animation:dGrow .36s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.dsvg.ul path{animation:dDraw .34s ease-out .5s both}
+.dsvg.circ path{animation:dDraw .4s ease-out .84s both}
+.dsvg.scr path{animation:dDraw .3s linear both}
+@keyframes dRow{0%{transform:translateY(26px) scale(1.06);opacity:0}100%{transform:none;opacity:1}}
+.rowd.in{animation:dRow .26s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dShake{0%,100%{transform:none}16%{transform:translateX(-9px) rotate(-.8deg)}34%{transform:translateX(8px) rotate(.8deg)}52%{transform:translateX(-6px)}72%{transform:translateX(4px)}}
+@media (max-height:760px){.play{--gap:6px}.chunk{font-size:60px;padding-inline:26px}.clock b{font-size:24px}.rowd{font-size:16px;padding-top:2px}.rowd.big{font-size:22px;padding-top:4px}.rowd:nth-last-child(n+3){display:none}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">D · Fragments · Doodle</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<div class="play">
+<div class="top"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 8c8-2 17-2 26 0c1 8 1 16 0 25c-8 1-17 1-26 0c-1-9-1-17 0-25z" fill="#fffdf6" stroke="#3f1d44" stroke-width="3" stroke-linejoin="round"/><path d="M16 12c4-2 9-2 14 0v16c-5 2-10 2-14 0z" fill="#ffe14a"/><path d="M12 15v10m8-11v12m7-11v10" stroke="#3f1d44" stroke-width="3.2" stroke-linecap="round"/></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="hdr"><span class="card lab" id="qn"></span><span class="card score"><span class="lab">Score</span><b id="score" data-display></b></span></div>
+<div class="chunkw"><div class="chunk" id="q" data-display></div></div>
+<div class="clock card"><b id="secs"></b><span class="lab">seconds<br>left</span><div class="line"><svg class="ghost" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10C22 5 38 14 58 9S92 13 118 8s40 6 62 2 44 5 62-1 38 4 55 1"/></svg><svg class="full" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10C22 5 38 14 58 9S92 13 118 8s40 6 62 2 44 5 62-1 38 4 55 1"/></svg><i class="rub"></i></div></div>
+<div class="list card" id="ans"></div>
+<div class="entry"><div class="field card" id="field"></div><button class="btn go" id="go" type="button">Try</button></div>
+<p class="note card" id="note" role="status"></p>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='';
+const field=$('#field'),FB=field.className,note=$('#note'),rmBox=$('#rm');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word){field.innerHTML='<span class="wd"></span><i class="caret"></i>';note.textContent=''}word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s);if(V.typed)V.typed(s,word)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">go</b></div>';
+const GAME='frag',PH='Your word';
+const ans=$('#ans'),go=$('#go');let chunk='';
+const svg=(c,vb,d)=>'<svg class="dsvg '+c+'" viewBox="'+vb+'" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="'+d+'"/></svg>';
+function row(o,anim){const i=o.w.indexOf(o.chunk);
+  ans.appendChild(el('div','rowd'+(o.big?' big':'')+(anim?' in':''),'<span class="n">'+o.n+'.</span><span class="w">'+o.w.slice(0,i)+'<mark>'+o.chunk+'</mark>'+o.w.slice(i+o.chunk.length)+'</span><span class="pt">+'+o.pts+'</span>'))}
+const V={
+  reset(){ans.innerHTML='';go.textContent='Try';go.classList.remove('pressed');row({w:'blanket',chunk:'nk',pts:50,n:3});row({w:'throw',chunk:'thr',pts:30,n:5})},
+  q(text,label){chunk=text;$('#qn').textContent=label;$('#q').textContent=text},
+  score(n){$('#score').textContent=n},
+  clock(l,w){$('#secs').textContent=w;$('#ans').parentNode.style.setProperty('--f',Math.min(1,l/20))},
+  typed(s,w){const i=w.indexOf(chunk);if(i>=0)[...field.firstChild.children].forEach((x,k)=>x.classList.toggle('hit',k>=i&&k<i+chunk.length))},
+  accept(o){const wd=field.firstChild,h=[...wd.querySelectorAll('.l.hit')],a=h[0],b=h[h.length-1],pad=o.big?7:4;
+    const bar=c=>{const e=el('i','hl '+c);e.style.left=a.offsetLeft-pad+'px';e.style.width=b.offsetLeft+b.offsetWidth-a.offsetLeft+pad*2+'px';wd.prepend(e)};
+    bar(o.big?'big':'');if(o.big)bar('two');
+    field.classList.add(o.big?'okbig':'ok');
+    const p=el('span','pts','+'+o.pts);wd.appendChild(p);
+    if(o.big){const u=el('span');u.innerHTML=svg('ul','0 0 100 12','M1 4C25 1 60 7 99 3M5 10C30 7 70 11 95 8');const s=u.firstChild;s.style.width=b.offsetLeft+b.offsetWidth+4+'px';wd.appendChild(s);p.insertAdjacentHTML('beforeend',svg('circ','0 0 100 50','M52 4C20 2 3 14 4 27c1 15 26 21 51 19 27-2 42-10 41-24C95 9 70 3 42 7'))}
+    at(o.big?1750:850,()=>{fClear();field.classList.add('off');row(o,true)})},
+  refuse(msg){note.textContent=msg;kick(field,'no');field.firstChild.insertAdjacentHTML('beforeend',svg('scr','0 0 100 30','M2 21L11 6l7 19L29 5l7 20L47 6l8 18L66 5l6 20L84 7l6 16 8-14'))},
+  btn(t){go.textContent=t},
+  press(p){go.classList.toggle('pressed',p)}
+};
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);V.clock(RM?w:left,w);root.dataset.low=left<=5?'1':'0'}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0){stopClock();T.forEach(clearTimeout);T=[];V.over();state('over')}},100)}
+function scriptOff(){
+  left=9;V.q('Name a fruit','Question 2 of 3');V.score(60);paint();state('waiting');startClock();
+  let t=typeWord(1400,'apple',130);
+  at(t+250,()=>{left+=2.6;fClear();V.accept({w:'apple',rar:'Common',pts:10,secs:2.6,big:false});V.score(70);paint();state('accepted')});
+  t=typeWord(3700,'bananna',120);
+  at(t+250,()=>{V.refuse('“bananna” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(5900,'mangosteen',120);
+  at(t+300,()=>{left+=6.5;fClear();V.accept({w:'mangosteen',rar:'Rare',pts:50,secs:6.5,big:true});V.score(120);paint();state('accepted-big')});
+  at(9500,()=>V.next(true));
+  at(9750,()=>{V.next(false);V.q('Name a planet','Question 3 of 3');note.textContent='';state('waiting')});
+  t=typeWord(10600,'pluto',140);
+  at(t+250,()=>{V.refuse('“pluto” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  typeWord(15600,'neptu',260);
+}
+function scriptFrag(){
+  left=8;V.q('ock','Round 6 of 7');V.score(135);paint();state('waiting');startClock();
+  let t=typeWord(1300,'pockit',140);
+  at(t+250,()=>{V.refuse('Not in the dictionary.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(3700,'pocket',135);
+  at(t+250,()=>{stopClock();V.accept({w:'pocket',chunk:'ock',pts:40,big:false,n:6});V.score(175);state('accepted')});
+  at(t+1250,()=>{note.textContent='You played pocket: 40 points.';V.btn('Next')});
+  at(7000,()=>V.press(true));
+  at(7250,()=>{V.press(false);V.btn('Try');fClear();left=20;V.q('ant','Round 7 of 7');note.textContent='';paint();state('waiting');startClock()});
+  t=typeWord(8400,'extravagant',115);
+  at(t+300,()=>{stopClock();V.accept({w:'extravagant',chunk:'ant',pts:120,big:true,n:7});V.score(295);state('accepted-big')});
+  at(t+2200,()=>{note.textContent='You played extravagant: 120 points.';V.btn('See results');state('over')});
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();fClear();note.textContent='';V.reset();(GAME=='off'?scriptOff:scriptFrag)()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>
