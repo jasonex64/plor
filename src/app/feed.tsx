@@ -19,7 +19,7 @@ import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
 import { GAME, GAME_ID, SUBSTRINGS } from "@/platform/game";
 import { COMMENT_MAX_LENGTH } from "@/config/tunables";
-import { Avatar } from "./avatar";
+import { PlayerAvatar, PlayerName } from "./player-link";
 import { ButtonLink } from "./button-link";
 import { Count, CommentContent, PENDING, characters, useArrived } from "./comments";
 import commentStyles from "./comments.module.css";
@@ -408,10 +408,14 @@ function ResultContent({ item, ids, reactable, react }: { item: FeedResultItem; 
   const game = item.game === GAME_ID ? GAME : SUBSTRINGS;
   return (
     <>
-      <Avatar name={item.name} />
+      <PlayerAvatar name={item.name} username={item.username} me={item.mine} />
       <div className={kit.grow}>
         <div className={kit.head}>
-          <strong id={`${ids}-name`}>{item.name}</strong>
+          <strong id={`${ids}-name`}>
+            <PlayerName username={item.username} me={item.mine}>
+              {item.name}
+            </PlayerName>
+          </strong>
           <span className={kit.chip}>
             <span>
               <span id={`${ids}-game`} className={commentStyles.nowrap}>{game.name}</span> ·{" "}

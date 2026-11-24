@@ -20,6 +20,7 @@ li.friend {
 .name {
   grid-column: 2;
   grid-row: 1;
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

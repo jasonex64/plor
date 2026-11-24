@@ -26,6 +26,7 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
+import { PlayerAvatar, PlayerName } from "./player-link";
 import styles from "./board.module.css";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
@@ -179,8 +180,10 @@ export function Board({
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
             <li key={f.username} className={`${kit.row} ${kit.board} ${styles.friend}`}>
-              <Avatar name={f.name} />
-              <b className={styles.name}>{f.name}</b>
+              <PlayerAvatar name={f.name} username={f.username} />
+              <PlayerName username={f.username} className={styles.name}>
+                {f.name}
+              </PlayerName>
               <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds)} className={`${toneOf(f)} ${styles.status}`} />
               {f.reactions && (
                 <div className={styles.reactions}>

@@ -10,10 +10,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Friend, FriendWithId } from "@/friends/friends";
 import { api } from "@/lib/api-client";
-import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
-import { PlayerLink } from "./player-link";
+import { PlayerAvatar, PlayerLink, PlayerName } from "./player-link";
 import { ReactMenu } from "./reactions";
 import { Line, Skeleton } from "./skeleton";
 
@@ -105,9 +104,9 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
             <ul className={kit.rows} aria-label="Requests to you">
               {lists.requests.map((p) => (
                 <li key={p.username} className={kit.row}>
-                  <Avatar name={p.name} />
+                  <PlayerAvatar name={p.name} username={p.username} />
                   <div className={kit.grow}>
-                    {p.name}
+                    <PlayerName username={p.username}>{p.name}</PlayerName>
                     <div className={kit.below}>
                       {action("Accept", "/api/friends/requests/accept", byName(p))}
                       {action("Decline", "/api/friends/requests/decline", byName(p))}
@@ -125,8 +124,10 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
               <ul className={kit.rows} aria-label="Requests you sent">
                 {lists.sent.map((p) => (
                   <li key={p.username} className={kit.row}>
-                    <Avatar name={p.name} />
-                    <span className={kit.grow}>{p.name}</span>
+                    <PlayerAvatar name={p.name} username={p.username} />
+                    <span className={kit.grow}>
+                      <PlayerName username={p.username}>{p.name}</PlayerName>
+                    </span>
                     {action("Cancel", "/api/friends/requests/cancel", byName(p))}
                   </li>
                 ))}
