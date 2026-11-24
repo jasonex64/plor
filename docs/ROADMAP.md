@@ -159,6 +159,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] On a touch laptop that reports `hover: hover`, the reaction ⋯ has no resting cue until its row is tapped or focused (accepted in the human's #270 request; DESIGN.md's ⋯ line could say so). Found in #294's review.
 - [ ] A Fragments score is read two ways: the weekly and overall boards from the ledger, the friends' board for a date and the feed by `scoreRun` on the stored words (`src/game/substring-places.ts:53`, `src/friends/board.ts:95`, `src/comments/feed-page.ts:186`). Any change to the scoring rule makes a past day read differently on the two; #295 did, for runs with a word of 11 or more letters. One reader, or a rule that a scoring change says what past days show. Found in #295's review.
 - [ ] `src/config/tunables.ts:214`'s comment still says each part grows by `growth` a step, no longer true of a word past 10 letters; `M16-16e-points-and-boards.md` keeps the old 11 to 18 table with no pointer to the 2026-11-23 change. Found in #295's review.
+- [ ] Four exports have no importer anywhere, tests included: `encodeCursor` (`src/comments/feed-page.ts`), `toComment` (`src/comments/comments.ts`), `checkSchedule` (`src/content/puzzle.ts`), `pageName` (`src/app/shell.tsx`); drop the `export`. Found in the 2026-11-23 audit (A7; `docs/audits/2026-11-23-weekly-audit.md`).
+- [ ] Helpers written twice: `shiftDay` (`src/app/day-text.ts:8`) and `daysBefore` (`src/friends/leaderboard.ts:79`) are one date shift with the sign flipped; `oneDecimal` is in both `src/game/par.ts:6` and `src/game/percentile.ts:6`. Found in the 2026-11-23 audit (A8; `docs/audits/2026-11-23-weekly-audit.md`).
 
 **For PROCESS-lint-rules**
 - [ ] `local/no-service-role` matches `service_role` only, as the ticket asked: not `serviceRoleKey`, `service-role` or `SUPABASE_SERVICE_KEY` (`/service[_-]?role/i` would cost nothing today, 0 hits); not regex literals, JSX text or split strings; it would flag a harmless `service_roles`; it covers `src/` only, not `scripts/` or `e2e/` (none use the key today). Found in rule 5 (review).
@@ -172,6 +174,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The values kept as built with no origin (answers 23 to 26: a tie counting half, 5 shown host answers, the peek's pattern, the draft hash) now cite the human's 2026-11-17 approval; nothing more is known of where they came from. Found in rule 2 (review).
 
 **For M16**
+- [ ] Fragments' try routes (`src/app/api/substrings/try/route.ts:14`, `src/app/api/guest/substrings/try/route.ts:13`) check only that `text` is a string; Offbeat refuses over 40 characters before matching (`src/game/runs.ts:219`). A huge body is cleaned and sent to SQL whole: one slow request (cost not timed). Found in the 2026-11-23 audit (A5; `docs/audits/2026-11-23-weekly-audit.md`).
 - [ ] `e2e/feed.e2e.ts` failed on CI in the 20 minutes after the day's reset (2026-11-15, PRs #214 and #215): its seeded comments carried today's day with yesterday's time, which the app never writes, and the second page came back empty. The helper now takes a comment's day from its time. Left: the date-line test's "today" comment, 5 minutes old, is yesterday's in the first 5 minutes of a day; and `feel.e2e.ts:51`, `live-board.e2e.ts:31` and `controls-and-state.e2e.ts:200` passed only on a retry in the same runs, cause not looked for. Found on CI, 2026-11-15.
 - [ ] The test that no word of the list reaches the player before the run ends (`src/app/api/substrings/route.db.test.ts`, "sends no word of the list…") leans on the test before it having had a word accepted, and reads only the early replies of a run it never ends. Found in M16's close (review).
 - [ ] This file's M16 row still says "the name still open" (it is Fragments, 16f answer 3); 16g-3's Status says 14c-9 "removes" the village, which is done (PR #181). Found in M16's close (review).
@@ -213,6 +216,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Replies to a comment, tucked under it behind a count (M16, 16f answers 28 and 32: left out of 16f, "Leave replies out"): a new feature, after the beta.
 
 **For M20** (20a's review, 2026-11-17)
+- [ ] DESIGN.md's `file:line` citations into `kit.module.css` and `globals.css` have drifted: none of 11 checked still holds (`.card` cited at `kit.module.css:7-20`, now `:21`; the focus ring at `globals.css:352-355`, now about `:387`). Re-cite them; the other ~125 are unchecked. Found in the 2026-11-23 audit (A4; `docs/audits/2026-11-23-weekly-audit.md`).
+- [ ] This file's M20 row says "20n-1 built, its PR open"; it merged in #296. Found in the 2026-11-23 audit (A3; `docs/audits/2026-11-23-weekly-audit.md`).
 - [ ] `e2e/look-audit.shots.ts` deletes its dictionary words whether or not it inserted them (the pattern `play2.e2e.ts:53` and `guest-play.e2e.ts:36` already have); a real word with that key would go with them. Found in 20l (review, 2026-11-23).
 - [ ] `npm run look-audit` does not itself check that no fixture rows are left: the check was the agent's, by hand; a run killed midway leaves rows and says nothing. Found in 20l (review).
 - [ ] `LOOK_AUDIT_OUT` is named only in the script's header, and no DECISIONS row names a Playwright-driven script with its own config. Found in 20l (review).
@@ -249,12 +254,15 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `docs/DESIGN.md`'s `leaderboard.tsx:157-173` (Show table) and `leaderboard.tsx:170` (the Monday note) already pointed at the wrong lines on `main` before M22 (they are now around `:285-308` and `:305`). Found in M22 22a.
 
 **For M21**
+- [ ] The M21 ticket's Status says 21a is "in pull request #238; merge on green checks"; #238 is merged (`fed7962`). Found in the 2026-11-23 audit (A3; `docs/audits/2026-11-23-weekly-audit.md`).
+- [ ] e2e helpers copied file to file: `idOf` five times (`boards`, `feed`, `overall-board`, `today-games`, `look-audit.shots`), `finishOffbeat` three, `addDay` and `removeDay` three and two, `sheetOf` three; one copy each in `e2e/players.ts` or `e2e/game.ts`. Found in the 2026-11-23 audit (A6; `docs/audits/2026-11-23-weekly-audit.md`).
 - [ ] `e2e/leaderboard-graph.e2e.ts:127` may race as `boards.e2e.ts:223` did: `withFriends` signs in, then dates accounts back and adds friends and points, and the test reads the board with no reload; passed locally and on CI on the built app. Found in M21 21a (review, 2026-11-16).
 - [ ] `e2e/player-screens.e2e.ts:158` ("the banner's Result opens the game screen at the result") was flaky on CI on the built app (`toHaveURL`); passed 3 of 3 locally. Found in M21 21a (build, 2026-11-16).
 - [ ] `e2e/test-run.e2e.ts:55`'s comment still speaks of waiting on `next dev`. Found in M21 21a (review).
 - [ ] `playwright.config.ts` sets `reuseExistingServer: false`, Playwright's default, kept explicit for answer 3. Found in M21 21a (review).
 
 **For M19**
+- [ ] M19's ticket Status and this file's row still say "in progress", though every step is merged and the row says "Done, 2026-11-13". Found in the 2026-11-23 audit (A3; `docs/audits/2026-11-23-weekly-audit.md`).
 - [ ] 19f's test cites `src/game/runs.db.test.ts` for the question's 20 seconds; the origin is the baseline migration (`supabase/migrations/20261028140000_baseline.sql:914-927`). Found in M19 19f (review, 2026-11-13).
 - [ ] `src/content/puzzle.ts` and `src/admin/audit.ts` keep their own copies of the uuid pattern beside `UUID` in `src/friends/friends.ts`. Found in M19 19e (build).
 - [ ] `src/app/friends-list.tsx`'s `Who` / `byName` helper is more than its one ID call needs. Found in M19 19e (review, 2026-11-13).
@@ -291,6 +299,9 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] One date formatter is written three times (`src/app/me.tsx`, `src/app/offbeat.tsx`, `e2e/me.e2e.ts`), the db tests' rolled-back-transaction helper four times and `asPlorApp` five (`docs/audits/2026-11-11-weekly-audit.md`, W13). Found in the 2026-11-11 audit. Nothing breaks.
 - [ ] `goodnight`: name every stop from CLAUDE.md's "Stop and ask when" (breaking a rule, an ambiguous source), say a permission prompt with nobody there stops the item, and keep "take the (Recommended) option" away from DECISIONS.md's "Hard to reverse". Found in the `process-2026-11-10` review — the skill already forbids security changes and merges.
 - [ ] `audit`: say it runs from the main checkout (its worktree path is relative) and what to do when `audit-<date>` already exists; its report name differs from `2026-10-26-codebase-audit.md`. Found in the `process-2026-11-10` review — the first run shows whether either bites.
+- [ ] `audit` step 1 says `git worktree add ../RIFF-audit-<date>` and step 6 removes it; CLAUDE.md ("Slots") says "Never make another folder or worktree". Say: take a free slot, check out `audit-<date>` from `origin/main` (no database reset), return the slot after the PR. Found in the 2026-11-23 audit (A1; `docs/audits/2026-11-23-weekly-audit.md`).
+- [ ] `goodnight` queues tickets with Status `planned`, but approved tickets read "approved…", "in progress" or "building"; it works in a milestone's "existing worktree" and never mentions slots or one e2e run at a time; `request_keep_awake` is named nowhere else (unverified that it exists). Found in the 2026-11-23 audit (A2; `docs/audits/2026-11-23-weekly-audit.md`).
+- [ ] ROADMAP's "Focus" section reads as current policy but is superseded: the MVP "M00 to M12", plor.app "may lag behind `main`. Nothing is published for others until launch", plor.app "needn't be playable before launch". Mark it history or cut it to what still holds. Found in the 2026-11-23 audit (A9; `docs/audits/2026-11-23-weekly-audit.md`).
 
 **For M12 (account):**
 - [ ] Account deletion: friendships may cascade before comments, so friends' open pages get no nudge; `getBoard` (`src/friends/board.ts`) reads run status and run events in two queries, so a friend deleted between them gives a 500 (seen once in an e2e run, cause *unverified*). Found in M08 8a, 8b, 8c and 8d. *(12c closed the rest: the comment and reaction indexes, and self-service deletion in place of the privacy page's emailed request.)*
