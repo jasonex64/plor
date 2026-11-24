@@ -129,3 +129,36 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+/* The result's details inside the game screen's one card (M20 20n-4, answer 84): the card's width, read from the left
+   as the cards' own text is, with the card's gap between its parts (kit.module.css, .card). */
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result > * {
+  margin: 0;
+}
+
+/* A card's heading, 24px (kit.module.css, .card > h2). */
+.result > h2 {
+  font-size: 1.5rem;
+}
+
+/* The game screen's own card (Banner's page): not Today's centred card but a page's, its parts the card's width and
+   read from the left, as Fragments' card is. */
+.banner.page {
+  align-items: stretch;
+  text-align: left;
+}
+
+.banner.page .facts {
+  justify-content: flex-start;
+}
+
+/* The time to the next puzzle stays a chip, its own width, at the card's left. */
+.banner.page > [role="timer"] {
+  align-self: flex-start;
+}

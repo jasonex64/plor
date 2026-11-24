@@ -467,23 +467,34 @@ function Run({
     );
   return (
     <div className={styles.game}>
-      <Banner date={run.date}>{over && <Score run={run} />}</Banner>
-      {run.status === "not_started" && (
-        <>
-          {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
-              have no constant here; the points come from tunables.ts. */}
-          <p className={styles.rules}>
-            <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the host didn&apos;t pick. Each
-            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
-            {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
-          </p>
-          <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
-            Start
-          </button>
-          <HowToPlay steps={GAME_1_STEPS} />
-        </>
-      )}
-      {over && <Result run={run} share={extras.share} search={extras.search} focus={seen && done} />}
+      {/* One card (docs/milestones/M20-design-rules-and-clean-up.md, 20n-4, answers 83 and 84): the band, then the
+          rules, Start and How to play before the run; after it the score, the result's details and the time to the
+          next puzzle. */}
+      <Banner date={run.date} page>
+        {run.status === "not_started" && (
+          <>
+            {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
+                have no constant here; the points come from tunables.ts. */}
+            <p className={styles.rules}>
+              <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the host didn&apos;t pick. Each
+              question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+              {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
+            </p>
+            <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
+              Start
+            </button>
+            <HowToPlay steps={GAME_1_STEPS} />
+          </>
+        )}
+        {over && (
+          <>
+            <BigScore points={run.points} />
+            <Facts facts={[...(earnsBonus(run) ? [`+ about ${run.bonus} bonus`] : []), endedText(run)]} />
+            <Result run={run} share={extras.share} search={extras.search} focus={seen && done} />
+            <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
+          </>
+        )}
+      </Banner>
       {over && extras.peek && <GuestPeek />}
       {error && <p role="alert">{error}</p>}
     </div>
@@ -500,8 +511,8 @@ function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
 }
 
 // A finished run in the banner: the score, how it ended, the result's details and the time to the next puzzle. The
-// details are on the game screen, under #result. With the result already drawn and shown (the game screen's own
-// banner; a game screen visited before stays in the document, hidden, under Today), Result scrolls to it without
+// details are on the game screen, under #result, in its one card (M20 20n-4), which has no Result of its own. With the
+// result already drawn and shown (a game screen visited before stays in the document, hidden, under Today), Result scrolls to it without
 // putting #result in the address, as Result does once it's drawn (docs/milestones/M14-14b-23-small-jumps-and-finds.md,
 // answer 2).
 function Score({ run }: { run: RunState }) {
@@ -567,9 +578,10 @@ export function BannerSkeleton() {
 }
 
 // game: Fragments' card is this banner in its own colour (src/app/today-fragments.tsx; M16 16f-2).
-export function Banner({ date, game = GAME, children }: { date?: string; game?: typeof GAME | typeof SUBSTRINGS; children?: ReactNode }) {
+// page: the game screen's own card, read from the left at the card's width, as Fragments' is (M20 20n-4).
+export function Banner({ date, game = GAME, page = false, children }: { date?: string; game?: typeof GAME | typeof SUBSTRINGS; page?: boolean; children?: ReactNode }) {
   return (
-    <div className={`${kit.card} ${styles.banner} ${gameColour(game.id)}`}>
+    <div className={`${kit.card} ${styles.banner} ${gameColour(game.id)}${page ? ` ${styles.page}` : ""}`}>
       <Band game={game} date={date} />
       {children}
     </div>
@@ -776,7 +788,7 @@ function Question({
   );
 }
 
-// The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
+// The result's details, in the game screen's card under the score (M20 20n-4, answer 84). A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14). Then
 // #result leaves the address, so the page shown again or reloaded later stays where the player left it
@@ -796,7 +808,7 @@ function Result({ run, share, search, focus }: { run: RunState; share: boolean; 
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
   }, []);
   return (
-    <div id="result" ref={box} className={kit.card}>
+    <div id="result" ref={box} className={styles.result}>
       <h2 ref={heading} tabIndex={-1}>
         {endedHeading(run)}
       </h2>

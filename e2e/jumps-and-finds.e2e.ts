@@ -64,11 +64,9 @@ test("the result comes into view when Result is tapped, and not again by itself 
   await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 
-  // The game screen's own Result, with the result drawn under it: into view, and still no #result (Next's link would
-  // otherwise add it, and Back would bring the jump back).
-  await page.getByRole("main").getByRole("link", { name: "Result" }).click();
-  await expect(result).toBeInViewport();
-  await expect(page).toHaveURL(/\/play$/);
+  // The game screen has no Result of its own since M20 20n-4 (answer 84): the result is in its one card. Today's
+  // Result, with the result already drawn, is e2e/today.e2e.ts's.
+  await expect(page.getByRole("main").getByRole("link", { name: "Result" })).toHaveCount(0);
 });
 
 test("a time-up on the Friends tab reloads the board alone (answer 7)", async ({ browser }) => {

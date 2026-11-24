@@ -145,6 +145,9 @@ export function SubstringsScreen({
           <Band game={SUBSTRINGS} date={run!.date} />
           <BigScore points={run!.score!.total} />
         </>
+      ) : run?.status === "not_started" ? (
+        // Before the run the card opens with the band too, as Offbeat's does (answer 83).
+        <Band game={SUBSTRINGS} date={run.date} />
       ) : (
         <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
       )}
