@@ -16,7 +16,7 @@ const db = new pg.Client({ connectionString: localStack().databaseUrl });
 beforeAll(() => db.connect());
 afterAll(() => db.end());
 
-const KEYS = ["bed", "acid", "cake"];
+const KEYS = ["bed", "acid", "cake", "cheese", "bread", "pasta", "soup", "candy", "sandwich", "hat", "bag", "footwear", "fabric", "kitchen_utensil", "tool", "knot", "bone", "gemstone", "color", "sport", "dance"];
 const file = (key: string) => JSON.parse(readFileSync(`content/lists/${key}.json`, "utf8")) as ResearchList;
 // An answer's permanent ID: its list's key and its name as typed, with "research" as its source.
 const answerId = (key: string, name: string) => thingId("research", `${key}/${normalize(name)}`);
