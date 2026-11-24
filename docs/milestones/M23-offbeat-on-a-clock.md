@@ -63,6 +63,8 @@ Second round (2026-11-24):
 
 34. On hat's sample list (226 answers), 2026-11-24, in the human's words: "i want it to be as generous as possible, and specific variations of hats should count as diff types of hats. this must be balanced by the amt of tokens it costs obviously but theres no downsides to more answers". Claude's reading, said back to the human: a named variation (straw cowboy hat, wool beanie, fitted cap) is its own answer with its own time and points, not a typed form of its parent; lists lean to including; the two passes stay two, with no extra agents per question.
 
+35. 2026-11-24, asked in chat with 23b-1's PR: "Should checkers keep removing names with no trace at all, or keep everything as you first answered?" The human: "Yes, keep that". So the checker removes a name that leaves no trace at all when searched for; a name it merely can't confirm stays (answer 24).
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)

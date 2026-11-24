@@ -5,7 +5,7 @@ description: Research an Offbeat question's answer list in two passes and write 
 
 # Researching a question's answer list
 
-The human's rules are their answers in `docs/milestones/M23-offbeat-on-a-clock.md` (1 to 4, 17 to 24, 34): what a list is, two passes, brands count, other meanings are borderline, keep what can't be confirmed, as generous as possible. The rest below is Claude's procedure, approved as a design in `M23-23b-research-and-review.md` and listed with its numbers in that ticket's Source diff and Numbers: the search counts, the size of the common tier, the ten first, what is left out (parts, one-off proper names), the one-in-five signal, and removing a name with no trace at all. The file format is `M23-23a-researched-lists.md`'s; `content/lists/bed.json` is an example.
+The human's rules are their answers in `docs/milestones/M23-offbeat-on-a-clock.md` (1 to 4, 17 to 24, 34, 35): what a list is, two passes, brands count, other meanings are borderline, keep what can't be confirmed, as generous as possible, remove a name with no trace at all. The rest below is Claude's procedure, approved as a design in `M23-23b-research-and-review.md` and listed with its numbers in that ticket's Source diff and Numbers: the search counts, the size of the common tier, the ten first, what is left out (parts, one-off proper names), and the one-in-five signal. The file format is `M23-23a-researched-lists.md`'s; `content/lists/bed.json` is an example.
 
 The main session runs this; the two passes are subagents on `sonnet` that never see each other's reasoning. At most six research agents run at once.
 
