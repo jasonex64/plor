@@ -819,12 +819,22 @@ function Result({ run, share, search, focus }: { run: RunState; share: boolean; 
       {share && <ShareResult text={shareText(run)} />}
       <ol className={kit.rows}>
         {run.answered.map((a) => (
+          // Stacked, not a sentence (M20 20n-5, answer 88): the question with its Safe or Caught chip, the two answers,
+          // then the points and how many gave the answer in the small text, and Search answers last.
           <li key={a.index} className={kit.row}>
-            <div className={kit.grow}>
+            <div className={`${kit.grow} ${styles.answered}`}>
+              <div className={kit.head}>
+                <strong>{a.prompt}</strong>
+                <span className="sr-only">: </span>
+                <span className={a.matched ? `${kit.chip} ${kit.caught}` : `${kit.chip} ${kit.safe}`}>{a.matched ? "Caught" : "Safe"}</span>
+              </div>
               <span>
-                {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-                {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
-              </span>{" "}
+                You: {a.answer.name} · Host: {a.hostAnswers.map((h) => h.name).join(", ")}
+              </span>
+              <span className={styles.small}>
+                {a.matched ? "" : `+${pointsText(a.points)}, bonus +${a.bonus} · `}
+                {givenText(a.share)}
+              </span>
               {search && <AnswerSearch date={run.date} index={a.index} prompt={a.prompt} />}
             </div>
           </li>

@@ -90,7 +90,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Caught on question 1: no survived answers, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points.")).toBeVisible();
   // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
-  await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
+  await expect(watcher.getByText(/too few players yet$/)).toBeVisible();
   // The streak's pill: today is the watcher's first day (M11 H4), the first rank's
   // (docs/milestones/M14-14b-2a-streak-ranks.md).
   await watcher.goto("/");

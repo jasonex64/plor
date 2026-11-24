@@ -162,3 +162,23 @@
 .banner.page > [role="timer"] {
   align-self: flex-start;
 }
+
+/* A question's row in the result (M20 20n-5, answer 88): its lines stacked 6px apart, as a row's second line is
+   (kit.module.css, .below); Search answers keeps its own width at the row's end. */
+.answered {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* The question's line and the open search take the row's width; the closed Search answers button keeps its own. */
+.answered > div {
+  align-self: stretch;
+}
+
+/* The points and how many gave the answer: the small text, muted (the kit's note size). */
+.small {
+  color: var(--muted);
+  font-size: var(--text-note);
+}
