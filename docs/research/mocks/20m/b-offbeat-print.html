@@ -1,0 +1,194 @@
+<title>Offbeat Print Shop Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Bowlby+One&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:38px;height:38px;flex:none}
+.entry{display:flex;gap:8px;align-items:stretch;flex:none}
+.field{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;width:2px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+.field.off .caret,.field.off .ph{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.note{flex:none;min-height:26px;line-height:1.25}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:60px;bottom:8px;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:16px}
+.over dl{display:grid;grid-template-columns:auto auto;gap:2px 18px;font-size:18px;text-align:left}
+.over dd{font-weight:800;text-align:right}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .o2{font-size:14px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* B: Offbeat as a two-ink print job. Ink one is Offbeat's #2f3d5c, ink two a riso red printed off-register, on one sheet of stock. */
+:root{--outer:#1d2538;--stock:#f5edda;--card:#fffaf0;--navy:#2f3d5c;--navy-d:#222d47;--riso:#f2573b;--riso-d:#b12d18;--ink:#222d47;--kb-bg:#0000;--k:#fffaf0;--k-ink:#222d47;--disp:'Bowlby One','Arial Black',sans-serif}
+.phone{background:radial-gradient(#f2573b 1.5px,#0000 1.9px) 0 0/8px 8px,radial-gradient(#f2573b 1.5px,#0000 1.9px) 4px 4px/8px 8px,#ecdcb9}
+.play{padding-block:10px}
+.sheet{flex:1;min-height:0;display:flex;flex-direction:column;gap:9px;padding:8px 12px 10px;background:var(--stock);color:var(--ink);position:relative;box-shadow:5px 5px 0 var(--navy)}
+.btn{min-height:44px;padding:0 14px;border:2px solid var(--navy);border-radius:0;background:var(--card);color:var(--navy-d);font-weight:700;font-size:15px}
+.btn.x{width:44px;padding:0 0 4px;font-size:26px;line-height:1}
+.btn.go{background:var(--navy);color:var(--card);font-weight:800;box-shadow:3px 3px 0 var(--riso)}
+.btn.pressed{background:var(--navy);color:var(--card)}
+.lab{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.hdr{flex:none;display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-block:2px solid var(--navy);box-shadow:0 4px 0 var(--stock),0 5px 0 var(--navy)}
+.score{display:flex;align-items:baseline;gap:8px}
+.score b{font:400 26px/1.1 var(--disp);color:var(--navy);text-shadow:2px 2px 0 var(--riso)}
+.q{flex:none;container-type:inline-size;margin-top:4px}
+.q span{display:block;font:400 14.6cqw/1.04 var(--disp);min-height:2.16em;color:var(--navy);text-shadow:.09em .07em 0 var(--riso);letter-spacing:-.01em;padding-bottom:.08em}
+.clock{flex:none;display:flex;align-items:flex-end;gap:12px}
+.num{display:flex;align-items:flex-end;gap:6px;position:relative}
+.num b{min-width:1.25em;font-size:44px;font-weight:800;line-height:.8;text-align:right}
+.num .lab{line-height:1.15;font-size:11px;padding-bottom:1px}
+.rulerw{flex:1;min-width:0;position:relative}
+.ruler{height:26px;position:relative;border-bottom:2px solid var(--navy);background:repeating-linear-gradient(90deg,var(--navy) 0 1.5px,#0000 1.5px 5%) 0 100%/100% 6px no-repeat,repeating-linear-gradient(90deg,var(--navy) 0 2px,#0000 2px 25%) 0 100%/100% 11px no-repeat;border-right:2px solid var(--navy)}
+.ruler i{position:absolute;left:0;top:0;height:12px;width:calc(var(--f,0)*100%);background:var(--navy)}
+.rn{display:flex;justify-content:space-between;font-size:11px;font-weight:700;line-height:1.3}
+[data-low="1"] .ruler i{background:var(--riso-d)}
+[data-low="1"] .num b{color:var(--riso-d)}
+.plus{position:absolute;right:0;top:-9px;z-index:2;padding:0 6px;border:2px solid var(--riso-d);background:var(--card);color:var(--riso-d);font-size:14px;font-weight:800;white-space:nowrap;visibility:hidden;--r:rotate(-5deg);transform:var(--r)}
+.plus.on{visibility:visible}
+.plus.bigp{font-size:19px;border-width:3px}
+.stubs{flex:1;min-height:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px 12px;padding:8px 6px 0 0;border-top:2px dotted var(--navy)}
+.stub{position:relative;display:flex;align-items:center;gap:9px;padding:3px 10px 1px 17px;background:var(--card);border:2px solid var(--navy);color:var(--navy-d);font-weight:800;font-size:18px}
+.stub::before{content:"";position:absolute;left:7px;top:0;bottom:0;border-left:2px dotted var(--navy)}
+.stub .pt{font-size:13px;font-weight:700}
+.st{display:inline-block;padding:1px 6px 0;border:2px solid var(--riso-d);border-radius:3px;color:var(--riso-d);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;--r:rotate(-7deg);transform:var(--r)}
+.stub.big{flex:1 0 100%;display:grid;gap:0;font-size:29px;line-height:1.15;padding:8px 12px 6px 22px;margin-top:6px;box-shadow:5px 5px 0 var(--riso)}
+.stub.big .pt{font-size:14px;line-height:1.15;white-space:nowrap}
+.stub.big .st{position:absolute;right:12px;top:50%;font-size:20px;border-width:3px;outline:2px solid var(--riso-d);outline-offset:2px;--r:translateY(-50%) rotate(-9deg)}
+.field{padding:0 12px;background:var(--card);border:2px solid var(--navy);color:var(--navy-d);font-weight:800;font-size:23px}
+.field .ph{font-weight:400;font-size:16px;color:#4b556d}
+.field .l{animation:bType .15s cubic-bezier(.2,.8,.2,1) both}
+.field.no{border-color:var(--riso-d);animation:bShake .4s cubic-bezier(.2,.8,.2,1)}
+.field.no .l{color:#59617a}
+.field.no .wd::after{content:"";position:absolute;left:-4px;right:-4px;top:calc(50% - 2px);height:5px;background:var(--riso-d);z-index:2;transform-origin:0 50%;animation:bStrike .14s ease-out both}
+.note{font-size:14px;font-weight:700;color:var(--riso-d)}
+.over{top:76px;left:calc(max(16px,env(safe-area-inset-left,0px)) + 12px);right:calc(max(16px,env(safe-area-inset-right,0px)) + 12px);bottom:20px;background:var(--card);border:2px solid var(--navy);box-shadow:5px 5px 0 var(--riso);color:var(--ink)}
+.kbd{padding-inline:6px}
+.kr b{border:1.5px solid var(--navy);border-radius:2px}
+@keyframes bType{0%{transform:translateY(-14px) scale(1.7);text-shadow:8px 6px 0 var(--riso)}55%{transform:translateY(1px) scale(.93);text-shadow:3px 2px 0 var(--riso)}100%{transform:none;text-shadow:0 0 0 #f2573b00}}
+@keyframes bStub{0%{transform:scale(2) rotate(-8deg);opacity:0}45%{transform:scale(.94) rotate(1deg);opacity:1}100%{transform:none}}
+@keyframes bStubBig{0%{transform:scale(2.8) rotate(-11deg);opacity:0}30%{transform:scale(.92) rotate(1.5deg);opacity:1}55%{transform:scale(1.04) rotate(-.5deg)}100%{transform:none}}
+.stub.in{animation:bStub .3s cubic-bezier(.2,.8,.2,1) both}
+.stub.big.in{animation:bStubBig .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bStamp{0%{transform:scale(3.2) rotate(-32deg);opacity:0}55%{opacity:1}100%{transform:var(--r);opacity:1}}
+.stub.in .st{animation:bStamp .2s cubic-bezier(.5,0,.8,.4) .32s both}
+.stub.big.in .st{animation:bStamp .26s cubic-bezier(.5,0,.8,.4) .62s both}
+.plus.in{animation:bStamp .2s cubic-bezier(.5,0,.8,.4) .12s both}
+@keyframes bThud{0%{transform:none}25%{transform:translateY(7px)}100%{transform:none}}
+.stubs.thud{animation:bThud .3s cubic-bezier(.2,.8,.2,1) .14s}
+@keyframes bKick{0%{text-shadow:.09em .07em 0 var(--riso)}22%{text-shadow:.42em .3em 0 var(--riso)}100%{text-shadow:.09em .07em 0 var(--riso)}}
+.q.kick span{animation:bKick .6s cubic-bezier(.2,.8,.2,1) .14s}
+@keyframes bStrike{from{transform:scaleX(0)}to{transform:none}}
+@keyframes bShake{0%,100%{transform:none}14%{transform:translateX(-10px)}30%{transform:translateX(9px)}46%{transform:translateX(-7px)}62%{transform:translateX(5px)}80%{transform:translateX(-3px)}}
+@media (max-height:760px){.sheet{gap:6px;padding-block:6px 8px}.q span{font-size:12.4cqw}.num b{font-size:36px}.stub.big{font-size:22px;padding:4px 10px 3px 20px;margin-top:2px}.stub.big .st{font-size:16px}.stub.big .pt{font-size:12.5px}.note{min-height:20px}.ruler{height:22px}.stubs{padding-top:5px;gap:5px 12px}.stub{font-size:16px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">B · Offbeat · Print shop</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<div class="play">
+<div class="sheet">
+<div class="top"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><circle cx="23" cy="22" r="11" fill="none" stroke="#f2573b" stroke-width="5"/><circle cx="18" cy="18" r="11" fill="none" stroke="#2f3d5c" stroke-width="5"/><path d="M18 1v34M1 18h34" stroke="#2f3d5c" stroke-width="1.5"/></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="hdr"><span class="lab" id="qn"></span><span class="score"><span class="lab">Score</span><b id="score" data-display></b></span></div>
+<h1 class="q" id="q" data-display><span></span></h1>
+<div class="clock"><div class="num"><b id="secs"></b><span class="lab">seconds<br>left</span></div><div class="rulerw"><span class="plus" id="plus"></span><div class="ruler"><i id="ink"></i></div><div class="rn" aria-hidden="true"><span>0</span><span>5</span><span>10</span><span>15</span><span>20</span></div></div></div>
+<div class="stubs" id="ans"></div>
+<div class="entry"><div class="field" id="field"></div><button class="btn go" type="button">Answer</button><button class="btn" id="next" type="button">Next</button></div>
+<p class="note" id="note" role="status"></p>
+</div>
+<div class="over" id="over" hidden><p class="o1">Time&rsquo;s up</p><dl><dt>Answers</dt><dd>5</dd><dt>Points</dt><dd>120</dd></dl><p class="o2">Tap anywhere to play the round again.</p></div>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='';
+const field=$('#field'),FB=field.className,note=$('#note'),rmBox=$('#rm');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word){field.innerHTML='<span class="wd"></span><i class="caret"></i>';note.textContent=''}word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s);if(V.typed)V.typed(s,word)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">go</b></div>';
+const GAME='off',PH='Your answer';
+const ans=$('#ans'),plus=$('#plus'),q=$('#q');
+const V={
+  reset(){$('#over').hidden=true;plus.className='plus';$('#next').classList.remove('pressed');ans.innerHTML='';ans.className='stubs';q.className='q'},
+  q(text,label){$('#qn').textContent=label;q.firstChild.textContent=text;ans.innerHTML=''},
+  score(n){$('#score').textContent=n},
+  clock(l,w){$('#secs').textContent=w;$('#ink').style.setProperty('--f',Math.min(1,l/20))},
+  accept(o){const s=el('div','stub in'+(o.big?' big':''),'<span>'+o.w+'</span><span class="pt">+'+o.pts+(o.big?' points · +'+o.secs.toFixed(1)+' seconds':'')+'</span><span class="st">'+o.rar+'</span>');ans.appendChild(s);
+    plus.textContent='+'+o.secs.toFixed(1)+' s';plus.className='plus on'+(o.big?' bigp':'');kick(plus,'in');at(2200,()=>{plus.className='plus'});
+    if(o.big){kick(ans,'thud');kick(q,'kick')}},
+  refuse(msg){note.textContent=msg;kick(field,'no')},
+  next(p){$('#next').classList.toggle('pressed',p)},
+  over(){$('#over').hidden=false}
+};
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);V.clock(RM?w:left,w);root.dataset.low=left<=5?'1':'0'}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0){stopClock();T.forEach(clearTimeout);T=[];V.over();state('over')}},100)}
+function scriptOff(){
+  left=9;V.q('Name a fruit','Question 2 of 3');V.score(60);paint();state('waiting');startClock();
+  let t=typeWord(1400,'apple',130);
+  at(t+250,()=>{left+=2.6;fClear();V.accept({w:'apple',rar:'Common',pts:10,secs:2.6,big:false});V.score(70);paint();state('accepted')});
+  t=typeWord(3700,'bananna',120);
+  at(t+250,()=>{V.refuse('“bananna” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(5900,'mangosteen',120);
+  at(t+300,()=>{left+=6.5;fClear();V.accept({w:'mangosteen',rar:'Rare',pts:50,secs:6.5,big:true});V.score(120);paint();state('accepted-big')});
+  at(9500,()=>V.next(true));
+  at(9750,()=>{V.next(false);V.q('Name a planet','Question 3 of 3');note.textContent='';state('waiting')});
+  t=typeWord(10600,'pluto',140);
+  at(t+250,()=>{V.refuse('“pluto” isn’t on our list. The clock keeps running.');state('refused')});
+  at(t+1050,fClear);
+  typeWord(15600,'neptu',260);
+}
+function scriptFrag(){
+  left=8;V.q('ock','Round 6 of 7');V.score(135);paint();state('waiting');startClock();
+  let t=typeWord(1300,'pockit',140);
+  at(t+250,()=>{V.refuse('Not in the dictionary.');state('refused')});
+  at(t+1050,fClear);
+  t=typeWord(3700,'pocket',135);
+  at(t+250,()=>{stopClock();V.accept({w:'pocket',chunk:'ock',pts:40,big:false,n:6});V.score(175);state('accepted')});
+  at(t+1250,()=>{note.textContent='You played pocket: 40 points.';V.btn('Next')});
+  at(7000,()=>V.press(true));
+  at(7250,()=>{V.press(false);V.btn('Try');fClear();left=20;V.q('ant','Round 7 of 7');note.textContent='';paint();state('waiting');startClock()});
+  t=typeWord(8400,'extravagant',115);
+  at(t+300,()=>{stopClock();V.accept({w:'extravagant',chunk:'ant',pts:120,big:true,n:7});V.score(295);state('accepted-big')});
+  at(t+2200,()=>{note.textContent='You played extravagant: 120 points.';V.btn('See results');state('over')});
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();fClear();note.textContent='';V.reset();(GAME=='off'?scriptOff:scriptFrag)()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>

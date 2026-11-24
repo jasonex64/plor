@@ -228,7 +228,7 @@ export function LeaderboardCard() {
         <h2>Leaderboard</h2>
         {(today || day || week) && <span className={kit.chip}>{today ? dayText(today.date) : day ? dayText(day.date) : `From ${dayText(week!.from)}`}</span>}
       </div>
-      <div role="radiogroup" aria-label="Period" className={styles.switch}>
+      <div role="radiogroup" aria-label="Period" className={styles.switch} style={{ "--choices": 3 } as CSSProperties}>
         {(["today", "yesterday", "week"] as const).map((p) => (
           <label key={p} className={period === p ? `${styles.choice} ${styles.on}` : styles.choice}>
             <input type="radio" name="leaderboard-period" checked={period === p} onChange={() => choose({ period: p })} />
