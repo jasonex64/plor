@@ -35,6 +35,18 @@ The game:
 15. Which questions may be used: "Only fully researched ones (Recommended)". Both passes done and its borderline list seen by the human.
 16. Until it ships: "Pause the beta". No days are approved in either game. (This replaces the same day's earlier "Approve as drafted".)
 
+23a's first round (2026-11-23, after "Approve M23"):
+17. Where a tier comes from once players have played: "Research first, play takes over (Recommended)". The researcher's tier holds until enough players have answered a question; then it follows what players typed.
+18. Web research by Claude's agents as a source of answers, and what an answer carries: "Yes; no links kept". The list holds answers only; the pilot files' links are not carried into the format.
+19. A brand typed for an everyday question (Tempur-Pedic, Twinkie): "brands should always count" (the human's own words, in place of the options).
+20. An answer that fits another meaning of the word (flower bed, urinal cake): "Accept, as borderline (Recommended)". On the borderline list, accepted by default, shown to the human to strike.
+
+23a's second round (2026-11-23):
+21. How many players must have answered a question before play takes over its tiers: "50 players". At the beta's size (17 on its busiest day) most questions stay on the researched tiers for months; said in the option, chosen knowingly.
+22. How a tier is read from play: "Only ever move one step". By rank (the ten most-typed answers common, the next twenty uncommon, the rest rare; 10 and 20 are Claude's starting numbers, to tune), an answer nobody has typed keeps its researched tier, and no answer moves more than one tier from what research said.
+23. How far brands go and what one is worth: "Any real brand, tiered like any answer (Recommended)". A brand the research missed is refused until added, like any missed answer.
+24. What the second pass does with an answer it can't confirm exists: "Keep it unless clearly wrong". The option's stated cost: an answer an agent invented could be accepted in play.
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
