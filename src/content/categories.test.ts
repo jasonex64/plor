@@ -11,11 +11,18 @@ describe("parseCategories", () => {
     const broken = [{ ...animal, key: "Bad Key" }, { ...animal, source: "usda" }, { ...animal, member_of: null }, { ...animal, extra: 1 }];
     expect(parseCategories("c.json", JSON.stringify(broken)).errors).toEqual([
       'c.json category 1: "key" must be a category key (lower-case letters and _)',
-      'c.json category 2: "source" must be "oewn" or "wikidata"',
+      'c.json category 2: "source" must be "oewn", "wikidata" or "research"',
       'c.json category 3: "member_of" must be the source\'s ID',
       'c.json category 4: unknown field "extra"',
       'c.json: category "animal" is listed twice',
     ]);
+  });
+});
+
+describe("a researched category", () => {
+  it("is listed with source research and its own key as the root", () => {
+    const bed = { key: "bed", name: "kind of bed", source: "research", root: "bed" };
+    expect(parseCategories("c.json", JSON.stringify([bed])).errors).toEqual([]);
   });
 });
 

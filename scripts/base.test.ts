@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, rowsOnlyIn, unusedListedRows, parentless, sparql, taxonName, valueItems, withValueNamesOnly, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, rowsOnlyIn, unusedListedRows, parentless, sparql, taxonName, valueItems, withValueNamesOnly, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, researchItems, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -680,5 +680,21 @@ describe("withValueNamesOnly", () => {
     const na = { id: "Q49", name: "North America", aliases: [{ alias: "north america", kind: "name" as const }, { alias: "na", kind: "synonym" as const }, { alias: "noam", kind: "synonym" as const }] };
     const city = { id: "Q60", name: "New York City", aliases: [{ alias: "nyc", kind: "synonym" as const }] };
     expect(withValueNamesOnly([na, city], new Set(["Q49"]))).toEqual([{ ...na, aliases: [{ alias: "north america", kind: "name" }] }, city]);
+  });
+});
+
+// M23 23a: a researched list as the items import_source takes (a root named by the category key, each answer under it).
+describe("researchItems", () => {
+  it("gives the root, then each answer under it with its typed forms as names", () => {
+    const list = { format: 1 as const, category: "bed", passes: 1 as const, borderline_seen: null, answers: [{ name: "Tempur-Pedic", aliases: ["temper pedic"], tier: "rare" as const, brand: true as const }] };
+    expect(researchItems(list)).toEqual([
+      { id: "bed", name: "bed (researched list)", aliases: [] },
+      {
+        id: "bed/tempurpedic",
+        name: "Tempur-Pedic",
+        aliases: [{ alias: "tempurpedic", kind: "name" }, { alias: "tempurpedics", kind: "plural" }, { alias: "temper pedic", kind: "synonym" }],
+        kind_of: ["bed"],
+      },
+    ]);
   });
 });

@@ -7,7 +7,7 @@ import { CATEGORY_KEY, checkKeys, isObject, isText } from "./puzzle.ts";
 
 // within: an older base category this one sits inside (berry in fruit), so they're one family and a day never asks
 // both (human, 2026-10-27: "Allow, never the same day (Recommended)"); `load all` checks the root is under within's.
-export type BaseCategory = { key: string; name: string; source: "oewn" | "wikidata"; root: string; member_of?: string; within?: string };
+export type BaseCategory = { key: string; name: string; source: "oewn" | "wikidata" | "research"; root: string; member_of?: string; within?: string };
 // A1's forms (human, 2026-10-26): a continent or an IUCN status, the continent maybe through the member's country; a
 // population at least some value ("At least only (Recommended)"); a letter. A fact lists its values, and a member fits
 // with any of them (13e-4b: "Approve: always a list (Recommended)").
@@ -61,7 +61,7 @@ export function parseCategories(file: string, text: string): { categories: Categ
     if (!("of" in v)) {
       checkKeys(errors, where, v, ["key", "name", "source", "root"], ["member_of", "within"]);
       if ("within" in v && !bases.has(v.within)) errors.push(`${where}: "within" must be a base category listed before it`);
-      if ("source" in v && v.source !== "oewn" && v.source !== "wikidata") errors.push(`${where}: "source" must be "oewn" or "wikidata"`);
+      if ("source" in v && v.source !== "oewn" && v.source !== "wikidata" && v.source !== "research") errors.push(`${where}: "source" must be "oewn", "wikidata" or "research"`);
       if ("root" in v && !isText(v.root)) errors.push(`${where}: "root" must be the source's ID`);
       if ("member_of" in v && !isText(v.member_of)) errors.push(`${where}: "member_of" must be the source's ID`);
       bases.add(v.key);

@@ -86,6 +86,10 @@ Hypothesis for step 5: a category whose root is a research thing needs no change
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Plan 3: keep "other_readings" as borderline | Kept, as 45 rare borderline answers across the three files (bed 23, acid 8, cake 14), with these readings of the pilot's shape: "a / b" is one answer, "a" with alias "b"; a comma list ("bleach, soap, …") is one answer each; parentheses are dropped ("acid music (acid house…)" is "acid music"); bare "acid" (the prompt's own word, which the pilot's rules refuse) is not an alias of LSD; 7 entries whose typed form another answer already had were left out (the pilot's answers folding bed, infant bed and hanging bed, its brands Aerobed and Select Comfort, and the readings pound and LSD), their typed forms still accepted through the other answer. Accepted as the pilot gives them, and for the human to strike: water and box (for bed), pancake, hotcake, crab cake, brownie, cookie (for cake), bleach, soap (for acid) | The validator refuses one typed form on two answers; the pilot lists some readings as lists or with notes, which the format has no place for |
+| "No second membership rule", no change to the checks `load all` runs | `checkWithin` is skipped when either category of a `within` pair is a researched one (bed within furniture, cookie within cake) | The check asks whether one root sits under the other in a source's tree; a research root sits in no other source's tree. The family (a day never asks both) still comes from `within` in the file |
+| Validator: refuses empty name, unknown tier, unknown category, shared typed form | Also refuses a category that isn't the file's name (`lists/bed.json` saying "cake"), an alias with no letters or digits, unknown or ill-typed fields, `format`, `passes`, `borderline_seen` | One file, one category; a form with no letters can never be typed |
+| Design: `load all` includes research | `hosted check` also prints the lists' answer count and `hosted load` reads the lists before writing | The hosted load runs `loadAll`, so the list must be read and counted like a set |
 
 ## Evidence
 **Step 1, read by the main session, 2026-11-23** (`supabase/migrations/20261028140000_baseline.sql`, `…_test_runs.sql`):
@@ -94,5 +98,26 @@ Hypothesis for step 5: a category whose root is a research thing needs no change
 - `category_members` (baseline 1392) and `resolve_in` (test_runs 12) walk `kind_of` from the root and read no source. The hypothesis holds on reading; step 5's tests are what prove it.
 - `resolve_in` judges by the root frozen in the approved day's question, so an old day keeps its old root (criterion 4).
 - Found, not designed for: `category_extra` rows (answers an admin accepted for bed, acid or cake) still count beside the researched list. Left as it is; the conversion checks each is on the list or says which is not.
+
+**Step 2** (`npx vitest run scripts/content-validate.test.ts`, failing first: 5 new cases failed because `lists/animal.json` was read as a puzzle; after: `Tests 26 passed (26)`).
+
+**Step 3** (`npm run content:validate` → `CONTENT OK content: 32 file(s)`). Converted by a throwaway script (not kept). Answers per file and tier:
+| file | answers | common | uncommon | rare | borderline | brand |
+|---|---|---|---|---|---|---|
+| bed | 141 | 43 | 48 | 50 | 62 | 12 |
+| acid | 185 | 32 | 32 | 121 | 35 | 0 |
+| cake | 152 | 36 | 37 | 79 | 35 | 3 |
+(bed's 12 brands are the pilot's `brands` list less Aerobed and Select Comfort, already typed forms of air mattress and Sleep Number; cake's 3 are Twinkie, Ding Dong, Ho Hos.) The pilot files are removed in the same commit.
+
+**Step 4**, before the migration and the switch: `npx vitest run scripts/research.db.test.ts --no-file-parallelism` → `Tests 14 failed (14)`: the members of bed, acid and cake are WordNet's (24 of 141, 144 of 185, 104 of 152 as the file has them); king, twin, citric, nitric, bundt and chocolate are refused, tortilla, dog biscuit, lansoprazole and couch accepted; the approved-day test fails on `thing_source_source_check`.
+
+**Step 5.** `npx supabase migration up --local` applied `20261124075116_research_source.sql`; `npm run base -- load all` → `LOADED lists (3 lists, lists): {"facts":478,"things":481,"aliases":1702,"numbers":0}` (3 roots + 141 + 185 + 152 answers), `DEFINED 231 categories`, `DATABASE 318 MB`.
+- Criteria 2, 3, 4: `npx vitest run scripts/research.db.test.ts --no-file-parallelism` → `Tests 14 passed (14)`.
+- Criterion 6: `npx supabase test db` → `plor_app_role.test.sql ....... ok`, `Result: PASS` (42 files, 833 tests), the file untouched.
+- Unit tests: `npm test` → `Tests 877 passed (877)`. Type check `npx tsc --noEmit -p .`: no output. Lint of the changed files: `npx eslint <changed files>`: no output (`npm run lint` reports 138 errors, all in `.claude/skills/impeccable` and `.github/skills/impeccable`, not in this change).
+- `npm run test:db` (whole suite, with the researched base loaded): 495 passed, 1 failed, 39 skipped; the failure and the skips were five files' 5 s test or 10 s hook limits timing out on the loaded machine (a signed-out 401, sign-in hooks); `npx vitest run src/app/api/admin/bank/route.db.test.ts src/app/api/admin/puzzles/substrings/route.db.test.ts --testTimeout=90000 --hookTimeout=90000` → `Tests 8 passed (8)`, and `matching.db.test.ts` and `friends/route.db.test.ts` pass on their own re-run.
+- `npm run base -- review bed` → `REVIEW bed: 141 members`, every flag 0 but "things under the root with no English name: 1", not looked into.
+- The hypothesis held: `resolve_in` and `category_members` needed no change.
+- `private.category_extra` on the local stack: no rows at all, so none for bed, acid or cake outside the list. The hosted database was not read.
 
 ## Review

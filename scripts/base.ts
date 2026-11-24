@@ -3,7 +3,7 @@
 // - fetch: pulls one set from its source (SOURCES.md, M13 D2) into a snapshot outside git, data/snapshots/<set>/<date>.json,
 //   and writes the committed manifest, data/manifests/<set>.json: source, date, method, item count and checksum.
 // - load: loads the manifest's snapshot into the local stack with private.import_source. `load all` loads every set,
-//   then the links in data/links.json (13e-2), then defines every category in data/categories.json, the one place
+//   then every researched list in content/lists/ (M23 23a; `load research` loads just those), then the links in data/links.json (13e-2), then defines every category in data/categories.json, the one place
 //   categories are defined (13e), and analyzes the base's tables (13e-5).
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
@@ -21,7 +21,7 @@
 // Both verify the database's certificate against supabase/certs/prod-ca-2021.crt; there is no way to turn that off.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
@@ -32,6 +32,7 @@ import { type DbConnection, isLocalHost, readDatabaseUrl } from "../src/config/e
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VIDEO_GAME_MIN_SITELINKS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
+import { LISTS_DIR, parseList, type ResearchList } from "../src/content/list.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
@@ -1211,6 +1212,8 @@ export async function hostedCheck(client: pg.Client, host: string): Promise<Host
   console.log(`RUNS IN PROGRESS: ${state.running}${state.running ? " (players are mid-game now)" : ""}`);
   console.log("A LOAD WOULD BRING:");
   for (const set of Object.keys(SETS)) console.log(`  ${set}: ${readManifest(set).items} items`);
+  const lists = readLists();
+  console.log(`  ${LISTS_DIR}: ${lists.reduce((n, l) => n + l.answers.length, 0)} answers in ${lists.length} researched lists`);
   console.log(`  ${DICTIONARY_SET}: ${readManifest(DICTIONARY_SET).items} words`);
   return state;
 }
@@ -1239,6 +1242,7 @@ export async function hostedLoad(client: pg.Client, host: string, ask: (question
   // Everything the load reads is read and checked before anything is written.
   const words = refusal ? [] : readSnapshot<DictionaryEntry>(DICTIONARY_SET).items;
   if (!refusal) for (const set of Object.keys(SETS)) readSnapshot(set);
+  if (!refusal) readLists();
   const typed = await ask(`To load into this database, type its host name (${host}), or just press Enter to stop: `);
   if (typed !== host) throw new Error(`what you typed isn't ${host}; nothing was written`);
   if (refusal) throw new Error(refusal);
@@ -1315,6 +1319,44 @@ async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<voi
     const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [def.source, manifest.snapshot, JSON.stringify(withIds)]);
     await client.query("commit");
     console.log(`LOADED ${set} (${manifest.snapshot}): ${JSON.stringify(rows[0].counts)}${aliases || dropped ? `, listed words: ${aliases} names and ${dropped} items dropped` : ""}`);
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
+  }
+}
+
+// --- researched lists (docs/milestones/M23-23a-researched-lists.md) ---
+// A list in git is its own snapshot, pinned by its commit, so it has no manifest and no file outside git: the files under
+// content/lists/ are what a load reads. A list becomes a root thing named by its category key, and each answer a thing
+// directly under it, so judging reads it as it reads any tree. A category on a list says `"source": "research"` and its
+// own key as the root in data/categories.json.
+const RESEARCH = "research";
+const RESEARCH_SNAPSHOT = "lists"; // the label import_source keeps in source_ref; the list's own history is git's
+const listsDir = join("content", LISTS_DIR);
+
+export function researchItems(list: ResearchList): Item[] {
+  const root: Item = { id: list.category, name: `${list.category} (researched list)`, aliases: [] };
+  const answers = list.answers.map((a): Item => ({ id: `${list.category}/${normalize(a.name)}`, name: a.name, aliases: aliasesFor([a.name], a.aliases), kind_of: [list.category] }));
+  return [root, ...answers];
+}
+
+// Every list under content/lists/, parsed as content:validate parses it, so a list that gets here is one it passes.
+export function readLists(): ResearchList[] {
+  if (!existsSync(listsDir)) return [];
+  return readdirSync(listsDir).filter((f) => f.endsWith(".json")).sort().map((f) => {
+    const { list, errors } = parseList(`${LISTS_DIR}/${f}`, readFileSync(join(listsDir, f), "utf8"), null);
+    if (!list) throw new Error(errors.join("\n"));
+    return list;
+  });
+}
+
+export async function loadResearch(client: pg.Client, lists: ResearchList[], snapshot = RESEARCH_SNAPSHOT): Promise<void> {
+  const items = lists.flatMap(researchItems).map((item) => ({ ...item, thing_id: thingId(RESEARCH, item.id) }));
+  try {
+    await client.query("begin");
+    const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [RESEARCH, snapshot, JSON.stringify(items)]);
+    await client.query("commit");
+    console.log(`LOADED ${LISTS_DIR} (${lists.length} lists, ${snapshot}): ${JSON.stringify(rows[0].counts)}`);
   } catch (err) {
     await client.query("rollback");
     throw err;
@@ -1844,7 +1886,9 @@ async function defineCategories(client: pg.Client): Promise<void> {
         await client.query("select private.define_subset($1, $2, $3, $4, $5::jsonb)", [c.key, c.name, c.of, bases.get(c.of)!.source, JSON.stringify(filterOf(c))]);
       } else {
         await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
-        if (c.within) await checkWithin(client, c.key, c.within);
+        // A researched list's root stands outside every other source's tree, so a family that crosses to or from one is
+        // the file's word alone; the check reads a tree.
+        if (c.within && c.source !== RESEARCH && bases.get(c.within)!.source !== RESEARCH) await checkWithin(client, c.key, c.within);
       }
     }
     await client.query("commit");
@@ -2041,6 +2085,7 @@ async function reviewOne(client: pg.Client, key: string, doubles: Doubles): Prom
 async function loadAll(client: pg.Client): Promise<void> {
   await beginLoad(client);
   for (const [set, def] of Object.entries(SETS)) await loadSet(client, set, def);
+  await loadResearch(client, readLists());
   const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
   if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
   const unusedRows = unusedListedRows(readHandFiles().listed, readHandFiles().names.rename, listedRowsUsed);
@@ -2064,6 +2109,14 @@ async function main(): Promise<void> {
       await client.end();
     }
   }
+  if (command === "load" && name === RESEARCH) {
+    const client = await localClient();
+    try {
+      return await loadResearch(client, readLists());
+    } finally {
+      await client.end();
+    }
+  }
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
   if (command === "fetch" && name === DICTIONARY_SET) return fetchSet(DICTIONARY_SET, DICTIONARY);
   if (command === "load" && name === DICTIONARY_SET) {
@@ -2079,7 +2132,7 @@ async function main(): Promise<void> {
   }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${DICTIONARY_SET}\n       npm run base -- hosted check|load\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${RESEARCH}|${DICTIONARY_SET}\n       npm run base -- hosted check|load\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);
