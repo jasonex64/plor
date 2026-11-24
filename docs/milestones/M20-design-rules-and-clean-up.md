@@ -286,7 +286,7 @@ Ranked, most damaging first; **P1** a broken layout or real confusion, **P2** an
   - 80, "should the separate \"Profile\" buttons stay anywhere?": "Remove them all (Recommended)".
   - 81, "When a name is your own ... what should pressing it do?": "Open the Me tab (Recommended)".
   - 82, rows that already open ("Where everyone ended", the find-a-player list): "Row keeps its job (Recommended)": there the name is not a profile link.
-  - → verify: an e2e at 390 × 844 finds a friend's long name on one line with the ⋯ menu holding Remove and Block; an e2e presses a name on the board, the leaderboard, the feed, a group's members and Your friends and lands on that profile, and presses its own and lands on Me; no "Profile" button is left (a grep and the e2e).
+  - **20n-3's part** (this PR): Your friends' rows, answers 79 and 80. → verify: an e2e at 390 × 844 finds a friend's long name on one line as the link to their profile, with the ⋯ holding Remove and Block, and no "Profile" link on the page. **20e's part** (the next PR): answers 81 and 82 and the other lists. → verify: an e2e presses a name on the board, the leaderboard, the feed and a group's members and lands on that profile, and presses its own and lands on Me.
 - **20n-4:** findings 6 and 8, one start and result header for both games, and the start screen's rules and Start inside the card.
 - **20n-5:** finding 7, the recap's rows and the reveal's safe or caught colour.
 - **20n-6:** finding 3 with answer 77 and inbox #268: the place strip on Today and the top three on a board; its look is asked first.

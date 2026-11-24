@@ -24,7 +24,7 @@ export function Reactions({ reactions, below = false, name = "Reactions" }: { re
     <span role="group" aria-label={name} className={below ? styles.summary : `${styles.summary} ${styles.line}`}>
       {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
         const { count, names } = reactions.counts.find((c) => c.emoji === emoji)!;
-        const mine = reactions.mine === emoji;
+        const mine = reactions?.mine === emoji;
         return (
           <Fragment key={emoji}>
             {/* Read "😂 1, ❤️ 2", not run together; between the counts, so each count's own text is as it was
@@ -135,7 +135,7 @@ export function ReactMenu({
   actions = [],
 }: {
   label: string;
-  reactions: ReactionsData;
+  reactions?: ReactionsData;
   onReact?: (emoji: Emoji | null) => void;
   actions?: MenuAction[];
 }) {
@@ -168,7 +168,7 @@ export function ReactMenu({
           {onReact && (
             <div role="group" aria-label="Reactions" className={styles.emojis}>
               {REACTIONS.map((emoji) => {
-                const mine = reactions.mine === emoji;
+                const mine = reactions?.mine === emoji;
                 return (
                   <button key={emoji} type="button" className={styles.pick} aria-pressed={mine} onClick={pick(() => onReact(mine ? null : emoji))}>
                     {emoji}

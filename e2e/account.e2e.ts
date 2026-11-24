@@ -136,11 +136,13 @@ test("nothing offers an invite link, an old one is not found, and removing a fri
     asked = dialog.message();
     void dialog.dismiss();
   });
+  await row.getByRole("button", { name: /^Actions for / }).click();
   await row.getByRole("button", { name: "Remove" }).click();
   expect(asked).toBe(`Remove if${RUN} as a friend? To be friends again, one of you sends a friend request.`);
   await inviter.reload();
   await expect(row).toBeVisible();
   inviter.once("dialog", (d) => void d.accept());
+  await row.getByRole("button", { name: /^Actions for / }).click();
   await row.getByRole("button", { name: "Remove" }).click();
   await expect(friends.getByText("No friends yet. Find a player by their username, above.")).toBeVisible();
 });
