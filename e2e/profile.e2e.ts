@@ -119,6 +119,8 @@ test("a name opens its profile on the board, the leaderboard, the feed and a gro
   // The avatar is part of the way in, and not a second stop for the keyboard or a screen reader.
   await expect(board.locator(`a[href="/u/${friend}"]`)).toHaveCount(2);
   await expect(board.locator(`a[href="/u/${friend}"][aria-hidden="true"][tabindex="-1"] [data-initial]`)).toHaveCount(1);
+  // The initial isn't underlined as a link's text is.
+  expect(await board.locator(`a[href="/u/${friend}"][aria-hidden="true"]`).evaluate((a) => getComputedStyle(a).textDecorationLine)).toBe("none");
 
   await toProfile(page.getByRole("region", { name: "Feed" }), friend, `/u/${friend}`);
 
