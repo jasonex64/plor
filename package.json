@@ -21,7 +21,8 @@
     "draft": "node --env-file-if-exists=.env.local scripts/draft.ts",
     "substrings": "node scripts/substrings.ts",
     "verify": "node scripts/verify.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "look-audit": "playwright test --config playwright.look-audit.config.ts"
   },
   "dependencies": {
     "@supabase/realtime-js": "2.118.0",
