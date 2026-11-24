@@ -1,6 +1,7 @@
 // Validates every puzzle file under a content root, and its question bank (bank.json at the root, M13 13d):
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
+// A researched list under lists/ (M23 23a) is checked too, and counted.
 // Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d), and no day asks two of one family (13e-4a).
 // The bank asks only categories listed in the categories file (data/categories.json from the command; a test passes
 // its own, 13e-1 review; 13f-4c), which is checked too (13e).
@@ -9,6 +10,7 @@ import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { gapProblems, parseBank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
+import { LISTS_DIR, parseList } from "../src/content/list.ts";
 import { checkPuzzleFile, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
 import { checkSubstringsFile, parseSubstringDay, substringGapProblems, type SubstringDay } from "../src/content/substrings.ts";
 import { SUBSTRINGS_ID } from "../src/platform/game.ts";
@@ -24,13 +26,17 @@ function listFiles(root: string): string[] {
 
 const BANK = "bank.json";
 
+// A researched list (M23 23a) is no puzzle: content/lists/<category>.json, checked by src/content/list.ts.
+const isList = (p: string) => p.startsWith(`${LISTS_DIR}/`);
+
 export function listPuzzleFiles(root: string): string[] {
-  return listFiles(root).filter((p) => p.endsWith(".json") && p !== BANK);
+  return listFiles(root).filter((p) => p.endsWith(".json") && p !== BANK && !isList(p));
 }
 
 export function validateRoot(root: string, categoriesFile: string): { files: number; errors: string[] } {
   const all = listFiles(root);
   const files = listPuzzleFiles(root);
+  const lists = all.filter((p) => p.endsWith(".json") && isList(p));
   // Anything else under the root is an error, so a mistyped file name can't drop a day while CONTENT OK prints
   // (M02 2f, B9).
   const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle or the bank`);
@@ -45,17 +51,18 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
   const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
   const { categories, errors: categoryErrors } = parseCategories(categoriesFile, readFileSync(categoriesFile, "utf8"));
   errors.push(...categoryErrors);
+  const keys = categories && { file: categoriesFile, keys: new Set(categories.map((c) => c.key)) };
+  for (const file of lists) errors.push(...parseList(file, readFileSync(join(root, file), "utf8"), keys).errors);
   // A broken categories file is reported above, and every family is then its own category.
   errors.push(...gapProblems(days, familyOf(categories ?? [])));
   if (all.includes(BANK)) {
     const { bank, errors: bankErrors } = parseBank(BANK, readFileSync(join(root, BANK), "utf8"));
     errors.push(...bankErrors);
     if (bank && categories) {
-      const keys = new Set(categories.map((c) => c.key));
-      for (const q of bank.questions) if (!keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${categoriesFile}`);
+      for (const q of bank.questions) if (!keys!.keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${categoriesFile}`);
     }
   }
-  return { files: files.length, errors };
+  return { files: files.length + lists.length, errors };
 }
 
 function main() {

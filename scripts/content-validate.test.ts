@@ -155,3 +155,64 @@ describe("content:validate on game 2's days", () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 });
+
+// M23 23a: an everyday question's researched list, content/lists/<category>.json. One case per refusal; a typed form is
+// compared after normalize, and a name is itself a typed form.
+describe("content:validate on researched lists", () => {
+  const LIST = "lists/animal.json";
+  const list = () => ({
+    format: 1,
+    category: "animal",
+    passes: 1,
+    borderline_seen: null as string | null,
+    answers: [
+      { name: "King Bed", aliases: ["king", "king size"], tier: "common" },
+      { name: "Tempur-Pedic", aliases: ["tempurpedic"], tier: "rare", brand: true },
+      { name: "flower bed", aliases: [], tier: "rare", borderline: true },
+    ],
+  });
+  const withList = (value: unknown, file = LIST) => validateRoot(root({ [FILE]: JSON.stringify(valid()), [file]: typeof value === "string" ? value : JSON.stringify(value) }), CATS);
+
+  it("passes a valid list beside a day, counts it, and doesn't read it as a puzzle", () => {
+    expect(withList(list())).toEqual({ files: 2, errors: [] });
+  });
+
+  it("refuses two answers sharing a typed form after normalization, a name being one", () => {
+    const l = list();
+    l.answers[2].aliases = ["KING!"];
+    expect(withList(l).errors).toEqual([`${LIST}: "king" is typed for both "King Bed" and "flower bed"`]);
+    l.answers[2].aliases = [];
+    l.answers[2].name = "king  bed";
+    expect(withList(l).errors).toEqual([`${LIST}: "king bed" is typed for both "King Bed" and "king  bed"`]);
+  });
+
+  it("refuses an empty name, an alias or name with no typed form, and an unknown tier", () => {
+    const l = list();
+    l.answers[0].name = "  ";
+    l.answers[1].aliases = ["..."];
+    l.answers[2].tier = "first10";
+    expect(withList(l).errors).toEqual([
+      `${LIST} answer 1: "name" must be a non-empty string`,
+      `${LIST} answer 2: alias "..." has no letters or digits to type`,
+      `${LIST} answer 3: "tier" must be "common", "uncommon" or "rare"`,
+    ]);
+  });
+
+  it("refuses a category not in the categories file, and one that isn't the file's name", () => {
+    expect(withList({ ...list(), category: "no_such_category" }, "lists/no_such_category.json").errors).toEqual([
+      `lists/no_such_category.json: category "no_such_category" is not in ${CATS}`,
+    ]);
+    expect(withList({ ...list(), category: "fruit" }).errors).toEqual([`${LIST}: "category" is "fruit", but the path must be lists/fruit.json`]);
+  });
+
+  it("refuses fields of the wrong shape, an unknown one, and a file that isn't JSON", () => {
+    const l = { ...list(), format: 2, passes: 3, borderline_seen: "2026-02-30", extra: 1 } as Record<string, unknown>;
+    expect(withList(l).errors).toEqual([
+      `${LIST}: unknown field "extra"`,
+      `${LIST}: "format" must be 1`,
+      `${LIST}: "passes" must be 0, 1 or 2`,
+      `${LIST}: "borderline_seen" must be null or a real date, YYYY-MM-DD`,
+    ]);
+    expect(withList("{ nope").errors).toEqual([expect.stringMatching(/^lists\/animal\.json: not valid JSON/)]);
+  });
+});
