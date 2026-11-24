@@ -72,7 +72,7 @@ One sonnet agent per question, about 120,000 tokens and 3 minutes each, 5 to 11 
 
 What it showed: most of the gain is short forms ("king", "citric", "chocolate"); the obscure tail is about 60 to 70% complete by the agents' own estimate; a quarter to a half of the rare entries are from memory with no source; no agent found data on what people type first, so the tiers are judgement. The second pass (answer 3) exists for these gaps.
 
-## The first 21 questions (proposed by Claude 2026-11-24 for the human's veto, answer 26)
+## The first 21 questions (proposed by Claude 2026-11-24, answer 26; the human, 2026-11-24: "Yes, these 18")
 Done in 23a: bed, acid, cake. Proposed next, all everyday questions on WordNet lists today, at most seven per area so each day can take three areas:
 - **Food (7 with cake):** cheese, bread, pasta, soup, candy, sandwich.
 - **Wearing (4):** hat, bag, footwear, fabric.
