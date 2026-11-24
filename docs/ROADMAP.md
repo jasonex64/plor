@@ -164,6 +164,9 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `src/app/race-layout.ts` "The 10ⁿ of answer 29" names the answer without its ticket path (the file header names it); `src/app/admin/insights.tsx` `COLUMNS.length - 1` has no comment saying the open row's first cell is empty. Found in rule 2 (review).
 - [ ] The values kept as built with no origin (answers 23 to 26: a tie counting half, 5 shown host answers, the peek's pattern, the draft hash) now cite the human's 2026-11-17 approval; nothing more is known of where they came from. Found in rule 2 (review).
 
+**Quick fixes**
+- [ ] On a touch laptop that reports `hover: hover`, the reaction ⋯ has no resting cue until its row is tapped or focused (accepted in the human's #270 request; DESIGN.md's ⋯ line could say so). Found in #294's review.
+
 **For M16**
 - [ ] `e2e/feed.e2e.ts` failed on CI in the 20 minutes after the day's reset (2026-11-15, PRs #214 and #215): its seeded comments carried today's day with yesterday's time, which the app never writes, and the second page came back empty. The helper now takes a comment's day from its time. Left: the date-line test's "today" comment, 5 minutes old, is yesterday's in the first 5 minutes of a day; and `feel.e2e.ts:51`, `live-board.e2e.ts:31` and `controls-and-state.e2e.ts:200` passed only on a retry in the same runs, cause not looked for. Found on CI, 2026-11-15.
 - [ ] The test that no word of the list reaches the player before the run ends (`src/app/api/substrings/route.db.test.ts`, "sends no word of the list…") leans on the test before it having had a word accepted, and reads only the early replies of a run it never ends. Found in M16's close (review).
