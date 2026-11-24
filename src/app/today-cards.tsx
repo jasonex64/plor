@@ -2,7 +2,7 @@
 
 // Today's game cards (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2; the human's answers 5, 7, 16, 25, 40 and 42).
 // On phones one card is in front, 82% of the row, with a strip of the next, under a row "Today's games" with Previous and
-// Next and "1 of 2"; once the cards' own row is 768px wide the two sit side by side with no arrows (the human, 2026-11-14:
+// Next and "1 of 2"; once the cards' own row is 560px wide (M20 answer 78) the two sit side by side with no arrows (the human, 2026-11-14:
 // "Side by side only with room": beside the sidebar a tablet's row is too narrow for two names). A day with an approved day in only one game shows
 // that card alone (src/app/today-games.ts). The row follows the WAI-ARIA APG Carousel pattern as How to play's steps do
 // (src/app/how-to-play.tsx): a carousel group, each card a slide named "N of 2", the arrows' state in aria-disabled.
