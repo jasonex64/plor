@@ -20,3 +20,64 @@
   font-size: var(--text-caption);
   font-weight: 700;
 }
+
+/* The row under the last item while more can load (inbox #266). Its height is kept whether or not a page is loading, so the
+   feed doesn't jump when the dots come and go. A calm frame (M20, answer 21): three dots in the muted colour, pulsing
+   in turn, the row fading in over --fade; "Loading more" stays for a screen reader, in the status. */
+.more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+  animation: dots-in var(--fade) var(--ease);
+}
+
+.dots > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: dot-pulse calc(var(--fade) * 3) var(--ease) infinite;
+}
+
+.dots > span:nth-child(2) {
+  animation-delay: var(--quick);
+}
+
+.dots > span:nth-child(3) {
+  animation-delay: calc(var(--quick) * 2);
+}
+
+@keyframes dots-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+/* Under reduced motion the dots stand still, at the middle of the pulse. */
+@media (prefers-reduced-motion: reduce) {
+  .dots,
+  .dots > span {
+    animation: none;
+  }
+
+  .dots > span {
+    opacity: 0.6;
+  }
+}
