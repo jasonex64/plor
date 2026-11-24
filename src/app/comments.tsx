@@ -16,7 +16,7 @@ import { latestOnly } from "@/lib/latest";
 import { choose } from "@/reactions/choose";
 import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
-import { Avatar } from "./avatar";
+import { PlayerAvatar, PlayerName } from "./player-link";
 import kit from "./kit.module.css";
 import { GameSwitch } from "./leaderboard";
 import styles from "./comments.module.css";
@@ -396,10 +396,14 @@ export function CommentContent({
 }) {
   return (
     <>
-      <Avatar name={comment.name} />
+      <PlayerAvatar name={comment.name} username={comment.username} me={mine} />
       <div className={kit.grow}>
         <div className={kit.head}>
-          <strong id={ids?.name}>{comment.name}</strong>
+          <strong id={ids?.name}>
+            <PlayerName username={comment.username} me={mine}>
+              {comment.name}
+            </PlayerName>
+          </strong>
           <span className={kit.chip}>
             {/* One flex item, so the chip's words wrap as text rather than as separate boxes. */}
             <span>

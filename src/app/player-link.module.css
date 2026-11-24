@@ -18,3 +18,17 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* The name alone as the link (PlayerName), in its place's own type and layout. */
+.inline {
+  border-radius: var(--r-small);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The avatar as a link (PlayerAvatar): the slot's own box, so its row lays it out as it did the bare slot. */
+.avatar {
+  display: flex;
+  flex: none;
+  border-radius: 50%;
+}

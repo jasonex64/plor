@@ -4,13 +4,21 @@
 // friend's fuller profile, reached from the friends list too.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { befriend, RUN, signInAndPick } from "./players";
+import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 
+// Today's Offbeat, for the run a fixture comment hangs on (the last test).
+let puzzle: TodayPuzzle;
+test.beforeAll(async () => {
+  puzzle = await todayPuzzle(DB);
+});
+
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
+  await removePuzzle(DB, puzzle);
   await DB.end();
 });
 
@@ -76,4 +84,58 @@ test("a player is found by username, sent a request from their profile, and show
   await page.goto(`/u/${A}`);
   await expect(you(page)).toContainText("This is you.");
   await expect(you(page).getByRole("link", { name: "Your Me page" })).toBeVisible();
+});
+
+// M20 20e (answers 81 and 82): a name opens its profile on the live board, the leaderboard, the feed and a group's
+// members, with its avatar; your own name opens Me. Sets its own screen: Today has its board and leaderboard from 1200px.
+test("a name opens its profile on the board, the leaderboard, the feed and a group's members; your own opens Me", async ({ browser }) => {
+  test.slow(); // two sign-ins and a friendship made on the screens
+  const SCREEN = { width: 1280, height: 900 };
+  const page = await (await browser.newContext({ viewport: SCREEN })).newPage();
+  await page.goto("/friends");
+  await signInAndPick(page, "pfc");
+  const other = await (await browser.newContext({ viewport: SCREEN })).newPage();
+  await other.goto("/friends");
+  await signInAndPick(other, "pfd");
+  await befriend(page, "pfc", other, "pfd");
+  const [me, friend] = [`pfc${RUN}`, `pfd${RUN}`];
+  const idOf = async (name: string) => (await DB.query<{ user_id: string }>("select user_id from private.profile where username = $1", [name])).rows[0].user_id;
+  const friendId = await idOf(friend);
+  // Old enough for the leaderboard, as boards.e2e.ts makes its players.
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[me, friend]]);
+  // The friend's comment in the friends' thread, written in the database with the run it hangs on: posting on the
+  // screens needs a whole run played.
+  await DB.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, 'offbeat', private.today())", [friendId]);
+  await DB.query("insert into private.comment (user_id, game_id, puzzle_date, body, group_id) values ($1, 'offbeat', private.today(), $2, null)", [friendId, `hello ${RUN}`]);
+  const toProfile = (region: ReturnType<Page["getByRole"]>, name: string, href: string) => expect(region.getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
+
+  await page.goto("/friends");
+  await toProfile(page.getByRole("region", { name: "Friends today" }), friend, `/u/${friend}`);
+  const board = page.getByRole("region", { name: "Friends leaderboard" });
+  // Today's board waits for the viewer's own run; the week's doesn't.
+  await board.getByRole("radiogroup", { name: "Period", exact: true }).getByText("This week", { exact: true }).click();
+  await toProfile(board, friend, `/u/${friend}`);
+  await toProfile(board, `${me} (you)`, "/me");
+  // The avatar is part of the way in, and not a second stop for the keyboard or a screen reader.
+  await expect(board.locator(`a[href="/u/${friend}"]`)).toHaveCount(2);
+  await expect(board.locator(`a[href="/u/${friend}"][aria-hidden="true"][tabindex="-1"] [data-initial]`)).toHaveCount(1);
+
+  await toProfile(page.getByRole("region", { name: "Feed" }), friend, `/u/${friend}`);
+
+  await page.goto("/groups");
+  await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Name Club");
+  await page.getByRole("region", { name: "Groups" }).getByRole("button", { name: "Create group" }).click();
+  await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
+  await DB.query("insert into private.group_member (group_id, user_id) values ($1, $2)", [page.url().split("/").pop(), friendId]);
+  await page.reload();
+  const members = page.getByRole("region", { name: "Members" });
+  await toProfile(members, friend, `/u/${friend}`);
+  await toProfile(members, me, "/me");
+
+  await members.getByRole("link", { name: friend, exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/u/${friend}$`));
+  await page.goto("/friends");
+  await board.getByRole("radiogroup", { name: "Period", exact: true }).getByText("This week", { exact: true }).click();
+  await board.getByRole("link", { name: `${me} (you)`, exact: true }).click();
+  await expect(page).toHaveURL(/\/me$/);
 });

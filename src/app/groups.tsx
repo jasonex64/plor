@@ -11,7 +11,7 @@ import { latestOnly } from "@/lib/latest";
 import { BOTH_GAMES } from "./feed-logic";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
-import { Avatar } from "./avatar";
+import { PlayerAvatar, PlayerName } from "./player-link";
 import { Comments } from "./comments";
 import kit from "./kit.module.css";
 import { Leaderboard } from "./leaderboard";
@@ -246,9 +246,11 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
           <ul className={kit.rows}>
             {group.members.map((m) => (
               <li key={m.username} className={kit.row}>
-                <Avatar name={m.name} />
+                <PlayerAvatar name={m.name} username={m.username} me={m.username === username} />
                 <span className={kit.grow}>
-                  {m.name}
+                  <PlayerName username={m.username} me={m.username === username}>
+                    {m.name}
+                  </PlayerName>
                   {m.creator && " (creator)"}
                 </span>
                 {group.creator && !m.creator && (
