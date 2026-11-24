@@ -1,6 +1,6 @@
 # M23 23a — A researched list's format and its way into the database
 
-**Status:** approved 2026-11-23 (the human: "Approve 23a"), from answers 17 to 24 in `M23-offbeat-on-a-clock.md`. **Built and reviewed, 2026-11-24**, on `m23-offbeat-on-a-clock`; in its PR, not merged. Local stack only: the hosted database has neither the migration nor the lists.
+**Status:** approved 2026-11-23 (the human: "Approve 23a"), from answers 17 to 24 in `M23-offbeat-on-a-clock.md`. **Built and reviewed, 2026-11-24**, on `m23-offbeat-on-a-clock`; merged as #298. Local stack only: the hosted database has neither the migration nor the lists.
 
 ## Goal
 An everyday question's answers come from one file in git that a person can read and edit, and the game judges against exactly that file.

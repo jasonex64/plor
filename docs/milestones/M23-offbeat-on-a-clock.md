@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is built and reviewed (its PR); nothing else is. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is built, reviewed and merged (#298); nothing else is. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
