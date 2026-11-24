@@ -1,6 +1,8 @@
 // A researched list's way into the answer database (docs/milestones/M23-23a-researched-lists.md, criteria 2 to 4), against
 // the local stack (run with `npm run test:db`). The first two describes read the base `npm run base -- load all` left
-// there, as the other tests that need the real base do; the third makes its own small category and takes it out again.
+// there; where no base is loaded (CI's fresh stack) they load the three lists themselves and take them out again, so there
+// "refuses" only shows a name absent from the list isn't judged in: the old WordNet members it refuses are in a loaded
+// base alone. The third makes its own small category and takes it out again.
 import { readFileSync } from "node:fs";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -18,6 +20,22 @@ const KEYS = ["bed", "acid", "cake"];
 const file = (key: string) => JSON.parse(readFileSync(`content/lists/${key}.json`, "utf8")) as ResearchList;
 // An answer's permanent ID: its list's key and its name as typed, with "research" as its source.
 const answerId = (key: string, name: string) => thingId("research", `${key}/${normalize(name)}`);
+
+// On a stack with no base loaded, the lists as `load all` would load and define them; taken out again after.
+let loadedHere = false;
+beforeAll(async () => {
+  const { rows } = await db.query("select key from private.category where key = any($1)", [KEYS]);
+  if (rows.length === KEYS.length) return;
+  loadedHere = true;
+  await loadResearch(db, KEYS.map(file));
+  for (const key of KEYS) await db.query("select private.define_category($1, $1, 'research', $1, null)", [key]);
+});
+afterAll(async () => {
+  if (!loadedHere) return;
+  await db.query("delete from private.category where key = any($1)", [KEYS]);
+  await db.query("delete from private.thing where id in (select thing_id from private.thing_source where source = 'research' and split_part(source_id, '/', 1) = any($1))", [KEYS]);
+  await db.query("delete from private.base_log where (action = 'import' and actor = 'source:research' and detail ->> 'snapshot' = 'lists') or (action = 'define_category' and detail ->> 'key' = any($1))", [KEYS]);
+});
 
 describe("a researched category's members", () => {
   it.each(KEYS)("%s has exactly the answers of its list file", async (key) => {
