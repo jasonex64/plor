@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { PROTOCOL_VERSION } from "../src/lib/protocol";
-import { RUN, signInAndPick } from "./players";
+import { befriend, RUN, signInAndPick } from "./players";
 import { localStack } from "../scripts/slot.ts";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
@@ -69,6 +69,7 @@ test("a request shows on the Friends tab and its page, is accepted, and a block 
     expect(dialog.message()).toContain(`Block ${B}?`);
     void dialog.accept();
   });
+  await friends(page).getByRole("button", { name: /^Actions for / }).click();
   await friends(page).getByRole("button", { name: "Block" }).click();
   await expect(friends(page).getByText("No friends yet.")).toBeVisible();
   await expect(board).not.toContainText(B);
@@ -104,4 +105,42 @@ test("Decline and block takes the request off the blocker's page, and the sender
   await other.reload();
   await expect(requests(other).getByRole("list", { name: "Requests you sent" }).getByRole("listitem")).toContainText([`frc${RUN}`]);
   await other.context().close();
+});
+
+// M20 20n-3 (the second look audit's finding 2; answers 79 and 80): on a phone a friend's row is the avatar and name, one
+// line, as the link to their profile, and a ⋯ that holds Remove and Block; no Profile button. Sets its own phone size.
+test("on a phone a friend's row is their name on one line, the link to their profile, with Remove and Block behind its ⋯", async ({ browser }) => {
+  test.slow(); // two sign-ins and a friendship made on the screens, as the test above
+  const PHONE = { width: 390, height: 844 };
+  const page = await (await browser.newContext({ viewport: PHONE })).newPage();
+  await page.goto("/friends");
+  await signInAndPick(page, "fre");
+  const other = await (await browser.newContext({ viewport: PHONE })).newPage();
+  await other.goto("/friends");
+  await signInAndPick(other, "frf");
+  await befriend(page, "fre", other, "frf");
+  const name = "Bartholomew Fitzwilliams";
+  await DB.query("update private.profile set display_name = $2 where username = $1", [`frf${RUN}`, name]);
+  await page.goto("/friends");
+
+  const row = friends(page).getByRole("listitem");
+  const link = row.getByRole("link", { name, exact: true });
+  await expect(link).toHaveAttribute("href", `/u/frf${RUN}`);
+  // One line: the row is the controls' 44px and its borders and padding, not a name broken a letter a line.
+  expect((await row.boundingBox())!.height).toBeLessThan(70);
+  expect((await link.getByText(name).boundingBox())!.height).toBeLessThan(30);
+  await expect(page.getByRole("link", { name: /profile/i })).toHaveCount(0);
+  await expect(row.getByRole("button", { name: "Remove" })).toHaveCount(0);
+  await expect(row.getByRole("button", { name: "Block" })).toHaveCount(0);
+
+  const more = row.getByRole("button", { name: `Actions for ${name}`, exact: true });
+  await more.click();
+  await expect(row.getByRole("button", { name: "Remove", exact: true })).toBeVisible();
+  await expect(row.getByRole("button", { name: "Block", exact: true })).toBeVisible();
+  // The open menu stays on the screen, with no sideways scroll.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.keyboard.press("Escape");
+
+  await link.click();
+  await expect(page).toHaveURL(new RegExp(`/u/frf${RUN}$`));
 });

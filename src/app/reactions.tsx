@@ -135,7 +135,7 @@ export function ReactMenu({
   actions = [],
 }: {
   label: string;
-  reactions: ReactionsData;
+  reactions?: ReactionsData;
   onReact?: (emoji: Emoji | null) => void;
   actions?: MenuAction[];
 }) {
@@ -168,7 +168,7 @@ export function ReactMenu({
           {onReact && (
             <div role="group" aria-label="Reactions" className={styles.emojis}>
               {REACTIONS.map((emoji) => {
-                const mine = reactions.mine === emoji;
+                const mine = reactions?.mine === emoji;
                 return (
                   <button key={emoji} type="button" className={styles.pick} aria-pressed={mine} onClick={pick(() => onReact(mine ? null : emoji))}>
                     {emoji}

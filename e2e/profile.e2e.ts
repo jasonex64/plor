@@ -69,7 +69,7 @@ test("a player is found by username, sent a request from their profile, and show
 
   // A reaches B's profile from the friends list, and their own name opens with a way to Me.
   await page.goto("/friends");
-  await page.getByRole("region", { name: "Your friends" }).getByRole("link", { name: `${B}'s profile` }).click();
+  await page.getByRole("region", { name: "Your friends" }).getByRole("link", { name: B, exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/u/${B}$`));
   await expect(you(page)).toContainText("You're friends.");
   await expect(page.getByRole("region", { name: "Calendar" })).toBeVisible();

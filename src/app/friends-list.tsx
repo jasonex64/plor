@@ -11,9 +11,10 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { Friend, FriendWithId } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
-import { ButtonLink } from "./button-link";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
+import { PlayerLink } from "./player-link";
+import { ReactMenu } from "./reactions";
 import { Line, Skeleton } from "./skeleton";
 
 type Who = { username: string } | { userId: string };
@@ -150,18 +151,19 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
           <ul className={kit.rows}>
             {friends.map((f) => (
               <li key={f.username} className={kit.row}>
-                <Avatar name={f.name} />
-                <span className={kit.grow}>{f.name}</span>
-                <ButtonLink href={`/u/${f.username}`} aria-label={`${f.name}'s profile`}>
-                  Profile
-                </ButtonLink>
-                {action(
-                  "Remove",
-                  "/api/friends/remove",
-                  { userId: f.userId },
-                  `Remove ${f.name} as a friend? To be friends again, one of you sends a friend request.`,
-                )}
-                {action("Block", "/api/friends/block", byName(f), blockQuestion(f.name))}
+                <PlayerLink name={f.name} username={f.username} />
+                {/* Remove and Block are behind the row's ⋯, so a phone's row keeps the name whole (M20 answer 79). */}
+                <ReactMenu
+                  label={`Actions for ${f.name}`}
+                  actions={[
+                    {
+                      name: "Remove",
+                      run: () =>
+                        !busy && void change("/api/friends/remove", { userId: f.userId }, `Remove ${f.name} as a friend? To be friends again, one of you sends a friend request.`),
+                    },
+                    { name: "Block", run: () => !busy && void change("/api/friends/block", byName(f), blockQuestion(f.name)) },
+                  ]}
+                />
               </li>
             ))}
           </ul>

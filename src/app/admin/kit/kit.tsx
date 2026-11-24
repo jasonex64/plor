@@ -52,7 +52,7 @@ export function Kit() {
           <button type="button">How to play</button>
           <button type="button" disabled>How to play</button>
           <ButtonLink href="/admin/kit">A link drawn as a button</ButtonLink>
-          <button type="button" className={kit.link}>Profile</button>
+          <button type="button" className={kit.link}>Cancel</button>
         </div>
       </Piece>
       <Piece name="Danger" when="A warning or a step that can't be undone: the danger colour on a button's edge and text, or a chip's.">

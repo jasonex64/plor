@@ -75,10 +75,10 @@ const short = (page: Page) =>
 
 // Controls each page must show before it's measured: the small kinds that were under 44px before 14b-10a.
 // A comment's Report and Delete are behind its ⋯ since 14b-13; the ⋯ itself is measured.
-const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /], "/friends": ["Remove"], "/groups": ["Create group"] };
+const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /], "/friends": [/^Actions for /], "/groups": ["Create group"] };
 
 test("only what can be pressed has a shadow, and every control is 44px tall", async ({ browser }) => {
-  // Two players who are friends, share a group, and have both played and commented, so the friends list's Remove, the
+  // Two players who are friends, share a group, and have both played and commented, so the friends list's ⋯ (Remove and Block are behind it since M20 20n-3), the
   // group's Rename, a comment's Report and Delete, and the feed's Post are all on screen. Two sign-ins, two runs and 23
   // pages measured took 96s on the Windows PC (2026-10-30), past test.slow()'s 90s.
   test.setTimeout(3 * 60_000);

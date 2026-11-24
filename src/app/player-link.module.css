@@ -1,0 +1,20 @@
+/* A player's avatar and name as a link (player-link.tsx): the row's gap between the two (kit.module.css, .row), the
+   controls' 44px to press (M14 14b-10, answer 7), the small corners under the hover rule's fill. */
+.player {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  border-radius: var(--r-small);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
