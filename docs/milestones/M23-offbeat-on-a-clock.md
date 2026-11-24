@@ -47,6 +47,12 @@ The game:
 23. How far brands go and what one is worth: "Any real brand, tiered like any answer (Recommended)". A brand the research missed is refused until added, like any missed answer.
 24. What the second pass does with an answer it can't confirm exists: "Keep it unless clearly wrong". The option's stated cost: an answer an agent invented could be accepted in play.
 
+23b's and 23c's first round (2026-11-24, after #298 merged):
+25. 23b, how the human reviews a question's borderline answers and brands: "An admin page with strike buttons (Recommended)". A write from the admin: its security change is proposed in 23b.
+26. 23b, which 21 questions are researched first: "Claude picks everyday ones, you veto (Recommended)". Big sets wait.
+27. 23c, a guest's run: "The same full run (Recommended)".
+28. 23c, a lost connection or closed tab: "Clock keeps running (Recommended)". The server's clock never stops; coming back before zero carries on with what is left.
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
