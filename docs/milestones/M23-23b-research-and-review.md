@@ -79,6 +79,10 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 | 2 | Passes per question | Human, 2026-11-23, answer 3 |
 | 18 | Questions researched here | Human, 2026-11-24, "Yes, these 18" |
 | 6 | Research agents at once | Claude's, to stay under the session's ten-agent guideline; not a product number |
+| 8, 6 | Fewest searches or page reads for the researcher, fewest searches for the checker | Claude's (the skill); the checker's added after hat's first checker searched nothing |
+| about 30 to 40 | Answers in a list's common tier | Claude's (the skill), a guide the lists run past: 32 to 94 |
+| 10 | The most obvious answers, listed first in a file | Claude's (the skill), from the pilot's "first ten" |
+| 1 in 5 | Removals and corrections by the checker above which pass 1's brief is fixed before more questions run | Claude's (this ticket's hypothesis) |
 
 ## Plan
 23b-1
@@ -100,6 +104,12 @@ Hypothesis for step 1: the second pass changes fewer than one answer in five. If
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answer 24: an answer the second pass can't confirm exists: "Keep it unless clearly wrong" | The checker removes a name with **no trace at all** when it searches for it, as "not a real thing"; a name it merely can't confirm stays | Claude's reading, made when two first researchers reported inventing placeholder rows under the generosity rule. Said to the human in chat the same day, not put to them as a question: theirs to overrule. Across 21 lists it removed about two dozen rows and typed forms |
+| Answer 1: every old member is judged keep or remove | The skill also leaves out parts and accessories of the thing, and one-off proper names unless the prompt asks for them | Claude's rule for what "not an answer" means; borderline cases are kept and marked instead |
+| Answer 34: "as generous as possible" | Colours, sizes and adjectives nobody names a thing by ("big hat") are not variations; rows are never built by combining words | Claude's line between generous and padded, after candy's first pass was built by a script |
+| Answer 3: the second agent "tests it against what players typed" | Done in every run (each checker's brief held the refused texts), but the skill's text first gave them to the researcher only | Fixed in the skill after the review |
+| The design: tiers by "what players type first" | Common tiers of 32 to 94 answers, by each agent's judgement; no data on what players type first exists yet | Play takes the tiers over after 50 players (answers 21, 22; 23e) |
+| The design: 23b-1 has no migration | As designed | |
 
 ## Evidence
 **Step 1, the skill proven on hat, 2026-11-24.** `.claude/skills/research-list/SKILL.md`. Pass 1 (about 11 searches and page reads, 129,000 tokens, 3 minutes): 33 old members → 201 answers; "beanie" (refused 3 times last week) is the fifth answer; one old member left out (millinery, the trade). Pass 2 (112,000 tokens, 1.5 minutes): removed nothing, added 24 answers and aliases to 10, re-tiered 2, marked 1 borderline: 37 of 201 changed, about 18%, under the hypothesis's one in five. Final: 226 answers (54 common, 89 uncommon, 83 rare), 27 borderline, 16 brands; `npm run content:validate` → `CONTENT OK content: 33 file(s)`. **Shortfall:** pass 2 searched nothing and added from memory, so its rarer additions are unconfirmed; the skill now requires at least six searches of the checker. Not yet done for hat: `categories.json`, the load, the db test (step 4, with the others).
@@ -126,3 +136,7 @@ The accepted ones are in `scripts/research.db.test.ts`'s "accepts" cases, with b
 **Not verified.** Most rare answers were not confirmed one by one: checkers searched the doubtful ones (cheese's ran 25 searches and removed 2), and gemstone's and dance's additions lean most on memory; by answer 24 what can't be confirmed stays. No list was looked at by the human except hat's sample in chat. The lists are on the local stack only.
 
 ## Review
+23b-1: the `reviewer` agent, 2026-11-24, fresh context. It reran `content:validate` and the three test files (75 passed), sampled eight lists with its own script, and found no problem in the code, tests or commits.
+- Blocking findings and how each was fixed: (1) the Source diff was empty: filled. (2) The skill's numbers had no recorded origin and its header called Claude's procedure the human's rules: Numbers rows added, the header rewritten. (3) Removing a name with "no trace at all" narrows answer 24 by Claude's reading: recorded in the Source diff as a deviation, with its reason, and told to the human in the PR and in chat as theirs to overrule; the skill now gives the refused texts to the checker too. (4) The handoff and ROADMAP said "in its PR" before one was open: the PR is opened with this commit.
+- Deferred to ROADMAP "Next revision", For M23: the list findings for the human's review (candy's 497 brand rows, many product variants; makers that aren't tools; teeth and numbered vertebrae under bone; hair knots and a bird under knot; over-high tiers); the unchecked family links for knife, tooth and hat; the drafted days of Nov 24 to 30 that must not be approved.
+- Unverified by the reviewer: plor.app's refusal counts; that each replaced thing ID was the name claimed (checked by the main session against the local database before replacing); the lists' rare entries; the checkers' percentages.

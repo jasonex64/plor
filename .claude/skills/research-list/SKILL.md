@@ -5,7 +5,7 @@ description: Research an Offbeat question's answer list in two passes and write 
 
 # Researching a question's answer list
 
-The rules come from the human's answers in `docs/milestones/M23-offbeat-on-a-clock.md` (1 to 4, 17 to 24) and the design in `M23-23b-research-and-review.md`. The file format is `M23-23a-researched-lists.md`'s; `content/lists/bed.json` is an example.
+The human's rules are their answers in `docs/milestones/M23-offbeat-on-a-clock.md` (1 to 4, 17 to 24, 34): what a list is, two passes, brands count, other meanings are borderline, keep what can't be confirmed, as generous as possible. The rest below is Claude's procedure, approved as a design in `M23-23b-research-and-review.md` and listed with its numbers in that ticket's Source diff and Numbers: the search counts, the size of the common tier, the ten first, what is left out (parts, one-off proper names), the one-in-five signal, and removing a name with no trace at all. The file format is `M23-23a-researched-lists.md`'s; `content/lists/bed.json` is an example.
 
 The main session runs this; the two passes are subagents on `sonnet` that never see each other's reasoning. At most six research agents run at once.
 
@@ -32,7 +32,7 @@ Give it the prompt, the key, today's members, the refused texts, and these rules
 - **Report back** (not in the file): counts by tier, the refused texts and what became of each, and where the list is likely thin.
 
 ## 3. Pass 2, the checker (a fresh `general-purpose` agent, `model: sonnet`)
-Give it only the prompt, the rules above and the file. It edits the file in place:
+Give it only the prompt, the rules above, the file, and the refused texts from step 1 (each is on the list or deliberately off it: the human's answer 3, "tests it against what players typed"). It edits the file in place:
 
 - **Lean to including** (answer 34): add named variations of answers already listed as answers of their own, and split an alias out into its own answer when it names a different variation.
 - **Hunt for invented entries first:** skim the rare tier for names that look made up or mechanically combined, search for the doubtful ones, and remove any with no trace at all: that is "not a real thing", not "can't confirm".
