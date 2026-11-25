@@ -39,7 +39,8 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
   const email = `${RUN}-${name}@example.test`;
   await forwardPlayerIp(page, email);
   const field = page.getByLabel("Email");
-  const link = page.getByRole("link", { name: "Sign in", exact: true });
+  // The front page's button under its cards (M20 20n-7, answer 99), or a guest game's "Sign in".
+  const link = page.getByRole("link", { name: /^Sign in( to see how your friends did)?$/ });
   await expect(field.or(link)).toBeVisible();
   const throughLink = !(await field.isVisible());
   const from = page.url();

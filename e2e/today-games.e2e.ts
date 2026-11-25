@@ -277,6 +277,12 @@ test("each game's card is a white card with its game's band, and once played the
     await expect(band(region)).toBeVisible();
     expect(await fill(cardOf(region))).toBe(await slot("--surface"));
     expect(await fill(band(region))).toBe(await slot(game));
+    // 20n-7 (answers 100 to 103): the game's emblem is in the band before its name, 24px, and hidden from screen readers.
+    const emblem = band(region).locator("svg[data-emblem]");
+    await expect(emblem).toHaveAttribute("aria-hidden", "true");
+    const [mark, name] = [(await emblem.boundingBox())!, (await band(region).getByRole("heading", { level: 2 }).boundingBox())!];
+    expect([mark.width, mark.height]).toEqual([24, 24]);
+    expect(mark.x + mark.width).toBeLessThanOrEqual(name.x);
   }
   // Once played: the score big and popping in, on Today's card and at the top of the game's own screen.
   await finishOffbeat(page);
@@ -322,6 +328,8 @@ test("each game's start is Back to Today and one card with its band, the rules, 
     await expect(main.getByRole("link", { name: "Today", exact: true }).filter({ visible: true })).toHaveAttribute("href", "/");
     await expect(tab).toHaveAttribute("aria-current", "true");
     expect(await cardOf(start), game.name).toEqual({ band: game.name, day: true, buttons: ["Start", "How to play"] });
+    // The emblems are on Today's cards and the front page, not on the game's own screen (20n-7, answer 100).
+    await expect(main.locator("svg[data-emblem]")).toHaveCount(0);
     // The rules are in the card too, above Start.
     expect(await start.evaluate((b, CARD) => /\d+ (questions|rounds)/.test(b.closest(CARD)!.textContent!), CARD), game.name).toBe(true);
   }

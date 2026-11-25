@@ -48,8 +48,8 @@ test("buttons, button links and fields take the ink border, corners and shadow, 
   for (const colorScheme of ["light", "dark"] as const) {
     const page = await (await browser.newContext({ colorScheme })).newPage();
     await page.goto("/");
-    // The form is behind the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
-    await page.getByRole("link", { name: "Sign in", exact: true }).click();
+    // The form is behind the front page's Sign in button (M18, answer 32; M20 20n-7, answer 99).
+    await page.getByRole("link", { name: "Sign in to see how your friends did", exact: true }).click();
     const color = await ink(page);
     expect(await look(page.getByRole("button", { name: "Email me a sign-in code" }))).toEqual({
       border: `2px ${color}`,
@@ -65,7 +65,7 @@ test("a button presses down onto its shadow, and doesn't move under reduced moti
   for (const reducedMotion of ["no-preference", "reduce"] as const) {
     const page = await (await browser.newContext({ reducedMotion })).newPage();
     await page.goto("/");
-    await page.getByRole("link", { name: "Sign in", exact: true }).click();
+    await page.getByRole("link", { name: "Sign in to see how your friends did", exact: true }).click();
     const button = page.getByRole("button", { name: "Email me a sign-in code" });
     // Since the front page offers each game to a guest (M18 18d), this button sits at the fold of the test's window:
     // a pointer pressed below the window's edge presses nothing.
@@ -128,7 +128,7 @@ test("signed-in Today: no introduction, the banner's own chips, and no words abo
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
   const chip = banner.getByText("7 questions", { exact: true });
   await expect(chip).toBeVisible();
-  await expect(page.getByText("Plor is a small site with a daily word game.")).toBeHidden();
+  await expect(page.getByText("Plor is a small site with two daily word games.")).toBeHidden();
   const color = await ink(page);
   expect(await chip.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el).borderTopColor])).toEqual([color, color]);
 
