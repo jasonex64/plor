@@ -130,6 +130,11 @@ select is(pg_temp.grants('plor_app'), array[
   'private.judge_word(uuid,date,text,text,text) execute',
   'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
+  -- The admin's review of a researched list (M23 23b-2): four writes and one read, each refusing a non-admin; the two
+  -- tables are granted to nobody.
+  'private.list_add(uuid,text,text,text) execute', 'private.list_edits(uuid) execute',
+  'private.list_mark_seen(uuid,text) execute',
+  'private.list_strike(uuid,text,text) execute', 'private.list_unstrike(uuid,text,text) execute',
   'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',

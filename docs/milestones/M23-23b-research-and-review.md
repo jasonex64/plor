@@ -92,7 +92,15 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 4. `categories.json`, `npm run base -- load all`, the db test over 21 keys → verify: `npx vitest run scripts/research.db.test.ts --no-file-parallelism`.
 5. Reviewer, PR.
 
-23b-2: written as checks once 23b-1 is merged and `add_player_thing` has been read.
+23b-2 (written 2026-11-24, after 23b-1 merged and `add_player_thing`, `audit_decide`, `category_members` and `load_finish` were read)
+1. The tables and functions, failing test first → verify: `npx supabase test db supabase/tests/list_review.test.sql` (fails with no migration, then passes); `plor_app_role.test.sql` lists exactly the five executes.
+2. The fold's pure part (edits and a list in, a list out) and the guard's (edits and lists in, the unfolded ones out), failing unit tests first → verify: `npx vitest run scripts/lists.test.ts`.
+3. `npm run lists -- fold`, the loader marking folded edits (`private.list_fold`), `hosted check` listing and `hosted load` refusing unfolded edits → verify: a db test of a load after a fold.
+4. The routes (`/api/admin/lists`), admins only → verify: a route db test (401, 403, the four writes, the read).
+5. The page, `/admin/lists`, from the admin's existing pieces → verify: an e2e at phone and desktop size (`@visual`): open a list, strike, undo, add, mark seen.
+6. DECISIONS.md (the Log's security line), DESIGN.md if the page adds a piece, the `reviewer` agent, the PR with its videos.
+
+What step 1's reading settled: a strike sets the end (`removed_at`) of the answer's `kind_of` link to its list's root to the next midnight, the column a load sets; listings of a category's members today drop it at once, while a day judges by the base as of its own start, so today's day still accepts it. An add is `private.add_player_thing` with origin `human`, the Audit page's accept; a researched list has no filter, so no `category_extra` row is needed. A day already started doesn't see an add (it judges as of its start): the add counts from the next day.
 
 Hypothesis for step 1: the second pass changes fewer than one answer in five. If it rewrites more, pass 1's prompt is wrong and is fixed before the batch, not after.
 
