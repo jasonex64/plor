@@ -33,27 +33,24 @@ type Outcome = { kind: "accepted"; answer: ClockAnswer } | { kind: "repeat" } | 
 // read again, not shown as a failure.
 const BEHIND = ["not_open", "out_of_order", "run_over"];
 
-// initial: the state Game just read, so the screen opens on it at once.
+// run, setRun: the state Game's useRun holds (src/app/game.tsx), which reports the run's end and times the reset from it.
 export function ClockGame({
   family,
   botCheck,
-  initial,
+  run,
+  setRun,
   onStarted,
   onPlaying,
-  onOver,
-  onDayOver,
 }: {
   family: RunFamily;
   botCheck?: () => Promise<string>;
-  initial: ClockState;
+  run: ClockState;
+  setRun: (run: ClockState) => void;
   onStarted?: () => void;
   onPlaying: (playing: boolean) => void;
-  onOver: (over: boolean) => void;
-  onDayOver: (inPlay: boolean) => void;
 }) {
   const router = useRouter();
   const routes = runRoutes(family);
-  const [run, setRun] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const playing = run.status === "in_progress";
@@ -77,17 +74,11 @@ export function ClockGame({
         },
         (err) => setError(errorText(err)),
       );
-  }, [routes.state]);
+  }, [routes.state, setRun]);
   useEffect(load, [load]);
 
   useEffect(spendToPlay, []);
   useEffect(() => onPlaying(playing), [onPlaying, playing]);
-  useEffect(() => onOver(over), [onOver, over]);
-  // Each state carries the time to the reset as the server measured it; a run in play goes on after it (M04 G13).
-  useEffect(() => {
-    const timer = setTimeout(() => onDayOver(playing), run.msToReset);
-    return () => clearTimeout(timer);
-  }, [run.msToReset, playing, onDayOver]);
 
   async function send<T extends { run: ClockState }>(path: string, body?: unknown): Promise<T | null> {
     setBusy(true);
@@ -207,7 +198,8 @@ function Play({
   async function submit(event: FormEvent) {
     event.preventDefault();
     const sent = text.trim();
-    if (sent === "" || sending.current) return;
+    // busy: a Next or Finish on its way; an answer sent then could land after it and show the earlier question again.
+    if (sent === "" || sending.current || busy) return;
     sending.current = true;
     try {
       const result = await onAnswer(sent);

@@ -1,6 +1,6 @@
 # M23 — 23d, the clock game's screens
 
-**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 is being built.
+**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built 2026-11-25, in its PR; 23d-2 is not started.
 
 ## Goal
 A player can play a format 4 Offbeat day from start to result on a phone or a computer, signed in or as a guest, share the result, and see friends' runs on the live board.
@@ -81,7 +81,13 @@ Green common, blue uncommon, purple rare.
 | 20 s; 3, 5, 8 s; 10, 25, 50 points | Shown in the rules and How to play | Answers 10 and 11, read from the server (`private.clock_start_ms`, `clock_added_ms`, `clock_points`), never typed into the screen's code |
 
 ## Plan
-Written as checks once approved, per sub-part.
+**23d-1, as checks (each run, each passed):**
+1. Read 23c's state and routes, the old game's screen and Fragments' → verify: the brief names what each gives (the builder's report).
+2. The card, the play screen, the plain end, for a player and a guest → verify: `npx playwright test e2e/clock.e2e.ts` passes at both sizes.
+3. A format 3 day still plays → verify: `npx playwright test e2e/offbeat.e2e.ts` passes.
+4. The run's rules untouched → verify: `npm run verify -- offbeat-run` passes.
+
+23d-2's is written when it starts.
 
 ## Removes
 Nothing: the old game's screens go in 23f.
@@ -92,9 +98,29 @@ Nothing: the old game's screens go in 23f.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 23d-1 (the design above) | | |
+| The rules on the card "in three lines (three questions, one clock that starts at 20 seconds, rarer answers add more time and points)" | "3 questions, one clock." / "Every answer adds time." / "Rarer answers add more time and more points.": no seconds and no points named, on the card or in How to play | Numbers: they are read from the server, never typed into a screen, and the state does not carry the rules' numbers. Carrying them is a server change; in ROADMAP, For M23 |
+| The clock "as the kit's countdown bar" | The bar starts full again at each accepted answer | `Countdown` draws the time left against the time left when it was shown, as in both other games; the state carries no whole length |
+| Not designed | Today shows a card for a clock day (Play, Continue or Result) | Without it Today's Offbeat card stayed a loading placeholder on a format 4 day |
+| Not designed | A tab that is behind (another tab pressed Next, or the run ended) reads the run again instead of showing an error | Answer 32: both tabs show the same run |
+| "With the phone keyboard's height taken off the screen" | The test shortens the window to 390 × 500 | Playwright has no phone keyboard; 500 is the builder's stand-in. Not proof on a real phone: the human tries it on the preview |
 
 ## Evidence
+**23d-1** (commands run 2026-11-25 on the local stack):
+- A player and a guest play from Start to the end at both sizes; an accepted answer, a repeat, text off the list, Next, Finish only on question 3, the same run after a reload and in a second tab: `CI=1 npx playwright test e2e/clock.e2e.ts` → `8 passed (50.4s)` (4 tests, each at 390 × 844 and 1280 × 720).
+- The clock reaching zero shows the end without a tap: the test loads a run with seconds left, sees the timer and the input, and waits for "Your answers" with no tap and no reload. Its first form passed whether or not the page's own count worked (the review); the stricter form then failed once, on the test's own mistake (it took the play screen's points chip for the end), and passes now.
+- The input and the last answer inside a window shortened to 390 × 500: in the same run (see the Source diff: a stand-in).
+- A format 3 day: `npx playwright test e2e/offbeat.e2e.ts` → `5 passed`.
+- `npm run verify -- offbeat-run` → `OffbeatRun.cfg: every rule holds (233 distinct states, 1.0 s)`; no covered file changed, so the sync commit stays.
+- `npx tsc --noEmit`, `npx eslint src e2e --quiet`: no output. `npm test` → `941 passed`.
+- Looked at by the session at both sizes (the card, an accepted answer, a repeat, the end); pictures and the run's videos sent to the human in the app; CI's are in the PR run's `e2e-videos`.
+- **Not verified:** a real phone's keyboard; Reduce motion beyond adding no motion (the end's score keeps the kit's `pop`, which has its own reduced-motion rule); the full e2e and db suites locally (CI runs them).
 
 ## Review
+**23d-1 (the `reviewer` agent, fresh context, 2026-11-25):**
+- Blocking, fixed: (1) the game page and the clock game each held the run and each timed midnight, the page's from the state it first loaded, so a run started after the page opened would have been thrown off its question at midnight: the clock game now uses the page's one state, one timer. Read from the code, not reproduced; no test covers midnight. (2) The clock-runs-out test could pass with the page's own count broken: made strict (Evidence).
+- Not blocking, fixed: an answer could be sent while Next was on its way.
+- Deferred to ROADMAP "Next revision", For M23: the rest.
+
 - Blocking findings and how each was fixed:
 - Deferred to ROADMAP "Next revision":

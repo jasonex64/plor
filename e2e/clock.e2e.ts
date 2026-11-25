@@ -164,14 +164,17 @@ test("a run whose clock reaches zero shows its end without a tap", { tag: "@visu
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await say(page, "dog");
   await expect(chip(page, "10 points")).toBeVisible();
-  // The clock's 20 seconds and the 3 the answer added are private.clock_start_ms and clock_added_ms: 20 seconds back leaves
-  // 3 less the time since.
-  await DB.query("update private.run set started_at = started_at - interval '20 seconds' where user_id = (select id from auth.users where email = $1)", [
+  // The clock's 20 seconds and the 3 the answer added are private.clock_start_ms and clock_added_ms: 15 seconds back leaves
+  // 8 less the time since, so the page loads a run still in play and the end comes from its own count reaching zero.
+  await DB.query("update private.run set started_at = started_at - interval '15 seconds' where user_id = (select id from auth.users where email = $1)", [
     `${RUN}-ck2@example.test`,
   ]);
   await page.reload();
-  // The page loaded a clock with a moment left, or already at zero; either way the end shows with no tap.
-  await expect(page.getByText("10 points", { exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("timer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
+  // No tap, no reload: the count reaches zero, the page asks the server, and the end shows.
+  await expect(page.getByRole("heading", { name: "Your answers", exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("10 points", { exact: true })).toBeVisible();
   await expect(chip(page, "1 answer")).toBeVisible();
   await expect(answerBox(page)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Next question", exact: true })).toHaveCount(0);

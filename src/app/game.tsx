@@ -88,7 +88,7 @@ function useRun({ onOver, onDayOver }: DayHooks, family: RunFamily = "account") 
     const timer = setTimeout(() => onDayOver((run ?? clock)?.status === "in_progress"), msToReset);
     return () => clearTimeout(timer);
   }, [run, clock, noPuzzle, onDayOver]);
-  return { run, setRun, clock, noPuzzle, error, setError, over };
+  return { run, setRun, clock, setClock, noPuzzle, error, setError, over };
 }
 
 // Starts today's run and opens the game screen with question 1 in play, sliding forward from Today (14b-6e): Play on
@@ -194,7 +194,7 @@ export function Game({
   ...hooks
 }: DayHooks & { family: RunFamily; botCheck?: () => Promise<string>; onStarted?: () => void; onPlaying: (playing: boolean) => void }) {
   const router = useRouter();
-  const { run, setRun, clock, noPuzzle, error, setError, over } = useRun(hooks, family);
+  const { run, setRun, clock, setClock, noPuzzle, error, setError, over } = useRun(hooks, family);
   const routes = runRoutes(family);
   const [busy, setBusy] = useState(false);
 
@@ -244,7 +244,8 @@ export function Game({
   }
 
   // A day on a clock plays on its own screen; the seven-question screens below are for format 3 days until 23f removes them.
-  if (clock) return <ClockGame family={family} botCheck={botCheck} initial={clock} onStarted={onStarted} onPlaying={onPlaying} onOver={hooks.onOver} onDayOver={hooks.onDayOver} />;
+  // Its state stays here, in useRun, so the one reset timer and the one report of the run's end read the run as it is now.
+  if (clock) return <ClockGame family={family} botCheck={botCheck} run={clock} setRun={setClock} onStarted={onStarted} onPlaying={onPlaying} />;
 
   const runner: Runner = {
     run,
