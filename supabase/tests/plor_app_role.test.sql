@@ -94,6 +94,13 @@ select is(pg_temp.grants('plor_app'), array[
   -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
   -- reads them all. Deleting the comment removes its reports (cascade), so none is deleted directly.
   'private.comment_report insert', 'private.comment_report select',
+  -- The run on a clock (M23 23c): a clock day's answers and Finish are read and inserted, never changed, for a player and
+  -- a guest; the status views plor_app evaluates read the starting time. The rules and triggers are granted to nobody.
+  'private.clock_answer insert', 'private.clock_answer select',
+  'private.clock_finish insert', 'private.clock_finish select',
+  'private.clock_start_ms() execute',
+  'private.guest_clock_answer insert', 'private.guest_clock_answer select',
+  'private.guest_clock_finish insert', 'private.guest_clock_finish select',
   'private.day_of(timestamp with time zone) execute',
   -- Deleting your own account (M12 12c, A7): one guarded function, never Auth's table.
   'private.delete_account(uuid,text) execute',
