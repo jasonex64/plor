@@ -84,6 +84,11 @@ select is(pg_temp.grants('plor_app'), array[
   'private.category_pool(uuid,text,text,integer,integer) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
   'private.clear_auth_attempts(text,text) execute',
+  -- The run on a clock (M23 23c): a clock day's answers and Finish are read and inserted, never changed, for a player and
+  -- a guest (below); the status views plor_app evaluates read the starting time. The rules and triggers are granted to nobody.
+  'private.clock_answer insert', 'private.clock_answer select',
+  'private.clock_finish insert', 'private.clock_finish select',
+  'private.clock_start_ms() execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
   'private.comment delete', 'private.comment insert', 'private.comment select',
   -- An admin's deletion of a reported comment and its record are one guarded function; plor_app only reads the
@@ -94,13 +99,6 @@ select is(pg_temp.grants('plor_app'), array[
   -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
   -- reads them all. Deleting the comment removes its reports (cascade), so none is deleted directly.
   'private.comment_report insert', 'private.comment_report select',
-  -- The run on a clock (M23 23c): a clock day's answers and Finish are read and inserted, never changed, for a player and
-  -- a guest; the status views plor_app evaluates read the starting time. The rules and triggers are granted to nobody.
-  'private.clock_answer insert', 'private.clock_answer select',
-  'private.clock_finish insert', 'private.clock_finish select',
-  'private.clock_start_ms() execute',
-  'private.guest_clock_answer insert', 'private.guest_clock_answer select',
-  'private.guest_clock_finish insert', 'private.guest_clock_finish select',
   'private.day_of(timestamp with time zone) execute',
   -- Deleting your own account (M12 12c, A7): one guarded function, never Auth's table.
   'private.delete_account(uuid,text) execute',
@@ -114,6 +112,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
+  'private.guest_clock_answer insert', 'private.guest_clock_answer select',
+  'private.guest_clock_finish insert', 'private.guest_clock_finish select',
   'private.guest_judge_word(text,date,text,text,text) execute',
   'private.guest_question_open insert', 'private.guest_question_open select',
   'private.guest_question_started_at(text,text,date,integer) execute',
