@@ -1,6 +1,6 @@
 # M23 23b — The research procedure, the first 21 lists, and the human's review page
 
-**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** **23b-2 is built (2026-11-24): `/admin/lists`, the two tables, the five functions, the fold, the load's guard; 23b-3 (the lists-only load onto plor.app) is built, in its PR; 23b-2 merged (#307, merge commit `4705b9a`, 2026-11-24, on nine green checks, the human's "Merge when green").**
+**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** **23b-2 is built (2026-11-24): `/admin/lists`, the two tables, the five functions, the fold, the load's guard; 23b-3 (the lists-only load onto plor.app) is merged (#310); 23b-2 merged (#307, merge commit `4705b9a`, 2026-11-24, on nine green checks, the human's "Merge when green").**
 
 ## Goal
 Eighteen more questions get researched lists the same way each time, in two passes, and the human can read a list's doubtful answers on plor.app and strike or add one from a phone.
@@ -54,7 +54,7 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 - **23b-2:** the review page, the two tables, the five functions, the fold, the load's guard.
 
 ## 23b-3, the lists-only load onto plor.app
-**Status:** approved 2026-11-25, its security change included (the human: "Approve 23b-3", to "Approve 23b-3, the lists-only load, with its new writing path into plor.app's database?"); built 2026-11-25, in its PR. Nothing has been run against plor.app: the command is the human's.
+**Status:** approved 2026-11-25, its security change included (the human: "Approve 23b-3", to "Approve 23b-3, the lists-only load, with its new writing path into plor.app's database?"); built 2026-11-25 and merged (#310, merge commit `7992e9a`, 2026-11-25, on nine green checks, the human's "Merge when green"). Nothing has been run against plor.app: the command is the human's.
 
 From answers 36 to 39 in `M23-offbeat-on-a-clock.md`. **Who uses it:** the human, to review the lists on plor.app (answer 37). **What breaks without it:** `hosted load` refuses plor.app's existing base, so the lists never get there and the clock game has no answers at the switch.
 - **The command:** `npm run base -- hosted load lists`, run by the human only, on the same connection, verified TLS and type-the-host-name guard as `hosted load`.

@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is merged (#307); 23b-3 (the lists-only load onto plor.app, answers 36 to 39) is built, in its PR. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is merged (#307); 23b-3 (the lists-only load onto plor.app, answers 36 to 39) is merged (#310). Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
