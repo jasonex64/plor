@@ -1,6 +1,6 @@
 # M23 23c — The run on a clock (the server's side)
 
-**Status:** designed 2026-11-24 from answers 5 to 11, 27, 28 and 31 to 33 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. Started 2026-11-24, after 23b-1's PR (#302) merged.
+**Status:** designed 2026-11-24 from answers 5 to 11, 27, 28 and 31 to 33 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **Built 2026-11-24, in its PR** (after 23b-1's PR, #302, merged): the model, the migration, the server code and their tests; no screen (23d).
 
 ## Goal
 The server can run, judge, time and score a day of the new Offbeat: three questions on one clock that grows with each accepted answer, for a signed-in player and a guest, with no screen yet.
@@ -48,16 +48,16 @@ The server can run, judge, time and score a day of the new Offbeat: three questi
 - No change to roles, to RLS policies on existing tables, or to who is an admin.
 
 ## Acceptance criteria
-- [ ] A run starts with 20 000 ms; a first common, uncommon and rare answer add 3 000, 5 000 and 8 000; the twentieth accepted answer adds its tier's time × 0.95¹⁹; no answer ever adds under 1 000 (unit test on the arithmetic's SQL function, and a db test of a run).
-- [ ] A repeated answer, and text that names nothing, change neither clock nor score; the second is logged as a miss (db test).
-- [ ] An answer after the clock has passed zero is refused, whatever the request says (db test with the clock moved).
-- [ ] An answer to a question that isn't the open one is refused; Next never goes back or past question 3; Finish is refused before question 3 and ends the run on it (db tests).
-- [ ] Two connections sending different answers at the same moment both count, and the second one's added time uses n + 1 (db test with two clients).
-- [ ] A guest's run passes the same tests (db tests on the guest tables).
-- [ ] The state never holds a later question's prompt or an unfound answer while the run is live (unit test on the payload).
-- [ ] A closed format 4 day's ledger row equals the sum of its answers' points (db test).
-- [ ] The rebuilt model passes: `npm run verify -- offbeat-run`; and a deliberately broken copy (the lock removed) fails it.
-- [ ] `plor_app_role.test.sql` lists exactly the new grants; a format 3 day still plays by today's rules (the existing run tests pass untouched).
+- [x] A run starts with 20 000 ms; a first common, uncommon and rare answer add 3 000, 5 000 and 8 000; the twentieth accepted answer adds its tier's time × 0.95¹⁹; no answer ever adds under 1 000 (unit test on the arithmetic's SQL function, and a db test of a run).
+- [x] A repeated answer, and text that names nothing, change neither clock nor score; the second is logged as a miss (db test).
+- [x] An answer after the clock has passed zero is refused, whatever the request says (db test with the clock moved).
+- [x] An answer to a question that isn't the open one is refused; Next never goes back or past question 3; Finish is refused before question 3 and ends the run on it (db tests).
+- [x] Two connections sending different answers at the same moment both count, and the second one's added time uses n + 1 (db test with two clients).
+- [x] A guest's run passes the same tests (db tests on the guest tables).
+- [x] The state never holds a later question's prompt or an unfound answer while the run is live (unit test on the payload).
+- [x] A closed format 4 day's ledger row equals the sum of its answers' points (db test).
+- [x] The rebuilt model passes: `npm run verify -- offbeat-run`; and a deliberately broken copy (the lock removed) fails it.
+- [x] `plor_app_role.test.sql` lists exactly the new grants; a format 3 day still plays by today's rules (the existing run tests pass untouched).
 
 ## Out of scope
 - Every screen, the share text, the live board's wording (23d). Drafting and approving a format 4 day (23e). Boards from the switch day, par, removing the old game (23f).
@@ -92,6 +92,16 @@ The old TLA+ model of the seven-question run (replaced by the new one in the sam
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The design: "One read function for the run's state, executable by `plor_app`" | No state function. The app reads `run_status` and its own rows; `plor_app` executes `private.clock_start_ms()` instead, an immutable number the status views read | Fewer rights than approved, not more: one constant in place of a function that reads. Recorded in DECISIONS.md's Log |
+| The design: the clock is read "by the database's own clock" | The triggers judge the time at the moment they hold the run's lock (`clock_timestamp()`); the old game judges at the statement's start | With a lock, a second tab's answer waits its turn; judging when it gets it keeps the check and the write one step, which is what the model checks |
+| The design: "Next opens the next question" | The tab sends the question it is showing and the server opens the one after it; a tab that is behind gets `out_of_order` | Otherwise a stale tab's Next would skip a question the player never saw |
+| The design: "Answers a player didn't find are returned only once the run is over" | Once over, the state lists per question the day's levelled answers (common and uncommon) not given. Rare ones are not listed | No granted function reads a category's members for a player. A finished player can already search a question's full list (`private.search_answers`, DECISIONS Log 2026-10-30); 23d decides what the result shows |
+| The design: the live board gets "the question number and the count of answers" | The existing `friend_status` message, sent on each answer, Next and Finish: the question being played, no count | The message keeps its shape (v 2) until 23d decides the board's wording. A clock that runs out writes nothing, so sends nothing, as a timed-out run today |
+| Plan's hypothesis: taking the lock before counting is enough; "wrong if ... a Next or Finish slips between the count and the insert; then the Next and Finish take the same lock" | All three take the lock. Without it the model breaks NoAnswerAfterEnd, OnlyTheOpenQuestion and CountIncludesEveryEarlierAnswer; Next's and Finish's own rules hold either way | The lock in Next and Finish protects the answers' rules (Evidence) |
+| Answer 7: text that names nothing "is logged as a miss, as today" | As today, through `private.record_miss`, for a signed-in player; a guest's is stored nowhere, as today | Unchanged. `record_miss` also runs players' learning (a text typed by enough players becomes an answer), now on researched lists too: put to the human before 23e (ROADMAP, For M23) |
+| Removes: "the old TLA+ model of the seven-question run" | As designed | Until 23f removes the old game, its run rules have no model check; the skill says so |
+| Not in the design | An answer sent to a run that is over returns the run's state, not an error; `/finish` on a format 3 day is 409 `not_a_clock_day`; a clock answer or Finish with no run is refused as its foreign key would (23503) | The first as today's `time_up`; the others are refusals the design didn't name |
+| Not in the design | A guest's clock answers are not added to `private.guest_tally` | Nothing reads them yet; 23e's tiers from play decide (ROADMAP, For M23) |
 
 ## Evidence
 **Step 1, read by the main session, 2026-11-24** (`20261111120000_guest_play_data.sql` 17-129, `…game_2_rounds.sql` 103-130, baseline 925-943):
@@ -100,5 +110,24 @@ The old TLA+ model of the seven-question run (replaced by the new one in the sam
 - `private.run_status` (a view, `security_invoker`) works a status out per game from `run_event`. A format 4 run needs a third branch: live while the clock is above zero and no Finish, else over. Other code reads `survived` as "finished" (the social gates), so an ended clock run reports `survived`; the design's "live or over" maps onto the existing words, no new status.
 - `question_deadline` is the one home of today's 20 seconds; the clock's numbers get the same kind of home.
 - Nothing read rules the design out. Not yet read: the guest triggers and `settleRuns` (before steps 3 and 6).
+
+**Step 2, the model** (`npm run verify -- offbeat-run`, 2026-11-24): `OffbeatRun.cfg: every rule holds (233 distinct states, 1.0 s)`. With `Locked = FALSE`: `Error: Invariant CountIncludesEveryEarlierAnswer is violated.` (exit 1). Each rule alone without the lock: NoAnswerAfterEnd, OnlyTheOpenQuestion and CountIncludesEveryEarlierAnswer are violated; NextOnlyForward, FinishOnlyOnLast and AnswersOnlyForOpened hold.
+
+**Step 3, failing first:** `supabase/tests/clock_run.test.sql` before the migration: `Bad plan. You planned 88 tests but ran 0.` (the tables don't exist), `Result: FAIL`. `plor_app_role.test.sql` after it, before its list was changed: test 15 failed on exactly nine new grants (select and insert on the four tables, execute on `clock_start_ms()`). The server tests: the subagent that wrote them saw the db and route tests fail first; it wrote `clock-state.ts` before its unit test, and checked that one by mutation instead (a `repeat` that is always false, and the ledger change reverted, each fail their tests).
+
+**Per criterion** (all on slot 1's local stack, 2026-11-24):
+- The numbers, and a run's first answers (3000, 4750, 7220 ms; 10, 25, 50 points; the twentieth x 0.95^19 = 1132 and 3019; never under 1000): `clock_run.test.sql`, tests 1 to 10 and the run's; `npm run test:sql`: `Files=43, Tests=921, Result: PASS`.
+- A repeat and unknown text change nothing; the second is a miss: `clock_run.test.sql` ("a repeated answer raises nothing", "stores nothing", "moves no clock"); `src/game/clock-runs.plor-app.db.test.ts` (the miss row).
+- An answer after the clock has passed zero is refused (OB003), with the run's start moved back: both files.
+- Not the open question (OB006), Next never back or past 3 (OB002, OB003), Finish refused before question 3 (OB019) and ends the run on it: `clock_run.test.sql`.
+- Two connections at once: `clock-runs.plor-app.db.test.ts`: B's insert waits for A's commit, both rows exist, B's time uses n + 1.
+- A guest's run: every case in `clock_run.test.sql` runs on both table sets (88 tests = 10 numbers + 39 cases x 2); the guest flow and routes in the two server test files.
+- The state holds no later prompt or unfound answer while live: `src/game/clock-state.test.ts` (4 tests).
+- The ledger row of a closed format 4 day: `src/game/ledger.db.test.ts`, one new test.
+- The model: step 2 above.
+- The grants and the old game: `plor_app_role.test.sql` passes with the nine grants listed; the existing run tests pass untouched (`runs.db.test.ts`, `runs.plor-app.db.test.ts`, `guest-runs.plor-app.db.test.ts`, `misses.db.test.ts`, `guest_play.test.sql`, `game.test.sql`).
+- All together: `npx tsc --noEmit -p .` and `npx eslint src scripts` clean; `npm test`: 77 files, 885 passed; `npm run test:db`: 69 files, 572 of 573 passed in each of three full runs; the one failure each time is `src/app/api/admin/bank/route.db.test.ts`, "answers 401 to a signed-out request", among the run's first tests, timing out at 5 s (5236 ms); it passes when run alone and touches nothing this ticket changed. Unexplained beyond that: CI's db job is the check.
+
+**Not verified:** nothing was looked at in a browser (there is no screen). Old code that reads a day as format 3 (`src/game/offbeat.ts`, `me.ts`, shares, boards) was not changed and would mishandle a format 4 day: 23d and 23f, before any such day is approved. The few milliseconds between a trigger's check and its commit are outside the model.
 
 ## Review
