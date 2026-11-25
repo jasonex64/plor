@@ -1,0 +1,11 @@
+/* The place strip on Today (place-strip.tsx; M20 20n-6b): under the cards, Today's 16px from them (today.module.css,
+   .today), its lines the kit's flat buttons in a wrapping row. */
+.strip {
+  margin-top: 16px;
+}
+
+/* What the lines are, in the small muted text (the kit's note size). */
+.label {
+  color: var(--muted);
+  font-size: var(--text-note);
+}

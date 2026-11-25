@@ -48,13 +48,14 @@ export function GameSwitch<T extends string>({ choices, value, onChange }: { cho
 // title names the board (its heading and region); path is the API route that returns it, which the game is added to;
 // todayPath is today's (docs/milestones/M22-todays-board.md, answer 9). One period shows at a time, chosen by the Period
 // switch, Today on every load (inbox #248; docs/milestones/M20-design-rules-and-clean-up.md, answer 27).
-export function Leaderboard({ title, path, todayPath }: { title: string; path: string; todayPath: string }) {
+// opensOn: the game the board opens on when it names one of the board's (Today's place strip's link), else Offbeat.
+export function Leaderboard({ title, path, todayPath, opensOn = null }: { title: string; path: string; todayPath: string; opensOn?: string | null }) {
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
   const [today, setToday] = useState<TodayBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Today's own, so the week's answer arriving after a failed Today doesn't clear it (M22 review).
   const [todayError, setTodayError] = useState<string | null>(null);
-  const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
+  const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(() => GAMES.find((g) => g.id === opensOn)?.id ?? GAME.id);
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
   // The overall board's Sum on every load, or its Average (answer 29).
