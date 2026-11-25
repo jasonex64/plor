@@ -303,7 +303,11 @@ Ranked, most damaging first; **P1** a broken layout or real confusion, **P2** an
   - 91, "What should it say?" (the place strip on Today): "Place per game played (Recommended)": one line per game finished today, "Offbeat: 2nd of 5 friends", "Fragments: 1st of 4".
   - 92, "Where does pressing the strip take you?": "The Friends tab's board (Recommended)": Friends, with the leaderboard on that game and Today's period.
   - 93, "before any friend has finished today, or when you have no friends yet?": "Hide it (Recommended)": no strip until at least one friend has finished the same game.
-  - Two PRs: **20n-6a**, the top three (the crown picked first); **20n-6b**, the place strip.
+  - 94, "Which crown?" (three drawings, `docs/research/mocks/20n-6/crowns.png`): "C, tilted".
+  - 95, "gold for 1st, silver for 2nd, bronze for 3rd ... Keep them?": "little flair for 2nd third but keep color consistent with rest". Read two ways (the medal colours kept with a flair added, or the app's own colours with a flair), so four drawings were shown (`docs/research/mocks/20n-6/top-three.png`).
+  - 96, "Which one?": "3: app colours, ribbon tails": no new colours; 1st stays the accent badge, with the crown; 2nd and 3rd stay ink as 4th is, with two small ribbon tails under the badge.
+  - Two PRs: **20n-6a**, the top three; **20n-6b**, the place strip.
+  - **20n-6a** → verify: an e2e on a board with four places finds a crown on the 1st badge alone, ribbon tails on the 2nd and 3rd alone, the 4th plain, none of them read by a screen reader, and no row taller than a row without them.
 - **20n-7:** finding 5 with answer 76: the signed-out front page as the two game cards, and the two emblems (a design step on Fable, picked by the human as the flowers were).
 - **Beside them, not a fix:** answer 75's two chip versions on `/admin/kit`.
 
