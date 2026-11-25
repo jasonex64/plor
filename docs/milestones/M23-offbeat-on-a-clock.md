@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is built, in its PR. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is merged (#307); 23b-3 (the lists-only load onto plor.app, answers 36 to 39) is built, in its PR. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
@@ -64,6 +64,10 @@ Second round (2026-11-24):
 34. On hat's sample list (226 answers), 2026-11-24, in the human's words: "i want it to be as generous as possible, and specific variations of hats should count as diff types of hats. this must be balanced by the amt of tokens it costs obviously but theres no downsides to more answers". Claude's reading, said back to the human: a named variation (straw cowboy hat, wool beanie, fitted cap) is its own answer with its own time and points, not a typed form of its parent; lists lean to including; the two passes stay two, with no extra agents per question.
 
 35. 2026-11-24, asked in chat with 23b-1's PR: "Should checkers keep removing names with no trace at all, or keep everything as you first answered?" The human: "Yes, keep that". So the checker removes a name that leaves no trace at all when searched for; a name it merely can't confirm stays (answer 24).
+36. 2026-11-24, after 23b-2 merged (#307): "The 21 researched answer lists can't reach plor.app: the load command only fills an empty database, and plor.app's already has answers. How should the lists get there?" The human: "New lists-only load (Recommended)" (a new command the human runs themselves that adds only the researched lists, with the same type-the-host-name guard, leaving every existing answer untouched).
+37. Same round: "Where do you want to do your review of the roughly 1,600 doubtful answers and 1,100 brands?" The human: "On plor.app".
+38. Same round: "If the lists go onto plor.app before the new Offbeat ships, should today's old-style Offbeat days be able to use them?" The human: "No, keep them apart (Recommended)". Collision, for 23b-3's design: `data/categories.json` points 21 category keys (cheese, bread, ...) at the researched lists, so defining them on plor.app would make an old-style day drafted on one of those questions judge by its list. Days already played judge by the answers as they stood then and do not change.
+39. 2026-11-24, the collision put to the human: "How should 'keep them apart' hold?" The human: "The pause is enough (Recommended)" (no old-style day is approved while the beta is paused; nothing extra is built).
 
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
@@ -101,7 +105,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 
 ## Sub-tickets, in order (one PR each)
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
-- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 built, in its PR): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
+- **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 merged, #307): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens.** The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.

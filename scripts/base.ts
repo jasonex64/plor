@@ -1192,8 +1192,11 @@ export type HostedState = { database: string; size: string; things: number; cate
 
 // A base is "there" when it has things or categories (a half-done load leaves one of them). Runs in progress are what
 // private.run_status says now: every run whose status is in_progress (not finished, its clock not run out), not only today's.
-export async function readHostedState(client: pg.Client): Promise<HostedState> {
+export async function readHostedState(client: pg.Client, host: string): Promise<HostedState> {
   return inReadOnly(client, async (c) => {
+    const ready = await c.query<{ ready: boolean }>("select to_regclass('private.list_edit') is not null as ready");
+    const unready = migrationsRefusal(host, ready.rows[0].ready);
+    if (unready) throw new Error(unready);
     const { rows } = await c.query<Omit<HostedState, "edits">>(`select current_database() as database, pg_size_pretty(pg_database_size(current_database())) as size,
       (select count(*) from private.thing)::int as things, (select count(*) from private.category)::int as categories,
       (select count(*) from private.dictionary_word)::int as words,
@@ -1206,7 +1209,7 @@ const readManifest = (set: string) => JSON.parse(readFileSync(manifestPath(set),
 
 // The dry run: what is there, and what a load would bring (each set's items from its committed manifest). Writes nothing.
 export async function hostedCheck(client: pg.Client, host: string, lists = readLists()): Promise<HostedState> {
-  const state = await readHostedState(client);
+  const state = await readHostedState(client, host);
   console.log(`HOST ${host}, database ${state.database}`);
   console.log(`SIZE ${state.size} now`);
   console.log(`BASE: ${state.things || state.categories ? `there, ${state.things} things and ${state.categories} categories` : "none yet (0 things, 0 categories)"}`);
@@ -1233,6 +1236,28 @@ export async function liftStatementTimeout(client: pg.Client): Promise<void> {
 export function hostedRefusal(host: string, state: Pick<HostedState, "things" | "categories">): string | null {
   if (state.things === 0 && state.categories === 0) return null;
   return `${host} already has a base (${state.things} things, ${state.categories} categories): 15e-1 loads an empty database only. If a load stopped part-way, the base is incomplete: stop and ask before doing anything else; nothing was written`;
+}
+
+// Why the lists-only load is refused, or null when it may go ahead (M23 23b-3): it adds the lists to a base that is
+// there, and a database with none, or with half of one, is `hosted load`'s.
+export function listsRefusal(host: string, state: Pick<HostedState, "things" | "categories">): string | null {
+  if (state.things > 0 && state.categories > 0) return null;
+  return `${host} has no whole base (${state.things} things, ${state.categories} categories): the lists-only load adds to a base that is there; \`hosted load\` loads the base and the lists together; nothing was written`;
+}
+
+// Why a hosted command stops before it reads anything: the database lacks the tables the lists' migrations make (M23
+// 23a and 23b-2), which the human's own push puts there.
+export function migrationsRefusal(host: string, ready: boolean): string | null {
+  return ready ? null : `${host} lacks the researched lists' tables: run \`npx supabase db push\` first; nothing was written`;
+}
+
+// The categories the lists-only load defines: each loaded list's own question, and the subsets of one (tool_w of
+// tool), in the file's order so a subset follows its base. A list no researched category points at is refused.
+export function listCategories(categories: CategoryDef[], lists: string[]): CategoryDef[] {
+  const bases = new Set(categories.filter((c) => !isSubset(c) && c.source === RESEARCH && lists.includes(c.key)).map((c) => c.key));
+  const missing = lists.filter((key) => !bases.has(key));
+  if (missing.length) throw new Error(`${CATEGORIES_FILE}: ${missing.join(", ")} have a list and no researched category`);
+  return categories.filter((c) => bases.has(isSubset(c) ? c.of : c.key));
 }
 
 // Why a load is refused while the files lack an admin's list edits (M23 23b-2), or null when they hold them all.
@@ -1263,7 +1288,30 @@ export async function hostedLoad(client: pg.Client, host: string, ask: (question
   console.log(`DATABASE ${rows[0].size} now`);
 }
 
-async function hostedMain(what: "check" | "load"): Promise<void> {
+// The lists-only load into a database that has a base (M23 23b-3; the human, 2026-11-24: "New lists-only load", and
+// "Approve 23b-3"): the check, the host's name typed, then in one transaction the lists' answers and the categories that
+// ask them (listCategories). No other source, category, word or day is written, and nothing is ended: no load is opened,
+// so private.load_finish never runs. Running it again writes the same.
+export async function hostedLoadLists(client: pg.Client, host: string, ask: (question: string) => Promise<string>, lists = readLists(),
+  categories = readCategories(), snapshot = RESEARCH_SNAPSHOT): Promise<void> {
+  const state = await hostedCheck(client, host, lists);
+  const refusal = unfoldedRefusal(unfoldedEdits(state.edits, lists)) ?? listsRefusal(host, state);
+  const defs = listCategories(categories, lists.map((l) => l.category));
+  const typed = await ask(`To load the ${lists.length} researched lists into this database, type its host name (${host}), or just press Enter to stop: `);
+  if (typed !== host) throw new Error(`what you typed isn't ${host}; nothing was written`);
+  if (refusal) throw new Error(refusal);
+  await liftStatementTimeout(client);
+  await loadResearch(client, lists, snapshot, async () => {
+    for (const c of defs) {
+      if (isSubset(c)) await client.query("select private.define_subset($1, $2, $3, $4, $5::jsonb)", [c.key, c.name, c.of, RESEARCH, JSON.stringify(filterOf(c))]);
+      else await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, RESEARCH, c.root, c.member_of ?? null]);
+    }
+  });
+  console.log(`DEFINED ${defs.length} categories of the lists: ${defs.map((c) => c.key).join(", ")}`);
+  await analyzeBase(client);
+}
+
+async function hostedMain(what: "check" | "load" | "lists"): Promise<void> {
   let raw = "";
   try {
     raw = await readHidden("Database connection string (session mode; nothing you type shows): ");
@@ -1273,7 +1321,7 @@ async function hostedMain(what: "check" | "load"): Promise<void> {
     try {
       if (what === "check") await hostedCheck(client, target.host);
       else {
-        await hostedLoad(client, target.host, async (question) => {
+        await (what === "lists" ? hostedLoadLists : hostedLoad)(client, target.host, async (question) => {
           const lines = createInterface({ input: process.stdin, output: process.stdout });
           try {
             return (await lines.question(question)).trim();
@@ -1286,7 +1334,7 @@ async function hostedMain(what: "check" | "load"): Promise<void> {
       await client.end();
     }
   } catch (err) {
-    console.error(`hosted ${what} failed: ${hostedFailure(err, raw)}`);
+    console.error(`hosted ${what === "lists" ? "load lists" : what} failed: ${hostedFailure(err, raw)}`);
     process.exitCode = 1;
   }
 }
@@ -1379,7 +1427,8 @@ const editsText = (edits: ListEdit[]) => edits.map((e) => `${e.kind} ${e.categor
 // Loads the lists. Edits made on the site (private.list_edit) that the files now hold are marked folded, in the load's
 // own transaction; the ones they don't yet are warned of, as a load would bring a struck answer back (the hosted load
 // refuses instead: hostedLoad). Only the given lists' categories are looked at, so a load of fewer lists leaves the rest.
-export async function loadResearch(client: pg.Client, lists: ResearchList[], snapshot = RESEARCH_SNAPSHOT): Promise<void> {
+// inSameTransaction: what else must land with the lists or not at all (the lists-only hosted load's categories).
+export async function loadResearch(client: pg.Client, lists: ResearchList[], snapshot = RESEARCH_SNAPSHOT, inSameTransaction?: () => Promise<void>): Promise<void> {
   const items = lists.flatMap(researchItems).map((item) => ({ ...item, thing_id: thingId(RESEARCH, item.id) }));
   const mine = (await readEdits(client)).filter((e) => lists.some((l) => l.category === e.category));
   const open = new Set(unfoldedEdits(mine, lists).map((e) => e.id));
@@ -1389,6 +1438,7 @@ export async function loadResearch(client: pg.Client, lists: ResearchList[], sna
     const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [RESEARCH, snapshot, JSON.stringify(items)]);
     const folded = mine.filter((e) => !open.has(e.id)).map((e) => e.id);
     await client.query("select private.list_fold($1::bigint[])", [folded]);
+    await inSameTransaction?.();
     await client.query("commit");
     if (folded.length) console.log(`FOLDED ${folded.length} list edits the files now hold`);
     console.log(`LOADED ${LISTS_DIR} (${lists.length} lists, ${snapshot}): ${JSON.stringify(rows[0].counts)}`);
@@ -2135,6 +2185,7 @@ async function loadAll(client: pg.Client): Promise<void> {
 async function main(): Promise<void> {
   const [command, name, ...more] = process.argv.slice(2);
   if (command === "review" && name) return review([name, ...more]);
+  if (command === "hosted" && name === "load" && more[0] === "lists") return hostedMain("lists");
   if (command === "hosted" && (name === "check" || name === "load")) return hostedMain(name);
   if (command === "load" && name === "all") {
     const client = await localClient();
@@ -2167,7 +2218,7 @@ async function main(): Promise<void> {
   }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${RESEARCH}|${DICTIONARY_SET}\n       npm run base -- hosted check|load\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${RESEARCH}|${DICTIONARY_SET}\n       npm run base -- hosted check|load\n       npm run base -- hosted load lists\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);

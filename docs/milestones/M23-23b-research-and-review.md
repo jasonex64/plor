@@ -1,6 +1,6 @@
 # M23 23b — The research procedure, the first 21 lists, and the human's review page
 
-**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** **23b-2 is built (2026-11-24): `/admin/lists`, the two tables, the five functions, the fold, the load's guard; in its PR.**
+**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** **23b-2 is built (2026-11-24): `/admin/lists`, the two tables, the five functions, the fold, the load's guard; 23b-3 (the lists-only load onto plor.app) is built, in its PR; 23b-2 merged (#307, merge commit `4705b9a`, 2026-11-24, on nine green checks, the human's "Merge when green").**
 
 ## Goal
 Eighteen more questions get researched lists the same way each time, in two passes, and the human can read a list's doubtful answers on plor.app and strike or add one from a phone.
@@ -52,6 +52,48 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 ## Sub-parts, one PR each
 - **23b-1:** the skill, the validator's bank check, and the 18 lists (content and docs only; no migration).
 - **23b-2:** the review page, the two tables, the five functions, the fold, the load's guard.
+
+## 23b-3, the lists-only load onto plor.app
+**Status:** approved 2026-11-25, its security change included (the human: "Approve 23b-3", to "Approve 23b-3, the lists-only load, with its new writing path into plor.app's database?"); built 2026-11-25, in its PR. Nothing has been run against plor.app: the command is the human's.
+
+From answers 36 to 39 in `M23-offbeat-on-a-clock.md`. **Who uses it:** the human, to review the lists on plor.app (answer 37). **What breaks without it:** `hosted load` refuses plor.app's existing base, so the lists never get there and the clock game has no answers at the switch.
+- **The command:** `npm run base -- hosted load lists`, run by the human only, on the same connection, verified TLS and type-the-host-name guard as `hosted load`.
+- **It refuses,** writing nothing: a database with no whole base (that is `hosted load`'s job); one without the lists' migrations (it says to run `npx supabase db push` first; `hosted check` says the same); one with a list edit the files do not hold (23b-2's guard).
+- **It writes, in one transaction:** the 21 lists' answers (the `research` source, as `load research` does locally) and the categories that ask them. No other source, category, dictionary word or day is touched, and nothing is ended (no load is opened). Running it again writes the same.
+- **Kept apart by the pause** (answers 38 and 39): nothing stops an old-style day approved on one of the 21 questions from judging by its list; none is approved while the beta is paused.
+- **Security:** no new role, grant, function or migration; a second writing path into the hosted database through the human's own command (DECISIONS.md, Log 2026-11-25).
+
+**Plan as checks (each run, each passed):**
+1. Read `hostedLoad`, `loadResearch`, `defineCategories`, `private.define_category`, `private.resolve_answer` → verify: the two unverified points are answered below.
+2. The three refusals and the category choice as failing unit tests → verify: `npx vitest run scripts/hosted.test.ts` fails on them (7 failed), then passes.
+3. The load as db tests → verify: `npx vitest run scripts/hosted-lists.db.test.ts --no-file-parallelism` passes.
+4. The real 21 lists on the local stack → verify: counts before and after a run are the same and 23 categories are named.
+
+**Source diff (against the design above):**
+| Design | Built | Why |
+|---|---|---|
+| "the 21 questions" | 23 categories: the 21 and the two subsets of one, `sport_f` and `tool_w` | a subset copies its base's root when defined, so left alone it would keep asking the old Wikidata answers |
+| the missing-migrations refusal is the lists load's | it is in the state read all three hosted commands share, inside its read-only transaction | `hosted check` otherwise fails there with the database's raw error |
+| unverified: played days stay as they were | verified: a day's stored question carries its own root, and `private.resolve_answer` judges by that as of the day's time (db test: the old answer still counts, the list's does not) | |
+| unverified: which of `load all`'s later steps the questions need | none: the lists' items have no links, and `within` (five families cross a list) lives in `data/categories.json` only, never in the database | |
+| not designed | answers players' misses or the Audit page added under one of the 21 questions' old roots stop counting for it once it points at its list | they hang from the old root; the same happens locally on `load all`. Not counted on plor.app (*unverified*: how many there are) |
+| not designed | the check before the host's name is typed still prints every set a full load would bring | `hostedCheck` is shared; in ROADMAP, Next revision |
+
+**Evidence:**
+- A database with a base takes the lists: `scripts/hosted-lists.db.test.ts`, 4 tests pass (the question and its subset answer from the list; another category's answers are the same; the day approved before judges as before; a second run changes no count; a wrong host name writes nothing; a category that fails takes the answers back with it).
+- The refusals and the category choice: `scripts/hosted.test.ts`, 32 pass (12 new). The three refusal rules and the category choice failed first (7). After the review, four more run the command itself against a stand-in database with no base, half a base, no lists' tables, and a strike the files lack: each stops with the refusal's words having sent only the read-only state read; with the two `throw`s taken out all four failed, and pass with them back.
+- The existing loaders: `scripts/base.db.test.ts` and `scripts/lists.db.test.ts` pass with it (16 tests over the three db files). The first build put the migrations probe outside the read-only transaction and `base.db.test.ts` caught it; it is inside now.
+- The real lists, local stack, 2026-11-25: before and after `{"t":260201,"f":352349,"e":24,"a":820438,"c":231,"research_cats":23}`; `LOADED lists (21 lists, lists): {"facts":0,"things":0,"aliases":0,"numbers":0}`; `DEFINED 23 categories of the lists: cheese, bread, candy, cake, soup, pasta, tool, kitchen_utensil, footwear, color, sport, fabric, dance, gemstone, sport_f, tool_w, bag, sandwich, bone, acid, knot, bed, hat`.
+- `npx tsc --noEmit`, `npx eslint scripts src --quiet`, `npm test`: pass.
+- **Not verified:** anything on plor.app; the load's time over the network (12,504 answers in one statement, the time limit lifted as `hosted load` does).
+
+**Review (the `reviewer` agent, fresh context, 2026-11-25):**
+- Blocking, fixed: the refusals were tested only as rules, not as the command runs them, so removing the line that acts on one left every test green. Four tests added (Evidence, above).
+- Found sound: everything written is inside one transaction that any failure rolls back; the checks and the host's name come before any write; nothing but the lists' answers, the marks on edits the files hold, and the lists' categories is written; nothing is ended; a day already approved judges by its own stored question as of its own time.
+- Not blocking, fixed here: the DECISIONS row's missing cells, this ticket's Status markup, ROADMAP's stale "next".
+- Not blocking, in ROADMAP, Next revision, For M23: the rest.
+
+**Removes:** nothing.
 
 ## Acceptance criteria
 23b-1
