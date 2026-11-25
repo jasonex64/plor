@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** planned: drafted 2026-11-25 from the human's answers (four rounds); waits for the human's approval of the ticket and of its security change. Nothing is built.
+**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is being built.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
@@ -39,7 +39,7 @@ The Groups tab opens the group a player starred, with a dropdown on its name to 
 - **Data** (one migration, the final shape confirmed at build):
   - `private.group_member.starred boolean not null default false`, with a unique index on `(user_id) where starred`, so the database keeps "one star". The star goes when the membership row does.
   - `private.friendship.favourite_of_a` and `favourite_of_b`, `boolean not null default false`: the pair has one row (`user_a < user_b`), so each side has its own flag. Unfriending or blocking deletes the row and the flags with it.
-- **Routes:** `POST /api/groups/star` (`{ id, starred }`; moving the star is one transaction: clear the old, set the new) and `POST /api/friends/favourite` (`{ username, favourite }`), signed in only, each changing only the signed-in player's own flag. `GET /api/groups` and `GET /api/friends` return the flags for the viewer.
+- **Routes:** `POST /api/groups/star` (`{ id, starred }`; moving the star is one transaction: clear the old, set the new) and `POST /api/friends/favourite` (`{ userId, favourite }`: the friend by ID, as Remove names them, M19 19e), signed in only, each changing only the signed-in player's own flag. `GET /api/groups` and `GET /api/friends` return the flags for the viewer.
 
 ## Security change proposed (needs the human's OK; recorded in DECISIONS.md, Log, before any migration)
 `plor_app` gains two column-level grants, and nothing else changes (no new table, policy, function or role):
@@ -107,6 +107,9 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| M10 G10: `plor_app` may read, insert and delete memberships | 24a: it may also update `starred`, and `favourite_of_a` and `favourite_of_b` on a friendship | The stars are kept on the account (answer 13); approved with the ticket (DECISIONS.md, Log, 2026-11-25) |
+| This ticket as drafted: the favourite route names the friend by username | 24a: by user ID | A username can change hands after the page was drawn (M19 19e); Remove already names a friend by ID |
+| DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row and the protocol stays | An older page ignores a field it does not read; nothing it reads changed |
 
 ## Evidence
 

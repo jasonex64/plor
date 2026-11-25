@@ -20,6 +20,7 @@ import { GET as preview } from "./preview/route";
 import { POST as remove } from "./remove/route";
 import { POST as rename } from "./rename/route";
 import { GET as groups } from "./route";
+import { POST as star } from "./star/route";
 
 // A group's start day (inbox #233); which day it is, at the Pacific boundary, is src/groups/groups.plor-app.db.test.ts's.
 const DAY = expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/);
@@ -85,7 +86,7 @@ describe("groups", () => {
     expect(await call(create, "/api/groups/create", "POST", { name: "a\u0000b" })).toEqual(invalid);
     expect(await call(groups, "/api/groups", "GET")).toEqual({
       status: 200,
-      body: { ok: true, groups: [{ id: longName, name: longest }, { id: club, name: "Book Club" }] },
+      body: { ok: true, groups: [{ id: longName, name: longest, starred: false }, { id: club, name: "Book Club", starred: false }] },
     });
 
     const page = await call(detail, `/api/groups/detail?id=${club}`, "GET");
@@ -126,6 +127,35 @@ describe("groups", () => {
     });
     useSession(C.session);
     expect(await call(join, "/api/groups/join", "POST", { code })).toEqual(error(409, "no_profile"));
+  });
+
+  it("stars one group as a player's default, moves the star in one step and clears it (M24 24a)", async () => {
+    const starred = async () =>
+      (await call(groups, "/api/groups", "GET")).body.groups.filter((g: { starred: boolean }) => g.starred).map((g: { id: string }) => g.id);
+    const set = (id: unknown, on: unknown) => call(star, "/api/groups/star", "POST", { id, starred: on });
+    useSession(A.session);
+    expect(await set(club, true)).toEqual({ status: 200, body: { ok: true } });
+    expect(await starred()).toEqual([club]);
+    expect(await set(longName, true)).toEqual({ status: 200, body: { ok: true } });
+    expect(await starred()).toEqual([longName]);
+    // A group that doesn't exist is the group page's 404, and the star stays where it was.
+    expect(await set("00000000-0000-4000-8000-000000000000", true)).toEqual(error(404, "group_not_found"));
+    expect(await set("not-an-id", true)).toEqual(error(404, "group_not_found"));
+    expect(await set(longName, "yes")).toEqual(error(400, "bad_request"));
+    expect(await starred()).toEqual([longName]);
+
+    // B is in Book Club only: B's star is B's own, a group B isn't in is a 404, and neither touches A's.
+    useSession(B.session);
+    expect(await set(longName, true)).toEqual(error(404, "group_not_found"));
+    expect(await set(longName, false)).toEqual(error(404, "group_not_found"));
+    expect(await set(club, true)).toEqual({ status: 200, body: { ok: true } });
+    expect(await starred()).toEqual([club]);
+    expect(await set(club, false)).toEqual({ status: 200, body: { ok: true } });
+    expect(await starred()).toEqual([]);
+    useSession(A.session);
+    expect(await starred()).toEqual([longName]);
+    expect(await set(longName, false)).toEqual({ status: 200, body: { ok: true } });
+    expect(await starred()).toEqual([]);
   });
 
   it("refuses the creator's powers to other members (G1)", async () => {
