@@ -51,7 +51,7 @@ test("on a desktop, Privacy's paragraphs and list items stop at 55ch and its hea
 test("signed-out Today's headings are spaced the same, and a card's heading is not", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const h2 = page.getByRole("heading", { level: 2, name: /^Today's game/ });
+  const h2 = page.getByRole("heading", { level: 2, name: "How Offbeat works", exact: true });
   expect(await h2.evaluate((el) => [getComputedStyle(el).marginTop, getComputedStyle(el).marginBottom])).toEqual(["40px", "10px"]);
   await page.goto("/nope");
   const card = page.getByRole("heading", { level: 2, name: "Page not found" });

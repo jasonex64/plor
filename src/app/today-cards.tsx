@@ -10,6 +10,8 @@
 // onView tells the page which games have a card, which is in front or opened in front, and whether the cards sit side
 // by side or in the carousel, for Today's live board, which follows the front card in the carousel and has its own
 // switch beside it (16f-6, answers 4 and 57).
+// family: the signed-out front page shows the same cards from the guest's runs (M20 20n-7, answer 98). raise: whether the
+// card in front holds the screen's raised button; not while the front page's sign-in form is open (answer 47).
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { BoardGame } from "@/friends/leaderboard";
 import type { SubstringRun } from "@/game/substring-state";
@@ -18,7 +20,7 @@ import { api } from "@/lib/api-client";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { BannerSkeleton, TodayBanner } from "./game";
 import { errorText } from "./messages";
-import { runRoutes, substringRoutes } from "./run-routes";
+import { runRoutes, substringRoutes, type RunFamily } from "./run-routes";
 import { todayCards } from "./today-games";
 import { FragmentsBanner } from "./today-fragments";
 import styles from "./today-cards.module.css";
@@ -30,6 +32,8 @@ type Days = { offbeat: OffbeatState; fragments: SubstringRun | null };
 export type CardsView = { games: BoardGame[]; front: number; wide: boolean; at: number };
 
 export function TodayCards({
+  family = "account",
+  raise = true,
   skip,
   day,
   timeUps,
@@ -37,6 +41,8 @@ export function TodayCards({
   onDayOver,
   onView,
 }: {
+  family?: RunFamily;
+  raise?: boolean;
   skip: boolean;
   day: number;
   timeUps: number;
@@ -49,14 +55,14 @@ export function TodayCards({
   // Read again on the new day, when the clock bar's time runs out and when Today shows again, so the card in front
   // follows what the player has played.
   useEffect(() => {
-    Promise.all([api<OffbeatState>(runRoutes("account").state, { method: "GET" }), api<{ run: SubstringRun | null }>(substringRoutes("account").state, { method: "GET" })]).then(
+    Promise.all([api<OffbeatState>(runRoutes(family).state, { method: "GET" }), api<{ run: SubstringRun | null }>(substringRoutes(family).state, { method: "GET" })]).then(
       ([offbeat, fragments]) => {
         setDays({ offbeat, fragments: fragments.run });
         setError(null);
       },
       (err) => setError(errorText(err)),
     );
-  }, [day, timeUps]);
+  }, [family, day, timeUps]);
 
   const { cards, front } = useMemo(
     () =>
@@ -81,11 +87,11 @@ export function TodayCards({
   const shown = cards.map((card, i) =>
     card === GAME.id ? (
       <section key={card} id="offbeat" aria-label={GAME.name}>
-        <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} main={i === front} onOver={onOver} onDayOver={onDayOver} />
+        <TodayBanner key={`game-${day}-${timeUps}`} family={family} skip={skip} main={raise && i === front} onOver={onOver} onDayOver={onDayOver} />
       </section>
     ) : (
       <section key={card} aria-label={SUBSTRINGS.name}>
-        <FragmentsBanner run={days!.fragments!} msToReset={days!.offbeat.run ? days!.offbeat.run.msToReset : days!.offbeat.msToReset} main={i === front} />
+        <FragmentsBanner run={days!.fragments!} msToReset={days!.offbeat.run ? days!.offbeat.run.msToReset : days!.offbeat.msToReset} main={raise && i === front} family={family} />
       </section>
     ),
   );

@@ -25,7 +25,7 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-const INTRO = "Plor is a small site with a daily word game.";
+const INTRO = "Plor is a small site with two daily word games.";
 
 // What the browser says when the page may not write to the clipboard (MDN, Clipboard.writeText: NotAllowedError).
 const refuseClipboard = (page: Page) =>
@@ -90,8 +90,8 @@ test("signed in, Today's introduction never shows, not even before the profile l
   // Signed in, on the pick-username step.
   const email = `${RUN}-hi@example.test`;
   await forwardPlayerIp(page, email);
-  // The form opens from the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
-  await page.getByRole("link", { name: "Sign in", exact: true }).click();
+  // The form opens from the front page's Sign in button (M18, answer 32; M20 20n-7, answer 99).
+  await page.getByRole("link", { name: "Sign in to see how your friends did", exact: true }).click();
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
   await page.getByLabel("Code").fill(await emailedCode(email));

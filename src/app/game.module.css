@@ -14,6 +14,7 @@
   align-self: stretch;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
   gap: 0 6px;
   margin: -14px -14px 0;
@@ -181,4 +182,23 @@
 .small {
   color: var(--muted);
   font-size: var(--text-note);
+}
+
+/* A card too narrow for its band's one line (the emblem, the longest name and the longest day, "Wednesday 30
+   September", come to about 324px at 16px text, worked out from the type, not measured; M20 20n-7) holds the day on its
+   own line under the name, with no dot left hanging at a line's end. The query reads the card's inside, so 20.5rem
+   there is a card about 360px wide with its 14px padding and 2px border. Not the game's own screen, whose band has no
+   emblem and keeps its one line on a phone. */
+.banner:not(.page) {
+  container-type: inline-size;
+}
+
+@container (max-width: 20.5rem) {
+  .band > span {
+    display: none;
+  }
+
+  .band > p {
+    flex-basis: 100%;
+  }
 }

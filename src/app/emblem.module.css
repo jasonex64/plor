@@ -1,0 +1,7 @@
+/* A game's emblem in its card's band (src/app/emblem.tsx): 24px beside the 16px name at the default text size, and it
+   grows with the text. */
+.emblem {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+}

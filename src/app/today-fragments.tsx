@@ -7,17 +7,19 @@
 import type { SubstringRun } from "@/game/substring-state";
 import { SUBSTRINGS } from "@/platform/game";
 import { ButtonLink } from "./button-link";
-import { Banner, BigScore, Facts, ResetCountdown } from "./game";
+import { Banner, BigScore, Facts, ResetCountdown, playText } from "./game";
 import styles from "./game.module.css";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
+import type { RunFamily } from "./run-routes";
 import { FORWARD } from "./slide";
 
 // msToReset: the time to the next reset, which Fragments' state doesn't carry; Offbeat's does (src/app/today-cards.tsx), and the
 // reset is the one for both games.
 // main: this card is the one in front on Today, so its Play or Continue is the screen's one raised button (M20, answers
 // 45 and 47); Result is flat.
-export function FragmentsBanner({ run, msToReset, main }: { run: SubstringRun; msToReset: number; main: boolean }) {
+// family: a guest's card says "Play without an account" (M20 20n-7, answer 98).
+export function FragmentsBanner({ run, msToReset, main, family }: { run: SubstringRun; msToReset: number; main: boolean; family: RunFamily }) {
   const play = main ? `${kit.primary} ${styles.play}` : styles.play;
   return (
     <Banner date={run.date} game={SUBSTRINGS}>
@@ -25,7 +27,7 @@ export function FragmentsBanner({ run, msToReset, main }: { run: SubstringRun; m
         <>
           <Facts facts={[`${run.total} rounds`, "20 seconds each"]} />
           <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={play}>
-            Play
+            {playText(family)}
           </ButtonLink>
           <HowToPlay steps={GAME_2_STEPS} />
         </>

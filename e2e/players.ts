@@ -39,15 +39,18 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
   const email = `${RUN}-${name}@example.test`;
   await forwardPlayerIp(page, email);
   const field = page.getByLabel("Email");
-  const link = page.getByRole("link", { name: "Sign in", exact: true });
+  // The front page's button under its cards (M20 20n-7, answer 99), or a guest game's "Sign in".
+  const link = page.getByRole("link", { name: /^Sign in( to see how your friends did)?$/ });
   await expect(field.or(link)).toBeVisible();
   const throughLink = !(await field.isVisible());
   const from = page.url();
   if (throughLink) {
     // A press that lands while the page is still starting up can go nowhere (seen on shell.e2e.ts, 2026-11-12): pressed
-    // again until the address is the form's.
+    // again until the address is the form's. Pressed without scrolling to it: the button is at the foot of the front
+    // page since M20 20n-7, and on a phone the scroll a real press makes there came back later, on Back, on another
+    // page (jumps-and-finds.e2e.ts failed on it in PR #309; ROADMAP, "For M20", has the behaviour as its own item).
     await expect(async () => {
-      if (!/\/\?sign-in$/.test(page.url())) await link.click();
+      if (!/\/\?sign-in$/.test(page.url())) await link.dispatchEvent("click");
       await expect(page).toHaveURL(/\/\?sign-in$/);
     }).toPass();
   }

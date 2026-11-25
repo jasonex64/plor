@@ -1,4 +1,4 @@
-// A visitor plays game 1 or game 2 with no account (docs/milestones/M18-guest-play.md, 18c to 18e): "Play Game 1 without an account" (or 2) on the front page,
+// A visitor plays game 1 or game 2 with no account (docs/milestones/M18-guest-play.md, 18c to 18e): "Play without an account" on a game's card on the front page,
 // Start with Cloudflare's always-pass test keys (CI's .env.local, .github/workflows/e2e.yml), the run through the guest routes to
 // a catch (game 1) or through the seven rounds (game 2), its result with the peek at what an account adds (and Share, game 1),
 // and none of the account screens. A signed-in player still plays through /api/run and sees no peek; a guest who makes an
@@ -41,6 +41,8 @@ test.afterAll(async () => {
 // The peek under a guest's result (src/app/guest-peek.tsx): the words name the region, the link goes where every Sign in
 // goes (answer 33), and the drawn stand-in, blurred, is hidden from screen readers (answer 15).
 const PEEK = "Make an account to keep your streak, see your friends and play today's game for points";
+// A game's card on the signed-out front page, and its way in (M20 20n-7, answer 98).
+const playAsGuest = (page: Page, game: typeof GAME | typeof SUBSTRINGS) => page.getByRole("region", { name: game.name, exact: true }).getByRole("link", { name: "Play without an account", exact: true });
 const peek = (page: Page) => page.getByRole("region", { name: PEEK, exact: true });
 async function expectPeek(region: Locator): Promise<void> {
   await expect(region).toBeVisible();
@@ -63,9 +65,9 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
 
   await page.goto("/");
   // Play first, sign in second: a small link, not the form (answer 32).
-  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toHaveAttribute("href", "/?sign-in");
+  await expect(page.getByRole("link", { name: "Sign in to see how your friends did", exact: true })).toHaveAttribute("href", "/?sign-in");
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toHaveCount(0);
-  await page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true }).click();
+  await playAsGuest(page, GAME).click();
   await expect(page).toHaveURL(/\/play$/);
 
   // Nothing of an account is on the screen: no shell navigation, and a way to sign in instead.
@@ -96,6 +98,13 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
   expect(posts.filter((path) => path.startsWith("/api/run"))).toEqual([]);
   for (const name of ["Friends", "Groups", "Me", "Settings"]) await expect(page.getByRole("link", { name, exact: true })).toHaveCount(0);
   await expect(page.getByText("Comments", { exact: true })).toHaveCount(0);
+
+  // Back on the front page the guest's own run is on the card (the guest cookie reaches /api/guest from "/"): Result,
+  // not Play again (M20 20n-7, review).
+  await page.goto("/");
+  const card = page.getByRole("region", { name: GAME.name, exact: true });
+  await expect(card.getByRole("link", { name: "Result", exact: true })).toBeVisible();
+  await expect(playAsGuest(page, GAME)).toHaveCount(0);
 });
 
 const runOut = async () => {
@@ -111,7 +120,7 @@ test("a visitor plays game 2 as a guest from the front page, through the guest r
   });
 
   await page.goto("/");
-  await page.getByRole("link", { name: `Play ${SUBSTRINGS.name} without an account`, exact: true }).click();
+  await playAsGuest(page, SUBSTRINGS).click();
   await expect(page).toHaveURL(/\/play2$/);
   await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
@@ -144,6 +153,13 @@ test("a visitor plays game 2 as a guest from the front page, through the guest r
   expect(posts.filter((path) => path.startsWith("/api/substrings") || path.startsWith("/api/run"))).toEqual([]);
   for (const name of ["Friends", "Groups", "Me", "Settings"]) await expect(page.getByRole("link", { name, exact: true })).toHaveCount(0);
   await expect(page.getByText("Comments", { exact: true })).toHaveCount(0);
+
+  // Back on the front page the guest's own run is on the card (the guest cookie reaches /api/guest from "/"): Result,
+  // not Play again (M20 20n-7, review).
+  await page.goto("/");
+  const card = page.getByRole("region", { name: SUBSTRINGS.name, exact: true });
+  await expect(card.getByRole("link", { name: "Result", exact: true })).toBeVisible();
+  await expect(playAsGuest(page, SUBSTRINGS)).toHaveCount(0);
 });
 
 test("a signed-in player still plays through /api/run, and their result has Share and no peek", async ({ browser }) => {
@@ -184,7 +200,7 @@ test("a guest who makes an account the same day starts clean and plays today's g
     if (request.method() === "POST") posts.push(new URL(request.url()).pathname);
   });
   await page.goto("/");
-  await page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true }).click();
+  await playAsGuest(page, GAME).click();
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await asked(page, "Name an animal");
   await safe(page, "aardvark");
@@ -226,9 +242,66 @@ test("the front page shows the sign-in form only at /?sign-in", async ({ page })
   await expect(page.getByLabel("Email")).toBeVisible();
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
   await page.goto("/");
-  await expect(page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true })).toBeVisible();
+  await expect(playAsGuest(page, GAME)).toBeVisible();
   await expect(page.getByLabel("Email")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toHaveCount(0);
+});
+
+// M20 20n-7 (the second look audit's finding 5; docs/milestones/M20-design-rules-and-clean-up.md, answers 97 to 103):
+// the signed-out front page is one line saying what Plor is, then the two game cards as Today's are, each with its
+// emblem and "Play without an account", then how each game works, then one outlined "Sign in to see how your friends
+// did". At /?sign-in the form is first, above the cards, and holds the page's one raised button.
+test("the signed-out front page is one line, the two game cards with their emblems, how the games work, then Sign in", { tag: "@visual" }, async ({ page }) => {
+  await page.goto("/");
+  const line = page.getByText("Plor is a small site with two daily word games.");
+  const cards = [
+    [page.getByRole("region", { name: GAME.name, exact: true }), GAME],
+    [page.getByRole("region", { name: SUBSTRINGS.name, exact: true }), SUBSTRINGS],
+  ] as const;
+  const words = page.getByRole("heading", { level: 2, name: `How ${GAME.name} works`, exact: true });
+  const signIn = page.getByRole("link", { name: "Sign in to see how your friends did", exact: true });
+  const raised = page.locator("a[class*='primary'], button[class*='primary']").filter({ visible: true });
+  const top = async (el: Locator) => (await el.boundingBox())!.y;
+
+  for (const [card, game] of cards) {
+    await expect(card.getByRole("heading", { level: 2, name: game.name, exact: true })).toBeVisible();
+    await expect(card.locator("svg[data-emblem]")).toHaveCount(1);
+    await expect(card.getByText(/^\d+ (questions|rounds)$/)).toBeVisible();
+    await expect(playAsGuest(page, game)).toHaveAttribute("href", game.path);
+    await expect(card.getByRole("button", { name: "How to play", exact: true })).toBeVisible();
+    // The band is one line with its dot, or, in a card too narrow for that, the day under the name with no dot.
+    const band = await card.getByRole("heading", { level: 2, name: game.name, exact: true }).evaluate((h2) => {
+      const [dot, day] = [h2.parentElement!.querySelector("span")!, h2.parentElement!.querySelector("p")!];
+      return { dot: dot.checkVisibility(), oneLine: day.getBoundingClientRect().top < h2.getBoundingClientRect().bottom };
+    });
+    expect(band.dot, game.name).toBe(band.oneLine);
+  }
+  await expect(page.getByRole("heading", { level: 2, name: `How ${SUBSTRINGS.name} works`, exact: true })).toBeVisible();
+  await expect(signIn).toHaveAttribute("href", "/?sign-in");
+  // Down the page: the line, the cards, the words, Sign in.
+  const order = [await top(line), await top(cards[0][0]), await top(words), await top(signIn)];
+  expect(order).toEqual([...order].sort((a, b) => a - b));
+  // The one raised button is the first game's Play; Sign in is outlined.
+  await expect(raised).toHaveCount(1);
+  await expect(raised).toHaveAttribute("href", GAME.path);
+  // Side by side on a computer, the carousel on a phone, as Today's cards.
+  const carousel = page.getByRole("group", { name: "Today's games", exact: true });
+  if (page.viewportSize()!.width >= 768) {
+    await expect(carousel).toHaveCount(0);
+    expect(await top(cards[0][0])).toBe(await top(cards[1][0]));
+  } else {
+    await expect(carousel).toBeVisible();
+  }
+
+  // Sign in opens the form first on the page, in view, above the cards; it holds the raised button now.
+  await signIn.click();
+  await expect(page).toHaveURL(/\/\?sign-in$/);
+  const email = page.getByLabel("Email");
+  await expect(email).toBeInViewport();
+  expect(await top(email)).toBeLessThan(await top(cards[0][0]));
+  await expect(cards[0][0].locator("[class*='primary']").filter({ visible: true })).toHaveCount(0);
+  await expect(raised).toHaveCount(1);
+  await expect(signIn).toHaveCount(0);
 });
 
 // Start pressed before Cloudflare's script has loaded waits for it, up to BOT_CHECK_LOAD_MS, and then plays; it isn't

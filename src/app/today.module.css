@@ -27,3 +27,8 @@
   grid-area: feed;
 }
 
+
+/* The front page's sign-in form, open above the game cards: a card's gap from them (kit.module.css, 16px; M20 20n-7). */
+.signIn {
+  margin-bottom: 16px;
+}

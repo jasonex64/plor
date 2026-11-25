@@ -28,6 +28,7 @@ import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
+import { Emblem } from "./emblem";
 import { ShareResult } from "./share";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { GAME_1_STEPS, HowToPlay } from "./how-to-play";
@@ -111,9 +112,11 @@ function useStartRun() {
 // after it, the score, how it ended, the result and the time to the next puzzle.
 // main: this card is the one in front on Today (src/app/today-games.ts), so its Play or Continue is the screen's one
 // raised button (docs/milestones/M20-design-rules-and-clean-up.md, answers 45 and 47).
-export function TodayBanner({ skip, main, ...hooks }: DayHooks & { skip: boolean; main: boolean }) {
+// family: a guest's card on the signed-out front page reads the guest's run, and its Play says "without an account"
+// (20n-7, answer 98).
+export function TodayBanner({ skip, main, family = "account", ...hooks }: DayHooks & { skip: boolean; main: boolean; family?: RunFamily }) {
   const play = main ? `${kit.primary} ${styles.play}` : styles.play;
-  const { run, noPuzzle, error, over } = useRun(hooks);
+  const { run, noPuzzle, error, over } = useRun(hooks, family);
   const starting = useStartRun();
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
@@ -124,7 +127,7 @@ export function TodayBanner({ skip, main, ...hooks }: DayHooks & { skip: boolean
           <>
             <Facts facts={[`${run.total} questions`, "Don't match the host"]} />
             <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={play}>
-              Play
+              {playText(family)}
             </ButtonLink>
             <HowToPlay steps={GAME_1_STEPS} />
           </>
@@ -577,12 +580,16 @@ export function BannerSkeleton() {
   );
 }
 
+// Play on a game's card: a guest's says what it is, as the front page's buttons did (M18, answer 26; M20 20n-7, answer 98).
+export const playText = (family: RunFamily) => (family === "guest" ? "Play without an account" : "Play");
+
 // game: Fragments' card is this banner in its own colour (src/app/today-fragments.tsx; M16 16f-2).
 // page: the game screen's own card, read from the left at the card's width, as Fragments' is (M20 20n-4).
 export function Banner({ date, game = GAME, page = false, children }: { date?: string; game?: typeof GAME | typeof SUBSTRINGS; page?: boolean; children?: ReactNode }) {
   return (
     <div className={`${kit.card} ${styles.banner} ${gameColour(game.id)}${page ? ` ${styles.page}` : ""}`}>
-      <Band game={game} date={date} />
+      {/* The emblem is on Today's cards and the front page, not on the game's own screen (20n-7, answer 100). */}
+      <Band game={game} date={date} emblem={!page} />
       {children}
     </div>
   );
@@ -590,9 +597,10 @@ export function Banner({ date, game = GAME, page = false, children }: { date?: s
 
 // A game's band, the first thing in its card: its name, the card's heading, and the day (M20 20k-3, answers 54 and 55).
 // The card's own game class colours it (kit .offbeat, .fragments).
-export function Band({ game, date }: { game: typeof GAME | typeof SUBSTRINGS; date?: string }) {
+export function Band({ game, date, emblem = false }: { game: typeof GAME | typeof SUBSTRINGS; date?: string; emblem?: boolean }) {
   return (
     <div className={styles.band}>
+      {emblem && <Emblem game={game.id} />}
       <h2>{game.name}</h2>
       {/* "Offbeat · Tuesday 17 November", as the Balanced sample's band reads; the dot is seen, not read, and is its own
           element so the day's is the day alone. */}

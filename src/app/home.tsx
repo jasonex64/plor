@@ -54,7 +54,7 @@ import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
-import { BACK, FORWARD } from "./slide";
+import { BACK } from "./slide";
 import { PAGE_BACK } from "./page-back";
 import kit from "./kit.module.css";
 import { GAME, SUBSTRINGS } from "@/platform/game";
@@ -296,36 +296,41 @@ export function Signed({ children, signedOut }: { children: ReactNode; signedOut
   return children;
 }
 
+const NOTHING = () => {};
+
 // The front page for a signed-out visitor: play first, sign in second (human, 2026-11-11: "Play first, sign in second
-// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 26). The sign-in is a small link, and the form shows at the
-// address the link goes to (answers 32 and 33).
+// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 26). The two games' cards as Today's are, from the guest's
+// own runs, each with "Play without an account" (docs/milestones/M20-design-rules-and-clean-up.md, 20n-7, answers 97
+// and 98). The sign-in form shows at the address every "Sign in" goes to (M18, answers 32 and 33), first on the page,
+// above the cards, so a visitor sent here to sign in meets it at once; it then holds the page's one raised button
+// (M20, answer 47).
 export function PlayFirst() {
   const { loadMe } = useFrame();
   const open = signInOpen(useSearchParams());
+  const [day, setDay] = useState(0);
+  const nextDay = useCallback(() => setDay((d) => d + 1), []);
   return (
     <>
-      <p>
-        {/* The page's one raised button: the first game's, or the sign-in form's once it's open
-            (docs/milestones/M20-design-rules-and-clean-up.md, answer 47). */}
-        <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={open ? undefined : kit.primary}>
-          Play {GAME.name} without an account
-        </ButtonLink>
-      </p>
-      <p>
-        <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD}>
-          Play {SUBSTRINGS.name} without an account
-        </ButtonLink>
-      </p>
-      {open ? (
-        <SignIn onSignedIn={loadMe} />
-      ) : (
-        <p>
-          <ButtonLink href={SIGN_IN_HREF}>
-            Sign in
-          </ButtonLink>
-        </p>
+      {open && (
+        <div className={styles.signIn}>
+          <SignIn onSignedIn={loadMe} />
+        </div>
       )}
+      <TodayCards family="guest" raise={!open} skip={false} day={day} timeUps={0} onOver={NOTHING} onDayOver={nextDay} onView={NOTHING} />
     </>
+  );
+}
+
+// The front page's sign-in for a signed-out visitor, under the cards and the words: one outlined button (20n-7, answer
+// 99). Gone once the form is open above.
+export function SignInBelow() {
+  const { me } = useFrame();
+  const open = signInOpen(useSearchParams());
+  if (!me || me.signedIn || open) return null;
+  return (
+    <p>
+      <ButtonLink href={SIGN_IN_HREF}>Sign in to see how your friends did</ButtonLink>
+    </p>
   );
 }
 
