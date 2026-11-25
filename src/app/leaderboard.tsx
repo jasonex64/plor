@@ -345,7 +345,7 @@ function OverallStandings({ label, week, average }: { label: string; week: Overa
   );
 }
 
-// Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
+// Mockup 3's rows: the place as a badge (place-badge.tsx: the first in the accent under a crown, the second and third with ribbon tails), the avatar, the name, the points. The list's own order
 // is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
 // the row's text; a hidden ": " keeps the row read as "name: 3 points". The overall board's number is its par scores
 // added up, the plain total the note explains (M16 16e, answer 24; M15 15i).

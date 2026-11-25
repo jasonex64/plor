@@ -2,8 +2,6 @@
    badge's own 24-unit box and shows outside its circle, so it grows with the badge (kit.module.css, .badge, in rem). */
 .place {
   position: relative;
-  /* The tails sit behind the badge's own fill and nothing else's. */
-  isolation: isolate;
 }
 
 .place svg {
@@ -22,8 +20,8 @@
   fill: var(--accent);
 }
 
-/* 2nd and 3rd: the tails in the badge's ink, behind it. */
+/* 2nd and 3rd: the tails in the badge's own ink, so they read as one shape with it; the number, the badge's ::before,
+   is drawn after them and stays on top. */
 .tails {
-  z-index: -1;
   fill: var(--ink);
 }
