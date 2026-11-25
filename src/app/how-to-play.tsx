@@ -34,7 +34,16 @@ export const GAME_2_STEPS = [
   `Longer words score more, and each word with the day's bonus letter earns ${SUBSTRING_BONUS_LETTER_POINTS} more. At the end, every different letter you've used adds to your bonus.`,
 ];
 
-// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS).
+// The clock game's four steps (docs/milestones/M23-23d-the-screens.md, Design). The clock's 20 seconds, the time each tier adds
+// and its points are judged in SQL (private.clock_start_ms, clock_added_ms, clock_points), so no number is typed here.
+export const CLOCK_STEPS = [
+  "One clock runs for the whole run. Name answers to each question: every answer adds time to the clock, and the rarer the answer, the more time and the more points.",
+  "Type an answer and press Enter. Text that isn't on the list, or an answer you've already said, adds nothing.",
+  "Next opens the next question, and there is no going back. On the last question, Finish ends your run.",
+  "When the clock reaches zero, your run is over. Your points are the total of your answers, and the result lists each one with how rare it was.",
+];
+
+// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS, CLOCK_STEPS).
 export function HowToPlay({ steps }: { steps: readonly string[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();

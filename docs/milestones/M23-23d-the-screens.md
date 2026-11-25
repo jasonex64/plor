@@ -1,6 +1,6 @@
 # M23 — 23d, the clock game's screens
 
-**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; waits on the human's approval. Nothing is built.
+**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 is being built.
 
 ## Goal
 A player can play a format 4 Offbeat day from start to result on a phone or a computer, signed in or as a guest, share the result, and see friends' runs on the live board.
@@ -51,8 +51,10 @@ Green common, blue uncommon, purple rare.
 **Reduce motion:** every change is instant.
 
 ## Sub-parts, one PR each
-- **23d-1:** the server's additions (the result's nine missed answers per question, fixed for the day; the board message's points) and the play screen, for a player and a guest.
-- **23d-2:** the result, the share text, the live board's rows, How to play, DESIGN.md.
+- **23d-1:** the card before the run and the play screen, for a player and a guest, ending on the points and the answers given (the state 23c already gives).
+- **23d-2:** the server's additions (the result's nine missed answers per question, fixed for the day; the board message's points, a migration), the full result, the share text, the live board's rows, How to play, DESIGN.md's result and board entries.
+- Split changed 2026-11-25, before any code: the server's additions serve the result and the board only, so they go with them.
+- **Found 2026-11-25, for 23d-2 and 23e:** a day holds only its common and uncommon answers (`levels`); every other member of the category is rare and no function `plor_app` may run lists a category's members for a player (`src/game/clock-state.ts`). So the three rare missed answers cannot be picked from the base at result time without a new grant. Planned instead, with no grant: the day itself carries an ordered handful of rare answers picked when it is drafted (23e), and the result shows the first three the player did not give. To be confirmed with the human when 23d-2 starts.
 
 ## Acceptance criteria
 - [ ] On a format 4 day, a signed-in player and a guest each play a run from Start to the result at 390 × 844 and 1280 × 720 (`@visual` Playwright tests): an accepted answer shows its name, tier, seconds and points and moves the clock and the score; a repeat shows "Already said" and text off the list "Not on the list", neither moving anything; Next opens the next question and never the last; Finish shows only on question 3.

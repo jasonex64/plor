@@ -10,6 +10,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
+import type { ClockState } from "@/game/clock-state";
 import type { PublicQuestion } from "@/game/payload";
 import type { Tier } from "@/content/puzzle";
 import { FINISHED } from "@/game/status";
@@ -38,9 +39,11 @@ import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
 import { runRoutes, startBody, type RunFamily } from "./run-routes";
 import { GuestPeek } from "./guest-peek";
 import { resultExtras, type RunKind } from "./result-extras";
+import { ClockGame, ClockTodayBanner } from "./clock-game";
 
-// run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
-type RunResponse = { run: RunState } | { run: null; msToReset: number };
+// run is null on a day with no puzzle, with the time to the reset (M12 12f, F2). A day on a clock (format 4) answers with its own
+// state (src/game/clock-state.ts), which says `format` where a seven-question run's does not (docs/milestones/M23-23d-the-screens.md).
+type RunResponse = { run: RunState | ClockState } | { run: null; msToReset: number };
 type NoPuzzle = { msToReset: number };
 // needs: with notInList, the taken letter the answer the text named needs (M15 15h); a client from before it reads
 // the reply as "not in our list".
@@ -59,10 +62,12 @@ type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) 
 // The day's run as the server last gave it, for Today's banner and the game screen alike.
 function useRun({ onOver, onDayOver }: DayHooks, family: RunFamily = "account") {
   const [run, setRun] = useState<RunState | null>(null);
+  // Today's run when the day is on a clock; the clock game's screen takes it from here (src/app/clock-game.tsx).
+  const [clock, setClock] = useState<ClockState | null>(null);
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const over = run !== null && FINISHED.includes(run.status);
-  const loaded = run !== null;
+  const over = (run !== null && FINISHED.includes(run.status)) || clock?.status === "over";
+  const loaded = run !== null || clock !== null;
   useEffect(() => {
     if (loaded) onOver(over);
   }, [onOver, loaded, over]);
@@ -70,7 +75,7 @@ function useRun({ onOver, onDayOver }: DayHooks, family: RunFamily = "account") 
   // Stable, so the run loads once each time the page shows, not on every render.
   const load = useCallback(() => {
     api<RunResponse>(runRoutes(family).state, { method: "GET" }).then(
-      (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset })),
+      (r) => (r.run ? ("format" in r.run ? setClock(r.run) : setRun(r.run)) : setNoPuzzle({ msToReset: r.msToReset })),
       (err) => setError(errorText(err)),
     );
   }, [family]);
@@ -78,12 +83,12 @@ function useRun({ onOver, onDayOver }: DayHooks, family: RunFamily = "account") 
   // Each state carries the time to the reset as the server measured it, so the timer starts again from each one, with
   // whether that state is in play.
   useEffect(() => {
-    const msToReset = run?.msToReset ?? noPuzzle?.msToReset;
+    const msToReset = run?.msToReset ?? clock?.msToReset ?? noPuzzle?.msToReset;
     if (msToReset === undefined) return;
-    const timer = setTimeout(() => onDayOver(run?.status === "in_progress"), msToReset);
+    const timer = setTimeout(() => onDayOver((run ?? clock)?.status === "in_progress"), msToReset);
     return () => clearTimeout(timer);
-  }, [run, noPuzzle, onDayOver]);
-  return { run, setRun, noPuzzle, error, setError, over };
+  }, [run, clock, noPuzzle, onDayOver]);
+  return { run, setRun, clock, noPuzzle, error, setError, over };
 }
 
 // Starts today's run and opens the game screen with question 1 in play, sliding forward from Today (14b-6e): Play on
@@ -113,8 +118,9 @@ function useStartRun() {
 // raised button (docs/milestones/M20-design-rules-and-clean-up.md, answers 45 and 47).
 export function TodayBanner({ skip, main, ...hooks }: DayHooks & { skip: boolean; main: boolean }) {
   const play = main ? `${kit.primary} ${styles.play}` : styles.play;
-  const { run, noPuzzle, error, over } = useRun(hooks);
+  const { run, clock, noPuzzle, error, over } = useRun(hooks);
   const starting = useStartRun();
+  if (clock) return <ClockTodayBanner run={clock} main={main} />;
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
@@ -188,7 +194,7 @@ export function Game({
   ...hooks
 }: DayHooks & { family: RunFamily; botCheck?: () => Promise<string>; onStarted?: () => void; onPlaying: (playing: boolean) => void }) {
   const router = useRouter();
-  const { run, setRun, noPuzzle, error, setError, over } = useRun(hooks, family);
+  const { run, setRun, clock, noPuzzle, error, setError, over } = useRun(hooks, family);
   const routes = runRoutes(family);
   const [busy, setBusy] = useState(false);
 
@@ -228,7 +234,7 @@ export function Game({
   async function timeUp(): Promise<RunState | null> {
     try {
       const response = await api<RunResponse>(routes.state, { method: "GET" });
-      if (!response.run) throw new Error("the run in play is gone");
+      if (!response.run || "format" in response.run) throw new Error("the run in play is gone");
       setRun(response.run);
       return response.run;
     } catch (err) {
@@ -236,6 +242,9 @@ export function Game({
       return null;
     }
   }
+
+  // A day on a clock plays on its own screen; the seven-question screens below are for format 3 days until 23f removes them.
+  if (clock) return <ClockGame family={family} botCheck={botCheck} initial={clock} onStarted={onStarted} onPlaying={onPlaying} onOver={hooks.onOver} onDayOver={hooks.onDayOver} />;
 
   const runner: Runner = {
     run,
