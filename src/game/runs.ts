@@ -336,7 +336,7 @@ async function settledAnswer(db: Db, userId: string, date: string, index: number
 // Logs typed text that named no entry for the question the player is on, at no cost to the run (human, 2026-10-18),
 // and lets private.record_miss learn from it once enough players typed it (M13 13b). The table's check allows 1 to 40
 // characters; longer text is rejected and nothing is stored.
-async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: number, typed: string): Promise<void> {
+export async function logMiss(db: Db, userId: string, puzzle: Pick<ApprovedPuzzle, "game_id" | "date">, index: number, typed: string): Promise<void> {
   const text = normalize(typed);
   let logged: boolean;
   try {

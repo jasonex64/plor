@@ -37,6 +37,14 @@ export type Where = { trait: string; values: string[]; via?: "country" } | { num
 export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number; where?: Where };
 export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[] };
 
+// A day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md), as the run reads it once approved: three
+// questions, each with its category, root and tiers (`levels`: common or uncommon by answer, rare for every other
+// member). No host answers and no taken letters. Drafting and approving one is 23e, so there is no draft type or
+// validator here yet; approved_at, which only SQL reads, is left out as in ApprovedPuzzle.
+export type ClockQuestion = { prompt: string; category: string; root: string; member_of: string | null; levels: Record<string, Level> };
+export const CLOCK_FORMAT = 4; // docs/milestones/M23-23c-the-run-on-a-clock.md, Design (a day is on a clock by its format)
+export type ClockPuzzle = { format: typeof CLOCK_FORMAT; game_id: typeof GAME_ID; date: string; questions: ClockQuestion[] };
+
 // The letters gone by question `index`: every letter stolen at it or before it.
 export function stolenLetters(puzzle: Pick<Puzzle, "questions">, index: number): string[] {
   return puzzle.questions.slice(0, index + 1).flatMap((q) => (q.steals ? [q.steals] : []));

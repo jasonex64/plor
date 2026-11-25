@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { POST as answer } from "./answer/route";
+import { POST as finish } from "./finish/route";
 import { POST as next } from "./next/route";
 import { POST as start } from "./start/route";
 
@@ -45,6 +46,7 @@ describe("guest start, refused before anything is created", () => {
 describe("guest answer and next without a guest cookie", () => {
   it.each([
     ["POST /api/guest/run/next", () => next(apiRequest("/api/guest/run/next", { method: "POST" }))],
+    ["POST /api/guest/run/finish", () => finish(apiRequest("/api/guest/run/finish", { method: "POST" }))],
     ["POST /api/guest/run/answer", () => answer(apiRequest("/api/guest/run/answer", { method: "POST", body: { index: 0, text: "x" } }))],
   ])("%s answers 404 no_run", async (_, callRoute) => {
     expect(await call(callRoute())).toEqual({ status: 404, body: { ok: false, error: "no_run" } });
