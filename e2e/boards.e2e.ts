@@ -445,3 +445,48 @@ test("the top three stand out on a board: a crown on 1st, ribbon tails on 2nd an
   expect(crown!.y).toBeLessThan(first!.y);
   expect(tails!.y + tails!.height).toBeGreaterThan(second!.y + second!.height);
 });
+
+// M20 20n-6b (the second look audit's finding 3; answers 77 and 91 to 93): once the player has finished a game that a
+// friend has finished too, Today says the player's place in it under the cards, one line a game, and the line opens the
+// Friends tab's board on that game. No friend finished, no strip.
+test("Today says your place in each game you and a friend have finished, and the line opens that game's board on Friends", async ({ browser }) => {
+  test.slow(); // a sign-in, two page loads and two trips to Friends
+  await addDay();
+  const page = await viewer(browser, "bvq", PHONE);
+  const friend = await friendOf("bvq", "bfq");
+  const strip = page.getByRole("region", { name: "Among friends today", exact: true });
+  await finishFragments(await idOf("bvq"));
+  await page.goto("/");
+  await expect(page.getByRole("region", { name: SUBSTRINGS.name, exact: true }).getByRole("link", { name: "Result", exact: true })).toBeVisible();
+  // Alone on the board: nothing to stand among.
+  await page.waitForLoadState("networkidle");
+  await expect(strip).toHaveCount(0);
+
+  await finishFragments(friend.id);
+  await page.reload();
+  const line = strip.getByRole("link");
+  await expect(line).toHaveCount(1);
+  await expect(line).toHaveText(new RegExp(`^${SUBSTRINGS.name}: (1st|2nd) of 2$`));
+  await expect(line).toHaveAttribute("href", "/friends?board=substrings");
+  // Under the cards, above the feed.
+  const [cards, place, feed] = await Promise.all([page.getByRole("group", { name: "Today's games", exact: true }).boundingBox(), strip.boundingBox(), page.getByRole("region", { name: "Feed", exact: true }).boundingBox()]);
+  expect(place!.y).toBeGreaterThan(cards!.y + cards!.height - 1);
+  expect(place!.y + place!.height).toBeLessThan(feed!.y + 1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+  await line.click();
+  await expect(page).toHaveURL(/\/friends\?board=substrings$/);
+  const card = page.getByRole("region", { name: "Friends leaderboard", exact: true });
+  await expect(card.getByRole("radiogroup", { name: "Game", exact: true }).getByRole("radio", { name: SUBSTRINGS.name, exact: true })).toBeChecked();
+  await expect(card.getByRole("radiogroup", { name: "Period", exact: true }).getByRole("radio", { name: "Today", exact: true })).toBeChecked();
+
+  // Pressed again after the board was moved to another game, with Friends already visited: it opens on the line's game
+  // again (20n-6b's review).
+  await card.getByRole("radiogroup", { name: "Game", exact: true }).getByText(GAME.name, { exact: true }).click();
+  await expect(card.getByRole("radiogroup", { name: "Game", exact: true }).getByRole("radio", { name: GAME.name, exact: true })).toBeChecked();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: /^Today/ }).filter({ visible: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await strip.getByRole("link").click();
+  await expect(page).toHaveURL(/\/friends\?board=substrings$/);
+  await expect(page.getByRole("region", { name: "Friends leaderboard", exact: true }).filter({ visible: true }).getByRole("radiogroup", { name: "Game", exact: true }).getByRole("radio", { name: SUBSTRINGS.name, exact: true })).toBeChecked();
+});

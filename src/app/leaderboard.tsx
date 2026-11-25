@@ -48,13 +48,37 @@ export function GameSwitch<T extends string>({ choices, value, onChange }: { cho
 // title names the board (its heading and region); path is the API route that returns it, which the game is added to;
 // todayPath is today's (docs/milestones/M22-todays-board.md, answer 9). One period shows at a time, chosen by the Period
 // switch, Today on every load (inbox #248; docs/milestones/M20-design-rules-and-clean-up.md, answer 27).
-export function Leaderboard({ title, path, todayPath }: { title: string; path: string; todayPath: string }) {
+// opensOn: the game the address names (Today's place strip's link, /friends?board=<game>); onPick: a game was picked on
+// the board while the address named one.
+export function Leaderboard({
+  title,
+  path,
+  todayPath,
+  opensOn = null,
+  onPick,
+}: {
+  title: string;
+  path: string;
+  todayPath: string;
+  opensOn?: string | null;
+  onPick?: () => void;
+}) {
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
   const [today, setToday] = useState<TodayBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Today's own, so the week's answer arriving after a failed Today doesn't clear it (M22 review).
   const [todayError, setTodayError] = useState<string | null>(null);
-  const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
+  // The game shown is the one the address names, while it names one of the board's; otherwise the one last picked here,
+  // Offbeat on every load. Picking one here drops the address's (onPick), so the pick stands. A tab visited before stays
+  // in the document with its state, so a link that opens it again on a game is read from the address each time, not
+  // only on the first load (20n-6b's review).
+  const [chosen, setChosen] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
+  const named = GAMES.find((g) => g.id === opensOn)?.id;
+  const game = named ?? chosen;
+  const setGame = (to: (typeof GAMES)[number]["id"]) => {
+    setChosen(to);
+    if (named) onPick?.();
+  };
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
   // The overall board's Sum on every load, or its Average (answer 29).
