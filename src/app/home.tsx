@@ -35,6 +35,7 @@ import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel
 import { Feed } from "./feed";
 import { FriendsList } from "./friends-list";
 import { GroupPage } from "./groups";
+import { PlaceStrip } from "./place-strip";
 import { PlayerPage } from "./player";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
@@ -626,6 +627,8 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
     <div className={styles.today}>
       <div className={styles.game}>
         <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} onView={setView} />
+        {/* Read again when the day turns, a run times out or the player's run ends (M20 20n-6b). */}
+        <PlaceStrip key={`place-${day}-${timeUps}-${runOver}`} />
       </div>
       {/* The circle is from 768px only: the feed is endless, so on phones the leaderboard card is off Today (M16 16f-5, the
           human's answer 19). */}
@@ -701,6 +704,9 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   // Counts the changes made in the friends list (a request answered, a friend removed or blocked): the board starts
   // again at each, so a blocked player leaves it at once (docs/milestones/M17-profiles-and-friend-requests.md, 17a, D5).
   const [changes, setChanges] = useState(0);
+  // Today's place strip opens the leaderboard on a game: /friends?board=<game> (M20 20n-6b, answer 92).
+  const opensOn = useSearchParams().get("board");
+  const router = useRouter();
   useEffect(() => {
     api<{ run: { msToReset: number } } | { run: null; msToReset: number }>("/api/run", { method: "GET" }).then(
       (r) => setReset({ ms: r.run ? r.run.msToReset : r.msToReset }),
@@ -720,7 +726,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
       <Board key={`${timeUps}-${changes}`} username={username} betterWithFriends />
-      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" todayPath="/api/leaderboard/today" />
+      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" todayPath="/api/leaderboard/today" opensOn={opensOn} onPick={() => router.replace("/friends", { scroll: false })} />
       <FriendsList
         onRequestsChanged={() => {
           setChanges((n) => n + 1);
