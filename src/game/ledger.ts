@@ -6,7 +6,7 @@
 // player's runs first, as a day's place needs the whole day (M16 16e-3b, answer 27), which is also how runs from
 // before M09 get their rows.
 // Relative imports with extensions: scripts/draft.ts runs this module on plain Node, which knows no "@/" paths.
-import { type ApprovedPuzzle } from "../content/puzzle.ts";
+import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "../content/puzzle.ts";
 import { GAME_ID } from "../platform/game.ts";
 import type { Db } from "@/lib/db";
 import { scoreRun, type DayCounts, type ScoredEvent } from "./scoring.ts";
@@ -29,7 +29,7 @@ export async function settleRuns(db: Db, day: string | null = null): Promise<num
   if (runs.length === 0) return 0;
   const dates = [...new Set(runs.map((r) => r.date))];
 
-  const { rows: puzzles } = await db.query<{ date: string; content: ApprovedPuzzle }>(
+  const { rows: puzzles } = await db.query<{ date: string; content: ApprovedPuzzle | ClockPuzzle }>(
     "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])",
     [GAME_ID, dates],
   );
@@ -43,10 +43,22 @@ export async function settleRuns(db: Db, day: string | null = null): Promise<num
     [GAME_ID, runs.map((r) => r.user_id), runs.map((r) => r.date)],
   );
 
+  // A day on a clock (format 4) scores by tier, with no rarity bonus: a run's row is the points of the answers it gave before
+  // the day's midnight (docs/milestones/M23-23c-the-run-on-a-clock.md, Design, "The score"), and pooledCounts is not asked.
+  const { rows: clockPoints } = await db.query<{ user_id: string; date: string; points: number }>(
+    `select a.user_id::text, a.puzzle_date::text as date, sum(a.points)::int as points
+     from private.clock_answer a
+     join unnest($2::uuid[], $3::date[]) as r(user_id, puzzle_date) on r.user_id = a.user_id and r.puzzle_date = a.puzzle_date
+     where a.game_id = $1 and private.day_of(a.created_at) = a.puzzle_date
+     group by a.user_id, a.puzzle_date`,
+    [GAME_ID, runs.map((r) => r.user_id), runs.map((r) => r.date)],
+  );
+
   const countsByDate = new Map<string, DayCounts>();
-  for (const { date, content } of puzzles) countsByDate.set(date, await pooledCounts(db, content, true));
+  for (const { date, content } of puzzles) if (content.format !== CLOCK_FORMAT) countsByDate.set(date, await pooledCounts(db, content, true));
   const scored = runs.map((r) => {
     const puzzle = puzzles.find((p) => p.date === r.date)!.content;
+    if (puzzle.format === CLOCK_FORMAT) return { ...r, points: clockPoints.find((c) => c.user_id === r.user_id && c.date === r.date)?.points ?? 0, bonus: 0 };
     const own: ScoredEvent[] = events
       .filter((e) => e.user_id === r.user_id && e.date === r.date && e.in_day)
       .map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day }));

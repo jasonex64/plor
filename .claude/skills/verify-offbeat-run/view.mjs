@@ -1,16 +1,14 @@
 // The /statechart view of OffbeatRun.tla: states and steps in the player's words.
-export const title = "An Offbeat run, two tabs";
+export const title = "An Offbeat run on a clock, two tabs";
 
 export const state = (v) => {
   if (!v.started) return "Not started";
-  if (v.died) return "Caught";
-  if (v.answered === 7) return "All seven survived";
-  const q = `Question ${v.answered + 1}`;
-  if (v.lastOpen < v.answered) return `Reveal before ${q}`;
-  return v.clockUp ? `${q}: time up` : `${q}: clock running`;
+  if (v.finished) return "Finished";
+  if (v.clockUp) return "Time up";
+  return `Question ${v.lastOpen + 1}: clock running`;
 };
 
-export const group = (v) => (!v.started ? "start" : v.died ? "end" : v.answered === 7 ? "end" : "play");
+export const group = (v) => (!v.started ? "start" : v.finished || v.clockUp ? "end" : "play");
 export const colors = { start: "tan", play: "blue", end: "purple" };
 
 export const step = (action, from, to) => {
@@ -18,19 +16,22 @@ export const step = (action, from, to) => {
     case "Start":
       return "you press Start";
     case "Tick":
-      return "the 20 seconds run out";
+      return "the clock passes zero";
+    case "Answer":
     case "AnswerWrites":
-      return to.died && !from.died ? "the host takes your answer" : "your answer is safe";
+      return to.got.length > from.got.length ? "your answer counts" : "your answer changes nothing";
+    case "NextQ":
     case "NextWrites":
-      return "the next question opens";
-    case "Load":
-      return "a tab loads the page";
+      return to.lastOpen > from.lastOpen ? "the next question opens" : "Next changes nothing";
+    case "Finish":
+    case "FinishWrites":
+      return to.finished && !from.finished ? "you press Finish" : "Finish changes nothing";
     case "AnswerChecked":
       return "a tab sends an answer";
-    case "NextReads":
+    case "NextChecked":
       return "a tab presses Next";
-    case "Responds":
-      return "the tab shows the server's answer";
+    case "FinishChecked":
+      return "a tab presses Finish";
     case "RunOver":
       return null;
     default:

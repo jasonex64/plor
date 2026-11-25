@@ -2,7 +2,7 @@
 // into the base through private.import_source, with the IDs every import computes (src/content/thing-id.ts), and a day
 // that asks them. Shared by the database tests (src/test/puzzles.ts) and the e2e tests (e2e/puzzle.ts), so it takes the
 // database client it's given. Its categories and source IDs start with "fixture", apart from any real data.
-import type { ApprovedPuzzle, ApprovedQuestion, Puzzle } from "../content/puzzle.ts";
+import type { ApprovedPuzzle, ApprovedQuestion, ClockPuzzle, Puzzle } from "../content/puzzle.ts";
 import { normalize } from "../content/puzzle.ts";
 import { thingId } from "../content/thing-id.ts";
 
@@ -241,5 +241,18 @@ export function fixtureDraft(date: string): Puzzle {
       levels: q.levels,
       ...(q.steals ? { steals: q.steals } : {}),
     })),
+  };
+}
+
+// The first three questions of the fixture as a day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md): no
+// host answers and no taken letters, so every member of the three categories can be typed, and its tier is the fixture's
+// (fixtureTier).
+export function fixtureClockDay(date: string, approvedAt: string): ClockPuzzle & { approved_at: string } {
+  return {
+    format: 4,
+    game_id: "offbeat",
+    date,
+    approved_at: approvedAt,
+    questions: fixtureDay(date, approvedAt).questions.slice(0, 3).map(({ prompt, category, root, member_of, levels }) => ({ prompt, category, root, member_of, levels })),
   };
 }

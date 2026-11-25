@@ -9,7 +9,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
 import { GAME_ID } from "@/platform/game";
-import { fixtureDay, fixtureId } from "@/test/answer-fixture";
+import { fixtureClockDay, fixtureDay, fixtureId } from "@/test/answer-fixture";
 import { pooledCounts, settleRuns } from "./ledger";
 import { localStack } from "../../scripts/slot.ts";
 
@@ -182,6 +182,43 @@ describe("settling runs into the points ledger", () => {
       expect(await settleRuns(client)).toBe(0);
       const { rows: again } = await client.query(ledger, [[a, b, c, d, e, f, g]]);
       expect(again).toEqual(rows);
+    });
+  });
+
+  // M23 23c: a day on a clock scores by tier with no bonus, and an answer given after the day's midnight earns nothing.
+  it("writes a closed clock day's row as the points of the answers given before midnight, with no bonus", async () => {
+    await inRolledBackTransaction(async (client) => {
+      await client.query("set local session_replication_role = replica");
+      const clockDay = fixtureClockDay(DAY, `${DAY}T00:00:00Z`);
+      await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, DAY, clockDay]);
+      const [a, b] = [await newUser(client), await newUser(client)];
+      for (const user of [a, b]) {
+        await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, $2, $3::date, $4)", [user, GAME_ID, DAY, at("23:59:00")]);
+      }
+      // A: a common and an uncommon answer before midnight, a rare one after it. B gave none.
+      const given: [string, string, number, string][] = [
+        [t(0, "dog"), "common", 10, at("23:59:10")],
+        [t(0, "cat"), "uncommon", 25, at("23:59:30")],
+        [t(0, "horde"), "rare", 50, afterMidnight("00:00:10")],
+      ];
+      for (const [entry, tier, points, when] of given) {
+        await client.query(
+          `insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at)
+           values ($1, $2, $3::date, 0, $4, $5, 3000, $6, $7)`,
+          [a, GAME_ID, DAY, entry, tier, points, when],
+        );
+      }
+      await client.query("set local session_replication_role = origin");
+      await client.query("set local role plor_app");
+      await settleRuns(client);
+      const { rows } = await client.query<{ user_id: string; points: number; bonus: number }>(
+        "select user_id, points, bonus from private.points_ledger where user_id = any($1::uuid[])",
+        [[a, b]],
+      );
+      expect(rows.sort((x, y) => y.points - x.points)).toEqual([
+        { user_id: a, points: 35, bonus: 0 },
+        { user_id: b, points: 0, bonus: 0 },
+      ]);
     });
   });
 

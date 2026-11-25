@@ -1,6 +1,6 @@
 # M23 23b — The research procedure, the first 21 lists, and the human's review page
 
-**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; in its PR.** 23b-2 (the review page) is not started.
+**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** 23b-2 (the review page) is not started.
 
 ## Goal
 Eighteen more questions get researched lists the same way each time, in two passes, and the human can read a list's doubtful answers on plor.app and strike or add one from a phone.

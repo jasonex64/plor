@@ -87,7 +87,7 @@ export type Lookup = (index: number, texts: string[]) => Promise<Candidate[]>;
 
 const COLUMNS = "alias, thing_id::text, caught, ancestors::text[]";
 
-export function dayLookup(db: Db, puzzle: ApprovedPuzzle): Lookup {
+export function dayLookup(db: Db, puzzle: Pick<ApprovedPuzzle, "game_id" | "date">): Lookup {
   return async (index, texts) =>
     (await db.query<Candidate>(`select ${COLUMNS} from private.resolve_answer($1, $2::date, $3, $4)`, [puzzle.game_id, puzzle.date, index, texts])).rows;
 }
@@ -118,7 +118,7 @@ export async function isNearTypo(lookup: Lookup, index: number, typed: string): 
 export async function resolveTyped(
   lookup: Lookup,
   namesOf: NamesOf,
-  puzzle: ApprovedPuzzle,
+  puzzle: { questions: { levels: Record<string, Level> }[] },
   index: number,
   typed: string,
   stolen: string[],
