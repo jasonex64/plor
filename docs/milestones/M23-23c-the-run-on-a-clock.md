@@ -1,6 +1,6 @@
 # M23 23c — The run on a clock (the server's side)
 
-**Status:** designed 2026-11-24 from answers 5 to 11, 27, 28 and 31 to 33 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **Built 2026-11-24, in its PR** (after 23b-1's PR, #302, merged): the model, the migration, the server code and their tests; no screen (23d).
+**Status:** designed 2026-11-24 from answers 5 to 11, 27, 28 and 31 to 33 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **Built 2026-11-24 and merged (#305, on green checks and the human's "Merge when green", 2026-11-24)** (after 23b-1's PR, #302, merged): the model, the migration, the server code and their tests; no screen (23d).
 
 ## Goal
 The server can run, judge, time and score a day of the new Offbeat: three questions on one clock that grows with each accepted answer, for a signed-in player and a guest, with no screen yet.
