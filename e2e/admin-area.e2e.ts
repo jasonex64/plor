@@ -40,15 +40,15 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Admin" })).toHaveAttribute("aria-current", "true");
 
   const tabs = page.getByRole("navigation", { name: "Admin" });
-  await expect(tabs.getByRole("group", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
+  await expect(tabs.getByRole("group", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/, /^Lists/]);
   await expect(tabs.getByRole("group", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database", "Kit"]);
   await expect(tabs.getByRole("link", { name: /^Puzzles/ })).toHaveAttribute("aria-current", "page");
 
   const needs = page.getByRole("complementary", { name: "What needs you" });
-  await expect(needs.getByRole("listitem")).toHaveCount(4);
+  await expect(needs.getByRole("listitem")).toHaveCount(5);
   // Tomorrow isn't approved here, so its warning stands in for the days-ahead row, first (14b-6f).
   const warning = await tomorrowWarning(DB);
-  await expect(needs.getByRole("link")).toHaveText([new RegExp(warning.what), /to approve/, /to review/, /reported comment/]);
+  await expect(needs.getByRole("link")).toHaveText([new RegExp(warning.what), /to approve/, /to review/, /reported comment/, /to look through/]);
   // At the right edge of the width a fixed bar gets (fixed-width.ts).
   expect(await needs.boundingBox()).toEqual({ x: (await fixedWidth(page)) - 360, y: 0, width: 360, height: 900 });
 
@@ -85,7 +85,7 @@ test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ 
   const cell = table.getByRole("cell").nth(1);
   expect(await cell.evaluate((td) => [td.getAttribute("data-label"), getComputedStyle(td, "::before").content])).toEqual(["Category", expect.stringContaining("Category")]);
   await button.click();
-  await expect(menu.getByRole("list", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
+  await expect(menu.getByRole("list", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/, /^Lists/]);
   await expect(menu.getByRole("list", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database", "Kit"]);
   await menu.getByRole("link", { name: "Database" }).click();
   await expect(page).toHaveURL("/admin/base");

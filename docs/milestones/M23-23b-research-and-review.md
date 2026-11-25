@@ -1,6 +1,6 @@
 # M23 23b — The research procedure, the first 21 lists, and the human's review page
 
-**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** 23b-2 (the review page) is not started.
+**Status:** designed 2026-11-24 from answers 1 to 4, 15 and 17 to 30 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-24, its security change included (the human: "Approve both", to "Approve both designs, including their two permission changes?")**. **23b-1 is built (2026-11-24): the skill, the validator's bank check, 21 lists at two passes; merged (#302, on green checks and the human's "Merge when green", 2026-11-24).** **23b-2 is built (2026-11-24): `/admin/lists`, the two tables, the five functions, the fold, the load's guard; in its PR.**
 
 ## Goal
 Eighteen more questions get researched lists the same way each time, in two passes, and the human can read a list's doubtful answers on plor.app and strike or add one from a phone.
@@ -92,7 +92,15 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 4. `categories.json`, `npm run base -- load all`, the db test over 21 keys → verify: `npx vitest run scripts/research.db.test.ts --no-file-parallelism`.
 5. Reviewer, PR.
 
-23b-2: written as checks once 23b-1 is merged and `add_player_thing` has been read.
+23b-2 (written 2026-11-24, after 23b-1 merged and `add_player_thing`, `audit_decide`, `category_members` and `load_finish` were read)
+1. The tables and functions, failing test first → verify: `npx supabase test db supabase/tests/list_review.test.sql` (fails with no migration, then passes); `plor_app_role.test.sql` lists exactly the five executes.
+2. The fold's pure part (edits and a list in, a list out) and the guard's (edits and lists in, the unfolded ones out), failing unit tests first → verify: `npx vitest run scripts/lists.test.ts`.
+3. `npm run lists -- fold`, the loader marking folded edits (`private.list_fold`), `hosted check` listing and `hosted load` refusing unfolded edits → verify: a db test of a load after a fold.
+4. The routes (`/api/admin/lists`), admins only → verify: a route db test (401, 403, the four writes, the read).
+5. The page, `/admin/lists`, from the admin's existing pieces → verify: an e2e at phone and desktop size (`@visual`): open a list, strike, undo, add, mark seen.
+6. DECISIONS.md (the Log's security line), DESIGN.md if the page adds a piece, the `reviewer` agent, the PR with its videos.
+
+What step 1's reading settled: a strike sets the end (`removed_at`) of the answer's `kind_of` link to its list's root to the next midnight, the column a load sets; listings of a category's members today drop it at once, while a day judges by the base as of its own start, so today's day still accepts it. An add is `private.add_player_thing` with origin `human`, the Audit page's accept; a researched list has no filter, so no `category_extra` row is needed. A day already started doesn't see an add (it judges as of its start): the add counts from the next day.
 
 Hypothesis for step 1: the second pass changes fewer than one answer in five. If it rewrites more, pass 1's prompt is wrong and is fixed before the batch, not after.
 
@@ -110,6 +118,18 @@ Hypothesis for step 1: the second pass changes fewer than one answer in five. If
 | Answer 3: the second agent "tests it against what players typed" | Done in every run (each checker's brief held the refused texts), but the skill's text first gave them to the researcher only | Fixed in the skill after the review |
 | The design: tiers by "what players type first" | Common tiers of 32 to 94 answers, by each agent's judgement; no data on what players type first exists yet | Play takes the tiers over after 50 players (answers 21, 22; 23e) |
 | The design: 23b-1 has no migration | As designed | |
+
+**23b-2**
+
+| Source says | We built | Why different |
+|---|---|---|
+| Part 3 and criterion 2: an added answer "counts at once" | It is an answer of the list at once, and a day counts it from the next day | A day judges by the base as of its own start (`private.answers_as_of`), the rule a strike relies on to leave a day in play unchanged. The page says "An added answer counts from the next day" |
+| Part 3: an add "uses `private.category_extra`, as the Audit page's 'Accept as'" | `private.add_player_thing` with origin `human`, the Audit page's plain accept | A researched list has no filter, so the new thing is a member through the tree; `category_extra` is for categories whose filter a new thing can't meet |
+| The security change: two tables, four writing functions, one read function | As approved, plus two functions granted to nobody: `list_guard` (the admin and researched-list checks, shared) and `list_fold` (the loader's, marking edits folded) | `list_fold` is the design's "the database marks those records folded"; neither is reachable by `plor_app` |
+| Part 3: the fold "reads the recorded strikes, adds and seen dates from plor.app (read-only)" | `npm run lists -- fold` reads the local stack, or a file with `--from`; it never connects to a hosted database | A session exports the edits read-only through the Supabase connector and hands the file to the fold, so no script holds a hosted connection |
+| Part 3: "`hosted load` refuses while there are any" | As designed; the local `load all` and `load research` warn and carry on | The local database is disposable; refusing there would only block tests |
+| Part 2: "**Seen** marks the list reviewed" | The button reads "Mark as seen"; a "Changed by you" section lists what was struck or added | So a struck ordinary answer doesn't vanish into the 300 below it |
+| Not in the design | Striking an answer added here and not yet folded takes the add back; the page offers Undo only on the strike's own day | Nothing is left to fold for an answer added and removed the same day |
 
 ## Evidence
 **Step 1, the skill proven on hat, 2026-11-24.** `.claude/skills/research-list/SKILL.md`. Pass 1 (about 11 searches and page reads, 129,000 tokens, 3 minutes): 33 old members → 201 answers; "beanie" (refused 3 times last week) is the fifth answer; one old member left out (millinery, the trade). Pass 2 (112,000 tokens, 1.5 minutes): removed nothing, added 24 answers and aliases to 10, re-tiered 2, marked 1 borderline: 37 of 201 changed, about 18%, under the hypothesis's one in five. Final: 226 answers (54 common, 89 uncommon, 83 rare), 27 borderline, 16 brands; `npm run content:validate` → `CONTENT OK content: 33 file(s)`. **Shortfall:** pass 2 searched nothing and added from memory, so its rarer additions are unconfirmed; the skill now requires at least six searches of the checker. Not yet done for hat: `categories.json`, the load, the db test (step 4, with the others).
@@ -135,8 +155,25 @@ The accepted ones are in `scripts/research.db.test.ts`'s "accepts" cases, with b
 
 **Not verified.** Most rare answers were not confirmed one by one: checkers searched the doubtful ones (cheese's ran 25 searches and removed 2), and gemstone's and dance's additions lean most on memory; by answer 24 what can't be confirmed stays. No list was looked at by the human except hat's sample in chat. The lists are on the local stack only.
 
+**23b-2, per criterion** (slot 1's local stack, 2026-11-24)
+- A struck answer is still accepted today and refused from the next midnight; Undo before midnight restores it; no Undo once it has stopped: `supabase/tests/list_review.test.sql` (35 tests; before the migration: `relation "private.list_edit" does not exist`, `Result: FAIL`).
+- An added answer is an answer at once (see the Source diff for what a day counts): the same file.
+- Each of the four writing functions, and the read, refuses a non-admin with `OB007` and writes nothing: the same file, tests 1 to 7. `plor_app_role.test.sql` lists exactly the five new executes. `npm run test:sql`: `Files=44, Tests=956, Result: PASS`.
+- The fold turns a strike, an add and a seen mark into the file changes, and writes all 21 real files back exactly as they are: `scripts/lists.test.ts` (40 tests).
+- `hosted load`'s guard refuses with an unfolded strike, and a load after a fold marks the edits folded: `scripts/lists.db.test.ts`.
+- The routes: 401, 403, the four writes and the read, 409, 400: `src/app/api/admin/lists/route.db.test.ts`.
+- The page in a browser at phone and desktop size: `e2e/lists.e2e.ts` (`@visual`): `2 passed`; with `e2e/admin-area.e2e.ts`, changed for the new tab: `6 passed (54.8s)`. The two videos and two pictures were sent to the human in the app; the PR's CI run artifact `e2e-videos` holds CI's.
+- `npx tsc --noEmit -p .` and `npx eslint src scripts e2e` clean; `npm test`: 78 files, 927 passed; `npm run build` passed, and the route's trace holds the 21 lists and `bank.json`.
+
+**Not verified:** nothing on plor.app (the migration isn't pushed and no list is loaded there). The full `npm run test:db` and the full e2e suite were not rerun locally after this sub-ticket: CI runs both. The phone layout was looked at in a full-page picture by the main session, not used by hand.
+
 ## Review
 23b-1: the `reviewer` agent, 2026-11-24, fresh context. It reran `content:validate` and the three test files (75 passed), sampled eight lists with its own script, and found no problem in the code, tests or commits.
 - Blocking findings and how each was fixed: (1) the Source diff was empty: filled. (2) The skill's numbers had no recorded origin and its header called Claude's procedure the human's rules: Numbers rows added, the header rewritten. (3) Removing a name with "no trace at all" narrows answer 24 by Claude's reading: recorded in the Source diff as a deviation, with its reason, and told to the human in the PR and in chat as theirs to overrule; the skill now gives the refused texts to the checker too. (4) The handoff and ROADMAP said "in its PR" before one was open: the PR is opened with this commit.
 - Deferred to ROADMAP "Next revision", For M23: the list findings for the human's review (candy's 497 brand rows, many product variants; makers that aren't tools; teeth and numbered vertebrae under bone; hair knots and a bird under knot; over-high tiers); the unchecked family links for knife, tooth and hat; the drafted days of Nov 24 to 30 that must not be approved.
 - Unverified by the reviewer: plor.app's refusal counts; that each replaced thing ID was the name claimed (checked by the main session against the local database before replacing); the lists' rare entries; the checkers' percentages.
+
+23b-2: the `reviewer` agent, 2026-11-24, fresh context. It reran `list_review.test.sql` and `plor_app_role.test.sql` (50 tests), the three new server test files (51 tests) and `tsc`, and read the migration's security side as sound: every function checks the admin first, the two helpers are granted to nobody, both tables have RLS on and no grant.
+- **Blocking, fixed:** a fold from `--from <file>` checked only that a time was text, so a bad time became a bad `borderline_seen` in a list file, and a category was not checked as a key. Three failing tests first (`scripts/lists.test.ts`), then `parseReview` refuses both.
+- Deferred to ROADMAP "Next revision", For M23: a strike followed after its midnight by an add of the same name is never marked folded (guard noise); `list_unstrike` can pick an older strike of the same name; Undo after a fold but before a load restores an answer the next load drops; seen marks are never marked folded and a fold rewrites the date each time; `hosted load`'s guard reads the files on disk, not what is committed; the route and e2e tests clean every edit of the real `bed` list on a developer's local database; no test pins that `list_fold` and `list_guard` are granted to nobody.
+- Unverified by the reviewer: the e2e specs (run by the main session, Evidence); that a later load leaves an already-ended link alone; the page's row rendering, only skimmed.

@@ -90,6 +90,8 @@ const MESSAGES: Record<string, string> = {
   reaction_changed: "That changed in another tab. Try again.",
   busy: "Plor was busy. Try again.",
   audit_invalid: "That decision no longer fits this answer. Reload the page.",
+  // The review of a researched list (docs/milestones/M23-23b-research-and-review.md, 23b-2).
+  list_invalid: "That change doesn't fit this list any more. Reload the page.",
 };
 
 export function messageFor(code: string): string {

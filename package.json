@@ -19,6 +19,7 @@
     "content:validate": "node scripts/content-validate.ts",
     "base": "node --max-old-space-size=4096 --env-file-if-exists=.env.local scripts/base.ts",
     "draft": "node --env-file-if-exists=.env.local scripts/draft.ts",
+    "lists": "node --env-file-if-exists=.env.local scripts/lists.ts",
     "substrings": "node scripts/substrings.ts",
     "verify": "node scripts/verify.ts",
     "test:e2e": "playwright test",
