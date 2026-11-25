@@ -5,7 +5,8 @@ import { readFileSync } from "node:fs";
 import { PassThrough } from "node:stream";
 import pg from "pg";
 import { describe, expect, it, vi } from "vitest";
-import { hostedConfig, hostedFailure, hostedRefusal, hostedTarget, listCategories, listsRefusal, migrationsRefusal, readHidden } from "./base.ts";
+import type { ResearchList } from "../src/content/list.ts";
+import { hostedConfig, hostedFailure, hostedLoadLists, hostedRefusal, hostedTarget, listCategories, listsRefusal, migrationsRefusal, readHidden } from "./base.ts";
 
 const PASSWORD = "s3cr3t-Pa55";
 const FAKE = `postgresql://postgres:${PASSWORD}@db.example.test:5432/postgres`;
@@ -173,5 +174,55 @@ describe("listCategories", () => {
 
   it("refuses a list no question points at", () => {
     expect(() => listCategories(all, ["tool", "knot"])).toThrow(/knot.*no researched category/);
+  });
+});
+
+// The lists-only load's refusals as the command runs them (23b-3's review): against a database that answers as given,
+// it stops with the refusal's words, and sends nothing but the read-only state read: no begin, no import, no setting.
+describe("hostedLoadLists refuses before it writes", () => {
+  const lists: ResearchList[] = [{ format: 1, category: "tool", passes: 2, borderline_seen: null, answers: [{ name: "hammer", aliases: [], tier: "common" }] }];
+  const categories = [{ key: "tool", name: "tool", source: "research" as const, root: "tool" }];
+  // A database with a whole base, the lists' tables and no edits, unless a test says otherwise.
+  function database(over: { ready?: boolean; things?: number; categories?: number; edits?: object[] }) {
+    const sent: string[] = [];
+    const query = async (sql: string) => {
+      sent.push(sql);
+      if (sql.includes("to_regclass")) return { rows: [{ ready: over.ready ?? true }] };
+      if (sql.includes("current_database()")) return { rows: [{ database: "postgres", size: "1 MB", things: over.things ?? 10, categories: over.categories ?? 3, words: 0, running: 0 }] };
+      if (sql.includes("from private.list_edit")) return { rows: over.edits ?? [] };
+      return { rows: [] };
+    };
+    return { client: { query } as unknown as pg.Client, sent };
+  }
+  const readOnly = (sent: string[]) => sent.every((sql) => sql === "begin read only" || sql === "rollback" || /^select /.test(sql) && !/import_source|define_|list_fold/.test(sql));
+  const run = (client: pg.Client) => hostedLoadLists(client, "h", async () => "h", lists, categories);
+
+  it.each([
+    ["a database with no base", { things: 0, categories: 0 }, /h has no whole base \(0 things, 0 categories\).*nothing was written/],
+    ["a load that stopped part-way", { things: 10, categories: 0 }, /h has no whole base \(10 things, 0 categories\).*nothing was written/],
+    ["a database without the lists' migrations", { ready: false }, /h lacks the researched lists' tables.*npx supabase db push/],
+    ["a strike made on the site that the files lack", { edits: [{ id: "1", category: "tool", name: "hammer", kind: "strike", at: new Date(0) }] }, /1 list edits made on the site aren't in content\/lists yet \(strike tool: hammer\).*nothing was written/],
+  ])("%s", async (_, over, message) => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      const { client, sent } = database(over);
+      await expect(run(client)).rejects.toThrow(message);
+      expect(sent.length).toBeGreaterThan(0);
+      expect(readOnly(sent)).toBe(true);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("and writes when nothing refuses (so the cases above stop at the refusal, not at the stand-in)", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      const { client, sent } = database({});
+      // The stand-in gives the import no counts, so the load's own report fails after its writes were sent.
+      await run(client).catch(() => undefined);
+      expect(sent.some((sql) => sql.includes("private.import_source"))).toBe(true);
+    } finally {
+      log.mockRestore();
+    }
   });
 });
