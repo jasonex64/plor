@@ -706,6 +706,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   const [changes, setChanges] = useState(0);
   // Today's place strip opens the leaderboard on a game: /friends?board=<game> (M20 20n-6b, answer 92).
   const opensOn = useSearchParams().get("board");
+  const router = useRouter();
   useEffect(() => {
     api<{ run: { msToReset: number } } | { run: null; msToReset: number }>("/api/run", { method: "GET" }).then(
       (r) => setReset({ ms: r.run ? r.run.msToReset : r.msToReset }),
@@ -725,7 +726,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
       <Board key={`${timeUps}-${changes}`} username={username} betterWithFriends />
-      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" todayPath="/api/leaderboard/today" opensOn={opensOn} />
+      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" todayPath="/api/leaderboard/today" opensOn={opensOn} onPick={() => router.replace("/friends", { scroll: false })} />
       <FriendsList
         onRequestsChanged={() => {
           setChanges((n) => n + 1);

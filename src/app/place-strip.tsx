@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { TodayBoard } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { GAME, SUBSTRINGS } from "@/platform/game";
@@ -22,32 +22,37 @@ export function PlaceStrip() {
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let current = true;
-    Promise.all([GAME, SUBSTRINGS].map(async (game) => ({ game, board: (await api<{ board: TodayBoard }>(`/api/leaderboard/today?game=${game.id}`, { method: "GET" })).board }))).then(
-      (boards) => {
-        if (!current) return;
-        setLines(
-          boards.flatMap(({ game, board }) => {
-            const place = board.entries.findIndex((e) => e.you) + 1;
-            return board.open && place > 0 && board.entries.length > 1 ? [{ id: game.id, name: game.name, place, of: board.entries.length }] : [];
-          }),
-        );
-      },
-      (err) => current && setError(errorText(err)),
-    );
+    // Each game's board is asked for on its own, so one that fails says so and the other's line still shows.
+    void Promise.allSettled([GAME, SUBSTRINGS].map(async (game) => ({ game, board: (await api<{ board: TodayBoard }>(`/api/leaderboard/today?game=${game.id}`, { method: "GET" })).board }))).then((asked) => {
+      if (!current) return;
+      setLines(
+        asked.flatMap((a) => {
+          if (a.status === "rejected") return [];
+          const { game, board } = a.value;
+          const place = board.entries.findIndex((e) => e.you) + 1;
+          return board.open && place > 0 && board.entries.length > 1 ? [{ id: game.id, name: game.name, place, of: board.entries.length }] : [];
+        }),
+      );
+      const failed = asked.find((a) => a.status === "rejected");
+      setError(failed ? errorText(failed.reason) : null);
+    });
     return () => {
       current = false;
     };
   }, []);
-  if (error) return <p role="alert">{error}</p>;
-  if (lines.length === 0) return null;
+  const label = useId();
+  if (lines.length === 0) return error ? <p role="alert">{error}</p> : null;
   return (
-    <section aria-label="Your place today" className={`${kit.chips} ${styles.strip}`}>
-      <span className={styles.label}>Among friends today</span>
+    <section aria-labelledby={label} className={`${kit.chips} ${styles.strip}`}>
+      <span id={label} className={styles.label}>
+        Among friends today
+      </span>
       {lines.map((line) => (
         <ButtonLink key={line.id} href={`/friends?board=${line.id}`} transitionTypes={FORWARD}>
           {line.name}: {ordinal(line.place)} of {line.of}
         </ButtonLink>
       ))}
+      {error && <p role="alert">{error}</p>}
     </section>
   );
 }
