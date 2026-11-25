@@ -9,6 +9,7 @@ describe("runRoutes", () => {
       start: "/api/run/start",
       next: "/api/run/next",
       answer: "/api/run/answer",
+      finish: "/api/run/finish",
     });
   });
 
@@ -18,6 +19,7 @@ describe("runRoutes", () => {
       start: "/api/guest/run/start",
       next: "/api/guest/run/next",
       answer: "/api/guest/run/answer",
+      finish: "/api/guest/run/finish",
     });
   });
 });

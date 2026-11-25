@@ -1,0 +1,51 @@
+/* The clock game's screens (docs/milestones/M23-23d-the-screens.md, 23d-1): only what the kit's card, chips and rows don't
+   already give. The card, its band, the prompt and the rows are game.module.css's and kit.module.css's. */
+
+/* The rules before the run, three short lines, 4px apart, read from the left as the game's card reads. */
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rules p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* The last answer's line and the count of this question's answers beside it. The line keeps its height with nothing in it,
+   so Next and Finish don't move when the first answer lands; 8px between its parts, as the chips' own gap (kit .chips). */
+.last {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.outcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 1.5em;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* The answers a question was given, on the end screen: one per line, its tier beside it. */
+.given {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.given li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

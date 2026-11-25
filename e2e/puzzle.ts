@@ -3,7 +3,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Pool } from "pg";
-import { FIXTURE, fixtureDay, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
+import { FIXTURE, fixtureClockDay, fixtureDay, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 
 // created: the date of the fixture this added, if it added one.
 export type TodayPuzzle = { hostAnswer: string; safeAnswer: string; created: string | null };
@@ -24,8 +24,20 @@ export async function todayPuzzle(db: Pool): Promise<TodayPuzzle> {
   return { hostAnswer: q.members[q.host[0]].names[0], safeAnswer: q.members.dog.names[0], created };
 }
 
+// Today as a day on a clock (format 4; src/test/answer-fixture.ts, fixtureClockDay): the fixture's first three questions. The day
+// must be free, since a fixture day of the old game under it would be the other game's. Removed by removePuzzle.
+export async function todayClockPuzzle(db: Pool): Promise<{ created: string }> {
+  const { rows } = await db.query<{ today: string; taken: boolean }>(
+    "select private.today()::text as today, exists (select from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()) as taken",
+  );
+  const { today, taken } = rows[0];
+  if (taken) throw new Error(`${today} has a puzzle already; the clock game's tests need it free for a clock day`);
+  await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [today, fixtureClockDay(today, await loadFixtureBase(db))]);
+  return { created: today };
+}
+
 // Run after the players are deleted (a run references its puzzle).
-export async function removePuzzle(db: Pool, puzzle: TodayPuzzle): Promise<void> {
+export async function removePuzzle(db: Pool, puzzle: Pick<TodayPuzzle, "created">): Promise<void> {
   if (puzzle.created) await db.query("delete from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [puzzle.created]);
 }
 

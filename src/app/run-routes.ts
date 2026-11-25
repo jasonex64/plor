@@ -7,7 +7,7 @@ const PREFIX: Record<RunFamily, string> = { account: "/api/run", guest: "/api/gu
 
 export function runRoutes(family: RunFamily) {
   const prefix = PREFIX[family];
-  return { state: prefix, start: `${prefix}/start`, next: `${prefix}/next`, answer: `${prefix}/answer` };
+  return { state: prefix, start: `${prefix}/start`, next: `${prefix}/next`, answer: `${prefix}/answer`, finish: `${prefix}/finish` };
 }
 
 // A guest's start carries the bot-check token (field name read by src/app/api/guest/run/start/route.ts); a signed-in start has no body.
