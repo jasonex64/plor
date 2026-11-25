@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { PassThrough } from "node:stream";
 import pg from "pg";
 import { describe, expect, it, vi } from "vitest";
-import { hostedConfig, hostedFailure, hostedRefusal, hostedTarget, readHidden } from "./base.ts";
+import { hostedConfig, hostedFailure, hostedRefusal, hostedTarget, listCategories, listsRefusal, migrationsRefusal, readHidden } from "./base.ts";
 
 const PASSWORD = "s3cr3t-Pa55";
 const FAKE = `postgresql://postgres:${PASSWORD}@db.example.test:5432/postgres`;
@@ -133,5 +133,45 @@ describe("hostedRefusal", () => {
     ["a base and a dictionary", state(10, 3, 500)],
   ])("refuses %s, loudly, saying 15e-1 loads an empty database only", (_, s) => {
     expect(hostedRefusal("h", s)).toMatch(/already has a base \(\d+ things, \d+ categories\): 15e-1 loads an empty database only.*incomplete.*nothing was written/);
+  });
+});
+
+// The lists-only load (M23 23b-3): the opposite rule to hostedRefusal's, and the plain word for a database not pushed to.
+describe("listsRefusal", () => {
+  it("loads the lists into a database that has a base", () => {
+    expect(listsRefusal("h", { things: 10, categories: 3 })).toBeNull();
+  });
+
+  it.each([
+    ["no base", { things: 0, categories: 0 }],
+    ["things with no categories (a load that stopped part-way)", { things: 10, categories: 0 }],
+    ["categories with no things", { things: 0, categories: 3 }],
+  ])("refuses %s, saying hosted load is the one for it", (_, s) => {
+    expect(listsRefusal("h", s)).toMatch(/h has no whole base \(\d+ things, \d+ categories\).*`hosted load`.*nothing was written/);
+  });
+});
+
+describe("migrationsRefusal", () => {
+  it("says to push the migrations when the list tables aren't there, and nothing when they are", () => {
+    expect(migrationsRefusal("h", false)).toMatch(/h lacks the researched lists' tables.*npx supabase db push.*nothing was written/);
+    expect(migrationsRefusal("h", true)).toBeNull();
+  });
+});
+
+describe("listCategories", () => {
+  const all = [
+    { key: "animal", name: "animal", source: "wikidata" as const, root: "Q729" },
+    { key: "tool", name: "tool", source: "research" as const, root: "tool" },
+    { key: "hat", name: "hat", source: "research" as const, root: "hat" },
+    { key: "animal_k", name: "animal starting with K", of: "animal", starts_with: "k" },
+    { key: "tool_w", name: "tool starting with W", of: "tool", starts_with: "w" },
+  ];
+
+  it("gives the loaded lists' questions and the subsets of them, in the file's order, and no other category", () => {
+    expect(listCategories(all, ["tool"]).map((c) => c.key)).toEqual(["tool", "tool_w"]);
+  });
+
+  it("refuses a list no question points at", () => {
+    expect(() => listCategories(all, ["tool", "knot"])).toThrow(/knot.*no researched category/);
   });
 });
