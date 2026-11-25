@@ -409,3 +409,39 @@ test("a board's rows are a hairline with their game's edge, and your own row the
   await expect(mine).toBeVisible();
   expect(await looks(mine)).toEqual({ border: await slot("--line"), edge: `${await slot("--accent")} 4px 0px 0px 0px inset`, weight: "700" });
 });
+
+// M20 20n-6a (inbox #268; answers 90 and 94 to 96): on a board, 1st's badge wears a small crown, 2nd's and 3rd's have
+// two ribbon tails, 4th's is plain; the drawings are for the eye only and make no row taller.
+test("the top three stand out on a board: a crown on 1st, ribbon tails on 2nd and 3rd, 4th plain", async ({ browser }) => {
+  const page = await viewer(browser, "bvm", WIDE);
+  for (const name of ["bfm", "bfn", "bfo"]) await friendOf("bvm", name);
+  await page.goto("/friends");
+  const card = page.getByRole("region", { name: "Friends leaderboard", exact: true });
+  await card.getByRole("radiogroup", { name: "Period", exact: true }).getByText("This week", { exact: true }).click();
+  const places = card.getByRole("region", { name: "This week", exact: true }).locator("ol > li");
+  await expect(places).toHaveCount(4);
+  const drawn = await places.evaluateAll((rows) =>
+    rows.map((li) => {
+      const badge = li.querySelector("[data-place]")!;
+      return {
+        place: badge.getAttribute("data-place"),
+        crown: badge.querySelector("[data-crown]") !== null,
+        tails: badge.querySelector("[data-tails]") !== null,
+        hidden: badge.getAttribute("aria-hidden") === "true",
+        height: Math.round(li.getBoundingClientRect().height),
+      };
+    }),
+  );
+  const height = drawn[3].height;
+  expect(drawn).toEqual([
+    { place: "1", crown: true, tails: false, hidden: true, height },
+    { place: "2", crown: false, tails: true, hidden: true, height },
+    { place: "3", crown: false, tails: true, hidden: true, height },
+    { place: "4", crown: false, tails: false, hidden: true, height },
+  ]);
+  // The crown is over the badge's top and the tails under its foot, each showing outside the badge's circle.
+  const box = (selector: string) => places.locator(selector).first().boundingBox();
+  const [first, crown, second, tails] = [await box("[data-place='1']"), await box("[data-crown] path"), await box("[data-place='2']"), await box("[data-tails] path")];
+  expect(crown!.y).toBeLessThan(first!.y);
+  expect(tails!.y + tails!.height).toBeGreaterThan(second!.y + second!.height);
+});

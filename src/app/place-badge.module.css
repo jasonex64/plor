@@ -1,0 +1,27 @@
+/* The top three's drawings on a board's badge (place-badge.tsx; M20 20n-6a, answers 94 to 96). Each is drawn on the
+   badge's own 24-unit box and shows outside its circle, so it grows with the badge (kit.module.css, .badge, in rem). */
+.place {
+  position: relative;
+}
+
+.place svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* 1st: the crown in the badge's accent, over its top. */
+.crown {
+  fill: var(--accent);
+}
+
+/* 2nd and 3rd: the tails in the badge's own ink, so they read as one shape with it; the number, the badge's ::before,
+   is drawn after them and stays on top. */
+.tails {
+  fill: var(--ink);
+}

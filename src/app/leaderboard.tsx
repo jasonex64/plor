@@ -13,6 +13,7 @@ import { ranked } from "@/friends/rank";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
+import { PlaceBadge } from "./place-badge";
 import { PlayerAvatar, PlayerName } from "./player-link";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
@@ -344,7 +345,7 @@ function OverallStandings({ label, week, average }: { label: string; week: Overa
   );
 }
 
-// Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
+// Mockup 3's rows: the place as a badge (place-badge.tsx: the first in the accent under a crown, the second and third with ribbon tails), the avatar, the name, the points. The list's own order
 // is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
 // the row's text; a hidden ": " keeps the row read as "name: 3 points". The overall board's number is its par scores
 // added up, the plain total the note explains (M16 16e, answer 24; M15 15i).
@@ -353,7 +354,7 @@ function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; pla
     <ol className={kit.rows}>
       {entries.map((e, i) => (
         <li key={e.username} className={e.you ? `${kit.row} ${kit.board} ${kit.you} ${styles.entry}` : `${kit.row} ${kit.board} ${styles.entry}`}>
-          <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
+          <PlaceBadge place={i + 1} />
           <PlayerAvatar name={e.name} username={e.username} me={e.you} />
           <PlayerName username={e.username} me={e.you} className={`${kit.grow} ${styles.name}`}>
             {e.name}
