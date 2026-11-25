@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is being built.
+**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built and reviewed, in its PR (merging it changes nothing a player sees; its migration reaches plor.app by the human's own `npx supabase db push`, needed before 24b or 24c merge). Next: 24b.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
@@ -61,11 +61,11 @@ What this exposes: a fault in either new route could flip another player's star 
 - **24c, favourite friends.** Same condition.
 
 ## Acceptance criteria
-- [ ] **24a** The database keeps "one star": a second starred membership for one player is refused (pgTAP). Leaving, removal and account deletion still pass their existing tests.
-- [ ] **24a** `plor_app` holds exactly the two new grants: `supabase/tests/plor_app_role.test.sql` lists them and `private_schema.test.sql` passes.
-- [ ] **24a** `POST /api/groups/star` moves the star in one step, refuses a group the player isn't in (404, as the group page) and a signed-out caller (401); a player cannot change another player's star. Route db tests.
-- [ ] **24a** `POST /api/friends/favourite` sets and clears the caller's own flag for a friend whichever side of the pair they are, refuses a non-friend and a signed-out caller, and leaves the friend's flag alone. Route db tests.
-- [ ] **24a** `npm run verify -- group-membership` passes (the change touches `private.group_member`; the skill's coverage table is read first and the model changed only if a covered step changed).
+- [x] **24a** The database keeps "one star": a second starred membership for one player is refused (pgTAP). Leaving, removal and account deletion still pass their existing tests.
+- [x] **24a** `plor_app` holds exactly the two new grants: `supabase/tests/plor_app_role.test.sql` lists them and `private_schema.test.sql` passes.
+- [x] **24a** `POST /api/groups/star` moves the star in one step, refuses a group the player isn't in (404, as the group page) and a signed-out caller (401); a player cannot change another player's star. Route db tests.
+- [x] **24a** `POST /api/friends/favourite` sets and clears the caller's own flag for a friend whichever side of the pair they are, refuses a non-friend and a signed-out caller, and leaves the friend's flag alone. Route db tests.
+- [x] **24a** `npm run verify -- group-membership` passes (the change touches `private.group_member`; the skill's coverage table is read first and the model changed only if a covered step changed).
 - [ ] **24b** `/groups` shows the starred group's page; with no star, the first group joined; with no groups, the Create box. Playwright, `@visual`.
 - [ ] **24b** The dropdown lists the player's groups and "New group…"; choosing a group shows it; "New group…" creates one. Playwright, `@visual`.
 - [ ] **24b** Tapping the star makes the group the default and it is still the default after a reload and in a second browser signed in as the same player. Playwright.
@@ -112,7 +112,14 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 | DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row and the protocol stays | An older page ignores a field it does not read; nothing it reads changed |
 
 ## Evidence
+**24a** (slot 3's local stack, 2026-11-25; CI's run is on the PR):
+- Failing first: `npm run test:sql` before the migration: `groups.test.sql (Tests: 27 Failed: 2) Failed tests: 26-27`, `plor_app_role.test.sql (Tests: 15 Failed: 1)`, `Result: FAIL`. The route tests could not load before the routes existed.
+- One star, and the exact grants: `npm run test:sql` after: `Files=44, Tests=958 … Result: PASS` (`groups.test.sql` 26 and 27: a player stars one group, a second starred group is refused, 23505; `plor_app_role.test.sql` lists the three column grants; `private_schema.test.sql` passes with the two update policies).
+- The routes: `npm run test:db`: `Test Files 1 failed | 72 passed (73)`, `Tests 552 passed | 43 skipped`. Passing among them: `src/app/api/groups/route.db.test.ts` ("stars one group as a player's default, moves the star in one step and clears it": a move, a 404 that leaves the star, a 400, a non-member's 404, each player's own star), `src/app/api/friends/route.db.test.ts` ("favourites a friend for the player who set it only, whichever side of the pair they are"), `src/groups/stars.plor-app.db.test.ts` (as `plor_app`: the flags set, a membership's or friendship's other columns refused with 42501; two moves at once, ten rounds, always one star). The signed-out 401s are in the two `route.test.ts` tables (`npm test`: 78 files, 943 passed).
+- **The one failed file is not this change's, unverified:** `scripts/research.db.test.ts` (M23), "Hook timed out in 10000ms" in its `beforeAll`, which loads the 21 researched lists on a stack with no base loaded (13 s here). The diff touches nothing it reads. Not rerun on `main`; CI's `db` job is the check.
+- The model: `npm run verify -- group-membership`: `GroupMembership.cfg: every rule holds (97961 distinct states, 12.5 s)`. The hypothesis held: no covered function changed, so the model is unchanged.
+- `npm run lint` and `npx tsc --noEmit -p .`: no output.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- **24a** (the `reviewer` agent, 2026-11-25, read the code, ran nothing): no blocking finding in the code. Blocking, docs: the handoff and the ROADMAP row still said "nothing built", and Evidence was empty: fixed in the same PR.
+- Deferred to ROADMAP "Next revision", For M24: a star move meeting the same player's account deletion can be the deadlock's victim (40P01, a 500); the race test rarely reaches the 23505 path, and no test of its own shows a star going with its membership; the protocol stays at its number.
