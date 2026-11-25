@@ -13,6 +13,7 @@ import { ranked } from "@/friends/rank";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
+import { PlaceBadge } from "./place-badge";
 import { PlayerAvatar, PlayerName } from "./player-link";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
@@ -353,7 +354,7 @@ function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; pla
     <ol className={kit.rows}>
       {entries.map((e, i) => (
         <li key={e.username} className={e.you ? `${kit.row} ${kit.board} ${kit.you} ${styles.entry}` : `${kit.row} ${kit.board} ${styles.entry}`}>
-          <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
+          <PlaceBadge place={i + 1} />
           <PlayerAvatar name={e.name} username={e.username} me={e.you} />
           <PlayerName username={e.username} me={e.you} className={`${kit.grow} ${styles.name}`}>
             {e.name}
