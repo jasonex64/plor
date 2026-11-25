@@ -67,6 +67,7 @@ Second round (2026-11-24):
 36. 2026-11-24, after 23b-2 merged (#307): "The 21 researched answer lists can't reach plor.app: the load command only fills an empty database, and plor.app's already has answers. How should the lists get there?" The human: "New lists-only load (Recommended)" (a new command the human runs themselves that adds only the researched lists, with the same type-the-host-name guard, leaving every existing answer untouched).
 37. Same round: "Where do you want to do your review of the roughly 1,600 doubtful answers and 1,100 brands?" The human: "On plor.app".
 38. Same round: "If the lists go onto plor.app before the new Offbeat ships, should today's old-style Offbeat days be able to use them?" The human: "No, keep them apart (Recommended)". Collision, for 23b-3's design: `data/categories.json` points 21 category keys (cheese, bread, ...) at the researched lists, so defining them on plor.app would make an old-style day drafted on one of those questions judge by its list. Days already played judge by the answers as they stood then and do not change.
+39. 2026-11-24, the collision put to the human: "How should 'keep them apart' hold?" The human: "The pause is enough (Recommended)" (no old-style day is approved while the beta is paused; nothing extra is built).
 
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 

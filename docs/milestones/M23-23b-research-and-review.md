@@ -53,6 +53,16 @@ The human runs, once 23b's PR is merged: `npx supabase db push` (23a's and 23b's
 - **23b-1:** the skill, the validator's bank check, and the 18 lists (content and docs only; no migration).
 - **23b-2:** the review page, the two tables, the five functions, the fold, the load's guard.
 
+## 23b-3, the lists-only load onto plor.app (proposed 2026-11-24, waits on the human's approval)
+From answers 36 to 39 in `M23-offbeat-on-a-clock.md`. **Who uses it:** the human, to review the lists on plor.app (answer 37). **What breaks without it:** `hosted load` refuses plor.app's existing base, so the lists never get there and the clock game has no answers at the switch.
+- **The command:** `npm run base -- hosted load lists`, run by the human only, on the same connection, verified TLS and type-the-host-name guard as `hosted load`. `hosted check` already prints what is there.
+- **It refuses,** writing nothing: a database with no base (that is `hosted load`'s job); one without 23a's and 23b-2's migrations (it says to run `npx supabase db push` first); one with a list edit the files do not hold (23b-2's guard).
+- **It writes, in one transaction:** the 21 lists' answers (the `research` source, as `load research` does locally) and the 21 questions in `data/categories.json` whose source is `research`, pointed at their lists. No other source, category, dictionary word or day is touched. Running it again is safe: it is the same load.
+- **Kept apart by the pause** (answers 38 and 39): nothing stops an old-style day approved on one of the 21 questions from judging by its list; none is approved while the beta is paused.
+- **Security:** no new role, grant, function or migration; a second writing path into the hosted database through the human's own command, recorded in DECISIONS.md's Log.
+- **Unverified until step 1 of the plan reads it:** that re-pointing an existing category at a researched root on a database with played days leaves those days' results as they were (the as-of rule says so; a db test will show it), and which of `load all`'s later steps (links, families) the 21 questions need.
+- **Criteria:** a db test loads the lists into a database that has a base and a played day, and the day's result is unchanged, the 21 questions answer from their lists, every other category's members are the same; the three refusals each have a failing-first test; a second run changes nothing.
+
 ## Acceptance criteria
 23b-1
 - [ ] 21 list files validate, each with `passes: 2` (`npm run content:validate`).
