@@ -1,6 +1,6 @@
 # M23 — Offbeat on a clock, with researched answer lists
 
-**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is merged (#307); 23b-3 (the lists-only load onto plor.app, answers 36 to 39) is built, in its PR. Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
+**Status:** approved 2026-11-23 (the human: "Approve M23"), from the sixteen answers below. 23a is merged (#298); 23b-1 (the research skill and 21 lists) is merged (#302); 23c (the run on a clock, the server's side) is merged (#305); 23b-2 (the review page) is merged (#307); 23b-3 (the lists-only load onto plor.app, answers 36 to 39) is merged (#310). Each sub-ticket is designed from its own questions first; 23b and 23c next. A pilot of the research ran on three questions (below). The beta is paused until this ships (answer 16).
 
 ## Goal
 Replace Offbeat's seven sudden-death questions with one run a day on a clock, three questions long, where each answer adds time by its rarity, played against answer lists researched per question.
@@ -69,6 +69,20 @@ Second round (2026-11-24):
 38. Same round: "If the lists go onto plor.app before the new Offbeat ships, should today's old-style Offbeat days be able to use them?" The human: "No, keep them apart (Recommended)". Collision, for 23b-3's design: `data/categories.json` points 21 category keys (cheese, bread, ...) at the researched lists, so defining them on plor.app would make an old-style day drafted on one of those questions judge by its list. Days already played judge by the answers as they stood then and do not change.
 39. 2026-11-24, the collision put to the human: "How should 'keep them apart' hold?" The human: "The pause is enough (Recommended)" (no old-style day is approved while the beta is paused; nothing extra is built).
 
+23d's first round (2026-11-25, after #310 merged and the human's own lists load onto plor.app):
+40. Which look 23d builds the screens in: "App's own look first (Recommended)". A style of its own comes later as its own ticket, once the human has judged M20 20m's mocks.
+41. What the play screen shows of the answers already given on a question: "Just the last one". Not the recommended option (a growing list): the player cannot check what they have already typed.
+42. What the result shows of the answers missed: "A sample of each rarity".
+43. The share text: "Score and squares (Recommended)". One row of coloured squares per question, one square per answer by rarity, no words.
+
+Second round (2026-11-25):
+44. What typing a repeat shows: "\"Already said\" (Recommended)", a note different from the one for text that is not an answer.
+45. Which missed answers, and how many: "3 each, same for everyone (Recommended)". Three common, three uncommon, three rare per question, picked once per day.
+46. A long question's squares in the share text: "Wrap every 10 (Recommended)".
+47. A friend's row on the live board mid-run: "Question and points (Recommended)", as "Question 2 of 3 · 180 points". The option's stated cost: a friend still to play sees scores before their own run.
+
+The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
+
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
 
 ## The pilot (2026-11-23)
@@ -107,7 +121,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
 - **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 merged, #307): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
-- **23d, the screens.** The play screen, the result screen, the share text, the live board's wording.
+- **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 built, in its PR). The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
