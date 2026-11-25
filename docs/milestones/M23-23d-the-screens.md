@@ -1,6 +1,6 @@
 # M23 — 23d, the clock game's screens
 
-**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built 2026-11-25, in its PR; 23d-2 is not started.
+**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built and merged 2026-11-25 (#312, on green checks and the human's "Merge when green"); 23d-2 is not started.
 
 ## Goal
 A player can play a format 4 Offbeat day from start to result on a phone or a computer, signed in or as a guest, share the result, and see friends' runs on the live board.
