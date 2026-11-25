@@ -83,8 +83,8 @@ test("a player deletes their account from the settings sheet", async ({ browser 
   await expect(button).toBeEnabled();
   await button.click();
 
-  // Signed out, the front page offers its small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
-  const signIn = page.getByRole("link", { name: "Sign in", exact: true });
+  // Signed out, the front page offers its Sign in button (M18, answer 32; M20 20n-7, answer 99).
+  const signIn = page.getByRole("link", { name: "Sign in to see how your friends did", exact: true });
   await expect(signIn).toBeVisible();
   await page.goto("/");
   await expect(signIn).toBeVisible();

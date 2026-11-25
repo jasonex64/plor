@@ -332,7 +332,7 @@ test("the look audit: every screen, at both sizes, in each theme", async ({ brow
       const guest = await newPage(browser, contexts, guestLook);
       const startButton = (page: Page) => page.getByRole("button", { name: "Start", exact: true });
       if (theme === "paper" || theme === "night") {
-        await shoot(guest, guestLook, "front", visit(guest, "/", seen(guest.getByRole("link", { name: "Sign in", exact: true }))));
+        await shoot(guest, guestLook, "front", visit(guest, "/", seen(guest.getByRole("link", { name: "Sign in to see how your friends did", exact: true }))));
         await shoot(guest, guestLook, "sign-in", visit(guest, "/?sign-in", seen(guest.getByLabel("Email"))));
         await shoot(guest, guestLook, "guest-offbeat", visit(guest, GAME.path, seen(startButton(guest))));
         await shoot(guest, guestLook, "guest-fragments", visit(guest, SUBSTRINGS.path, seen(startButton(guest))));

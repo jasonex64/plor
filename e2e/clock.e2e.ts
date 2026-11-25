@@ -148,7 +148,8 @@ test("a signed-in player plays a run on a clock from Start to the end", { tag: "
 
 test("a guest plays a run on a clock from Start to the end", { tag: "@visual" }, async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true }).click();
+  // The front page's card for the game, a clock day's too (M20 20n-7).
+  await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play without an account", exact: true }).click();
   await expect(page).toHaveURL(/\/play$/);
   await expect(page.getByText("3 questions, one clock.")).toBeVisible();
   await playRun(page);

@@ -11,7 +11,7 @@ import type { ClockAnswer, ClockState } from "@/game/clock-state";
 import { api, ApiError } from "@/lib/api-client";
 import { GuestPeek } from "./guest-peek";
 import { ButtonLink } from "./button-link";
-import { Banner, BigScore, Facts, pointsText, ResetCountdown } from "./game";
+import { Banner, BigScore, Facts, playText, pointsText, ResetCountdown } from "./game";
 import { Countdown } from "./countdown-bar";
 import { answersText, addedText, TIER_WORD } from "./clock-text";
 import { CLOCK_STEPS, HowToPlay } from "./how-to-play";
@@ -321,7 +321,8 @@ function End({ run, focus }: { run: ClockState; focus: boolean }) {
 }
 
 // Today's card for a day on a clock: Play before the run, Continue in it, the points after.
-export function ClockTodayBanner({ run, main }: { run: ClockState; main: boolean }) {
+// family: a guest's card says "Play without an account", as the other cards do (M20 20n-7, answer 98).
+export function ClockTodayBanner({ run, main, family }: { run: ClockState; main: boolean; family: RunFamily }) {
   const play = main ? `${kit.primary} ${game.play}` : game.play;
   return (
     <Banner date={run.date}>
@@ -329,7 +330,7 @@ export function ClockTodayBanner({ run, main }: { run: ClockState; main: boolean
         <>
           <Facts facts={[`${run.total} questions`, "One clock"]} />
           <ButtonLink href="/play" transitionTypes={FORWARD} className={play}>
-            Play
+            {playText(family)}
           </ButtonLink>
         </>
       )}
