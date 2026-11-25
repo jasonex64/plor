@@ -23,23 +23,25 @@ import { Bank } from "./bank/bank";
 import { dayText, whenText } from "../day-text";
 import { Insights } from "./insights";
 import { Kit } from "./kit/kit";
+import { Lists } from "./lists/lists";
 import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
 import styles from "./admin.module.css";
 import { Line, Skeleton } from "../skeleton";
 import { warningOf, tomorrowOf, type Tomorrow } from "./tomorrow";
 
-export type AdminPage = "puzzles" | "audit" | "reports" | "insights" | "bank" | "base" | "kit";
+export type AdminPage = "puzzles" | "audit" | "reports" | "lists" | "insights" | "bank" | "base" | "kit";
 
 // What waits for the admin: drafted days not yet approved (and the first), texts to review, reported comments (and
 // when the first was reported), the approved days after today (and the last), and whether tomorrow has a puzzle
-// (14b-6f).
-type Counts = { toApprove: string[]; ahead: string[]; review: number; reports: ReportedComment[]; tomorrow: Tomorrow };
+// (14b-6f), and the researched lists nobody has looked through (M23 23b-2).
+type Counts = { toApprove: string[]; ahead: string[]; review: number; reports: ReportedComment[]; unseen: number; tomorrow: Tomorrow };
 
 const TO_DO: { page: AdminPage; name: string; count: (c: Counts) => number }[] = [
   { page: "puzzles", name: "Puzzles", count: (c) => c.toApprove.length },
   { page: "audit", name: "Audit", count: (c) => c.review },
   { page: "reports", name: "Reports", count: (c) => c.reports.length },
+  { page: "lists", name: "Lists", count: (c) => c.unseen },
 ];
 const LOOK_UP: { page: AdminPage; name: string }[] = [
   { page: "insights", name: "Insights" },
@@ -58,8 +60,9 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
       api<{ today: string; days: DayView[]; substringDays: SubstringDayView[] }>("/api/admin/puzzles", { method: "GET" }),
       api<{ open: number }>("/api/admin/audit?count", { method: "GET" }),
       api<{ reports: ReportedComment[] }>("/api/admin/reports", { method: "GET" }),
+      api<{ lists: { seen: string | null }[] }>("/api/admin/lists", { method: "GET" }),
     ]).then(
-      ([puzzles, audit, reports]) => {
+      ([puzzles, audit, reports, lists]) => {
         const dates = (keep: (d: DayView) => boolean) => puzzles.days.filter(keep).map((d) => d.date).sort();
         setCounts({
           // Both games' days, so a drafted game 2 day can't sit unnoticed (M16 16c-2).
@@ -67,6 +70,7 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
           ahead: dates((d) => d.live !== null && d.date > puzzles.today),
           review: audit.open,
           reports: reports.reports,
+          unseen: lists.lists.filter((l) => !l.seen).length,
           tomorrow: tomorrowOf(puzzles.today, puzzles.days),
         });
         setError(null);
@@ -111,6 +115,8 @@ function Page({ page, onChanged }: { page: AdminPage; onChanged: () => void }) {
       return <Audit onChanged={onChanged} />;
     case "reports":
       return <Reports onChanged={onChanged} />;
+    case "lists":
+      return <Lists onChanged={onChanged} />;
     case "insights":
       return <Insights />;
     case "bank":
@@ -166,6 +172,7 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
         { href: "/admin/puzzles", n: counts.toApprove.length, one: "day", many: "days" },
         { href: "/admin/audit", n: counts.review, one: "answer", many: "answers" },
         { href: "/admin/reports", n: counts.reports.length, one: "report", many: "reports" },
+        { href: "/admin/lists", n: counts.unseen, one: "list to read", many: "lists to read" },
       ].filter((w) => w.n > 0)
     : [];
   const item = (p: AdminPage, name: string, count?: number) => (
@@ -228,7 +235,7 @@ function NeedsYouSkeleton() {
       <div className={kit.card}>
         <h2>What needs you</h2>
         <ul className={kit.rows}>
-          {["puzzles", "audit", "reports", "ahead"].map((row) => (
+          {["puzzles", "audit", "reports", "lists", "ahead"].map((row) => (
             <li key={row} className={kit.row}>
               <Line />
             </li>
@@ -263,6 +270,12 @@ function NeedsYou({ counts }: { counts: Counts }) {
       n: counts.reports.length,
       what: counts.reports.length === 1 ? "reported comment" : "reported comments",
       more: first ? `First reported ${whenText(first.firstReportedAt)}` : "None",
+    },
+    {
+      href: "/admin/lists",
+      n: counts.unseen,
+      what: counts.unseen === 1 ? "list to look through" : "lists to look through",
+      more: "Researched answers, doubtful ones first",
     },
     ...(warning
       ? []

@@ -160,7 +160,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
   );
 }
 
-function Table({ head, children }: { head: string[]; children: ReactNode }) {
+export function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
     <table className={admin.table} role="table">
       <thead role="rowgroup" className="sr-only-on-phones">

@@ -13,7 +13,7 @@
 // (M15 15e-1; DECISIONS.md, Log, 2026-11-14), never by `load`:
 // - `npm run base -- hosted check`: asks for the database's session-mode connection string at a hidden prompt (kept in
 //   memory only: never in a file, the environment or the output), then reads inside a read-only transaction and prints the
-//   host, the size, whether a base and a dictionary are there, the runs in progress, and what a load would bring. Writes nothing.
+//   host, the size, whether a base and a dictionary are there, the runs in progress, the list edits made on the site that the files do not hold yet (M23 23b-2; `hosted load` refuses while there are any), and what a load would bring. Writes nothing.
 // - `npm run base -- hosted load`: the same check, then asks you to type the host name it showed (anything else stops with
 //   nothing written), then loads the dictionary and then the base (as `load all`), and prints the new size. A database
 //   with any base already there (a thing or a category) is refused: updating a live base is 15e-2, and a load that stopped
@@ -32,6 +32,7 @@ import { type DbConnection, isLocalHost, readDatabaseUrl } from "../src/config/e
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VIDEO_GAME_MIN_SITELINKS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
+import { type ListEdit, type ListSeen, unfoldedEdits } from "../src/content/list-edits.ts";
 import { LISTS_DIR, parseList, type ResearchList } from "../src/content/list.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
@@ -1186,33 +1187,35 @@ export async function inReadOnly<T>(client: pg.Client, work: (client: pg.Client)
   }
 }
 
-export type HostedState = { database: string; size: string; things: number; categories: number; words: number; running: number };
+// edits: the admin's list edits no load has marked folded (EditRow), not all of which are missing from the files.
+export type HostedState = { database: string; size: string; things: number; categories: number; words: number; running: number; edits: EditRow[] };
 
 // A base is "there" when it has things or categories (a half-done load leaves one of them). Runs in progress are what
 // private.run_status says now: every run whose status is in_progress (not finished, its clock not run out), not only today's.
 export async function readHostedState(client: pg.Client): Promise<HostedState> {
   return inReadOnly(client, async (c) => {
-    const { rows } = await c.query<HostedState>(`select current_database() as database, pg_size_pretty(pg_database_size(current_database())) as size,
+    const { rows } = await c.query<Omit<HostedState, "edits">>(`select current_database() as database, pg_size_pretty(pg_database_size(current_database())) as size,
       (select count(*) from private.thing)::int as things, (select count(*) from private.category)::int as categories,
       (select count(*) from private.dictionary_word)::int as words,
       (select count(*) from private.run_status where status = 'in_progress')::int as running`);
-    return rows[0];
+    return { ...rows[0], edits: await readEdits(c) };
   });
 }
 
 const readManifest = (set: string) => JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
 
 // The dry run: what is there, and what a load would bring (each set's items from its committed manifest). Writes nothing.
-export async function hostedCheck(client: pg.Client, host: string): Promise<HostedState> {
+export async function hostedCheck(client: pg.Client, host: string, lists = readLists()): Promise<HostedState> {
   const state = await readHostedState(client);
   console.log(`HOST ${host}, database ${state.database}`);
   console.log(`SIZE ${state.size} now`);
   console.log(`BASE: ${state.things || state.categories ? `there, ${state.things} things and ${state.categories} categories` : "none yet (0 things, 0 categories)"}`);
   console.log(`DICTIONARY: ${state.words ? `there, ${state.words} words` : "none yet (0 words)"}`);
   console.log(`RUNS IN PROGRESS: ${state.running}${state.running ? " (players are mid-game now)" : ""}`);
+  const unfolded = unfoldedEdits(state.edits, lists);
+  console.log(`LIST EDITS NOT IN THE FILES: ${unfolded.length}${unfolded.length ? ` (${editsText(unfolded)}); a load refuses until \`npm run lists -- fold\` writes them` : ""}`);
   console.log("A LOAD WOULD BRING:");
   for (const set of Object.keys(SETS)) console.log(`  ${set}: ${readManifest(set).items} items`);
-  const lists = readLists();
   console.log(`  ${LISTS_DIR}: ${lists.reduce((n, l) => n + l.answers.length, 0)} answers in ${lists.length} researched lists`);
   console.log(`  ${DICTIONARY_SET}: ${readManifest(DICTIONARY_SET).items} words`);
   return state;
@@ -1232,17 +1235,23 @@ export function hostedRefusal(host: string, state: Pick<HostedState, "things" | 
   return `${host} already has a base (${state.things} things, ${state.categories} categories): 15e-1 loads an empty database only. If a load stopped part-way, the base is incomplete: stop and ask before doing anything else; nothing was written`;
 }
 
+// Why a load is refused while the files lack an admin's list edits (M23 23b-2), or null when they hold them all.
+export function unfoldedRefusal(unfolded: ListEdit[]): string | null {
+  if (unfolded.length === 0) return null;
+  return `${unfolded.length} list edits made on the site aren't in content/lists yet (${editsText(unfolded)}): a load would undo them. Run \`npm run lists -- fold\`, commit the files, then load; nothing was written`;
+}
+
 // The load into a database with no base (15e-1): the check, the snapshots read and verified, the host's name typed, and
 // only then the writes: the dictionary first (replaced in one transaction, so a re-run after a failure is safe while no base
 // is there), then the base. A failure after the dictionary leaves a part-loaded base, which the next run refuses.
 // The refusal comes after the name, so a wrong name is always the first thing refused.
-export async function hostedLoad(client: pg.Client, host: string, ask: (question: string) => Promise<string>): Promise<void> {
-  const state = await hostedCheck(client, host);
-  const refusal = hostedRefusal(host, state);
+export async function hostedLoad(client: pg.Client, host: string, ask: (question: string) => Promise<string>, lists = readLists()): Promise<void> {
+  const state = await hostedCheck(client, host, lists);
+  // The files must hold every strike and add an admin made on the site, or the load would bring a struck answer back.
+  const refusal = unfoldedRefusal(unfoldedEdits(state.edits, lists)) ?? hostedRefusal(host, state);
   // Everything the load reads is read and checked before anything is written.
   const words = refusal ? [] : readSnapshot<DictionaryEntry>(DICTIONARY_SET).items;
   if (!refusal) for (const set of Object.keys(SETS)) readSnapshot(set);
-  if (!refusal) readLists();
   const typed = await ask(`To load into this database, type its host name (${host}), or just press Enter to stop: `);
   if (typed !== host) throw new Error(`what you typed isn't ${host}; nothing was written`);
   if (refusal) throw new Error(refusal);
@@ -1350,12 +1359,38 @@ export function readLists(): ResearchList[] {
   });
 }
 
+// An admin's strike or add from the review page that no load has marked folded yet, with its row (M23 23b-2). The fold
+// reads these (`npm run lists -- fold`), and a load marks the ones the files now hold.
+export type EditRow = ListEdit & { id: string; at: string };
+
+export async function readEdits(client: pg.Client): Promise<EditRow[]> {
+  const { rows } = await client.query<{ id: string; category: string; name: string; kind: "strike" | "add"; at: Date }>(
+    "select id::text, category, name, kind, edited_at as at from private.list_edit where folded_at is null order by id");
+  return rows.map((r) => ({ ...r, at: r.at.toISOString() }));
+}
+
+export async function readSeen(client: pg.Client): Promise<ListSeen[]> {
+  const { rows } = await client.query<{ category: string; at: Date }>("select category, seen_at as at from private.list_seen order by category");
+  return rows.map((r) => ({ ...r, at: r.at.toISOString() }));
+}
+
+const editsText = (edits: ListEdit[]) => edits.map((e) => `${e.kind} ${e.category}: ${e.name}`).join("; ");
+
+// Loads the lists. Edits made on the site (private.list_edit) that the files now hold are marked folded, in the load's
+// own transaction; the ones they don't yet are warned of, as a load would bring a struck answer back (the hosted load
+// refuses instead: hostedLoad). Only the given lists' categories are looked at, so a load of fewer lists leaves the rest.
 export async function loadResearch(client: pg.Client, lists: ResearchList[], snapshot = RESEARCH_SNAPSHOT): Promise<void> {
   const items = lists.flatMap(researchItems).map((item) => ({ ...item, thing_id: thingId(RESEARCH, item.id) }));
+  const mine = (await readEdits(client)).filter((e) => lists.some((l) => l.category === e.category));
+  const open = new Set(unfoldedEdits(mine, lists).map((e) => e.id));
+  if (open.size) console.log(`UNFOLDED ${open.size} list edits aren't in the files yet (${editsText(mine.filter((e) => open.has(e.id)))}); this load undoes them. Run \`npm run lists -- fold\``);
   try {
     await client.query("begin");
     const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [RESEARCH, snapshot, JSON.stringify(items)]);
+    const folded = mine.filter((e) => !open.has(e.id)).map((e) => e.id);
+    await client.query("select private.list_fold($1::bigint[])", [folded]);
     await client.query("commit");
+    if (folded.length) console.log(`FOLDED ${folded.length} list edits the files now hold`);
     console.log(`LOADED ${LISTS_DIR} (${lists.length} lists, ${snapshot}): ${JSON.stringify(rows[0].counts)}`);
   } catch (err) {
     await client.query("rollback");

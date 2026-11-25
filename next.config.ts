@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     "/api/admin/puzzles/approve": ["./content/offbeat/*.json"],
     // The question bank page reads the bank and the drafted days it ran on (M13 13d).
     "/api/admin/bank": ["./content/bank.json", "./content/offbeat/*.json"],
+    // The review of researched lists reads the lists' files and the bank's prompts (M23 23b-2).
+    "/api/admin/lists": ["./content/lists/*.json", "./content/bank.json"],
   },
 };
 
