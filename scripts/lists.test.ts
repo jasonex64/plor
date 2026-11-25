@@ -86,6 +86,9 @@ describe("parseReview (the file a session exports from the hosted database)", ()
     ["a kind that is neither", JSON.stringify({ ...good, edits: [{ ...good.edits[0], kind: "remove" }] })],
     ["an empty name", JSON.stringify({ ...good, edits: [{ ...good.edits[0], name: "" }] })],
     ["a seen row with no date", JSON.stringify({ ...good, seen: [{ category: "hat" }] })],
+    ["a seen time that is no date", JSON.stringify({ ...good, seen: [{ category: "hat", at: "garbage" }] })],
+    ["an edit time that is no date", JSON.stringify({ ...good, edits: [{ ...good.edits[0], at: "soon" }] })],
+    ["a category that is no key", JSON.stringify({ ...good, seen: [{ category: "../hat", at: good.seen[0].at }] })],
   ])("refuses %s", (_what, text) => {
     expect(() => parseReview("review.json", text)).toThrow(/review\.json/);
   });

@@ -4,7 +4,7 @@
 // load's guard asks which of them a file does not hold yet. Pure and relative-imported, as the scripts and the review
 // page's server code both use it.
 import type { ListAnswer, ResearchList } from "./list.ts";
-import { isObject, isText, normalize } from "./puzzle.ts";
+import { CATEGORY_KEY, isCalendarDate, isObject, isText, normalize } from "./puzzle.ts";
 
 // name: the typed form struck (normalized, as the database keeps it) or the name as the admin wrote it, for an add.
 export type ListEdit = { category: string; name: string; kind: "strike" | "add" };
@@ -50,13 +50,16 @@ export function parseReview(file: string, text: string): Review {
     throw new Error(`${file}: not valid JSON (${(err as Error).message})`);
   }
   if (!isObject(data) || !Array.isArray(data.edits) || !Array.isArray(data.seen)) throw new Error(`${file}: must be an object with "edits" and "seen" lists`);
+  // A time as the database writes one (an ISO timestamp): its calendar date comes before the "T", and a seen mark's becomes the date in the list's file.
+  const isTime = (v: unknown) => isText(v) && isCalendarDate(v.split("T")[0]) && !Number.isNaN(Date.parse(v));
+  const isKey = (v: unknown) => typeof v === "string" && CATEGORY_KEY.test(v);
   for (const e of data.edits) {
-    if (!isObject(e) || !isText(e.category) || !isText(e.name) || (e.kind !== "strike" && e.kind !== "add") || !isText(e.at)) {
+    if (!isObject(e) || !isKey(e.category) || !isText(e.name) || (e.kind !== "strike" && e.kind !== "add") || !isTime(e.at)) {
       throw new Error(`${file}: every edit needs a category, a name, a kind of "strike" or "add", and a time`);
     }
   }
   for (const s of data.seen) {
-    if (!isObject(s) || !isText(s.category) || !isText(s.at)) throw new Error(`${file}: every seen mark needs a category and a time`);
+    if (!isObject(s) || !isKey(s.category) || !isTime(s.at)) throw new Error(`${file}: every seen mark needs a category and a time`);
   }
   return data as Review;
 }
