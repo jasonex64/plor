@@ -1,0 +1,251 @@
+<title>Offbeat Chalkboard Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Gochi+Hand&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:10px 8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative;z-index:1}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:40px;height:40px;flex:none;overflow:visible}
+.field{flex:none;min-height:50px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1;white-space:pre}
+.caret{flex:none;width:2.5px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;position:relative;z-index:1}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:208px;bottom:8px;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;padding:16px}
+.over dl{display:grid;grid-template-columns:auto auto;gap:2px 22px;font-size:18px;text-align:left;align-items:baseline}
+.over dd{font-weight:800;text-align:right}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .o2{font-size:14px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* F: Offbeat as chalk on a board. The board is Offbeat's blue; white chalk and one yellow chalk, the emblem's two colours. The clock is a thick chalk bar that is rubbed away and chalked back on. */
+:root{--outer:#151b2b;--board:#2f3d5c;--pan:#2a3755;--ink:#fff;--dim:#d5dbea;--yel:#ffd84d;--dark:#1a1a1a;--kb-bg:#0000;--k:#263250;--k-ink:#fff;--disp:'Gochi Hand','Comic Sans MS',cursive;--wob:255px 15px 225px 15px/15px 225px 15px 255px;--wob2:15px 225px 15px 255px/255px 15px 225px 15px}
+.phone{background:var(--board)}
+.haze{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.play{--gap:9px}
+/* A panel is a patch of board wiped clean: one flat colour under every line of text, its edge left rough by the cloth. */
+.pan{position:relative;isolation:isolate;background:var(--pan)}
+.pan::before{content:"";position:absolute;inset:-5px -4px;background:var(--pan);border-radius:14px 22px 12px 20px;filter:blur(4px);z-index:-1}
+.btn{position:relative;isolation:isolate;min-height:44px;padding:1px 15px 0;background:var(--pan);border:0;border-radius:var(--wob2);color:var(--ink);font-weight:700;font-size:15px}
+.btn::after{content:"";position:absolute;inset:0;border:2.5px solid #fff;border-radius:inherit;filter:url(#dust);pointer-events:none}
+.btn.x{width:46px;padding:0 0 4px;font-size:26px;line-height:1;border-radius:50% 46% 52% 44%/48% 54% 44% 52%}
+.btn.go{min-width:150px;background:var(--yel);color:var(--dark);font-weight:800;font-size:17px;border-radius:9px 14px 8px 13px/12px 8px 14px 9px;transform:rotate(-1.6deg)}
+.btn.go::before{content:"";position:absolute;inset:-3px;background:var(--yel);border-radius:inherit;filter:url(#rough);z-index:-1}
+.btn.go::after{inset:5px 4px -7px 7px;border:0;border-bottom:2.5px solid #fff;border-right:2.5px solid #fff;border-radius:0 0 12px 0}
+.btn.pressed{transform:rotate(-1.6deg) translate(2px,3px)}
+.btn.pressed::after{visibility:hidden}
+.lab{font-size:13.5px;font-weight:700;color:var(--dim)}
+/* The clock. */
+.clock{flex:none;display:flex;flex-direction:column;padding:6px 14px 4px}
+.feed{position:relative;height:32px;flex:none}
+.plus{position:absolute;top:5px;left:0;white-space:nowrap;font-size:19px;font-weight:800;line-height:1.1;color:var(--yel);transform:rotate(-4deg);transform-origin:50% 50%}
+.plus.bigp{font-size:25px;top:3px;transform:rotate(-5deg)}
+.plus svg{position:absolute;left:-10px;top:-5px;width:calc(100% + 20px);height:calc(100% + 9px);overflow:visible;filter:url(#dust)}
+.plus path{fill:none;stroke:var(--yel);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.bar{position:relative;height:46px;flex:none;margin-top:5px}
+.bar svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.bar path{fill:none;stroke-linecap:butt;stroke-linejoin:round}
+.sm{opacity:.2;filter:url(#smear)}
+.sm path,.wh path{stroke:#fff}
+.wh,.fd,.fd2{filter:url(#chalk)}
+.wh{-webkit-mask-image:linear-gradient(90deg,#000 calc(min(var(--f),var(--a))*100% - 7px),#0000 calc(min(var(--f),var(--a))*100% + 4px));mask-image:linear-gradient(90deg,#000 calc(min(var(--f),var(--a))*100% - 7px),#0000 calc(min(var(--f),var(--a))*100% + 4px))}
+.fd,.fd2{clip-path:inset(-14px -14px -14px calc(var(--a)*100%));-webkit-mask-image:linear-gradient(90deg,#000 calc(var(--f)*100% - 7px),#0000 calc(var(--f)*100% + 4px));mask-image:linear-gradient(90deg,#000 calc(var(--f)*100% - 7px),#0000 calc(var(--f)*100% + 4px))}
+.fd path,.fd2 path{stroke:var(--yel)}
+.fd2{visibility:hidden}
+.clock.rare .fd2{visibility:visible}
+.puff{position:absolute;top:-6px;bottom:-6px;left:calc(var(--f)*100%);width:44px;transform:translateX(-58%);background:radial-gradient(closest-side,#ffffff38,#fff0);pointer-events:none}
+.secs{flex:none;align-self:flex-start;display:flex;align-items:baseline;gap:9px;padding-left:4px}
+.secs b{position:relative;display:inline-block;min-width:.62em;text-align:center;font-size:48px;font-weight:800;line-height:.95;color:var(--ink)}
+.secs .lab{font-size:15px}
+.ring{position:absolute;left:-11px;top:-7px;width:calc(100% + 22px);height:calc(100% + 8px);overflow:visible;visibility:hidden;filter:url(#dust)}
+.ring path{fill:none;stroke:var(--yel);stroke-width:3;stroke-linecap:round}
+[data-low="1"] .ring{visibility:visible}
+[data-low="1"] .secs{gap:19px}
+[data-low="1"] .secs b{color:var(--yel)}
+[data-state="over"] .wh,[data-state="over"] .fd,[data-state="over"] .fd2,[data-state="over"] .puff{visibility:hidden}
+/* The writing area. */
+.write{flex:1;min-height:0;display:flex;flex-direction:column;gap:9px;padding:8px 12px 12px}
+.hdr{flex:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hdr .lab{font-size:15px;color:var(--ink)}
+.score{display:flex;align-items:baseline;gap:7px}
+.score b{font:400 34px/1 var(--disp);color:var(--yel);filter:url(#dust);transform:rotate(-3deg);display:inline-block}
+.qw{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.q{font:400 41px/1.08 var(--disp);color:var(--ink);text-align:center;filter:url(#dust);padding:0 2px}
+.q .w{display:inline-block;white-space:nowrap}
+.q i{display:inline-block;font-style:normal}
+.qul{width:62%;height:12px;overflow:visible;filter:url(#dust);flex:none}
+.qul path{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round}
+.field{padding:0 14px;color:var(--ink);font-weight:700;font-size:23px;border-radius:var(--wob)}
+.field::after{content:"";position:absolute;inset:0;border:2.5px solid #fff;border-radius:inherit;filter:url(#dust);pointer-events:none}
+.field .ph{font-weight:400;font-size:16px;color:var(--dim)}
+.field .l{animation:fType .15s cubic-bezier(.2,.8,.2,1) both}
+.rubd{position:absolute;inset:6% -8px 2%;z-index:2;border-radius:40% 55% 45% 50%;background:linear-gradient(96deg,#fff0,#ffffff2e 18%,#ffffff24 80%,#fff0);filter:blur(2px);transform-origin:0 50%;animation:fRub .3s cubic-bezier(.3,0,.2,1) both;pointer-events:none}
+.field.no{animation:fShake .34s cubic-bezier(.2,.8,.2,1)}
+.field.no .l{color:var(--dim)}
+.field.no .caret{visibility:hidden}
+.last{flex:none;display:flex;align-items:center;gap:9px;min-height:34px;font-size:16px;font-weight:700;line-height:1.2;white-space:nowrap}
+.last .nm{font-size:19px;font-weight:800;position:relative}
+.last .ad{color:var(--yel)}
+.last .pt{font-weight:800;margin-left:auto}
+.last .msg{font-size:18px;font-weight:800}
+.chip{padding:1px 9px 0;border:2px solid #fff;border-radius:11px 14px 10px 15px/14px 10px 15px 11px;font-size:13.5px;font-weight:700;line-height:1.35}
+.chip.rarec{background:var(--yel);border-color:var(--yel);color:var(--dark);font-weight:800}
+.last.bigl .nm{font-size:21px}
+.star{width:22px;height:22px;flex:none;overflow:visible;margin-right:-3px;filter:url(#dust)}
+.star path{fill:none;stroke:var(--yel);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
+.foot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.foot .lab{font-size:15px;color:var(--ink)}
+.kr b{border-radius:10px 5px 9px 6px/6px 9px 5px 10px}
+.over{background:var(--pan)}
+.over::after{content:"";position:absolute;inset:0;border:3px solid #fff;border-radius:var(--wob);filter:url(#chalk);pointer-events:none}
+.over dd.pts{font:400 34px/1 var(--disp);color:var(--yel)}
+/* Three motions: a letter typed, an answer accepted (the stroke chalked on, bigger and twice over for a rarer one), an answer refused. */
+@keyframes fType{0%{transform:translateY(-7px) rotate(-9deg) scale(1.5);opacity:.25}60%{transform:translateY(1px) rotate(2deg) scale(.96);opacity:1}100%{transform:none}}
+@keyframes fFeed{from{clip-path:inset(-14px calc(100% - var(--a)*100%) -14px calc(var(--a)*100%))}}
+.fd.go{animation:fFeed .34s cubic-bezier(.35,0,.3,1) both}
+.clock.rare .fd.go{animation-duration:.6s}
+.clock.rare .fd2.go{animation:fFeed .55s cubic-bezier(.35,0,.3,1) .55s both}
+@keyframes fWrite{0%{clip-path:inset(-40% 100% -40% -20%)}100%{clip-path:inset(-40% -20% -40% -20%)}}
+.plus.go{animation:fWrite .22s ease-out .3s both}
+.plus.bigp.go{animation:fWrite .3s ease-out 1.05s both}
+@keyframes fDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.plus.go path{animation:fDraw .4s ease-out 1.35s both}
+.last.in{animation:fWrite .26s ease-out .1s both}
+.last.bigl.in .star path{animation:fDraw .45s ease-out .4s both}
+@keyframes fPop{0%{transform:none}45%{transform:scale(1.22) rotate(-2deg)}100%{transform:none}}
+.last.bigl.in .nm{animation:fPop .5s cubic-bezier(.2,.8,.2,1) .35s both;transform-origin:0 60%}
+@keyframes fRub{0%{transform:scaleX(0)}100%{transform:none}}
+@keyframes fShake{0%,100%{transform:none}16%{transform:translateX(-9px) rotate(-.8deg)}34%{transform:translateX(8px) rotate(.8deg)}52%{transform:translateX(-6px)}72%{transform:translateX(4px)}}
+@media (max-height:760px){.play{--gap:6px;padding-block:6px}.clock{padding-block:3px 2px}.bar{height:36px;margin-top:2px}.secs b{font-size:38px}.feed{height:27px}.plus{top:2px}.plus.bigp{font-size:22px;top:2px}.write{gap:6px;padding-block:5px 9px}.q{font-size:31px}.score b{font-size:29px}.field{min-height:46px}.last{min-height:30px}.over{top:170px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">F · Offbeat · Chalkboard</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<svg class="haze" aria-hidden="true"><defs>
+<filter id="hz" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0045 .013" numOctaves="3" seed="11" result="a"/><feColorMatrix in="a" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .56 0 0 0 -.21" result="h"/><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="4" result="b"/><feColorMatrix in="b" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .3 0 0 0 -.135" result="g"/><feMerge><feMergeNode in="h"/><feMergeNode in="g"/></feMerge></filter>
+<filter id="rough" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>
+<filter id="chalk" x="-5%" y="-40%" width="110%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="3" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency=".035 .75" numOctaves="3" seed="8" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4.2 0 0 0 3.25" result="m"/><feComposite in="d" in2="m" operator="in"/></filter>
+<filter id="smear" x="-5%" y="-40%" width="110%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".012 .5" numOctaves="3" seed="21" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 0 0 2.5" result="m"/><feGaussianBlur in="SourceGraphic" stdDeviation="2.5 1.2" result="b"/><feComposite in="b" in2="m" operator="in"/></filter>
+<filter id="dust" x="-8%" y="-20%" width="116%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="5" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -5 0 0 0 3.7" result="m"/><feComposite in="d" in2="m" operator="in"/></filter>
+</defs><rect width="100%" height="100%" filter="url(#hz)"/></svg>
+<div class="play">
+<div class="top"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" filter="url(#dust)"><path d="M5.1 4.2c3.2-.4 6-.3 9 .1 1.3.2 1.9.9 1.9 2.1.2 3.9.1 7.6 0 11.5-.1 1.3-.8 2-2 2.100-2.900.2-5.800.2-8.800 0-1.300-.1-2-.8-2.100-2-.3-3.900-.2-7.700 0-11.600.100-1.300.8-2 2-2.200z"/><g transform="rotate(14 15 13)"><path d="M11.200 5.600c2.600-.3 5.100-.3 7.700 0 1.300.1 2 .8 2.100 2.100.2 3.600.2 7.100 0 10.700-.1 1.300-.8 2-2.100 2.100-2.600.2-5.100.2-7.700 0-1.300-.1-2-.8-2.100-2.100-.2-3.600-.2-7.100 0-10.700.1-1.300.8-2 2.100-2.100z" fill="#ffd84d"/><path d="M12 10.600c2-.3 4-.3 6 0M12 14.100c1.300-.2 2.700-.2 4 0" stroke="#1a1a1a" stroke-width="1.5"/></g></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="clock pan" id="clock">
+<div class="secs"><b><span id="secs"></span><svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M58 5C28 1 5 20 4 48c-1 30 20 47 47 47 30 0 46-18 46-45C97 22 80 6 46 7"/></svg></b><span class="lab">seconds left</span></div>
+<div class="bar" id="bar">
+<svg class="sm" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-width="24" d="M-4 21C40 17 90 24 150 20S250 23 304 19"/><path vector-effect="non-scaling-stroke" stroke-width="5" d="M10 4C60 9 120 2 190 7s70 -2 100 3M20 37c60-4 130 3 180-1s60 2 90-1"/></svg>
+<svg class="wh" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-width="19" d="M1 21C30 18 62 23 96 20S160 17 196 21 262 22 300 19"/><path vector-effect="non-scaling-stroke" stroke-width="7" opacity=".85" d="M3 11C50 13 90 8 140 11S230 9 299 12"/><path vector-effect="non-scaling-stroke" stroke-width="6" opacity=".8" d="M2 30C44 28 100 33 150 30S240 32 298 29"/></svg>
+<svg class="fd" id="fd" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-width="5.5" id="hatch"/></svg>
+<svg class="fd2" id="fd2" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-width="24" d="M0 20C40 23 80 17 130 21S220 18 300 22"/><path vector-effect="non-scaling-stroke" stroke-width="8" d="M0 7C50 10 100 5 160 8S250 6 300 9M0 34C60 31 120 36 180 33S260 35 300 32"/></svg>
+<i class="puff"></i>
+</div>
+<div class="feed" id="feed"></div>
+</div>
+<div class="write pan">
+<div class="hdr"><span class="lab" id="qn"></span><span class="score"><b id="score" data-display></b><span class="lab">points</span></span></div>
+<div class="qw"><h1 class="q" id="q" data-display></h1><svg class="qul" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M3 6C40 2 70 10 104 5s60 4 93-1"/></svg></div>
+<div class="field" id="field"></div>
+<p class="last" id="note" role="status" aria-label="Last answer"></p>
+<div class="foot"><span class="lab" id="count"></span><button class="btn go" id="go" type="button">Next question</button></div>
+</div>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='',fedFrom=99,held=0,points=0,given=0,tiers={};
+const field=$('#field'),FB=field.className,note=$('#note'),rmBox=$('#rm'),clock=$('#clock'),bar=$('#bar'),feed=$('#feed'),go=$('#go'),phone=$('#phone');
+const PH='Your answer',CAP=20,LOW=5;
+// The game's numbers, as the server holds them (supabase/migrations/20261124235832_clock_run.sql): 20 s to start; an
+// answer adds 3, 5 or 8 s by tier, 5% less for each answer the run already holds; 10, 25 or 50 points.
+const TIER={Common:{ms:3000,pts:10},Uncommon:{ms:5000,pts:25},Rare:{ms:8000,pts:50}};
+const added=(tier,n)=>Math.max(1000,Math.round(TIER[tier].ms*Math.pow(.95,n)));
+const addedText=ms=>{const s=ms/1000;return '+'+(Number.isInteger(s)?s:s.toFixed(1))+' s'};
+const answersText=n=>n===1?'1 answer':n+' answers';
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const rnd=n=>{const x=Math.sin(n*12.9898)*43758.5453;return x-Math.floor(x)};
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word)field.innerHTML='<span class="wd"></span><i class="caret"></i>';word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">send</b></div>';
+// The yellow chalk is a hatch, scribbled up and down by hand: the same still path every time.
+{let d='M0 '+(5+rnd(1)*3).toFixed(1);for(let x=2.4,i=0;x<=300;x+=4.3+rnd(i+7)*1.6,i++)d+='L'+x.toFixed(1)+' '+(i%2?3+rnd(i+90)*5:32+rnd(i+50)*5).toFixed(1);$('#hatch').setAttribute('d',d)}
+function setQ(text,label,btn){$('#qn').textContent=label;go.textContent=btn;
+  $('#q').innerHTML=text.split(' ').map((w,wi)=>'<span class="w" style="transform:rotate('+((rnd(wi*17+2)-.5)*4).toFixed(1)+'deg)">'+[...w].map((c,i)=>'<i style="transform:translateY('+((rnd(wi*31+i*7+1)-.5)*6).toFixed(1)+'px) rotate('+((rnd(wi*13+i*5+3)-.5)*9).toFixed(1)+'deg)">'+c+'</i>').join('')+'</span>').join(' ')}
+function setScore(){$('#score').textContent=points}
+function setCount(){$('#count').textContent=answersText(given)}
+function clearPlus(){feed.innerHTML='';clock.classList.remove('rare');fedFrom=99}
+function paint(){const w=Math.ceil(left-1e-9);if(left<fedFrom&&fedFrom<99)clearPlus();
+  clock.style.setProperty('--f',Math.min(1,(RM?w:left)/CAP));clock.style.setProperty('--a',Math.min(2,fedFrom/CAP));
+  $('#secs').textContent=w;root.dataset.low=left<=LOW?'1':'0'}
+function accept(name,tier){const ms=added(tier,held),big=tier==='Rare';
+  held++;given++;points+=TIER[tier].pts;tiers[tier]=(tiers[tier]||0)+1;
+  clearPlus();fedFrom=left;left+=ms/1000;clock.classList.toggle('rare',big);paint();
+  // "+N s", chalked over the stroke it names; a rare one is bigger and ringed.
+  const p=el('span','plus'+(big?' bigp':''),addedText(ms)+(big?'<svg viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" vector-effect="non-scaling-stroke" d="M54 4C22 1 3 13 4 27c1 15 26 21 51 19 27-2 42-10 41-24C95 9 70 3 40 7"/></svg>':''));
+  feed.appendChild(p);const W=bar.clientWidth,x0=Math.min(1,fedFrom/CAP)*W,x1=Math.min(1,left/CAP)*W,pad=big?10:0;
+  p.style.left=Math.max(pad,Math.min(W-p.offsetWidth-pad,(x0+x1)/2-p.offsetWidth/2))+'px';
+  kick($('#fd'),'go');kick($('#fd2'),'go');kick(p,'go');
+  fClear();setScore();setCount();
+  note.className='last'+(big?' bigl':'');
+  note.innerHTML=(big?'<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M12 2.500l2.600 6.400 6.900.5-5.300 4.500 1.800 6.800-6-3.800-6 3.900 1.700-6.900L2.500 9.500l6.900-.6z"/></svg>':'')+'<span class="nm">'+name+'</span><span class="chip'+(big?' rarec':'')+'">'+tier+'</span><span class="ad">'+addedText(ms)+'</span><span class="pt">+'+TIER[tier].pts+'</span>';
+  kick(note,'in');state(big?'accepted-big':'accepted')}
+function refuse(msg){kick(field,'no');field.firstChild.appendChild(el('i','rubd'));note.className='last';note.innerHTML='<span class="msg">'+msg+'</span>';state('refused')}
+function over(){stopClock();T.forEach(clearTimeout);T=[];left=0;paint();clearPlus();paint();
+  const o=el('div','over','<p class="o1">Time is up</p><dl><dt>Points</dt><dd class="pts" data-display>'+points+'</dd><dt>Answers</dt><dd>'+held+'</dd><dt>Common</dt><dd>'+(tiers.Common||0)+'</dd><dt>Uncommon</dt><dd>'+(tiers.Uncommon||0)+'</dd><dt>Rare</dt><dd>'+(tiers.Rare||0)+'</dd></dl><p class="o2">Tap to play it again</p>');
+  o.id='over';phone.appendChild(o);state('over')}
+function stopClock(){clearInterval(tick);tick=null}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0)over()},100)}
+function script(){
+  // The run so far: question 1 took four answers (three common, one uncommon) for 55 points, and 12 s are left.
+  held=4;given=0;points=55;tiers={Common:3,Uncommon:1};left=12;fedFrom=99;
+  setQ('Name a kind of cheese','Question 2 of 3','Next question');setScore();setCount();paint();state('waiting');startClock();
+  let t=typeWord(1200,'cheddar',130);
+  at(t+290,()=>accept('Cheddar','Common'));
+  t=typeWord(4000,'stinking bishop',110);
+  at(t+300,()=>accept('Stinking Bishop','Rare'));
+  t=typeWord(8200,'cheddar',120);
+  at(t+260,()=>refuse('Already said'));
+  at(t+1060,fClear);
+  t=typeWord(10800,'tofu',140);
+  at(t+240,()=>refuse('Not on the list'));
+  at(t+1040,()=>{fClear();state('waiting')});
+  at(17300,()=>go.classList.add('pressed'));
+  at(17550,()=>{go.classList.remove('pressed');given=0;setCount();note.className='last';note.innerHTML='';fClear();setQ('Name a river','Question 3 of 3','Finish');state('waiting')});
+  typeWord(18400,'amazo',330);
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();const o=$('#over');if(o)o.remove();fClear();note.className='last';note.innerHTML='';clearPlus();go.classList.remove('pressed');script()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+phone.addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>

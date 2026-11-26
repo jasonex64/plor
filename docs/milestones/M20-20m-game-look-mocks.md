@@ -93,6 +93,41 @@ Nothing: it adds four mock files under `docs/` and no app code.
 
 **What the mocks guessed** (for the build ticket's questions, not decisions): Offbeat opens on question 2 of 3 with 9 s left; "about 5% less an answer" compounds per answer (the 4th, common, adds 2.6 s; the 5th, rare, 6.5 s); several answers a question before Next; the clock in whole seconds, "low" from 5 s; the refusal's wording; Uncommon is never shown. Fragments leaves out the bonus letter, the letters tracker and the cash-in, so its running score is word points only; mock C adds a line under the chunk the app doesn't have. The question changing on Next and the score changing are instant (no fourth motion).
 
+**Criterion 6, the human's judgement (2026-11-26):** "ok i like the marker doodle but i dont like any of the offbeat mocks, especially with the new game mechanics. also i want to see what we can do about the logo/wordmark as well". Fragments: D, marker doodle. Offbeat: neither A nor B; new mocks for the clock game as M23 built it follow, from guided questions. Nothing is built into the app from this pick yet.
+
+## Round two: Offbeat again (2026-11-26)
+
+The human's answers (2026-11-26, from Claude's guided questions; numbered on from the M20 ticket's):
+
+- 117, "What was wrong with the two Offbeat mocks (game-show hardware and print shop)?": "Nothing to do with the game" and "Not hand-made like the doodle".
+- 118, "... Which part of that should Offbeat's look be built around?": "Show me one of each (Recommended)": the rare find, the clock you feed, the odd one out.
+- 119, "Fragments is now the marker doodle ... How should Offbeat sit beside it?": "Show me both": hand-made with another tool, and a different world.
+- 120 is the logo's (the M20 ticket, 20g).
+
+**The design, proposed by Claude from the answers.** 118 and 119 together would be six mocks; since 117 names "not hand-made" as a miss, three are hand-made, one per idea and each with its own tool, and one is the different world (Claude's reading; not asked). The same skeleton, ceiling, scripted round and criteria 1 to 5 as round one, on the clock game as M23 23d built it (`docs/milestones/M23-23d-the-screens.md`: the clock with its seconds, "Question 2 of 3", the running points, the question, the input, the last answer only with its tier, seconds and points, Next and Finish), with the game's numbers read from `src/config/tunables.ts`. Sources in `docs/research/mocks/20m-2/`.
+
+| | Idea | Kind | The central object | The clock | An accepted answer |
+|---|---|---|---|---|---|
+| E | The rare find | Hand-made: a sticker album in ballpoint | The question as the album page's heading | A row of ballpoint tally marks struck off | A sticker stuck on the page: plain for Common, striped for Uncommon, a still foil star for Rare |
+| F | The clock you feed | Hand-made: chalk on a board in Offbeat's blue | The clock, a chalk bar across the top of the board | That bar, rubbed away and chalked back on | Its seconds are chalked back onto the bar, a longer stroke for a rarer answer |
+| G | The odd one out | Hand-made: index cards and paper tape | A straight row of taped cards | A strip of tape that is peeled back | Your card is taped on askew, as the emblem's is; the rarer, the further off the line |
+| H | The clock you feed, with the tiers as three shapes | A different world: flat, sharp, in the emblem's blue, white and yellow | A ring clock | The ring, emptying and refilling | A circle, a diamond or a star drops into the ring and tops it up |
+
+Nothing is built into the app from these.
+
+**Built 2026-11-26**, each by its own design agent on Fable, each page read by the main session before it was published:
+
+| | Page | Display face | Clock | Page + fonts transferred | Lowest contrast |
+|---|---|---|---|---|---|
+| E sticker album | https://claude.ai/artifact/KyeFQ9tm7knbqX1ZJ4qhz8 | Gochi Hand | 25 ballpoint tally marks, one struck off a second | 79.0 KB | 5.89 to 1 |
+| F chalkboard | https://claude.ai/artifact/YE6DG3ov7Pu6s3FLPEwNvD | Gochi Hand | A chalk bar rubbed away, fed in yellow | 84.0 KB | 8.53 to 1 |
+| G index cards | https://claude.ai/artifact/8qH7w8Z6cu5ZLQzZibPUBt | Permanent Marker | Paper tape on a 0 to 20 measure, peeled back | 94.2 KB | 6.10 to 1 |
+| H flat shapes | https://claude.ai/artifact/VJEP8pbUeTorZvsWXRZbzg | Unbounded 800 | A ring that empties, the seconds inside | 75.5 KB | 10.81 to 1 |
+
+**Criteria 1 to 5, as each agent reported them** (Playwright against the file on a local server, over 100 samples through each round, at 390 × 844 and 1280 × 720): no console error, no sideways scroll, the display face on the question and the score only, the contrast above, no running animation with Reduce motion on, no picture file or script library. The published links and a real phone were not measured: *unverified* there, as is F's frame rate with its chalk filters on a phone.
+
+**What the mocks read and guessed:** the clock's numbers are not in `src/config/tunables.ts`; each agent read them from `supabase/migrations/20261124235832_clock_run.sql` (20 s; 3, 5 or 8 s, 5% less for each answer the run holds, never under 1 s; 10, 25 or 50 points). Guessed: each round's opening state, "low" at 5 s, a clock drawing that is full at 20 s (25 marks in E) though the clock can go higher, the sample questions and answers, each tally's layout. E and G show the tier before the name on the answer; the app's order is name, tier, seconds, points.
+
 **Criterion 6:** waits for the human.
 
 ## Review
