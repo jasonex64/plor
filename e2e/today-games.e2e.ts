@@ -392,3 +392,33 @@ test("Offbeat's result rows are stacked: the question in bold with a Safe or Cau
   const [box, row] = await Promise.all([rows.nth(0).getByRole("searchbox").or(rows.nth(0).getByRole("textbox")).boundingBox(), rows.nth(0).boundingBox()]);
   expect(box!.width).toBeGreaterThan(row!.width * 0.6);
 });
+
+// M20 20n-10 (answers 114 to 116): on Me, each game's card has its emblem inside the game's colour block beside the
+// name, the same 24px as on Today's band, hidden from screen readers.
+test("Me's game cards each have the game's emblem inside its colour block", { tag: "@visual" }, async ({ page }) => {
+  await page.goto("/");
+  await signInAndPick(page, "gce");
+  await page.goto("/me");
+  const slot = (name: string) =>
+    page.evaluate((n) => {
+      const probe = document.body.appendChild(document.createElement("i"));
+      probe.style.color = `var(${n})`;
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }, name);
+  for (const [game, colour] of [[GAME, "--offbeat"], [SUBSTRINGS, "--fragments"]] as const) {
+    const name = page.getByRole("region", { name: game.name, exact: true }).getByRole("heading", { level: 2, name: game.name, exact: true });
+    await expect(name).toBeVisible();
+    const emblem = name.locator("..").locator(`svg[data-emblem='${game.id}']`);
+    await expect(emblem).toHaveAttribute("aria-hidden", "true");
+    const block = emblem.locator("..");
+    expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor), game.name).toBe(await slot(colour));
+    const [mark, tile, text] = [(await emblem.boundingBox())!, (await block.boundingBox())!, (await name.boundingBox())!];
+    expect([mark.width, mark.height], game.name).toEqual([24, 24]);
+    // Centred in the block, and the block before the name.
+    expect(Math.abs(mark.x + mark.width / 2 - (tile.x + tile.width / 2)), game.name).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(mark.y + mark.height / 2 - (tile.y + tile.height / 2)), game.name).toBeLessThanOrEqual(0.5);
+    expect(tile.x + tile.width, game.name).toBeLessThanOrEqual(text.x);
+  }
+});
