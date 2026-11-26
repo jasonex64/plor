@@ -10,6 +10,7 @@ import type { Me } from "@/game/me";
 import type { Stats } from "@/game/offbeat";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
+import { Emblem } from "./emblem";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import kit from "./kit.module.css";
@@ -98,8 +99,10 @@ export function StatsCards({
       {/* The game's card, its numbers as chips (mockup 3's "Your <game>" card); plain since 14b-15 (answer 7). */}
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
-          {/* The game's plain block beside its name. */}
-          <span className={styles.block} aria-hidden="true" />
+          {/* The game's emblem in its colour block beside its name (M20 20n-10, answers 115 and 116). */}
+          <span className={styles.block}>
+            <Emblem game={GAME.id} />
+          </span>
           <h2>{GAME.name}</h2>
         </div>
         <dl className={styles.stats}>
@@ -117,7 +120,9 @@ export function StatsCards({
       {fragments && (
         <section aria-label={SUBSTRINGS.name} className={kit.card}>
           <div className={styles.game}>
-            <span className={`${styles.block} ${styles.plum}`} aria-hidden="true" />
+            <span className={`${styles.block} ${styles.plum}`}>
+              <Emblem game={SUBSTRINGS.id} />
+            </span>
             <h2>{SUBSTRINGS.name}</h2>
           </div>
           <dl className={styles.stats}>
