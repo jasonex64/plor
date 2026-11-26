@@ -258,6 +258,8 @@ export const SLOTS = [
 // A day on a clock (docs/milestones/M23-23d-the-screens.md, Numbers). Missed answers shown per tier and question on the
 // result: 3 common, 3 uncommon, 3 rare (the human, 2026-11-25, answer 45: "3 each, same for everyone (Recommended)").
 export const MISSED_PER_TIER = 3;
+// Questions in a day on a clock: "three questions long" (docs/milestones/M23-offbeat-on-a-clock.md, Goal).
+export const QUESTIONS_PER_CLOCK_DAY = 3;
 // Rare answers a day carries per question, for the result's missed ones (the human, 2026-11-25, answer 49: "6 per question
 // (Recommended)").
 export const RARE_PER_CLOCK_QUESTION = 6;

@@ -2,7 +2,7 @@ import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { isAdmin } from "@/insights/queries";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
-import { isCalendarDate, type ApprovedPuzzle } from "@/content/puzzle";
+import { isCalendarDate, isClockDay, type ApprovedPuzzle } from "@/content/puzzle";
 import { withHostAnswers } from "@/admin/puzzle-entry";
 import { buildPuzzle, draftProblems, isHostAnswerLists, readDrafts } from "@/admin/puzzles";
 import { dayLookup, draftLookup } from "@/game/matching";
@@ -36,6 +36,8 @@ export const POST = handle(async (request) => {
   }
   const draft = readDrafts().get(date);
   if (!draft) throw new AppError("no_draft", STATUS.notFound);
+  // A day on a clock has no host answers to test with.
+  if (isClockDay(draft)) throw new AppError("bad_request", STATUS.badRequest, "date");
   if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", STATUS.badRequest, "hostAnswers");
   if (moves.texts.length > draft.questions.length) throw new AppError("bad_request", STATUS.badRequest, "texts");
   const puzzle = withHostAnswers(draft, hostAnswers);

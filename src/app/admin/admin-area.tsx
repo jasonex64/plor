@@ -25,6 +25,7 @@ import { Insights } from "./insights";
 import { Kit } from "./kit/kit";
 import { Lists } from "./lists/lists";
 import { Puzzles } from "./puzzles/puzzles";
+import { hasDraft, isApproved } from "./puzzle-dates";
 import { Reports } from "./reports/reports";
 import styles from "./admin.module.css";
 import { Line, Skeleton } from "../skeleton";
@@ -66,8 +67,8 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
         const dates = (keep: (d: DayView) => boolean) => puzzles.days.filter(keep).map((d) => d.date).sort();
         setCounts({
           // Both games' days, so a drafted game 2 day can't sit unnoticed (M16 16c-2).
-          toApprove: [...dates((d) => d.draft !== null && d.live === null), ...puzzles.substringDays.filter((d) => d.draft !== null && d.live === null).map((d) => d.date)].sort(),
-          ahead: dates((d) => d.live !== null && d.date > puzzles.today),
+          toApprove: [...dates((d) => hasDraft(d) && !isApproved(d)), ...puzzles.substringDays.filter((d) => d.draft !== null && d.live === null).map((d) => d.date)].sort(),
+          ahead: dates((d) => isApproved(d) && d.date > puzzles.today),
           review: audit.open,
           reports: reports.reports,
           unseen: lists.lists.filter((l) => !l.seen).length,

@@ -13,5 +13,5 @@ export const GET = handle(async (request) => {
   const userId = await requireUserId(await createAuthClient());
   const db = getPool();
   if (!(await isAdmin(db, userId))) throw new AppError("admins_only", STATUS.forbidden);
-  return Response.json({ ok: true, ...(await listDays(db, readDrafts())), substringDays: await listSubstringDays(db, readSubstringDrafts()) });
+  return Response.json({ ok: true, ...(await listDays(db, readDrafts(), userId)), substringDays: await listSubstringDays(db, readSubstringDrafts()) });
 });
