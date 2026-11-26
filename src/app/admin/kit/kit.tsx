@@ -9,6 +9,7 @@ import kit from "../../kit.module.css";
 import { ButtonLink } from "../../button-link";
 import { Reactions } from "../../reactions";
 import type { Reactions as ReactionsData } from "@/reactions/reactions";
+import { ChipVersions } from "./chip-versions";
 import { Looks } from "./looks";
 import styles from "./kit.module.css";
 
@@ -157,6 +158,7 @@ export function Kit() {
           </p>
         ))}
       </Piece>
+      <ChipVersions />
       <Looks />
     </div>
   );
