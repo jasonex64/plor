@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, emailedCode, forwardPlayerIp, play, signInAndPick, befriend } from "./players";
+import { RUN, emailedCode, emailsTo, forwardPlayerIp, play, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
@@ -93,8 +93,9 @@ test("signed in, Today's introduction never shows, not even before the profile l
   // The form opens from the front page's Sign in button (M18, answer 32; M20 20n-7, answer 99).
   await page.getByRole("link", { name: "Sign in to see how your friends did", exact: true }).click();
   await page.getByLabel("Email").fill(email);
+  const had = await emailsTo(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
-  await page.getByLabel("Code").fill(await emailedCode(email));
+  await page.getByLabel("Code").fill(await emailedCode(email, had));
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Pick a username" })).toBeVisible();
   await expect(page.getByText(INTRO)).toBeHidden();

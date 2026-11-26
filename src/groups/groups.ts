@@ -54,6 +54,16 @@ export async function listGroups(db: Db, userId: string): Promise<ListedGroup[]>
   return rows;
 }
 
+// The group the Groups tab opens (M24 24b, answer 9): the player's starred one, or with no star the first they joined;
+// null for a player in no group.
+export async function defaultGroupId(db: Db, userId: string): Promise<string | null> {
+  const { rows } = await db.query<{ id: string }>(
+    "select group_id as id from private.group_member where user_id = $1 order by starred desc, joined_at, group_id limit 1",
+    [userId],
+  );
+  return rows[0]?.id ?? null;
+}
+
 // A group the player is in, with its members and invite code, which every member may share (G1).
 export async function getGroup(db: Db, userId: string, groupId: string): Promise<Group> {
   const { rows } = await db.query<Group>(

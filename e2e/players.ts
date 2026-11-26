@@ -8,13 +8,22 @@ import { localStack } from "../scripts/slot.ts";
 const MAILPIT = localStack().mailpitUrl;
 export const RUN = Date.now().toString(36);
 
-export async function emailedCode(email: string): Promise<string> {
+const mailTo = async (email: string) => (await (await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`)).json()).messages ?? [];
+
+// How many emails the address has had: read before asking for a sign-in code, and given to emailedCode.
+export const emailsTo = async (email: string): Promise<number> => (await mailTo(email)).length;
+
+// The code in the email that came after the `had` the address already had. Without that, an address another test
+// used earlier in the run (a name used twice) gave its old email's code at once, the sign-in was refused and the
+// username step never came (feel.e2e.ts after feed.e2e.ts, both "fl", on every CI run until PR #318's were read).
+export async function emailedCode(email: string, had: number): Promise<string> {
   let code: string | undefined;
   await expect
     .poll(async () => {
-      const list = await (await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`)).json();
-      if (!list.messages?.length) return false;
-      const message = await (await fetch(`${MAILPIT}/api/v1/message/${list.messages[0].ID}`)).json();
+      // Newest first.
+      const mail = await mailTo(email);
+      if (mail.length <= had) return false;
+      const message = await (await fetch(`${MAILPIT}/api/v1/message/${mail[0].ID}`)).json();
       code = /<strong>(\d+)<\/strong>/.exec(message.HTML)?.[1];
       return Boolean(code);
     })
@@ -55,8 +64,9 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
     }).toPass();
   }
   await field.fill(email);
+  const had = await emailsTo(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
-  await page.getByLabel("Code").fill(await emailedCode(email));
+  await page.getByLabel("Code").fill(await emailedCode(email, had));
   await page.getByRole("button", { name: "Sign in" }).click();
   // The visible step: signed in from a guest game, the game's page is still in the document, hidden, with a step of its
   // own (seen in guest-play.e2e.ts, 2026-11-12: two Username fields).

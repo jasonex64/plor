@@ -75,7 +75,7 @@ const short = (page: Page) =>
 
 // Controls each page must show before it's measured: the small kinds that were under 44px before 14b-10a.
 // A comment's Report and Delete are behind its ⋯ since 14b-13; the ⋯ itself is measured.
-const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /], "/friends": [/^Actions for /], "/groups": ["Create group"] };
+const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /], "/friends": [/^Actions for /], "/groups": ["Rename"] };
 
 test("only what can be pressed has a shadow, and every control is 44px tall", async ({ browser }) => {
   // Two players who are friends, share a group, and have both played and commented, so the friends list's ⋯ (Remove and Block are behind it since M20 20n-3), the

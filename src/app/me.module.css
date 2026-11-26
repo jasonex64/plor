@@ -98,10 +98,13 @@
   font-size: var(--text-subheading);
 }
 
-/* The game's plain block beside its name, edged like the kit's tiles. */
+/* The game's block beside its name, edged like the kit's tiles, its emblem in the middle (src/app/emblem.tsx; M20
+   20n-10, answers 115 and 116). 40px at the default text size; in rem, so it grows with the emblem's 1.5rem. */
 .block {
-  width: 40px;
-  height: 40px;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
   flex-shrink: 0;
   border: 2px solid var(--ink);
   border-radius: var(--r-small);

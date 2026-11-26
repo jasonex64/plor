@@ -34,7 +34,7 @@ import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Feed } from "./feed";
 import { FriendsList } from "./friends-list";
-import { GroupPage } from "./groups";
+import { GroupPage, Groups } from "./groups";
 import { PlaceStrip } from "./place-strip";
 import { PlayerPage } from "./player";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
@@ -447,6 +447,12 @@ export function GroupTab({ id }: { id: string }) {
       <GroupPage id={id} username={player.username} name={nameOf(player)} timeUps={timeUps} />
     </>
   );
+}
+
+// The Groups tab: the player's default group, or Create (docs/milestones/M24-groups-tab-and-favourites.md, 24b).
+export function GroupsTab() {
+  const { player, timeUps } = usePlayer();
+  return <Groups username={player.username} name={nameOf(player)} timeUps={timeUps} />;
 }
 
 // A player's profile, opened from Find a player or a friend's row (docs/milestones/M17-profiles-and-friend-requests.md,
