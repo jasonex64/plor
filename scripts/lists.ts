@@ -1,5 +1,5 @@
 // `npm run lists -- fold [--from <file>]` (docs/milestones/M23-23b-research-and-review.md, Part 3): writes what an admin
-// did on the review page into the list files: a struck answer's line deleted, an added answer a line (rare, no marks),
+// did on the review page into the list files: a struck answer's line deleted, an added answer a line (rare, no marks), an answer's tier changed,
 // and the date a list was seen as its borderline_seen. The commit is the fold; the next load marks the edits folded
 // (scripts/base.ts, loadResearch), and `hosted load` refuses until they are.
 // The edits come from the local stack, or from a file (--from) a Claude session exported read-only from the hosted
@@ -27,8 +27,8 @@ export function foldFiles(review: Review, root = "content"): string[] {
     const folded = foldList(list, edits, seen ? seen.at.slice(0, 10) : null);
     const after = formatList(folded);
     if (after !== before) writeFileSync(file, after);
-    const strikes = edits.filter((e) => e.kind === "strike").length;
-    printed.push(`FOLDED ${category}: ${strikes} struck, ${edits.length - strikes} added, ${list.answers.length} → ${folded.answers.length} answers${seen ? `, seen ${folded.borderline_seen}` : ""}${after === before ? " (the file already held them)" : ""}`);
+    const count = (kind: string) => edits.filter((e) => e.kind === kind).length;
+    printed.push(`FOLDED ${category}: ${count("strike")} struck, ${count("add")} added${count("tier") ? `, ${count("tier")} given another tier` : ""}, ${list.answers.length} → ${folded.answers.length} answers${seen ? `, seen ${folded.borderline_seen}` : ""}${after === before ? " (the file already held them)" : ""}`);
   }
   return printed;
 }

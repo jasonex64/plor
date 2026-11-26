@@ -1,6 +1,6 @@
 # M23, 23e: drafting and approving a day on a clock
 
-**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23e"), security changes included**. 23e-1 (draft and approve) is built and reviewed 2026-11-25, in its PR; 23e-2 not started.
+**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23e"), security changes included**. 23e-1 (draft and approve) is built, reviewed and merged 2026-11-26 (#321, on green checks and the human's "Merge when green"); its migration reaches plor.app by the human's own `npx supabase db push`. 23e-2 (texts on no list, Dismiss, a tier change) is built and reviewed 2026-11-26, in its PR.
 
 ## Goal
 The human can draft a day on a clock (format 4) from the researched lists, change it while approving, and approve it; and a text players type that is on no list waits for the human instead of joining a list by itself.
@@ -81,7 +81,13 @@ No new number.
 7. The page: swap, edit, move, re-roll, redraft, approve, and the warning on leaving → verify: `npx playwright test e2e/<the new file>`, `@visual`, the stored day equal to what the page showed.
 8. Nothing else moved → verify: `npm test`, `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, `npx playwright test e2e/admin*.e2e.ts` (whichever cover the approval page today).
 
-23e-2's steps are written when 23e-1 is merged.
+**23e-2, as checks** (the human, 2026-11-26: "Build 23e-2"; each new test is seen failing first):
+1. On a format 4 day `private.record_miss` logs the text and makes no answer and no review row, however many players type it; on a format 3 day it behaves as before → verify: `npm run test:sql` (a new test, failing before the migration is applied; the old misses tests unchanged).
+2. The list's read gives the texts typed on its clock days that are on no list and not dismissed, most players first, with the number of players → verify: a db test of `src/admin/lists.ts`.
+3. Dismiss: an admin-only action that stops a text showing; Add is the existing Add, after which the text no longer shows → verify: the route's db test; a player who is not an admin is refused.
+4. A tier change: an admin-only list edit, shown on the Lists page, used by the day builder (so the next drafted day's `levels` and rare examples follow it) and by the lists fold (so the file takes it) → verify: unit tests of the builder and the fold, the route's db test.
+5. The Lists page: the texts with Add and Dismiss, and the tier control on an answer → verify: `npx playwright test e2e/<the lists file>`, `@visual`.
+6. Nothing else moved → verify: `npm test`, `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, the admin db tests, `e2e/clock.e2e.ts` and `e2e/clock-approval.e2e.ts`.
 
 ## Removes
 23e-1: nothing (the old draft goes in 23f). 23e-2: making answers from players' texts, on a clock day only.
@@ -99,6 +105,11 @@ No new number.
 | Not designed | The bank page counts only format 3 days | Its insights are the old game's |
 | Not designed | The drafted file holds no re-roll count or edited wording; the page starts from re-roll 0 | Changes live on the page until Approve (design 3) |
 | The six keyed on "the date, the question and the re-roll count" | Keyed on the date, the list and the re-roll count | Moving a question up or down must not change its six |
+| 23e-2 | | |
+| "Breaks without it": on a clock day a text typed by three players "still becomes an answer by itself" | Narrower than written: the count that decides it reads format 3 days only (`private.category_questions`), so a text typed on clock days alone never became an answer. A clock-day miss could decide a text only when format 3 days already held three typers. That is what now stops | Found by the builder, confirmed by the reviewer; the change is still what answer 53 asks |
+| Security: "two new admin-only list edits, Dismiss and a tier change" | Four admin-only functions (`list_set_tier`, `list_unset_tier`, `list_dismiss`, `list_unlisted`), a new table `private.list_dismissed` granted to no role, and `private.list_edit`'s key widened from (list, answer) to (list, answer, kind) | The undo of a tier change and the read behind the texts are needed for what was approved; a dismissal names no answer, so it is not a list edit; an answer may hold a strike and a tier change at once. More database surface than the ticket's words: put to the human with the PR |
+| Dismiss "stops showing" | A dismissed text stays dismissed however many more players type it, and has no undo | The smallest that fits; ROADMAP, For M23 |
+| A tier change "kept as a list edit, like Strike and Add" | Undo works until the list's file holds the tier, not until midnight as a strike's does; refused on an answer that is struck or added and not yet in the file | A tier has no timed effect in the database; an added answer's ID changes when the file takes it |
 
 ## Evidence
 **23e-1** (commands run 2026-11-25 on the local stack; the orchestrator's own runs unless said):
@@ -111,8 +122,24 @@ No new number.
 - Videos of the approval page at both sizes sent to the human in the app; CI's are in the PR run's `e2e-videos`.
 - **Not verified:** the route db tests and the draft db test were written after the code (the builder removed the day check and saw two fail, then restored it); the draft against list edits that exist in the database, beyond a unit test; the migration against a database loaded with the real lists; a real phone; the browser's Back button with unsaved changes.
 
+**23e-2** (commands run 2026-11-26 on the local stack; the orchestrator's own runs unless said):
+- A text on a clock day is logged and decides nothing; a format 3 day as before; the four functions, who may run them, the dismissed table: `npm run test:sql` → `Files=48, Tests=1032, Result: PASS`.
+- The texts' read, Dismiss, Add, a tier change and its undo through the route, a player refused: `npx vitest run src/app/api/admin scripts/lists.db.test.ts src/game/misses.db.test.ts --no-file-parallelism` → `16 files, 114 passed`.
+- The day builder and the fold following a tier change: `npm test` → `80 files, 1004 passed`.
+- The Lists page, a tier changed and taken back, a text dismissed and one added: `CI=1 npx playwright test e2e/lists.e2e.ts` → `4 passed (1.5m)` (2 tests at 390 × 844 and 1280 × 720).
+- `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`: exit 0. `npm run content:validate` → `CONTENT OK content: 50 file(s)`.
+- The builder's run, not repeated: `e2e/clock.e2e.ts` and `e2e/clock-approval.e2e.ts` → `15 passed, 1 flaky` (a guest's clock run at desktop size, passed on retry; nothing this change touches, **not shown to be unrelated**; CI decides). The builder saw each new test fail first, the route's included.
+- Videos of the Lists page at both sizes sent to the human in the app; CI's are in the PR run's `e2e-videos`.
+- **Not verified:** the new card and the tier control looked at on a phone (videos only); the fold against edits made on plor.app; `hosted.test.ts` with a tier edit. The builder deleted today's test day and its runs from the local database after a killed e2e run left them.
+
 ## Review
 **23e-1 (the `reviewer` agent, fresh context, 2026-11-25):**
 - Blocking: none in the code. One on process, the ticket, ROADMAP and handoff not yet written when it read the tree: written in this commit.
 - Checked and found sound: the new `private.build_puzzle` differs from the earlier one only in the format 4 branch, its definer settings, admin check and grant unchanged; `private.build_clock_day` is revoked from every role; both routes check the admin first and take only a list, a wording and a re-roll count from the page, the server building levels, rare answers and size itself; thing IDs equal the lists load's; the six are exact, rare only, and do not depend on a question's place; the pick and its "days ago".
+- Deferred to ROADMAP "Next revision", For M23: the rest.
+
+**23e-2 (the `reviewer` agent, fresh context, 2026-11-26):**
+- Blocking: none.
+- Checked and found sound: `private.record_miss` differs from the earlier one only in the early return for a format 4 day, after the text is stored, its settings and grant unchanged, and no other path makes an answer of a clock day's text; no existing function relied on `list_edit`'s old key; the four functions check the admin first, are revoked from every other role and granted to `plor_app` as Strike and Add are; `list_unlisted` gives texts and a count of players, no player's ID; the tier edit from the page through the day builder and the fold; an edits file without a tier still reads; the allowlist of what `plor_app` may run gained exactly the four.
+- Its note on scope, not blocking: the undo, the read, the table and the key are more than the ticket named, each needed for what was approved; said in the Source diff and to the human.
 - Deferred to ROADMAP "Next revision", For M23: the rest.
