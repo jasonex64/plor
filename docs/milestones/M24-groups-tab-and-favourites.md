@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. 24b, the Groups tab, is built and reviewed, in its PR (answers 17 to 19 asked first). Next: 24c.
+**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. 24b, the Groups tab, is built, reviewed and merged (#315, 2026-11-25, merge commit `690ba06`, on nine green checks at `01de3eb` and the human's "Merge when green", after main was merged into the branch); it is on plor.app and needed no database push (answers 17 to 19 asked first). Next: 24c.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
@@ -130,6 +130,7 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 - `npm test`: 79 files, 945 passed. `npm run lint` and `npx tsc --noEmit -p .`: no output.
 - **CI's first e2e run on the PR failed, on two older tests the agent had not run** (only `e2e/groups.e2e.ts` was run here): `e2e/calm.e2e.ts` waited for "Create group" on the Groups tab of a player in a group, and `e2e/frame.e2e.ts` expected that tab not to scroll at 400px tall. Both expectations were the old tab's. Now calm waits for the creator's Rename there, and frame measures the short tab on a second player in no group and holds the first player's tab to the stacked pages' 16px gaps. `npm run test:e2e -- calm frame --project=chromium -g "only what can be pressed|every tab starts"`: `2 passed (4.4m)`, so the star and the dropdown are 44px controls with no stray shadow at 390px and 1280px.
 - **Not looked at by eye:** the dropdown and star were measured by the test, not seen; CI's `e2e-videos` show them.
+- CI on the merged branch (`01de3eb`, main's M23 and M20 merges included): nine checks green; the Groups tab's test at desktop and phone size is in the run's `e2e-videos` artifact, https://github.com/jasonex64/plor/actions/runs/45759112498 (both clips sent to the human in the app).
 - `verify-group-membership`: not rerun. 24b adds one read of `group_member` (`defaultGroupId`) and changes no step that creates, removes or hands over a membership.
 
 ## Review
