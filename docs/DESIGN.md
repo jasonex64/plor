@@ -76,7 +76,7 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | A row that opens (`.row > details`, "Where everyone ended") | its summary is the whole row, 44px tall for one line (`calc((44px - 1lh) / 2)` above and below); 8px under the open list | 69-83 |
 | Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 86-88 |
 | A row's second line (`.below`) | 6px gap, 6px above | 134-142 |
-| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 144-162 |
+| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips. A soft-filled version, the theme's tint with no outline, is drawn beside it on `/admin/kit` in the five themes for the human's pick (M20 20n-8); no screen uses it | 144-162 |
 | Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: the game screen's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:88`) | 188-194 |
 | Badge | 24px round, ink fill, 12px 800; the first in the accent | 197-219 |
 | Main button (`.primary`) | 0 18px, accent fill, 17px, the 2px ink border and 4px edge; a 40px face | 235-269 |
