@@ -133,4 +133,5 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 
 ## Review
 - **24a** (the `reviewer` agent, 2026-11-25, read the code, ran nothing): no blocking finding in the code. Blocking, docs: the handoff and the ROADMAP row still said "nothing built", and Evidence was empty: fixed in the same PR.
-- Deferred to ROADMAP "Next revision", For M24: a star move meeting the same player's account deletion can be the deadlock's victim (40P01, a 500); the race test rarely reaches the 23505 path, and no test of its own shows a star going with its membership; the protocol stays at its number.
+- **24b** (the `reviewer` agent, 2026-11-25, read the code; ran neither the e2e suite nor, to the end, lint or the type check): no blocking finding. Six items deferred to ROADMAP "Next revision", For M24.
+- 24a's, deferred to ROADMAP "Next revision", For M24: a star move meeting the same player's account deletion can be the deadlock's victim (40P01, a 500); the race test rarely reaches the 23505 path, and no test of its own shows a star going with its membership; the protocol stays at its number.
