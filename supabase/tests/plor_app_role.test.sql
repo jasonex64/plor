@@ -109,9 +109,13 @@ select is(pg_temp.grants('plor_app'), array[
   -- Friend requests (M17 17a): read, sent, and deleted by an accept, a decline or a cancel.
   'private.friend_request delete', 'private.friend_request insert', 'private.friend_request select',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
+  -- A player's favourite friends (M24 24a): each side sets its own flag on the pair's row, and no other column.
+  'private.friendship.favourite_of_a update', 'private.friendship.favourite_of_b update',
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
+  -- A player's one starred group, their default (M24 24a): the star alone, never the membership.
+  'private.group_member.starred update',
   'private.guest_clock_answer insert', 'private.guest_clock_answer select',
   'private.guest_clock_finish insert', 'private.guest_clock_finish select',
   'private.guest_judge_word(text,date,text,text,text) execute',

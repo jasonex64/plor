@@ -2,6 +2,7 @@
 // call. The signed-in paths are in route.db.test.ts.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
+import { POST as favourite } from "./favourite/route";
 import { POST as remove } from "./remove/route";
 import { GET as friends } from "./route";
 
@@ -19,6 +20,7 @@ beforeEach(() => {
 describe("/api/friends routes (M07 7b)", () => {
   it.each([
     ["GET /api/friends", () => friends(apiRequest("/api/friends", { method: "GET" }))],
+    ["POST /api/friends/favourite", () => favourite(apiRequest("/api/friends/favourite", { method: "POST", body: { userId: "abc", favourite: true } }))],
     ["POST /api/friends/remove", () => remove(apiRequest("/api/friends/remove", { method: "POST", body: { userId: "abc" } }))],
   ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
     const response = await call();

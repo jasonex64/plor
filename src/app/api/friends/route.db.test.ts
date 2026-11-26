@@ -9,6 +9,7 @@ import { apiRequest } from "@/test/request-scope";
 import { handNameOver } from "@/test/usernames";
 import { POST as setDisplayName } from "../profile/display-name/route";
 import { POST as createProfile } from "../profile/route";
+import { POST as favourite } from "./favourite/route";
 import { POST as remove } from "./remove/route";
 import { POST as accept } from "./requests/accept/route";
 import { POST as send } from "./requests/route";
@@ -57,10 +58,32 @@ describe("friends list", () => {
     expect((await call(send, "/api/friends/requests", "POST", { username: B.username })).status).toBe(200);
     useSession(B.session);
     expect((await call(accept, "/api/friends/requests/accept", "POST", { username: A.username })).status).toBe(200);
-    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: A.userId, username: A.username, name: "Ana" }]);
+    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: A.userId, username: A.username, name: "Ana", favourite: false }]);
     useSession(A.session);
     // B has no display name, so A sees B's username.
-    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: B.userId, username: B.username, name: B.username }]);
+    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: B.userId, username: B.username, name: B.username, favourite: false }]);
+  });
+
+  it("favourites a friend for the player who set it only, whichever side of the pair they are (M24 24a)", async () => {
+    const set = (userId: unknown, on: unknown) => call(favourite, "/api/friends/favourite", "POST", { userId, favourite: on });
+    const flags = async () => (await call(friends, "/api/friends", "GET")).body.friends.map((f: { favourite: boolean }) => f.favourite);
+    useSession(A.session);
+    expect(await set(B.userId, true)).toEqual({ status: 200, body: { ok: true } });
+    expect(await flags()).toEqual([true]);
+    useSession(B.session);
+    expect(await flags()).toEqual([false]);
+    expect(await set(A.userId, true)).toEqual({ status: 200, body: { ok: true } });
+    useSession(A.session);
+    expect(await set(B.userId, false)).toEqual({ status: 200, body: { ok: true } });
+    expect(await flags()).toEqual([false]);
+    // Not a friend, the player themself, or no ID at all.
+    expect(await set("00000000-0000-4000-8000-000000000000", true)).toEqual({ status: 404, body: { ok: false, error: "not_friends" } });
+    expect(await set(A.userId, true)).toEqual({ status: 404, body: { ok: false, error: "not_friends" } });
+    expect(await set("abc", true)).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await set(B.userId, "yes")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    useSession(B.session);
+    expect(await flags()).toEqual([true]);
+    expect(await set(A.userId, false)).toEqual({ status: 200, body: { ok: true } });
   });
 
   it("removes a friendship both ways, and only an existing one", async () => {

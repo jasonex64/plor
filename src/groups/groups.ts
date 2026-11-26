@@ -1,13 +1,16 @@
 // Groups and their members (docs/milestones/M10-groups.md, 10b; G1, G6, G8). The database keeps the rules: the name
 // format, the invite code's shape, the creator always a member, the caps and the creator handover
 // (supabase/migrations/20261028140000_baseline.sql). The routes pass only the verified player's ID.
-import { DatabaseError } from "pg";
+import { DatabaseError, type Pool } from "pg";
 import { newInviteCode, UUID, type FriendWithId } from "@/friends/friends";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { log } from "@/lib/log";
 import { STATUS } from "@/lib/status";
 
 export type GroupSummary = { id: string; name: string };
+// A group in the player's own list: starred marks their one default group (M24 24a).
+export type ListedGroup = GroupSummary & { starred: boolean };
 // A member as the others see them (G3): the ID identifies them (the creator removes by it), and the name shown is the
 // display name if set (M07 7a).
 export type Member = FriendWithId & { creator: boolean };
@@ -42,9 +45,9 @@ export async function createGroup(db: Db, userId: string, name: string): Promise
   }
 }
 
-export async function listGroups(db: Db, userId: string): Promise<GroupSummary[]> {
-  const { rows } = await db.query<GroupSummary>(
-    `select g.id, g.name from private.group_member m join private.player_group g on g.id = m.group_id
+export async function listGroups(db: Db, userId: string): Promise<ListedGroup[]> {
+  const { rows } = await db.query<ListedGroup>(
+    `select g.id, g.name, m.starred from private.group_member m join private.player_group g on g.id = m.group_id
      where m.user_id = $1 order by lower(g.name), g.id`,
     [userId],
   );
@@ -67,6 +70,38 @@ export async function getGroup(db: Db, userId: string, groupId: string): Promise
   );
   if (!rows[0]) throw new AppError("group_not_found", STATUS.notFound);
   return rows[0];
+}
+
+// Sets or clears the player's one star, their default group (M24 24a; the human, 2026-11-25: "Just one star: the
+// default"). A move clears the old star and sets the new one in one transaction, the clear first because the database
+// allows one star at any moment (group_member_one_star), so a refused move leaves the star where it was. A group the
+// player isn't in is the group page's 404. Only the player's own memberships are named, so nobody else's star moves.
+export async function setGroupStar(pool: Pool, userId: string, groupId: string, starred: boolean): Promise<void> {
+  const client = await pool.connect();
+  let broken = false;
+  try {
+    await client.query("begin");
+    if (starred) {
+      await client.query("update private.group_member set starred = false where user_id = $1 and starred and group_id <> $2", [userId, groupId]);
+    }
+    const { rowCount } = await client.query("update private.group_member set starred = $3 where user_id = $1 and group_id = $2", [userId, groupId, starred]);
+    if (rowCount === 0) throw new AppError("group_not_found", STATUS.notFound);
+    await client.query("commit");
+  } catch (err) {
+    // As in setReaction (src/reactions/reactions.ts): a rollback that fails too leaves the connection in an unknown
+    // state, so it's logged and the client destroyed.
+    try {
+      await client.query("rollback");
+    } catch (rollbackErr) {
+      broken = true;
+      log.error("rollback failed", { error: String(rollbackErr) });
+    }
+    // Two moves by one player at the same moment: the later one meets the earlier one's star.
+    if (err instanceof DatabaseError && err.code === "23505" && err.constraint === "group_member_one_star") throw new AppError("busy", STATUS.conflict);
+    throw err;
+  } finally {
+    client.release(broken);
+  }
 }
 
 // Which group a code opens, for the join page to ask "Join <name>?".
