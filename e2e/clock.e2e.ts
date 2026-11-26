@@ -3,17 +3,21 @@
 // under the input, "Already said" and "Not on the list" for the rest, Next on questions 1 and 2 and Finish only on question 3,
 // the same run after a reload or in a second tab, an end that comes by itself when the clock runs out, and the input and the
 // last answer inside the visible area with a phone keyboard open. The day is the fixture's first three questions (src/test/
-// answer-fixture.ts, fixtureClockDay): dog and bear are common, cat uncommon, cherry rare.
+// answer-fixture.ts, fixtureClockDay): dog and bear are common, cat uncommon, cherry rare. 23d-2 adds the result's missed answers (the
+// same nine for two players), Share, and a friend's question and points on the live board.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { answerBox } from "./game";
-import { RUN, signInAndPick } from "./players";
+import { RUN, befriend, openBoard, signInAndPick } from "./players";
 import { removePuzzle, todayClockPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let day: { created: string };
+
+// The clipboard is allowed, so Share copies rather than showing the text to copy by hand.
+test.use({ permissions: ["clipboard-read", "clipboard-write"] });
 
 test.beforeAll(async () => {
   day = await todayClockPuzzle(DB);
@@ -122,6 +126,11 @@ async function playRun(page: Page): Promise<void> {
   await expect(rows.filter({ hasText: "Name an animal" })).toContainText("catUncommon");
   await expect(rows.filter({ hasText: "Name a fruit" })).toContainText("cherryRare");
   await expect(rows.filter({ hasText: "Name a color" })).toContainText("redCommon");
+  // What was missed, never what was given, and the rest counted: the list's size less the answers given and the ones shown.
+  await expect(rows.filter({ hasText: "Name an animal" })).toContainText("You missedCommonbearUncommon");
+  await expect(rows.filter({ hasText: "Name an animal" })).toContainText("and 4 more");
+  await expect(rows.filter({ hasText: "Name a color" })).toContainText("and 3 more");
+  await expect(page.locator("#result").getByRole("button", { name: "Share", exact: true })).toBeVisible();
   await expect(page.getByRole("timer")).toContainText("Next puzzle in");
 
   // A reload after the end shows the same end.
@@ -203,4 +212,98 @@ test("with a phone keyboard open, the input and the last answer are inside the v
       expect(box.y + box.height, `${name} after ${text}`).toBeLessThanOrEqual(visible);
     }
   }
+});
+
+// Today's date as the share text writes it.
+const shareDay = (date: string) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+// Plays a run quickly: the text given on question 1, then Next, Next and Finish. Leaves the result showing.
+async function quickRun(page: Page, onFirst: string[]): Promise<void> {
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  for (const text of onFirst) await say(page, text);
+  await page.getByRole("button", { name: "Next question", exact: true }).click();
+  await expect(heading(page, "Name a fruit")).toBeVisible();
+  await page.getByRole("button", { name: "Next question", exact: true }).click();
+  await expect(heading(page, "Name a color")).toBeVisible();
+  await page.getByRole("button", { name: "Finish", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Your answers", exact: true })).toBeVisible();
+}
+
+// What a question's row says, as the text the page holds.
+const rowText = (page: Page, prompt: string) => page.locator("#result").getByRole("listitem").filter({ hasText: prompt }).first().innerText();
+
+test("two players see the same missed answers, and Share copies the run as squares", { tag: "@visual" }, async ({ browser }) => {
+  const first = await (await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] })).newPage();
+  const second = await (await browser.newContext()).newPage();
+  await first.goto("/");
+  await signInAndPick(first, "ck4");
+  await first.goto(GAME.path);
+  await second.goto("/");
+  await signInAndPick(second, "ck5");
+  await second.goto(GAME.path);
+
+  // The first player gives dog and cat; the second gives nothing.
+  await quickRun(first, ["dog", "cat"]);
+  await quickRun(second, []);
+
+  // Questions 2 and 3: nobody gave anything, so the nine are the same words for both. Common and uncommon in the day's order,
+  // whichever that is; the rare ones in the day's own (the fixture's: cherry, then the extras it carries); the rest counted.
+  for (const prompt of ["Name a fruit", "Name a color"]) expect(await rowText(first, prompt)).toBe(await rowText(second, prompt));
+  const fruit = await rowText(first, "Name a fruit");
+  expect(fruit).toMatch(/Common\s*(apple, banana|banana, apple)/);
+  expect(fruit).toMatch(/Uncommon\s*(kiwi, mango|mango, kiwi)/);
+  expect(fruit).toMatch(/Rare\s*cherry, plum, peach/);
+  expect(fruit).toContain("and 3 more");
+  // Question 1: the one who gave dog is shown bear as the only common answer missed; the other is shown both.
+  expect(await rowText(first, "Name an animal")).toMatch(/Common\s*bear\s/);
+  expect(await rowText(second, "Name an animal")).toMatch(/Common\s*(bear, dog|dog, bear)/);
+
+  // Share copies the score and a line of squares per question, no answer; then the page's own link.
+  await first.locator("#result").getByRole("button", { name: "Share", exact: true }).click();
+  await expect(first.getByRole("status").filter({ hasText: "Copied" })).toBeVisible();
+  const copied = await first.evaluate(() => navigator.clipboard.readText());
+  // (Windows' clipboard turns each line break into two characters.)
+  expect(copied.split(/\r?\n/).slice(0, 4)).toEqual([`Plor ${GAME.name}, ${shareDay(day.created)}: 35 points`, "1 🟩🟦", "2", "3"]);
+  expect(copied).not.toMatch(/dog|cat/i);
+});
+
+// The live board with two real browsers on a clock day (answer 47): a friend who has not played sees the other's question and
+// points as they change, with no reload, and the points once the run has ended; no answer reaches the page.
+test("a friend's question and points show live on the board", { tag: "@visual" }, async ({ browser }) => {
+  test.slow();
+  const watcher = await (await browser.newContext()).newPage();
+  const player = await (await browser.newContext()).newPage();
+  const frames: string[] = [];
+  watcher.on("websocket", (ws) => {
+    if (ws.url().includes("/realtime/v1")) ws.on("framereceived", (f) => void frames.push(String(f.payload)));
+  });
+  await watcher.goto("/friends");
+  await signInAndPick(watcher, "kw");
+  await player.goto("/friends");
+  await signInAndPick(player, "kp");
+  await befriend(player, "kp", watcher, "kw");
+  const playerName = `kp${RUN}`;
+
+  await openBoard(watcher);
+  const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
+  await expect(row).toHaveText(`${playerName}: Not yet`);
+
+  // The watcher has not played, and still sees the run as it goes.
+  await player.goto(GAME.path);
+  await player.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 0 points`);
+  await say(player, "dog");
+  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 10 points`);
+  await say(player, "cat");
+  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 35 points`);
+  await player.getByRole("button", { name: "Next question", exact: true }).click();
+  await expect(row).toHaveText(`${playerName}: Question 2 of 3 · 35 points`);
+  await player.getByRole("button", { name: "Next question", exact: true }).click();
+  await player.getByRole("button", { name: "Finish", exact: true }).click();
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+
+  // The board as the server gives it says the same, and no frame that reached the watcher names an answer.
+  await openBoard(watcher);
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+  expect(frames.join("\n")).not.toMatch(/\b(dog|cat)\b/i);
 });

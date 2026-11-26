@@ -125,14 +125,16 @@ export function Board({
       return;
     }
     // A friend finished: fetch how their run ended. Only a player who has finished is told (M12 12d), so this page's
-    // own refetch for that may still be on its way.
-    if (message.state === "finished") {
+    // own refetch for that may still be on its way. A run on a clock has no ending to fetch: its message holds the points.
+    if (message.state === "finished" && board.questions === null) {
       load();
       return;
     }
     setBoard({
       ...board,
-      friends: board.friends.map((f) => (f.username === message.username ? { ...f, state: message.state, question: message.question } : f)),
+      friends: board.friends.map((f) =>
+        f.username === message.username ? { ...f, state: message.state, question: message.question, ...(board.questions === null ? {} : { points: message.points ?? 0 }) } : f,
+      ),
     });
   }
 
@@ -184,7 +186,7 @@ export function Board({
               <PlayerName username={f.username} className={styles.name}>
                 {f.name}
               </PlayerName>
-              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds)} className={`${toneOf(f)} ${styles.status}`} />
+              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds, shownBoard.questions)} className={`${toneOf(f)} ${styles.status}`} />
               {f.reactions && (
                 <div className={styles.reactions}>
                   <Reactions reactions={f.reactions} below />
@@ -224,9 +226,12 @@ function toneOf(f: BoardFriend): string {
 }
 
 // rounds: Fragments' rounds today, which a friend's round is counted against; null on Offbeat's board, which has questions.
-function describe(f: BoardFriend, rounds: number | null): string {
+// questions: a day on a clock's questions, whose friends show their question and points from their first answer (answer 47).
+function describe(f: BoardFriend, rounds: number | null, questions: number | null): string {
   if (f.ended) return endedText(f.ended);
   if (f.score !== null) return pointsText(f.score);
+  if (questions !== null && f.state === "playing") return `Question ${f.question} of ${questions} · ${pointsText(f.points ?? 0)}`;
+  if (questions !== null && f.state === "finished") return pointsText(f.points ?? 0);
   if (f.state === "playing") return rounds === null ? `Question ${f.question}` : `on round ${f.question} of ${rounds}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "Not yet";

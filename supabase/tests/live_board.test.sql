@@ -42,11 +42,11 @@ create function pg_temp.sent(who text) returns jsonb[] language sql
 
 insert into private.run (user_id, game_id, puzzle_date) values ('00000000-0000-0000-0000-0000000007c1', 'offbeat', private.today());
 select is(pg_temp.sent('00000000-0000-0000-0000-0000000007c2'),
-  array[jsonb_build_object('v', 2, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
+  array[jsonb_build_object('v', 3, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
     'state', 'started', 'question', null)],
   'starting a run sends a friend who hasn''t finished only who, which day, and started');
 select is(pg_temp.sent('00000000-0000-0000-0000-0000000007c4'),
-  array[jsonb_build_object('v', 2, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
+  array[jsonb_build_object('v', 3, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
     'state', 'playing', 'question', 1)],
   'and a friend who has finished playing, and on which question');
 select is(array_length(pg_temp.sent('00000000-0000-0000-0000-0000000007c1'), 1), 1, 'and the player''s own board');
@@ -67,7 +67,7 @@ select is(array_length(pg_temp.sent('00000000-0000-0000-0000-0000000007c2'), 1),
 insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
   values ('00000000-0000-0000-0000-0000000007c1', 'offbeat', private.today(), 1, 'tiger', true);
 select is((pg_temp.sent('00000000-0000-0000-0000-0000000007c4'))[4],
-  jsonb_build_object('v', 2, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
+  jsonb_build_object('v', 3, 'type', 'friend_status', 'username', 'p7c', 'gameId', 'offbeat', 'puzzleDate', private.today(),
     'state', 'finished', 'question', null),
   'a caught run is sent to a finished friend as finished, with nothing about how it ended');
 select is(array_length(pg_temp.sent('00000000-0000-0000-0000-0000000007c2'), 1), 1,

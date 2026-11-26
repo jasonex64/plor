@@ -254,3 +254,12 @@ export const SLOTS = [
   { devPort: 3002, stackBase: 54420, inspectorPort: 8183 },
   { devPort: 3003, stackBase: 54520, inspectorPort: 8283 },
 ] as const;
+
+// A day on a clock (docs/milestones/M23-23d-the-screens.md, Numbers). Missed answers shown per tier and question on the
+// result: 3 common, 3 uncommon, 3 rare (the human, 2026-11-25, answer 45: "3 each, same for everyone (Recommended)").
+export const MISSED_PER_TIER = 3;
+// Rare answers a day carries per question, for the result's missed ones (the human, 2026-11-25, answer 49: "6 per question
+// (Recommended)").
+export const RARE_PER_CLOCK_QUESTION = 6;
+// Squares per line in the share text (the human, 2026-11-25, answer 46: "Wrap every 10 (Recommended)").
+export const SHARE_SQUARES_PER_LINE = 10;

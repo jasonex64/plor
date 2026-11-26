@@ -79,6 +79,10 @@ Second round (2026-11-25):
 44. What typing a repeat shows: "\"Already said\" (Recommended)", a note different from the one for text that is not an answer.
 45. Which missed answers, and how many: "3 each, same for everyone (Recommended)". Three common, three uncommon, three rare per question, picked once per day.
 46. A long question's squares in the share text: "Wrap every 10 (Recommended)".
+
+23d-2's round (2026-11-25, after #312 merged), on the finding that a day holds no rare answers:
+48. Where the result's three rare missed answers come from: "Chosen when the day is drafted (Recommended)". Each day carries a short ordered list of rare answers per question, picked at drafting and seen by the human at approval; no new database permission.
+49. How many the day holds per question: "6 per question (Recommended)". A player who gave up to three of them still sees three.
 47. A friend's row on the live board mid-run: "Question and points (Recommended)", as "Question 2 of 3 · 180 points". The option's stated cost: a friend still to play sees scores before their own run.
 
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
@@ -121,7 +125,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
 - **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 merged, #307): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
-- **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 built, in its PR). The play screen, the result screen, the share text, the live board's wording.
+- **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 built, in its PR). The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 

@@ -5,6 +5,7 @@
 import type { ApprovedPuzzle, ApprovedQuestion, ClockPuzzle, Puzzle } from "../content/puzzle.ts";
 import { normalize } from "../content/puzzle.ts";
 import { thingId } from "../content/thing-id.ts";
+import { RARE_PER_CLOCK_QUESTION } from "../config/tunables.ts";
 
 type Querier = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }> };
 
@@ -140,6 +141,13 @@ export const FIXTURE: FixtureQuestion[] = [
 ];
 
 const sourceId = (key: string, slug: string) => `${key}-${slug}`;
+
+// Rare answers the clock day's fruit and color questions need beyond their members, which hold only one rare answer each
+// (a day carries six per question: docs/milestones/M23-23d-the-screens.md, answer 49); the animals' lose the second "aardvark",
+// whose main name is the first's, which the result would show as the same answer twice. They are things of the base that
+// belong to no category, so the old game's questions, which count and list the categories' members, are unchanged.
+const CLOCK_EXTRA_RARE: Record<number, string[]> = { 0: ["lynx"], 1: ["plum", "peach", "pear", "grape", "lime"], 2: ["white", "pink", "orange", "purple", "brown"] };
+const clockExtraSlug = (name: string) => `clock-${name}`;
 export const fixtureId = (index: number, slug: string) => thingId("wikidata", sourceId(FIXTURE[index].key, slug));
 
 // A fixture answer's tier from the fixture's own lists, the way fixtureDay sets the levels: common for the host bank,
@@ -173,7 +181,15 @@ export async function loadFixtureBase(db: Querier): Promise<string> {
       thing_id: thingId("wikidata", sourceId(q.key, slug)),
     })),
   ]);
-  await db.query("select private.import_source('wikidata', 'fixture', $1::jsonb)", [JSON.stringify(items)]);
+  const extras = Object.entries(CLOCK_EXTRA_RARE).flatMap(([i, names]) =>
+    names.map((name) => ({
+      id: sourceId(FIXTURE[+i].key, clockExtraSlug(name)),
+      name,
+      aliases: [{ alias: normalize(name), kind: "name" }],
+      thing_id: thingId("wikidata", sourceId(FIXTURE[+i].key, clockExtraSlug(name))),
+    })),
+  );
+  await db.query("select private.import_source('wikidata', 'fixture', $1::jsonb)", [JSON.stringify([...items, ...extras])]);
   for (const q of FIXTURE) {
     await db.query("select private.define_category($1, $2, 'wikidata', $3, null)", [q.key, q.prompt, sourceId(q.key, "root")]);
   }
@@ -247,12 +263,24 @@ export function fixtureDraft(date: string): Puzzle {
 // The first three questions of the fixture as a day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md): no
 // host answers and no taken letters, so every member of the three categories can be typed, and its tier is the fixture's
 // (fixtureTier).
+// Each question also carries its six rare answers (the members the levels don't name, then CLOCK_EXTRA_RARE) and its list's size.
 export function fixtureClockDay(date: string, approvedAt: string): ClockPuzzle & { approved_at: string } {
   return {
     format: 4,
     game_id: "offbeat",
     date,
     approved_at: approvedAt,
-    questions: fixtureDay(date, approvedAt).questions.slice(0, 3).map(({ prompt, category, root, member_of, levels }) => ({ prompt, category, root, member_of, levels })),
+    questions: fixtureDay(date, approvedAt)
+      .questions.slice(0, 3)
+      .map(({ prompt, category, root, member_of, levels }, i) => {
+        const extra = CLOCK_EXTRA_RARE[i] ?? [];
+        const rare = [
+          ...Object.entries(FIXTURE[i].members)
+            .filter(([slug, m], n, all) => !(fixtureId(i, slug) in levels) && all.findIndex(([, other]) => other.names[0] === m.names[0]) === n)
+            .map(([slug]) => fixtureId(i, slug)),
+          ...extra.map((name) => fixtureId(i, clockExtraSlug(name))),
+        ].slice(0, RARE_PER_CLOCK_QUESTION);
+        return { prompt, category, root, member_of, levels, rare, size: Object.keys(FIXTURE[i].members).length + extra.length };
+      }),
   };
 }

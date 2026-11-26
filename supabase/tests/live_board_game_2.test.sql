@@ -49,7 +49,7 @@ create function pg_temp.sent(who text) returns jsonb[] language sql
   return (select coalesce(array_agg(payload - 'id' order by inserted_at, id), '{}') from realtime.messages
           where topic = 'board:' || who and event = 'friend_status' and payload ->> 'username' = 'p16d');
 create function pg_temp.msg(state text, q int) returns jsonb language sql
-  return (select jsonb_build_object('v', 2, 'type', 'friend_status', 'username', 'p16d', 'gameId', 'substrings', 'puzzleDate', day,
+  return (select jsonb_build_object('v', 3, 'type', 'friend_status', 'username', 'p16d', 'gameId', 'substrings', 'puzzleDate', day,
                                     'state', state, 'question', q) from d);
 
 insert into private.run (user_id, game_id, puzzle_date) select '00000000-0000-0000-0000-0000000016d1', 'substrings', day from d;

@@ -20,3 +20,7 @@ export const SUBSTRINGS_ID = SUBSTRINGS.id;
 // The overall board, both games' places (M16 16e-3b, docs/milestones/M16-16e-points-and-boards.md, answer 29): a
 // board's third choice beside the two games, not a game.
 export const OVERALL = { id: "overall", name: "Overall" } as const;
+
+// The site's name, as a share text gives it (docs/milestones/M23-23d-the-screens.md, "The share text"). No
+// imports, as above.
+export const SITE = { name: "Plor" } as const;

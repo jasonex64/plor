@@ -1,6 +1,6 @@
 # M23 — 23d, the clock game's screens
 
-**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built 2026-11-25, in its PR; 23d-2 is not started.
+**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built and merged 2026-11-25 (#312, on green checks and the human's "Merge when green"); 23d-2 (the result's missed answers, the share text, the live board) is built and reviewed 2026-11-25, in its PR.
 
 ## Goal
 A player can play a format 4 Offbeat day from start to result on a phone or a computer, signed in or as a guest, share the result, and see friends' runs on the live board.
@@ -54,7 +54,7 @@ Green common, blue uncommon, purple rare.
 - **23d-1:** the card before the run and the play screen, for a player and a guest, ending on the points and the answers given (the state 23c already gives).
 - **23d-2:** the server's additions (the result's nine missed answers per question, fixed for the day; the board message's points, a migration), the full result, the share text, the live board's rows, How to play, DESIGN.md's result and board entries.
 - Split changed 2026-11-25, before any code: the server's additions serve the result and the board only, so they go with them.
-- **Found 2026-11-25, for 23d-2 and 23e:** a day holds only its common and uncommon answers (`levels`); every other member of the category is rare and no function `plor_app` may run lists a category's members for a player (`src/game/clock-state.ts`). So the three rare missed answers cannot be picked from the base at result time without a new grant. Planned instead, with no grant: the day itself carries an ordered handful of rare answers picked when it is drafted (23e), and the result shows the first three the player did not give. To be confirmed with the human when 23d-2 starts.
+- **Found 2026-11-25, for 23d-2 and 23e:** a day holds only its common and uncommon answers (`levels`); every other member of the category is rare and no function `plor_app` may run lists a category's members for a player (`src/game/clock-state.ts`). So the three rare missed answers cannot be picked from the base at result time without a new grant. Settled 2026-11-25 (answers 48 and 49): with no grant, each question of the day carries `rare`, six rare answers in an order picked when it is drafted (23e), and the result shows the first three the player did not give. For the same reason the count of the rest ("and 452 more") cannot be read at result time, so each question also carries `size`, its list's count of answers when drafted. 23d-2 adds both fields to a format 4 day and its check; 23e fills them.
 
 ## Acceptance criteria
 - [ ] On a format 4 day, a signed-in player and a guest each play a run from Start to the result at 390 × 844 and 1280 × 720 (`@visual` Playwright tests): an accepted answer shows its name, tier, seconds and points and moves the clock and the score; a repeat shows "Already said" and text off the list "Not on the list", neither moving anything; Next opens the next question and never the last; Finish shows only on question 3.
@@ -76,6 +76,7 @@ Green common, blue uncommon, purple rare.
 | Value | Used for | Origin |
 |---|---|---|
 | 3, 3, 3 | Missed answers shown per question, per tier | The human, 2026-11-25, answer 45: "3 each, same for everyone (Recommended)" |
+| 6 | Rare answers a day carries per question | The human, 2026-11-25, answer 49: "6 per question (Recommended)" |
 | 10 | Squares per line in the share text | The human, 2026-11-25, answer 46: "Wrap every 10 (Recommended)" |
 | 390 × 844, 1280 × 720 | The sizes the screens are tested at | CLAUDE.md, Testing (`@visual`) |
 | 20 s; 3, 5, 8 s; 10, 25, 50 points | Shown in the rules and How to play | Answers 10 and 11, read from the server (`private.clock_start_ms`, `clock_added_ms`, `clock_points`), never typed into the screen's code |
@@ -87,7 +88,13 @@ Green common, blue uncommon, purple rare.
 3. A format 3 day still plays → verify: `npx playwright test e2e/offbeat.e2e.ts` passes.
 4. The run's rules untouched → verify: `npm run verify -- offbeat-run` passes.
 
-23d-2's is written when it starts.
+**23d-2, as checks:**
+1. A format 4 day's question carries `rare` (six thing IDs, none in `levels`) and `size`; the day's check refuses one without them → verify: `npm test` (the puzzle check's tests, a failing case first).
+2. The state's `missed` gives per question up to three common, three uncommon (in an order fixed by the day and the question) and three rare (the day's order), none the player gave, and the count of the rest → verify: `npx vitest run src/game/clock-state.test.ts`, and a db test that two players get the same nine.
+3. The share text → verify: `npx vitest run src/game/share.test.ts` (a question with more than 10 answers; no answer's name).
+4. The board message carries the run's points (version 3) and the board's read gives question and points → verify: the board's db tests and a unit test that the message holds no answer; `npm run test:sql`.
+5. The result screen, the share button, the live board's rows, How to play → verify: `npx playwright test e2e/clock.e2e.ts` at both sizes, a two-player test for the board.
+6. A format 3 day still plays, the run's rules hold → verify: `npx playwright test e2e/offbeat.e2e.ts`; `npm run verify -- offbeat-run`.
 
 ## Removes
 Nothing: the old game's screens go in 23f.
@@ -104,6 +111,14 @@ Nothing: the old game's screens go in 23f.
 | Not designed | Today shows a card for a clock day (Play, Continue or Result) | Without it Today's Offbeat card stayed a loading placeholder on a format 4 day |
 | Not designed | A tab that is behind (another tab pressed Next, or the run ended) reads the run again instead of showing an error | Answer 32: both tabs show the same run |
 | "With the phone keyboard's height taken off the screen" | The test shortens the window to 390 × 500 | Playwright has no phone keyboard; 500 is the builder's stand-in. Not proof on a real phone: the human tries it on the preview |
+| 23d-2 | | |
+| The share text ends with the line `plor.app` | The text ends with the last question's squares; the Share button adds the page's own link after it (`https://plor.app/` on the site) | `ShareResult` already adds the link for both other games; the text naming the address too gave it twice |
+| A question's line is "its number and squares" | A question with no answers is its number alone ("2") | Nothing to show; no trailing space |
+| "A count of the rest" | The count is the question's `size` (its list's count when drafted) less the answers given and shown | Nothing a player's role may run counts a list (answers 48 and 49); `size` is filled at drafting (23e) |
+| Not designed | The day's check for `rare` and `size` (`checkClockPuzzle`) exists and is tested, and nothing calls it yet | No code approves or loads a format 4 day until 23e, which wires it in; tests build such days directly |
+| The board message "gains the points" | Every board message is version 3; only a clock run's carries `points`; on a clock day every friend is sent it, played or not | Answer 47 and its stated cost. A format 3 day and Fragments keep "only started until you finish" (their SQL tests changed in the version number only) |
+| Not designed | The feed gives a finished clock run a time: its Finish, or its clock's end, whichever is first | A clock run has no answer events, so its time was empty and the Friends and Today pages crashed once a friend finished one (found by the board's e2e; `feed-page.clock.db.test.ts` failed first) |
+| Not designed | The feed still words a finished clock run "survived" | The old game's wording; replaced in 23f |
 
 ## Evidence
 **23d-1** (commands run 2026-11-25 on the local stack):
@@ -116,10 +131,27 @@ Nothing: the old game's screens go in 23f.
 - Looked at by the session at both sizes (the card, an accepted answer, a repeat, the end); pictures and the run's videos sent to the human in the app; CI's are in the PR run's `e2e-videos`.
 - **Not verified:** a real phone's keyboard; Reduce motion beyond adding no motion (the end's score keeps the kit's `pop`, which has its own reduced-motion rule); the full e2e and db suites locally (CI runs them).
 
+**23d-2** (commands run 2026-11-25 on the local stack, on the tree as committed):
+- The result for a player and a guest, the same missed answers for two players, Share copying the squares and no answer, a friend's question and points arriving on the board with no reload: `CI=1 npx playwright test e2e/clock.e2e.ts` → `12 passed (4.5m)` (6 tests, each at 390 × 844 and 1280 × 720).
+- The pick of the nine and `more`: `npx vitest run src/game/clock-state.test.ts` (in `npm test`); two players and a guest get the same ones from the database: `src/game/clock-runs.plor-app.db.test.ts`.
+- The share text for more than 10 answers on a question, no answer's name: `src/game/share.test.ts` → `11 passed`.
+- The board's read, the feed's time, the clock runs: `npx vitest run src/game/clock-runs.plor-app.db.test.ts src/app/api/board src/comments src/app/api/feed --no-file-parallelism` → `8 files, 44 passed`. The board message in SQL (version 3, points, no answer, a stranger gets nothing): `npm run test:sql` → `Result: PASS`.
+- `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`: exit 0, no output. `npm test` → `79 files, 953 passed`.
+- `npm run verify -- offbeat-run` → `OffbeatRun.cfg: every rule holds (233 distinct states, 1.1 s)`. `src/game/clock-play.ts` changed in one argument of the names read, nothing the model covers.
+- A format 3 day: `npx playwright test e2e/offbeat.e2e.ts e2e/live-board.e2e.ts` → `12 passed, 1 failed`. The failure is `live-board.e2e.ts:32`, "a friend's run shows up live, with no spoiler": `Test timeout of 90000ms exceeded`, twice in a whole-file run, and it passed run alone (1.1 min). Its trace shows no failed step: five waits of about 5 seconds each for an Undo toast's send, and the test still navigating at 90 s. Read as a test at the edge of its time limit on this PC, **not shown to be unrelated to this change**; CI's e2e run decides, and the PR is not merged unless it is green. In ROADMAP, For M23.
+- Videos of the result at both sizes sent to the human in the app; CI's are in the PR run's `e2e-videos`.
+- **Not verified:** the screens looked at by the session (videos only, no pictures taken); Reduce motion beyond adding no motion; a real phone; the whole db suite locally (the builder's run had two known timeouts, `admin/bank` and `account/delete`, each passing alone); the new SQL test was written after the migration was applied, so it was never seen failing.
+
 ## Review
 **23d-1 (the `reviewer` agent, fresh context, 2026-11-25):**
 - Blocking, fixed: (1) the game page and the clock game each held the run and each timed midnight, the page's from the state it first loaded, so a run started after the page opened would have been thrown off its question at midnight: the clock game now uses the page's one state, one timer. Read from the code, not reproduced; no test covers midnight. (2) The clock-runs-out test could pass with the page's own count broken: made strict (Evidence).
 - Not blocking, fixed: an answer could be sent while Next was on its way.
+- Deferred to ROADMAP "Next revision", For M23: the rest.
+
+**23d-2 (the `reviewer` agent, fresh context, 2026-11-25):**
+- Blocking: none in the code. One on process, the ticket, ROADMAP and handoff not yet written when it read the tree: written in this commit.
+- Checked and found sound, by reading and by the unit tests: nothing of an answer before the run is over or in a board message or read; the old "only started" rule for a format 3 day and Fragments; the migration's definer settings, a missing day, a guest run; the same nine for every player and the `more` count; `node:crypto` stays on the server; the feed's SQL.
+- Between this PR's deploy and the human's `npx supabase db push`, plor.app's database still sends version 2: the board logs "unknown version" and reads the board again on each message, so it stays right. The beta is paused.
 - Deferred to ROADMAP "Next revision", For M23: the rest.
 
 - Blocking findings and how each was fixed:

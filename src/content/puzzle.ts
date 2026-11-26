@@ -4,7 +4,7 @@
 // (src/game/matching.ts). Hand-written checks, no schema library (human, 2026-10-18). The server imports this same
 // module, so content is checked one way.
 import { GAME_ID } from "../platform/game.ts";
-import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY } from "../config/tunables.ts";
+import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY, RARE_PER_CLOCK_QUESTION } from "../config/tunables.ts";
 
 // The drafting session's first guess at how many players give an answer (M13 D5). Members it doesn't name are rare.
 export type Level = "common" | "uncommon";
@@ -39,9 +39,22 @@ export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQu
 
 // A day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md), as the run reads it once approved: three
 // questions, each with its category, root and tiers (`levels`: common or uncommon by answer, rare for every other
-// member). No host answers and no taken letters. Drafting and approving one is 23e, so there is no draft type or
-// validator here yet; approved_at, which only SQL reads, is left out as in ApprovedPuzzle.
-export type ClockQuestion = { prompt: string; category: string; root: string; member_of: string | null; levels: Record<string, Level> };
+// member). No host answers and no taken letters. Drafting and approving one is 23e, so there is no draft type here yet,
+// only the check on what the result reads (checkClockPuzzle); approved_at, which only SQL reads, is left out as in
+// ApprovedPuzzle.
+// rare: RARE_PER_CLOCK_QUESTION rare answers in an order picked when the day is drafted, which the result shows first
+// to last, skipping the ones the player gave (answers 48 and 49: no granted function lists a category's members for a
+// player). size: the list's count of answers when drafted, for the result's "and N more" (docs/milestones/M23-23d-the-screens.md,
+// "Found 2026-11-25").
+export type ClockQuestion = {
+  prompt: string;
+  category: string;
+  root: string;
+  member_of: string | null;
+  levels: Record<string, Level>;
+  rare: string[];
+  size: number;
+};
 export const CLOCK_FORMAT = 4; // docs/milestones/M23-23c-the-run-on-a-clock.md, Design (a day is on a clock by its format)
 export type ClockPuzzle = { format: typeof CLOCK_FORMAT; game_id: typeof GAME_ID; date: string; questions: ClockQuestion[] };
 
@@ -224,4 +237,24 @@ export function checkSchedule(file: string, puzzle: Puzzle): string[] {
     if (q.steals) seen.add(q.steals);
   });
   return out;
+}
+
+// The rules a day on a clock holds its questions to, for the result (docs/milestones/M23-23d-the-screens.md, "Found
+// 2026-11-25"): `rare` is exactly RARE_PER_CLOCK_QUESTION thing IDs with no repeat and none a key of `levels`, and `size` is a
+// positive integer. `where` prefixes each message.
+export function checkClockPuzzle(where: string, puzzle: ClockPuzzle): string[] {
+  return puzzle.questions.flatMap((q, i) => {
+    const at = `${where} q${i + 1}`;
+    const out: string[] = [];
+    const bag = q as Partial<ClockQuestion>;
+    if (!("rare" in bag)) out.push(`${at}: missing "rare"`);
+    else if (!isThingIdList(bag.rare) || bag.rare.length !== RARE_PER_CLOCK_QUESTION) out.push(`${at}: "rare" must be ${RARE_PER_CLOCK_QUESTION} thing IDs`);
+    else {
+      for (const id of duplicates(bag.rare)) out.push(`${at} thing "${id}": listed twice in rare`);
+      for (const id of bag.rare) if (id in q.levels) out.push(`${at} thing "${id}": rare, but it is in levels`);
+    }
+    if (!("size" in bag)) out.push(`${at}: missing "size"`);
+    else if (!Number.isInteger(bag.size) || bag.size! < 1) out.push(`${at}: "size" must be a positive integer`);
+    return out;
+  });
 }
