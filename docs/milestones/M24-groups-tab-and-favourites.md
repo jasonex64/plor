@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built and reviewed, in its PR (merging it changes nothing a player sees; its migration reaches plor.app by the human's own `npx supabase db push`, needed before 24b or 24c merge). Next: 24b.
+**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. Next: 24b.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
