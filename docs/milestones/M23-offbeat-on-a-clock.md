@@ -137,7 +137,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 merged, #307): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 merged, #316). The play screen, the result screen, the share text, the live board's wording.
-- **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 merged, #321; 23e-2 built, in its PR). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
+- **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 merged, #321; 23e-2 merged, #322). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
 ## Acceptance criteria
