@@ -58,7 +58,7 @@ export type Board = {
   friends: BoardFriend[];
 };
 
-type Row = { user_id: string; username: string; name: string; status: RunStatus | null; answered: number | null };
+type Row = { user_id: string; username: string; name: string; status: RunStatus | null; answered: number | null; favourite: boolean };
 
 export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promise<Board> {
   const { rows: today } = await db.query<{ date: string; content: ApprovedPuzzle | ClockPuzzle | SubstringDay | null; games: BoardGame[] }>(
@@ -70,12 +70,14 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
   );
   const { date, content, games } = today[0];
   const clock = game === GAME_ID && (content as ClockPuzzle | null)?.format === CLOCK_FORMAT;
-  // The viewer and each friend, with today's run status if they started one.
+  // The viewer and each friend, with today's run status if they started one, and the viewer's own star on them (M24 24c).
   const { rows } = await db.query<Row>(
     `with people as (${circleSql("$1")})
-     select p.user_id, pr.username::text as username, coalesce(pr.display_name, pr.username::text) as name, s.status, s.answered
+     select p.user_id, pr.username::text as username, coalesce(pr.display_name, pr.username::text) as name, s.status, s.answered,
+            coalesce(case when f.user_a = $1 then f.favourite_of_a else f.favourite_of_b end, false) as favourite
      from people p
      join private.profile pr on pr.user_id = p.user_id
+     left join private.friendship f on f.user_a = least($1::uuid, p.user_id) and f.user_b = greatest($1::uuid, p.user_id)
      left join private.run_status s on s.user_id = p.user_id and s.game_id = $2 and s.puzzle_date = $3::date`,
     [viewerId, game, date],
   );
@@ -121,7 +123,10 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
     games,
     mine: finished && content && game === GAME_ID && !clock ? ended(viewer!, caught.get(viewerId), names) : null,
     reactionsOnMine: finished ? (reactions.get(viewerId) ?? NO_REACTIONS) : null,
+    // The viewer's favourites first, then the rest, each part by name (M24 24c, answer 19). The star itself isn't sent:
+    // the card only orders by it.
     friends: friends
+      .toSorted((a, b) => Number(b.favourite) - Number(a.favourite) || a.name.localeCompare(b.name) || a.username.localeCompare(b.username))
       .map((f): BoardFriend => {
         const state =
           f.status === null ? "not_started" : !finished && !clock ? "started" : FINISHED.includes(f.status) ? "finished" : "playing";
@@ -136,8 +141,7 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
           ...(clock ? { points: state === "not_started" ? null : (points.get(f.user_id) ?? 0) } : {}),
           reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
         };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name) || a.username.localeCompare(b.username)),
+      }),
   };
 }
 

@@ -452,3 +452,20 @@ button.link {
   width: 100%;
   padding-right: 42px;
 }
+
+/* A row's star (a favourite friend, M24 24c): a mark with no border, at the buttons' one 44px, faint while empty and
+   the text's colour once filled. */
+.star {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 1.125rem;
+  color: var(--muted);
+}
+
+.star[aria-pressed="true"] {
+  color: var(--text);
+}

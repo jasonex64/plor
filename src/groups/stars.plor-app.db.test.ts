@@ -5,8 +5,10 @@
 import { randomUUID } from "node:crypto";
 import { DatabaseError, Pool } from "pg";
 import { afterAll, beforeAll, expect, it } from "vitest";
+import { getBoard } from "@/friends/board";
 import { listFriends, setFavourite } from "@/friends/friends";
 import { AppError } from "@/lib/http";
+import { GAME_ID } from "@/platform/game";
 import { createGroup, listGroups, setGroupStar } from "./groups";
 import { localStack } from "../../scripts/slot.ts";
 
@@ -14,6 +16,9 @@ const URL = localStack().adminDatabaseUrl;
 const admin = new Pool({ connectionString: URL, max: 1 });
 const app = new Pool({ connectionString: URL, options: "-c role=plor_app" });
 const [a, b] = [randomUUID(), randomUUID()].toSorted();
+// Three players who are all friends, named in their IDs' order, so each of lo and hi is on one side of both their pairs.
+const [lo, mid, hi] = [randomUUID(), randomUUID(), randomUUID()].toSorted();
+const SHOWN = new Map([[lo, "Ann"], [mid, "Bea"], [hi, "Cy"]]);
 const name = (id: string) => `s${id.slice(0, 8)}${id.slice(-6)}`;
 // How many times the race is run; the test's size, not a limit of the app.
 const ROUNDS = 10;
@@ -23,10 +28,15 @@ beforeAll(async () => {
     await admin.query("insert into auth.users (id, email) values ($1, $2)", [id, `${id}@example.test`]);
     await admin.query("insert into private.profile (user_id, username) values ($1, $2)", [id, name(id)]);
   }
+  for (const [id, shown] of SHOWN) {
+    await admin.query("insert into auth.users (id, email) values ($1, $2)", [id, `${id}@example.test`]);
+    await admin.query("insert into private.profile (user_id, username, display_name) values ($1, $2, $3)", [id, name(id), shown]);
+  }
+  for (const [x, y] of [[lo, mid], [lo, hi], [mid, hi]]) await admin.query("insert into private.friendship (user_a, user_b) values ($1, $2)", [x, y]);
 });
 
 afterAll(async () => {
-  await admin.query("delete from auth.users where id in ($1, $2)", [a, b]);
+  await admin.query("delete from auth.users where id = any($1::uuid[])", [[a, b, lo, mid, hi]]);
   await admin.end();
   await app.end();
 });
@@ -61,4 +71,23 @@ it("two moves of one player's star at the same moment always leave exactly one s
     expect(results.some((r) => r.status === "fulfilled")).toBe(true);
     expect((await listGroups(app, b)).filter((g) => g.starred)).toHaveLength(1);
   }
+});
+
+// M24 24c: the order is by the viewer's own star, whichever side of the pair's row they are, in Your friends and on the
+// live board, and never by the friend's star on them.
+it("puts a player's favourites first in their friends list and on their live board, from either side of the pair, and nobody else's", async () => {
+  const listed = async (viewer: string) => (await listFriends(app, viewer)).map((f) => f.name);
+  const board = async (viewer: string) => (await getBoard(app, viewer, GAME_ID)).friends;
+  const orders = async (viewer: string) => [await listed(viewer), (await board(viewer)).map((f) => f.name)];
+
+  // Ann is the first of both her pairs: her star on Cy puts Cy above Bea.
+  await setFavourite(app, lo, hi, true);
+  expect(await orders(lo)).toEqual([["Cy", "Bea"], ["Cy", "Bea"]]);
+  // Cy is the second of both her pairs: her star on Bea puts Bea above Ann.
+  await setFavourite(app, hi, mid, true);
+  expect(await orders(hi)).toEqual([["Bea", "Ann"], ["Bea", "Ann"]]);
+  // Bea starred nobody: Cy's star on her moves nothing in her lists.
+  expect(await orders(mid)).toEqual([["Ann", "Cy"], ["Ann", "Cy"]]);
+  // The board orders by the star and doesn't send it.
+  for (const friend of await board(lo)) expect(friend).not.toHaveProperty("favourite");
 });
