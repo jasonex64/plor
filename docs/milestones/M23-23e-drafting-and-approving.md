@@ -1,6 +1,6 @@
 # M23, 23e: drafting and approving a day on a clock
 
-**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **waits on the human's approval**. Nothing is built.
+**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23e"), security changes included**. 23e-1 (draft and approve) is built and reviewed 2026-11-25, in its PR; 23e-2 not started.
 
 ## Goal
 The human can draft a day on a clock (format 4) from the researched lists, change it while approving, and approve it; and a text players type that is on no list waits for the human instead of joining a list by itself.
@@ -71,12 +71,48 @@ Two PRs.
 No new number.
 
 ## Plan
-Written as `<step> → verify: <check>` when the human approves, 23e-1 first.
+**23e-1, as checks** (each check is run and must be able to fail; a new test is seen failing first):
+1. `parsePuzzle`'s clock twin reads a format 4 day file and refuses a bad one; the day check covers three different lists and a wording that is not empty → verify: `npx vitest run src/content/puzzle.test.ts`.
+2. The function that builds a day (wording, `levels`, `rare` by date, question and re-roll count, `size`; struck answers out, added ones rare) → verify: its unit tests, the same inputs giving the same six, another re-roll count giving a different six.
+3. The pick: least recently used, random among ties, last use from approved days and drafted files → verify: unit tests of the pick; a db test of last use.
+4. `npm run draft -- clock <date>` writes the file and prints each list's last use → verify: `npx vitest run scripts/draft.test.ts scripts/draft.db.test.ts --no-file-parallelism`.
+5. The migration: `private.build_puzzle` accepts a format 4 day from an admin, format 3 unchanged → verify: `npm run test:sql` (a new test, failing before the migration is applied).
+6. The routes: the page's read gives what it needs for a clock day and the swap menu; approve builds the day again on the server and refuses a list that is not researched, a repeated list, an empty wording → verify: the routes' db tests.
+7. The page: swap, edit, move, re-roll, redraft, approve, and the warning on leaving → verify: `npx playwright test e2e/<the new file>`, `@visual`, the stored day equal to what the page showed.
+8. Nothing else moved → verify: `npm test`, `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, `npx playwright test e2e/admin*.e2e.ts` (whichever cover the approval page today).
+
+23e-2's steps are written when 23e-1 is merged.
 
 ## Removes
 23e-1: nothing (the old draft goes in 23f). 23e-2: making answers from players' texts, on a clock day only.
 
 ---
 ## Source diff
+| Source says | We built | Why different |
+|---|---|---|
+| 23e-1 | | |
+| Design 1: added answers "count as rare" | An answer added on the Lists page and not yet in the list's file counts in `size` and is never one of the six rare examples | Its thing ID is replaced when the file holds it, so a day cannot name it ahead of the next lists load |
+| Numbers: 3 questions, "existing" | A new constant, `QUESTIONS_PER_CLOCK_DAY = 3` | No constant held it; its origin is the M23 Goal |
+| Redraft "replaces all three" | Each press leaves out every list the page has shown so far and picks the three used longest ago among the rest; with fewer than three left it answers "no lists left" | The design did not say how a second press differs from the first |
+| Not designed | A day on a clock is outside the 30-day gap in `content:validate` and the old draft | Answer 54: lists repeat within 7 days |
+| Not designed | The old approve and test-run routes refuse a clock draft (400); a clock day has no Play test | The test run is the old game's; ROADMAP, For M23 |
+| Not designed | The bank page counts only format 3 days | Its insights are the old game's |
+| Not designed | The drafted file holds no re-roll count or edited wording; the page starts from re-roll 0 | Changes live on the page until Approve (design 3) |
+| The six keyed on "the date, the question and the re-roll count" | Keyed on the date, the list and the re-roll count | Moving a question up or down must not change its six |
+
 ## Evidence
+**23e-1** (commands run 2026-11-25 on the local stack; the orchestrator's own runs unless said):
+- Swap, edit, move, re-roll, redraft, approve, the stored day equal to what the page showed, and the warning on leaving: `CI=1 npx playwright test e2e/clock-approval.e2e.ts` → `4 passed (43.4s)` (2 tests at 390 × 844 and 1280 × 720).
+- The day builder, the pick, the day's check: `npm test` → `80 files, 995 passed`.
+- Last use from approved days and drafted files; the routes refusing a list that is not researched, a repeated list, an empty wording: `npx vitest run src/app/api/admin scripts/draft.db.test.ts scripts/lists.db.test.ts --no-file-parallelism` → `16 files, 127 passed`.
+- The database's approval of a format 4 day, format 3 unchanged, `plor_app` unable to run `private.build_clock_day`: `npm run test:sql` → `Result: PASS` (the builder's run: `Files=46, Tests=979`).
+- `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`: exit 0.
+- The builder's runs, not repeated: `npm run draft -- clock 2026-12-01` printed three questions (candy, color, dance), each "last appeared never", and its file was deleted; the old approval, admin, test-run and lists e2e files, 17 passed with the new one.
+- Videos of the approval page at both sizes sent to the human in the app; CI's are in the PR run's `e2e-videos`.
+- **Not verified:** the route db tests and the draft db test were written after the code (the builder removed the day check and saw two fail, then restored it); the draft against list edits that exist in the database, beyond a unit test; the migration against a database loaded with the real lists; a real phone; the browser's Back button with unsaved changes.
+
 ## Review
+**23e-1 (the `reviewer` agent, fresh context, 2026-11-25):**
+- Blocking: none in the code. One on process, the ticket, ROADMAP and handoff not yet written when it read the tree: written in this commit.
+- Checked and found sound: the new `private.build_puzzle` differs from the earlier one only in the format 4 branch, its definer settings, admin check and grant unchanged; `private.build_clock_day` is revoked from every role; both routes check the admin first and take only a list, a wording and a re-roll count from the page, the server building levels, rare answers and size itself; thing IDs equal the lists load's; the six are exact, rare only, and do not depend on a question's place; the pick and its "days ago".
+- Deferred to ROADMAP "Next revision", For M23: the rest.

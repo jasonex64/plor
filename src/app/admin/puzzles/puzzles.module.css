@@ -149,3 +149,39 @@
   padding: 0;
   list-style: none;
 }
+
+/* A day on a clock (M23 23e-1): its six rare examples as the kit's chips, wrapping; Up and Down, and a wording's Save and
+   Cancel, side by side in the action column's width; the wording's form under its question. */
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.moves {
+  display: flex;
+  gap: 6px;
+}
+
+.moves button {
+  flex: 1 1 0;
+}
+
+.wording {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.clockQuestion {
+  min-width: 0;
+}
+
+.counts {
+  margin: 6px 0;
+  max-width: none;
+}

@@ -7,7 +7,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
 import { TYPED_ANSWER_MAX_LENGTH } from "@/config/tunables";
-import { formsOf, type ListEdit, type ListSeen } from "@/content/list-edits";
+import { formsOf, type ListEdit, type Review } from "@/content/list-edits";
 import { LISTS_DIR, parseList, type ListTier, type ResearchList } from "@/content/list";
 import { CATEGORY_KEY, normalize } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
@@ -35,7 +35,7 @@ function mapError(err: unknown): never {
 
 // CI validates every list, so one that fails here is a bug: it throws. The path is written out in full, as readDrafts
 // does, so the build traces the files (next.config.ts).
-function readLists(): ResearchList[] {
+export function readLists(): ResearchList[] {
   const dir = join(process.cwd(), "content", "lists");
   return readdirSync(dir).filter((f) => f.endsWith(".json")).sort().map((f) => {
     const { list, errors } = parseList(`${LISTS_DIR}/${f}`, readFileSync(join(dir, f), "utf8"), null);
@@ -44,14 +44,23 @@ function readLists(): ResearchList[] {
   });
 }
 
+// What the admin has done that no load has folded into the files yet, and the lists seen. A day built from the lists counts the
+// edits in (src/content/clock-day.ts). The function checks the admin.
+export async function readReview(db: Db, adminId: string): Promise<Review> {
+  try {
+    return (await db.query<{ review: Review }>("select private.list_edits($1) as review", [adminId])).rows[0].review;
+  } catch (err) {
+    mapError(err);
+  }
+}
+
 type Doing = { edits: (ListEdit & { undoUntil: string | null })[]; seen: { category: string; on: string }[] };
 
 // What the admin has done that no load has marked folded. A strike can be undone until the midnight after it was made,
 // which the database counts (private.day_of, private.next_reset); a list was seen on its day there too.
 async function doing(db: Db, adminId: string): Promise<Doing> {
   try {
-    const { rows } = await db.query<{ review: { edits: (ListEdit & { at: string })[]; seen: ListSeen[] } }>("select private.list_edits($1) as review", [adminId]);
-    const { edits, seen } = rows[0].review;
+    const { edits, seen } = await readReview(db, adminId);
     const { rows: day } = await db.query<{ today: string; ends: string; days: string[] }>(
       `select private.today()::text as today, private.next_reset() as ends,
         array(select private.day_of(t)::text from unnest($1::timestamptz[]) with ordinality as u(t, n) order by n) as days`,
@@ -95,7 +104,7 @@ function rowOf(list: ResearchList, answers: AnswerView[], prompts: Map<string, s
   };
 }
 
-const promptsOf = () => new Map(readBank().questions.map((q) => [q.category, q.prompt]));
+export const promptsOf = () => new Map(readBank().questions.map((q) => [q.category, q.prompt]));
 
 export async function listRows(db: Db, adminId: string): Promise<ListRow[]> {
   const { edits, seen } = await doing(db, adminId);

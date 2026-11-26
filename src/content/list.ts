@@ -2,6 +2,7 @@
 // of one everyday question, each with the names players type for it and a starting tier. Disk input, so every field is
 // checked; `npm run content:validate` and `npm run base -- load research` both read it through here.
 import { CATEGORY_KEY, checkKeys, isCalendarDate, isObject, isText, normalize } from "./puzzle.ts";
+import { thingId } from "./thing-id.ts";
 
 export type ListTier = "common" | "uncommon" | "rare";
 // brand and borderline are for the human's review only; the game treats such an answer like any other (M23 answers 20, 23).
@@ -11,6 +12,13 @@ export type ResearchList = { format: 1; category: string; passes: 0 | 1 | 2; bor
 export const LISTS_DIR = "lists";
 export const listPath = (category: string) => `${LISTS_DIR}/${category}.json`;
 const TIERS = ["common", "uncommon", "rare"];
+
+// A list's answers are things of this source, each named by its list and its name as typed text is normalized, so the
+// same list gives the same thing IDs in every database (src/content/thing-id.ts). The loader (scripts/base.ts) and a
+// day built from a list (src/content/clock-day.ts) both name an answer here, so a day's IDs are the loaded things'.
+export const RESEARCH_SOURCE = "research";
+export const researchKey = (category: string, name: string) => `${category}/${normalize(name)}`;
+export const answerId = (category: string, name: string) => thingId(RESEARCH_SOURCE, researchKey(category, name));
 
 // The file's problems, each naming where (`file` is its path under the content root). `categories` is the categories file
 // and the keys it lists, or null when that file is itself broken (reported elsewhere), which skips the category check.
