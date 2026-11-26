@@ -21,6 +21,11 @@ import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
 
 type GroupSummary = { id: string; name: string };
+// A group in the player's own list: starred is their one default, which the Groups tab opens (M24, answers 9 and 11).
+type ListedGroup = GroupSummary & { starred: boolean };
+type GroupList = { groups: ListedGroup[]; defaultId: string | null };
+// The dropdown's last line (M24, answer 14); no group has this ID.
+const NEW_GROUP = "new";
 type Member = { userId: string; username: string; name: string; creator: boolean };
 type Group = GroupSummary & { inviteCode: string; creator: boolean; startedOn: string; members: Member[] };
 
@@ -42,20 +47,12 @@ function useAction() {
   return { busy, error, setError, run };
 }
 
-// The player's groups, each linking to its page, and Create (G7).
-export function Groups() {
+// The name box and Create group: all the Groups tab shows a player in no group, and what "New group…" opens on a
+// group's page (M24, answer 14). A new group opens on its own page.
+function CreateGroup() {
   const router = useRouter();
-  const [groups, setGroups] = useState<GroupSummary[] | null>(null);
   const [name, setName] = useState("");
-  const { busy, error, setError, run } = useAction();
-
-  useEffect(() => {
-    api<{ groups: GroupSummary[] }>("/api/groups", { method: "GET" }).then(
-      (r) => setGroups(r.groups),
-      (err) => setError(errorText(err)),
-    );
-  }, [setError]);
-
+  const { busy, error, run } = useAction();
   const create = (event: FormEvent) => {
     event.preventDefault();
     void run(async () => {
@@ -63,28 +60,8 @@ export function Groups() {
       router.push(`/groups/${group.id}`, { transitionTypes: FORWARD });
     });
   };
-
   return (
-    // By analogy with mockup 3 (14b-8, answer 8): a card, the groups as a column of buttons, Create group the accent one.
-    <section aria-label="Groups" className={kit.card}>
-      <h2>Groups</h2>
-      {groups && groups.length === 0 && <p>No groups yet. Make one and send its link to your group chat.</p>}
-      {groups && groups.length > 0 && (
-        <ul className={kit.rows}>
-          {groups.map((g) => (
-            <li key={g.id}>
-              <ButtonLink href={`/groups/${g.id}`} transitionTypes={FORWARD}>
-                {g.name}
-              </ButtonLink>
-            </li>
-          ))}
-        </ul>
-      )}
-      {!groups && !error && (
-        <Skeleton label="Loading your groups">
-          <Line />
-        </Skeleton>
-      )}
+    <>
       <form onSubmit={create} className={kit.chips}>
         <label className={kit.grow}>
           New group&apos;s name
@@ -95,15 +72,50 @@ export function Groups() {
         </button>
       </form>
       {error && <p role="alert">{error}</p>}
+    </>
+  );
+}
+
+// The Groups tab (G7; M24 24b, answer 9): the page of the group the player starred, or with no star the first they
+// joined; in no group, Create. username, name and timeUps are the signed-in player's, as GroupPage takes them.
+export function Groups(player: { username: string; name: string; timeUps: number }) {
+  const [list, setList] = useState<GroupList | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api<GroupList>("/api/groups", { method: "GET" }).then(setList, (err) => setError(errorText(err)));
+  }, []);
+
+  if (list?.defaultId) return <GroupPage key={list.defaultId} id={list.defaultId} listed={list.groups} {...player} />;
+  return (
+    <section aria-label="Groups" className={kit.card}>
+      <h2>Groups</h2>
+      {list && (
+        <>
+          <p>No groups yet. Make one and send its link to your group chat.</p>
+          <CreateGroup />
+        </>
+      )}
+      {!list && !error && (
+        <Skeleton label="Loading your groups">
+          <Line />
+        </Skeleton>
+      )}
+      {error && <p role="alert">{error}</p>}
     </section>
   );
 }
 
 // A group's page: members, the invite link every member can share, the creator's powers (G1, G6), the group's weekly
-// leaderboard (10c) and its thread, live (10d; G4, G5). username is the signed-in player's.
-export function GroupPage({ id, username, name, timeUps }: { id: string; username: string; name: string; timeUps: number }) {
+// leaderboard (10c) and its thread, live (10d; G4, G5). username is the signed-in player's. The group's name is a
+// dropdown of the player's groups, with this group's star beside it (M24 24b); listed is that list when the Groups tab
+// has already loaded it.
+export function GroupPage({ id, username, name, timeUps, listed }: { id: string; username: string; name: string; timeUps: number; listed?: ListedGroup[] }) {
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
+  const [groups, setGroups] = useState<ListedGroup[] | null>(listed ?? null);
+  // "New group…" is chosen in the dropdown: the name box shows under it.
+  const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState("");
   const [shared, setShared] = useState<Shared | null>(null);
   const { busy, error, setError, run } = useAction();
@@ -139,6 +151,13 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   }
   useEffect(load, [id, setError, latest, day]);
   useEffect(() => {
+    if (listed) return;
+    api<GroupList>("/api/groups", { method: "GET" }).then(
+      (r) => setGroups(r.groups),
+      (err) => setError(errorText(err)),
+    );
+  }, [listed, setError]);
+  useEffect(() => {
     if (reset === null) return;
     const timer = setTimeout(() => setDay((d) => d + 1), reset.ms);
     return () => clearTimeout(timer);
@@ -154,8 +173,23 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
     act(async () => {
       const r = await api<{ name: string }>("/api/groups/rename", { method: "POST", body: { id, name: draft } });
       setGroup((g) => g && { ...g, name: r.name });
+      setGroups((all) => all && all.map((g) => (g.id === id ? { ...g, name: r.name } : g)));
     });
   };
+  // Choosing a group goes to its page, which stays a link of its own (answer 10); the last line opens the name box.
+  const switchTo = (value: string) => {
+    setCreating(value === NEW_GROUP);
+    if (value !== NEW_GROUP && value !== id) router.push(`/groups/${value}`, { transitionTypes: FORWARD });
+  };
+  // The player's one star (answers 11 and 15): starring this group takes it from any other, and tapping a filled star
+  // clears it (answer 17).
+  const starred = groups?.some((g) => g.id === id && g.starred) ?? false;
+  const toggleStar = () =>
+    act(async () => {
+      await api("/api/groups/star", { method: "POST", body: { id, starred: !starred } });
+      setGroups((all) => all && all.map((g) => ({ ...g, starred: g.id === id && !starred })));
+    });
+  const starLabel = starred ? "Opens first" : "Open this group first";
   // The link isn't shown (docs/milestones/M14-14b-3-invite-button.md), so a reset says it happened, as the friend
   // link's does.
   const [linkReset, setLinkReset] = useState(false);
@@ -202,7 +236,26 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
         <LiveStatus channel={channel} />
         {group && link && (
           <>
-            <h2>{group.name}</h2>
+            {/* The name is the dropdown (answer 10), so the heading is for screen readers and the page's outline. */}
+            <h2 className="sr-only">{group.name}</h2>
+            <div className={kit.chips}>
+              <label className={`${kit.select} ${kit.grow}`}>
+                <span className="sr-only">Group</span>
+                <select value={creating ? NEW_GROUP : id} onChange={(e) => switchTo(e.target.value)}>
+                  {(groups ?? [{ id, name: group.name, starred: false }]).map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.starred ? `${g.name} ★` : g.name}
+                    </option>
+                  ))}
+                  <option value={NEW_GROUP}>New group…</option>
+                </select>
+              </label>
+              {/* Filled or outlined, not only coloured (WCAG 1.4.1); the words are answer 18's. */}
+              <button type="button" aria-label={starLabel} title={starLabel} disabled={busy || !groups} onClick={toggleStar}>
+                {starred ? "★" : "☆"}
+              </button>
+            </div>
+            {creating && <CreateGroup />}
             {/* How old the group is (inbox #233; the human 2026-11-16: "Started Nov 2"). The day is already Pacific
                 text, so it's read in UTC and can't shift a day. */}
             <p>

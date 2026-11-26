@@ -70,7 +70,7 @@ describe("groups", () => {
 
   it("creates a group with its creator as the only member, and checks the name rule (G1, G11)", async () => {
     useSession(A.session);
-    expect(await call(groups, "/api/groups", "GET")).toEqual({ status: 200, body: { ok: true, groups: [] } });
+    expect(await call(groups, "/api/groups", "GET")).toEqual({ status: 200, body: { ok: true, groups: [], defaultId: null } });
     const created = await call(create, "/api/groups/create", "POST", { name: "  Book Club " });
     expect(created.status).toBe(201);
     club = created.body.group.id;
@@ -86,7 +86,7 @@ describe("groups", () => {
     expect(await call(create, "/api/groups/create", "POST", { name: "a\u0000b" })).toEqual(invalid);
     expect(await call(groups, "/api/groups", "GET")).toEqual({
       status: 200,
-      body: { ok: true, groups: [{ id: longName, name: longest, starred: false }, { id: club, name: "Book Club", starred: false }] },
+      body: { ok: true, groups: [{ id: longName, name: longest, starred: false }, { id: club, name: "Book Club", starred: false }], defaultId: club },
     });
 
     const page = await call(detail, `/api/groups/detail?id=${club}`, "GET");
@@ -132,12 +132,16 @@ describe("groups", () => {
   it("stars one group as a player's default, moves the star in one step and clears it (M24 24a)", async () => {
     const starred = async () =>
       (await call(groups, "/api/groups", "GET")).body.groups.filter((g: { starred: boolean }) => g.starred).map((g: { id: string }) => g.id);
+    // The group the Groups tab opens (24b): the starred one, or the first joined.
+    const opens = async () => (await call(groups, "/api/groups", "GET")).body.defaultId;
     const set = (id: unknown, on: unknown) => call(star, "/api/groups/star", "POST", { id, starred: on });
     useSession(A.session);
     expect(await set(club, true)).toEqual({ status: 200, body: { ok: true } });
     expect(await starred()).toEqual([club]);
+    expect(await opens()).toBe(club);
     expect(await set(longName, true)).toEqual({ status: 200, body: { ok: true } });
     expect(await starred()).toEqual([longName]);
+    expect(await opens()).toBe(longName);
     // A group that doesn't exist is the group page's 404, and the star stays where it was.
     expect(await set("00000000-0000-4000-8000-000000000000", true)).toEqual(error(404, "group_not_found"));
     expect(await set("not-an-id", true)).toEqual(error(404, "group_not_found"));
@@ -156,6 +160,7 @@ describe("groups", () => {
     expect(await starred()).toEqual([longName]);
     expect(await set(longName, false)).toEqual({ status: 200, body: { ok: true } });
     expect(await starred()).toEqual([]);
+    expect(await opens()).toBe(club);
   });
 
   it("refuses the creator's powers to other members (G1)", async () => {

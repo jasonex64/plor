@@ -49,7 +49,12 @@ test("every tab starts its content at one place, with cards 16px apart", async (
   await page.getByRole("button", { name: "Create group" }).click();
   await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const group = new URL(page.url()).pathname;
-  const stacked = ["/friends", "/me", group, `/u/lf${RUN}`];
+  // The Groups tab is the player's group's page since M24 24b, so it is stacked like it. A second player, in no group,
+  // has the short Groups tab: the Create box alone.
+  const stacked = ["/friends", "/groups", "/me", group, `/u/lf${RUN}`];
+  const groupless = await (await browser.newContext({ viewport: { width: 1280, height: 400 } })).newPage();
+  await groupless.goto("/groups");
+  await signInAndPick(groupless, "lg");
   for (const width of [1280, 1920]) {
     await page.setViewportSize({ width, height: 400 });
     const seen: Record<string, { left: number; top: number; gaps: number[]; scrolls: boolean }> = {};
@@ -59,8 +64,13 @@ test("every tab starts its content at one place, with cards 16px apart", async (
       await page.waitForLoadState("networkidle");
       seen[path] = await frame(page);
     }
-    // Groups, with one group, doesn't scroll at this height and Friends does, so the scrollbar's room is compared.
-    expect([seen["/groups"].scrolls, seen["/friends"].scrolls]).toEqual([false, true]);
+    // Groups, for a player in no group, doesn't scroll at this height and Friends does, so the scrollbar's room is compared.
+    await groupless.setViewportSize({ width, height: 400 });
+    await groupless.goto("/groups");
+    await expect(groupless.getByRole("button", { name: "Create group" })).toBeVisible();
+    await groupless.waitForLoadState("networkidle");
+    seen["/groups, in no group"] = await frame(groupless);
+    expect([seen["/groups, in no group"].scrolls, seen["/friends"].scrolls]).toEqual([false, true]);
     const at = seen["/friends"];
     for (const [path, place] of Object.entries(seen)) {
       expect({ path, width, left: place.left, top: place.top }).toEqual({ path, width, left: at.left, top: at.top });

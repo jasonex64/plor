@@ -76,9 +76,10 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
   await expect(board.getByRole("listitem")).toHaveText([`ga${RUN}: 0 points`, `gb${RUN} (you): 0 points`]);
 
-  // The group is on the creator's Groups tab too.
+  // The creator's Groups tab opens the group itself (M24 24b): their only one, so the first they joined.
   await creator.goto("/groups");
-  await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
+  await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
+  await expect(creator.getByRole("region", { name: "Group leaderboard" })).toBeVisible();
 
   // Today's layout before playing (docs/milestones/M14-14a-2a-today.md): Offbeat's banner with Play first, then the
   // feed, with nothing to read yet; at this desktop width (1280px) the live board and the leaderboard card, whose board
@@ -153,6 +154,76 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await thread.getByRole("button", { name: "Post" }).click();
   await refetch;
   await expect(feed.getByRole("article").filter({ hasText: second })).toContainText("Book Club");
+});
+
+// The Groups tab opens a group at once (docs/milestones/M24-groups-tab-and-favourites.md, 24b; answers 9 to 11, 14, 15,
+// 17 and 18): the starred one, or with no star the first joined. The group's name is a dropdown of the player's groups
+// that ends with "New group…", and the star beside it makes the group the default, on the account.
+test("the Groups tab opens the starred group, its name a dropdown that switches groups and starts one", { tag: "@visual" }, async ({ page, browser }) => {
+  // The name of the phone run's player differs from the desktop run's, which can run at the same moment.
+  const who = page.viewportSize()!.width < 768 ? "gsp" : "gsd";
+  await page.goto("/groups");
+  await signInAndPick(page, who);
+  // In no group, the tab is the Create box.
+  const none = page.getByRole("region", { name: "Groups" });
+  await expect(none.getByText("No groups yet.")).toBeVisible();
+  await none.getByLabel("New group's name").fill("Alpha");
+  await none.getByRole("button", { name: "Create group" }).click();
+  await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
+  const alphaUrl = page.url();
+
+  // The name is a dropdown: the player's groups, then "New group…", which opens the name box.
+  const card = page.getByRole("region", { name: "Group", exact: true });
+  // The card's one dropdown: a label's text includes its options', so it has no exact label to find it by.
+  const switcher = card.getByRole("combobox");
+  await expect(switcher.locator("option")).toHaveText(["Alpha", "New group…"]);
+  await switcher.selectOption({ label: "New group…" });
+  await card.getByLabel("New group's name").fill("Beta");
+  await card.getByRole("button", { name: "Create group" }).click();
+  await expect(page).not.toHaveURL(alphaUrl);
+  await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
+  const betaUrl = page.url();
+  await expect(page.getByRole("heading", { name: "Beta" })).toBeVisible();
+  await expect(switcher.locator("option")).toHaveText(["Alpha", "Beta", "New group…"]);
+
+  // No star yet: the tab opens the first group joined, with its board, and no list to tap through.
+  await page.goto("/groups");
+  await expect(page.getByRole("heading", { name: "Alpha" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Group leaderboard" })).toBeVisible();
+  await expect(switcher).toHaveValue(alphaUrl.split("/").pop()!);
+  // The name and the star sit on one line, inside the card, at phone width too.
+  const star = card.getByRole("button", { name: "Open this group first", exact: true });
+  const [nameBox, starBox, cardBox] = [await switcher.boundingBox(), await star.boundingBox(), await card.boundingBox()];
+  expect(Math.abs(nameBox!.y + nameBox!.height / 2 - (starBox!.y + starBox!.height / 2))).toBeLessThan(2);
+  expect(starBox!.x + starBox!.width).toBeLessThanOrEqual(cardBox!.x + cardBox!.width);
+  // At least WCAG 2.2's 24px target (2.5.8).
+  expect(Math.min(starBox!.width, starBox!.height)).toBeGreaterThanOrEqual(24);
+
+  // Choosing a group shows it.
+  await switcher.selectOption({ label: "Beta" });
+  await expect(page).toHaveURL(betaUrl);
+  await expect(page.getByRole("heading", { name: "Beta" })).toBeVisible();
+
+  // The star makes Beta the default: after a reload, on the tab, and in a second browser signed in as the same player.
+  await star.click();
+  const filled = card.getByRole("button", { name: "Opens first", exact: true });
+  await expect(filled).toBeVisible();
+  await expect(switcher.locator("option")).toHaveText(["Alpha", "Beta ★", "New group…"]);
+  await page.reload();
+  await expect(filled).toBeVisible();
+  await page.goto("/groups");
+  await expect(page.getByRole("heading", { name: "Beta" })).toBeVisible();
+  const second = await (await browser.newContext({ storageState: await page.context().storageState(), viewport: page.viewportSize() })).newPage();
+  await second.goto("/groups");
+  await expect(second.getByRole("heading", { name: "Beta" })).toBeVisible();
+  await expect(second.getByRole("button", { name: "Opens first", exact: true })).toBeVisible();
+  await second.close();
+
+  // Tapping the filled star clears it (answer 17), and the tab is back to the first group joined.
+  await filled.click();
+  await expect(star).toBeVisible();
+  await page.goto("/groups");
+  await expect(page.getByRole("heading", { name: "Alpha" })).toBeVisible();
 });
 
 // A group's page left open past midnight moves to the new day too (M11 H6): its board and thread start again, and the
