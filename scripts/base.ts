@@ -33,7 +33,7 @@ import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VI
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { type ListEdit, type ListSeen, unfoldedEdits } from "../src/content/list-edits.ts";
-import { LISTS_DIR, RESEARCH_SOURCE, parseList, researchKey, type ResearchList } from "../src/content/list.ts";
+import { LISTS_DIR, RESEARCH_SOURCE, parseList, researchKey, type ListTier, type ResearchList } from "../src/content/list.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
@@ -1407,14 +1407,14 @@ export function readLists(): ResearchList[] {
   });
 }
 
-// An admin's strike or add from the review page that no load has marked folded yet, with its row (M23 23b-2). The fold
+// An admin's strike, add or tier change from the review page that no load has marked folded yet, with its row (M23 23b-2). The fold
 // reads these (`npm run lists -- fold`), and a load marks the ones the files now hold.
 export type EditRow = ListEdit & { id: string; at: string };
 
 export async function readEdits(client: pg.Client): Promise<EditRow[]> {
-  const { rows } = await client.query<{ id: string; category: string; name: string; kind: "strike" | "add"; at: Date }>(
-    "select id::text, category, name, kind, edited_at as at from private.list_edit where folded_at is null order by id");
-  return rows.map((r) => ({ ...r, at: r.at.toISOString() }));
+  const { rows } = await client.query<{ id: string; category: string; name: string; kind: "strike" | "add" | "tier"; tier: ListTier | null; at: Date }>(
+    "select id::text, category, name, kind, tier, edited_at as at from private.list_edit where folded_at is null order by id");
+  return rows.map(({ kind, tier, at, ...r }): EditRow => ({ ...r, at: at.toISOString(), ...(kind === "tier" ? { kind, tier: tier! } : { kind }) }));
 }
 
 export async function readSeen(client: pg.Client): Promise<ListSeen[]> {
@@ -1422,7 +1422,7 @@ export async function readSeen(client: pg.Client): Promise<ListSeen[]> {
   return rows.map((r) => ({ ...r, at: r.at.toISOString() }));
 }
 
-const editsText = (edits: ListEdit[]) => edits.map((e) => `${e.kind} ${e.category}: ${e.name}`).join("; ");
+const editsText = (edits: ListEdit[]) => edits.map((e) => `${e.kind} ${e.category}: ${e.name}${e.kind === "tier" ? ` → ${e.tier}` : ""}`).join("; ");
 
 // Loads the lists. Edits made on the site (private.list_edit) that the files now hold are marked folded, in the load's
 // own transaction; the ones they don't yet are warned of, as a load would bring a struck answer back (the hosted load

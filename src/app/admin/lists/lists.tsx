@@ -3,11 +3,13 @@
 // The review of the researched lists (docs/milestones/M23-23b-research-and-review.md, 23b-2; the human's answers 25, 29
 // and 30 in M23-offbeat-on-a-clock.md): each researched question with its counts, and one question's answers, the doubtful
 // ones and the brands first, then every answer behind a search. An answer can be struck (Undo works until midnight),
-// an answer added, and the list marked seen. Built from the admin's own pieces: the audit's table, the pool's page of 20,
+// an answer added, an answer given another tier (23e-2; Undo works until the file holds it), and the list marked seen; the
+// texts players typed on its clock days that are on no list wait under it, each to add or dismiss. Built from the admin's own pieces: the audit's table, the pool's page of 20,
 // the base page's search row.
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
-import type { AnswerView, ListRow, ListView } from "@/admin/lists";
+import type { AnswerView, ListRow, ListView, Unlisted } from "@/admin/lists";
 import { POOL_PAGE_SIZE, TYPED_ANSWER_MAX_LENGTH } from "@/config/tunables";
+import type { ListTier } from "@/content/list";
 import { normalize } from "@/content/puzzle";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
@@ -16,7 +18,9 @@ import { Table } from "../audit/audit";
 import kit from "../../kit.module.css";
 import { Line, Skeleton } from "../../skeleton";
 
-type Edit = { action: "strike" | "unstrike" | "add" | "seen"; name?: string };
+type Edit = { action: "strike" | "unstrike" | "add" | "seen" | "dismiss" | "untier"; name?: string } | { action: "tier"; name: string; tier: ListTier };
+
+const TIER_NAMES: ListTier[] = ["common", "uncommon", "rare"];
 
 const count = (n: number) => n.toLocaleString("en-US");
 const CHECKED = ["Not checked", "Checked once", "Checked twice"];
@@ -138,7 +142,7 @@ function ListPage({ category, onBack, onChanged }: { category: string; onBack: (
   const { list, answers } = view;
   const needle = normalize(query);
   const found = answers.filter((a) => normalize(a.name).includes(needle));
-  const changed = answers.filter((a) => a.struck || a.added);
+  const changed = answers.filter((a) => a.struck || a.added || a.tierWas);
   return (
     <>
       {back}
@@ -149,8 +153,8 @@ function ListPage({ category, onBack, onChanged }: { category: string; onBack: (
           {list.seen ? `Seen ${list.seen}.` : "Not seen yet."}
         </p>
         <p className={admin.note}>
-          A strike counts from midnight Pacific, and Undo brings the answer back until then. An added answer counts from the next day. Claude writes your
-          changes into the list&apos;s file later.
+          A strike counts from midnight Pacific, and Undo brings the answer back until then. An added answer counts from the next day. A new tier counts
+          in the next day you draft or approve; an answer you added has to be in the file first. Claude writes your changes into the list&apos;s file later.
         </p>
         {error && <p role="alert">{error}</p>}
         <form onSubmit={add} className={admin.search}>
@@ -169,6 +173,7 @@ function ListPage({ category, onBack, onChanged }: { category: string; onBack: (
         </div>
       </section>
       {changed.length > 0 && <Answers label="Changed by you" answers={changed} busy={busy} change={change} />}
+      <Typed unlisted={view.unlisted} busy={busy} change={change} />
       <Answers label="Doubtful answers" answers={answers.filter((a) => a.borderline)} empty="No doubtful answers." busy={busy} change={change} />
       <Answers label="Brands" answers={answers.filter((a) => a.brand)} empty="No brands." busy={busy} change={change} />
       <Answers label="All answers" answers={found} empty="No answer has that in its name." busy={busy} change={change} key={needle}>
@@ -180,6 +185,49 @@ function ListPage({ category, onBack, onChanged }: { category: string; onBack: (
         </div>
       </Answers>
     </>
+  );
+}
+
+const TYPED_HEAD = ["Text", "Players", "Change"];
+
+// What players typed on this list's clock days that no list has, most players first. A text can be added to the list (the Add
+// above) or dismissed, which keeps it from showing again however many more players type it. Guests' texts are not kept.
+function Typed({ unlisted, busy, change }: { unlisted: Unlisted[]; busy: boolean; change: (edit: Edit) => Promise<boolean> }) {
+  const [shown, setShown] = useState(POOL_PAGE_SIZE);
+  return (
+    <section aria-label="Typed on no list" className={kit.card}>
+      <h3 className={admin.cardTitle}>
+        Typed, on no list <span className={admin.muted}>{count(unlisted.length)}</span>
+      </h3>
+      <p className={admin.note}>Texts signed-in players typed on this question that no list has, the most typed first. Add one to the list, or dismiss it.</p>
+      {unlisted.length === 0 ? (
+        <p>No text is waiting.</p>
+      ) : (
+        <Table head={TYPED_HEAD}>
+          {unlisted.slice(0, shown).map((u) => (
+            <tr role="row" key={u.text} aria-label={u.text}>
+              <td role="cell" className={admin.strong} data-label={TYPED_HEAD[0]}>{u.name}</td>
+              <td role="cell" data-label={TYPED_HEAD[1]}>{count(u.players)}</td>
+              <td role="cell">
+                <div className={admin.actions}>
+                  <button type="button" className={admin.button} disabled={busy} onClick={() => void change({ action: "add", name: u.name })}>
+                    Add<span className="sr-only"> {u.name}</span>
+                  </button>
+                  <button type="button" className={admin.button} disabled={busy} onClick={() => void change({ action: "dismiss", name: u.text })}>
+                    Dismiss<span className="sr-only"> {u.name}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </Table>
+      )}
+      {shown < unlisted.length && (
+        <button type="button" className={kit.link} onClick={() => setShown(shown + POOL_PAGE_SIZE)}>
+          Show more ({count(shown)} of {count(unlisted.length)})
+        </button>
+      )}
+    </section>
   );
 }
 
@@ -229,6 +277,7 @@ function AnswerRow({ answer: a, busy, change }: { answer: AnswerView; busy: bool
         <span className={admin.muted}>{a.tier}</span>
         {a.struck && <span className={kit.chip}> Struck</span>}
         {a.added && <span className={kit.chip}> Added</span>}
+        {a.tierWas && <span className={kit.chip}> Was {a.tierWas}</span>}
         {a.borderline && <span className={`${kit.chip} ${admin.decide}`}> Doubtful</span>}
         {a.brand && <span className={kit.chip}> Brand</span>}
       </td>
@@ -248,6 +297,23 @@ function AnswerRow({ answer: a, busy, change }: { answer: AnswerView; busy: bool
             </>
           )}
           {a.struck && !a.struck.undoUntil && <span className={admin.muted}>Not an answer now</span>}
+          {!a.struck && !a.added && (
+            <label className={kit.select}>
+              <span className="sr-only">Tier of {a.name}</span>
+              <select value={a.tier} disabled={busy} onChange={(e) => void change({ action: "tier", name: a.name, tier: e.target.value as ListTier })}>
+                {TIER_NAMES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {a.tierWas && (
+            <button type="button" className={admin.button} disabled={busy} onClick={() => void change({ action: "untier", name: a.name })}>
+              Undo<span className="sr-only"> the tier change of {a.name}</span>
+            </button>
+          )}
         </div>
       </td>
     </tr>

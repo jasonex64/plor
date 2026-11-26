@@ -11,7 +11,7 @@ export type ResearchList = { format: 1; category: string; passes: 0 | 1 | 2; bor
 
 export const LISTS_DIR = "lists";
 export const listPath = (category: string) => `${LISTS_DIR}/${category}.json`;
-const TIERS = ["common", "uncommon", "rare"];
+export const TIERS: string[] = ["common", "uncommon", "rare"];
 
 // A list's answers are things of this source, each named by its list and its name as typed text is normalized, so the
 // same list gives the same thing IDs in every database (src/content/thing-id.ts). The loader (scripts/base.ts) and a

@@ -16,7 +16,8 @@ export type ClockPick = { category: string; wording?: string; reroll: number };
 // (private.list_edit), and each list's wording (the bank's, by category).
 export type ClockSource = { lists: ResearchList[]; edits: ListEdit[]; prompts: Map<string, string> };
 
-// A list's answers as a day holds them. The answers struck on the Lists page are left out, as a load ends them. An answer
+// A list's answers as a day holds them. The answers struck on the Lists page are left out, as a load ends them, and an answer
+// given another tier there has it (the last change counts; the fold writes it into the file). An answer
 // added there and not yet in the file counts in `size`, but is not drawn as an example: its thing is made when it is added
 // and replaced by the file's line when the file holds it, so its ID would not last (src/content/list-edits.ts).
 export type ClockAnswers = { levels: Record<string, Level>; rare: { id: string; name: string }[]; size: number };
@@ -25,13 +26,15 @@ export function listAnswers(list: ResearchList, edits: ListEdit[]): ClockAnswers
   const mine = edits.filter((e) => e.category === list.category);
   const struck = new Set(mine.filter((e) => e.kind === "strike").map((e) => normalize(e.name)));
   const standing = list.answers.filter((a) => !formsOf(a).some((form) => struck.has(form)));
+  const retiered = new Map(mine.flatMap((e) => (e.kind === "tier" ? [[normalize(e.name), e.tier] as const] : [])));
   const added = new Set(mine.filter((e) => e.kind === "add" && !list.answers.some((a) => formsOf(a).includes(normalize(e.name)))).map((e) => normalize(e.name)));
   const levels: Record<string, Level> = {};
   const rare: ClockAnswers["rare"] = [];
   for (const a of standing) {
     const id = answerId(list.category, a.name);
-    if (a.tier === "rare") rare.push({ id, name: a.name });
-    else levels[id] = a.tier;
+    const tier = formsOf(a).map((form) => retiered.get(form)).find((t) => t !== undefined) ?? a.tier;
+    if (tier === "rare") rare.push({ id, name: a.name });
+    else levels[id] = tier;
   }
   return { levels, rare, size: standing.length + added.size };
 }

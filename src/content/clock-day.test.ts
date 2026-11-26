@@ -49,6 +49,45 @@ describe("listAnswers", () => {
   });
 });
 
+describe("listAnswers and a tier change", () => {
+  it("takes an answer's tier from the edit, by any of its names: out of the rare pool into the levels, and the other way", () => {
+    const a = listAnswers(list("alpha"), [
+      { category: "alpha", name: "plains", kind: "tier", tier: "rare" },
+      { category: "alpha", name: "Fancy", kind: "tier", tier: "common" },
+      { category: "alpha", name: "odd alpha 3", kind: "tier", tier: "uncommon" },
+      { category: "beta", name: "plain", kind: "tier", tier: "uncommon" }, // another list's
+    ]);
+    expect(a.levels).toEqual({ [answerId("alpha", "Fancy")]: "common", [answerId("alpha", "Odd alpha 3")]: "uncommon" });
+    expect(a.rare.map((r) => r.name)).toContain("Plain");
+    expect(a.rare.map((r) => r.name)).not.toContain("Odd alpha 3");
+    expect(a.rare).toHaveLength(12);
+    expect(a.size).toBe(14);
+  });
+
+  it("gives a day whose levels and rare examples follow the change", () => {
+    const edits = [{ category: "alpha", name: "plain", kind: "tier" as const, tier: "rare" as const }];
+    const { day, examples } = buildClockDay("2026-12-01", picks("alpha", "beta", "gamma"), source({ edits }));
+    expect(day.questions[0].levels).toEqual({ [answerId("alpha", "Fancy")]: "uncommon" });
+    expect(day.questions[1].levels).toEqual(listAnswers(list("beta"), []).levels);
+    const pool = listAnswers(list("alpha"), edits).rare;
+    expect(pool.some((r) => r.name === "Plain")).toBe(true);
+    for (const id of day.questions[0].rare) expect(pool.map((r) => r.id)).toContain(id);
+    expect(examples[0]).toHaveLength(RARE_PER_CLOCK_QUESTION);
+  });
+
+  it("gives the answer the last tier edit says, and leaves a struck answer out whatever its tier", () => {
+    const a = listAnswers(list("alpha"), [
+      { category: "alpha", name: "plain", kind: "tier", tier: "uncommon" },
+      { category: "alpha", name: "plain", kind: "tier", tier: "rare" },
+      { category: "alpha", name: "fancy", kind: "tier", tier: "rare" },
+      { category: "alpha", name: "fancy", kind: "strike" },
+    ]);
+    expect(a.levels).toEqual({});
+    expect(a.rare.map((r) => r.name)).toContain("Plain");
+    expect(a.rare.map((r) => r.name)).not.toContain("Fancy");
+  });
+});
+
 describe("buildClockDay", () => {
   it("builds a format 4 day of the bank's wording, the list's tiers, six rare answers and the list's count", () => {
     const { day } = buildClockDay("2026-12-01", picks("alpha", "beta", "gamma"), source());
