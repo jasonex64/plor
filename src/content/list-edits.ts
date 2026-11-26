@@ -1,13 +1,15 @@
 // What an admin does to a researched list on the review page, and how it reaches the list's file (docs/milestones/
-// M23-23b-research-and-review.md, Part 3): a strike takes an answer off, an add puts one on, and a seen mark dates the
-// review. They wait in the database until `npm run lists -- fold` writes them into content/lists/<category>.json; the
+// M23-23b-research-and-review.md, Part 3; 23e-2): a strike takes an answer off, an add puts one on, a tier edit gives an
+// answer another tier, and a seen mark dates the review. They wait in the database until `npm run lists -- fold` writes
+// them into content/lists/<category>.json; the
 // load's guard asks which of them a file does not hold yet. Pure and relative-imported, as the scripts and the review
 // page's server code both use it.
-import type { ListAnswer, ResearchList } from "./list.ts";
+import type { ListAnswer, ListTier, ResearchList } from "./list.ts";
 import { CATEGORY_KEY, isCalendarDate, isObject, isText, normalize } from "./puzzle.ts";
 
-// name: the typed form struck (normalized, as the database keeps it) or the name as the admin wrote it, for an add.
-export type ListEdit = { category: string; name: string; kind: "strike" | "add" };
+// name: the typed form struck or given another tier (normalized, as the database keeps it) or the name as the admin wrote it,
+// for an add. A tier edit carries the tier the answer is to have.
+export type ListEdit = { category: string; name: string } & ({ kind: "strike" | "add" } | { kind: "tier"; tier: ListTier });
 export type ListSeen = { category: string; at: string };
 // What private.list_edits returns: the edits not yet folded, and the lists seen.
 export type Review = { edits: (ListEdit & { at: string })[]; seen: ListSeen[] };
@@ -17,19 +19,28 @@ export const formsOf = (a: ListAnswer): string[] => [a.name, ...a.aliases].map(n
 
 const has = (list: ResearchList | undefined, name: string) => list?.answers.some((a) => formsOf(a).includes(normalize(name))) ?? false;
 
-// The edits the files do not hold yet: a strike whose answer is still on its file's list, an add that is not on it.
+// The tier a list's file gives the answer that bears this typed form, or undefined when it has none.
+const tierOf = (list: ResearchList | undefined, name: string): ListTier | undefined => list?.answers.find((a) => formsOf(a).includes(normalize(name)))?.tier;
+
+// The edits the files do not hold yet: a strike whose answer is still on its file's list, an add that is not on it, a tier
+// edit whose answer is on the list with another tier (one whose answer has left the list has nothing to write).
 // Whatever else an edit carries (the loader's row ID) stays on it.
 export function unfoldedEdits<E extends ListEdit>(edits: E[], lists: ResearchList[]): E[] {
-  return edits.filter((e) => has(lists.find((l) => l.category === e.category), e.name) === (e.kind === "strike"));
+  return edits.filter((e) => {
+    const list = lists.find((l) => l.category === e.category);
+    if (e.kind === "tier") return has(list, e.name) && tierOf(list, e.name) !== e.tier;
+    return has(list, e.name) === (e.kind === "strike");
+  });
 }
 
 // The list with its category's edits written in: a struck answer's line deleted, an added answer a line of its own (rare,
-// no marks) unless the list has it, and, when the list was seen, `seen` (YYYY-MM-DD) as its borderline_seen date.
+// no marks) unless the list has it, an answer's tier changed, and, when the list was seen, `seen` (YYYY-MM-DD) as its borderline_seen date.
 export function foldList(list: ResearchList, edits: ListEdit[], seen: string | null): ResearchList {
   let answers = list.answers;
   for (const e of edits.filter((x) => x.category === list.category)) {
     const form = normalize(e.name);
     if (e.kind === "strike") answers = answers.filter((a) => !formsOf(a).includes(form));
+    else if (e.kind === "tier") answers = answers.map((a) => (formsOf(a).includes(form) ? { ...a, tier: e.tier } : a));
     else if (!answers.some((a) => formsOf(a).includes(form))) answers = [...answers, { name: e.name, aliases: [], tier: "rare" }];
   }
   return { ...list, borderline_seen: seen ?? list.borderline_seen, answers };
@@ -54,9 +65,10 @@ export function parseReview(file: string, text: string): Review {
   const isTime = (v: unknown) => isText(v) && isCalendarDate(v.split("T")[0]) && !Number.isNaN(Date.parse(v));
   const isKey = (v: unknown) => typeof v === "string" && CATEGORY_KEY.test(v);
   for (const e of data.edits) {
-    if (!isObject(e) || !isKey(e.category) || !isText(e.name) || (e.kind !== "strike" && e.kind !== "add") || !isTime(e.at)) {
-      throw new Error(`${file}: every edit needs a category, a name, a kind of "strike" or "add", and a time`);
+    if (!isObject(e) || !isKey(e.category) || !isText(e.name) || !["strike", "add", "tier"].includes(e.kind as string) || !isTime(e.at)) {
+      throw new Error(`${file}: every edit needs a category, a name, a kind of "strike", "add" or "tier", and a time`);
     }
+    if (e.kind === "tier" && !["common", "uncommon", "rare"].includes(e.tier as string)) throw new Error(`${file}: a tier edit needs a tier of "common", "uncommon" or "rare"`);
   }
   for (const s of data.seen) {
     if (!isObject(s) || !isKey(s.category) || !isTime(s.at)) throw new Error(`${file}: every seen mark needs a category and a time`);

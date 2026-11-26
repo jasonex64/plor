@@ -7,7 +7,7 @@ import { STATUS } from "@/lib/status";
 
 // The researched lists an admin reviews (docs/milestones/M23-23b-research-and-review.md, 23b-2): signed out → 401, not
 // in private.admin → 403. GET lists every list with its counts, or with ?category=<key> one list's answers with the
-// admin's edits in; POST strikes, undoes a strike, adds an answer or marks a list seen, 409 if the edit doesn't fit the list.
+// admin's edits in; POST strikes, undoes a strike, adds an answer, marks a list seen, gives an answer another tier (and takes that back) or dismisses a text typed on no list, 409 if the edit doesn't fit the list.
 export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
