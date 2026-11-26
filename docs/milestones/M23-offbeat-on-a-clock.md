@@ -79,6 +79,10 @@ Second round (2026-11-25):
 44. What typing a repeat shows: "\"Already said\" (Recommended)", a note different from the one for text that is not an answer.
 45. Which missed answers, and how many: "3 each, same for everyone (Recommended)". Three common, three uncommon, three rare per question, picked once per day.
 46. A long question's squares in the share text: "Wrap every 10 (Recommended)".
+
+23d-2's round (2026-11-25, after #312 merged), on the finding that a day holds no rare answers:
+48. Where the result's three rare missed answers come from: "Chosen when the day is drafted (Recommended)". Each day carries a short ordered list of rare answers per question, picked at drafting and seen by the human at approval; no new database permission.
+49. How many the day holds per question: "6 per question (Recommended)". A player who gave up to three of them still sees three.
 47. A friend's row on the live board mid-run: "Question and points (Recommended)", as "Question 2 of 3 · 180 points". The option's stated cost: a friend still to play sees scores before their own run.
 
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.

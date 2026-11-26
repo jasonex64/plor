@@ -1,6 +1,6 @@
 # M23 — 23d, the clock game's screens
 
-**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built and merged 2026-11-25 (#312, on green checks and the human's "Merge when green"); 23d-2 is not started.
+**Status:** designed 2026-11-25 from answers 40 to 47 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23d")**. 23d-1 (the card before the run and the play screen) is built and merged 2026-11-25 (#312, on green checks and the human's "Merge when green"); 23d-2 is being built.
 
 ## Goal
 A player can play a format 4 Offbeat day from start to result on a phone or a computer, signed in or as a guest, share the result, and see friends' runs on the live board.
@@ -54,7 +54,7 @@ Green common, blue uncommon, purple rare.
 - **23d-1:** the card before the run and the play screen, for a player and a guest, ending on the points and the answers given (the state 23c already gives).
 - **23d-2:** the server's additions (the result's nine missed answers per question, fixed for the day; the board message's points, a migration), the full result, the share text, the live board's rows, How to play, DESIGN.md's result and board entries.
 - Split changed 2026-11-25, before any code: the server's additions serve the result and the board only, so they go with them.
-- **Found 2026-11-25, for 23d-2 and 23e:** a day holds only its common and uncommon answers (`levels`); every other member of the category is rare and no function `plor_app` may run lists a category's members for a player (`src/game/clock-state.ts`). So the three rare missed answers cannot be picked from the base at result time without a new grant. Planned instead, with no grant: the day itself carries an ordered handful of rare answers picked when it is drafted (23e), and the result shows the first three the player did not give. To be confirmed with the human when 23d-2 starts.
+- **Found 2026-11-25, for 23d-2 and 23e:** a day holds only its common and uncommon answers (`levels`); every other member of the category is rare and no function `plor_app` may run lists a category's members for a player (`src/game/clock-state.ts`). So the three rare missed answers cannot be picked from the base at result time without a new grant. Settled 2026-11-25 (answers 48 and 49): with no grant, each question of the day carries `rare`, six rare answers in an order picked when it is drafted (23e), and the result shows the first three the player did not give. For the same reason the count of the rest ("and 452 more") cannot be read at result time, so each question also carries `size`, its list's count of answers when drafted. 23d-2 adds both fields to a format 4 day and its check; 23e fills them.
 
 ## Acceptance criteria
 - [ ] On a format 4 day, a signed-in player and a guest each play a run from Start to the result at 390 × 844 and 1280 × 720 (`@visual` Playwright tests): an accepted answer shows its name, tier, seconds and points and moves the clock and the score; a repeat shows "Already said" and text off the list "Not on the list", neither moving anything; Next opens the next question and never the last; Finish shows only on question 3.
@@ -76,6 +76,7 @@ Green common, blue uncommon, purple rare.
 | Value | Used for | Origin |
 |---|---|---|
 | 3, 3, 3 | Missed answers shown per question, per tier | The human, 2026-11-25, answer 45: "3 each, same for everyone (Recommended)" |
+| 6 | Rare answers a day carries per question | The human, 2026-11-25, answer 49: "6 per question (Recommended)" |
 | 10 | Squares per line in the share text | The human, 2026-11-25, answer 46: "Wrap every 10 (Recommended)" |
 | 390 × 844, 1280 × 720 | The sizes the screens are tested at | CLAUDE.md, Testing (`@visual`) |
 | 20 s; 3, 5, 8 s; 10, 25, 50 points | Shown in the rules and How to play | Answers 10 and 11, read from the server (`private.clock_start_ms`, `clock_added_ms`, `clock_points`), never typed into the screen's code |
@@ -87,7 +88,13 @@ Green common, blue uncommon, purple rare.
 3. A format 3 day still plays → verify: `npx playwright test e2e/offbeat.e2e.ts` passes.
 4. The run's rules untouched → verify: `npm run verify -- offbeat-run` passes.
 
-23d-2's is written when it starts.
+**23d-2, as checks:**
+1. A format 4 day's question carries `rare` (six thing IDs, none in `levels`) and `size`; the day's check refuses one without them → verify: `npm test` (the puzzle check's tests, a failing case first).
+2. The state's `missed` gives per question up to three common, three uncommon (in an order fixed by the day and the question) and three rare (the day's order), none the player gave, and the count of the rest → verify: `npx vitest run src/game/clock-state.test.ts`, and a db test that two players get the same nine.
+3. The share text → verify: `npx vitest run src/game/share.test.ts` (a question with more than 10 answers; no answer's name).
+4. The board message carries the run's points (version 3) and the board's read gives question and points → verify: the board's db tests and a unit test that the message holds no answer; `npm run test:sql`.
+5. The result screen, the share button, the live board's rows, How to play → verify: `npx playwright test e2e/clock.e2e.ts` at both sizes, a two-player test for the board.
+6. A format 3 day still plays, the run's rules hold → verify: `npx playwright test e2e/offbeat.e2e.ts`; `npm run verify -- offbeat-run`.
 
 ## Removes
 Nothing: the old game's screens go in 23f.
