@@ -14,13 +14,14 @@ type Session = { url: string; publishableKey: string; userId: string; accessToke
 
 // The payload versions these pages understand (M00 data design §2: an unknown v is logged and the page refetches):
 // PAYLOAD_VERSION for the comment and reaction nudges, STATUS_VERSION for friends' run states, 2 since M12 12d added
-// started (supabase/migrations/20261028140000_baseline.sql).
+// started (supabase/migrations/20261028140000_baseline.sql), 3 since M23 23d-2 added a clock run's points
+// (supabase/migrations/20261126003223_clock_board_points.sql).
 export const PAYLOAD_VERSION = 1;
-export const STATUS_VERSION = 2;
+export const STATUS_VERSION = 3; // docs/milestones/M23-23d-the-screens.md, "The live board": answer 47
 
 // started: a friend's run began, sent to a player who hasn't finished that day instead of playing or finished (12d).
 // gameId: the game the run is in, as each game has its own board (M16 16f-6); question is Offbeat's question or Fragments'
-// round.
+// round. points: a run on a clock's points so far, absent for every other run; never an answer.
 export type StatusMessage = {
   v: number;
   username: string;
@@ -28,6 +29,7 @@ export type StatusMessage = {
   puzzleDate: string;
   state: "started" | "playing" | "finished";
   question: number | null;
+  points?: number;
 };
 
 // A comment or reaction changed on that day: in the group with groupId, or in the friends thread when there is none

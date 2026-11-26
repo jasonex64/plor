@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { checkHostNames, normalize, parsePuzzle, type Puzzle } from "./puzzle.ts";
+import { fixtureClockDay } from "../test/answer-fixture.ts";
+import { checkClockPuzzle, checkHostNames, normalize, parsePuzzle, type ClockPuzzle, type ClockQuestion, type Puzzle } from "./puzzle.ts";
 
 describe("normalize", () => {
   it.each([
@@ -82,5 +83,47 @@ describe("checkHostNames", () => {
 
   it("refuses a host answer the answer database doesn't know", () => {
     expect(checkHostNames("d", day([undefined], [[id(9)]]), new Map())).toEqual([`d q1 thing "${id(9)}": host answer is not in the answer database`]);
+  });
+});
+
+describe("checkClockPuzzle (a day on a clock)", () => {
+  const ids = (from: number, n: number) => Array.from({ length: n }, (_, i) => id(from + i));
+  const question = (over: Record<string, unknown> = {}) => ({
+    prompt: "Name a thing",
+    category: "thing",
+    root: id(99),
+    member_of: null,
+    levels: { [id(1)]: "common" as const, [id(2)]: "uncommon" as const },
+    rare: ids(10, 6),
+    size: 40,
+    ...over,
+  });
+  const day = (q: object): ClockPuzzle => ({ format: 4, game_id: "offbeat", date: "2026-12-01", questions: [q, q, q] as ClockQuestion[] });
+
+  it("accepts a day whose questions each carry six rare answers and a size", () => {
+    expect(checkClockPuzzle("d", day(question()))).toEqual([]);
+  });
+
+  it("accepts the tests' own clock day", () => {
+    expect(checkClockPuzzle("fixture", fixtureClockDay("2026-12-01", "2026-12-01T00:00:00Z"))).toEqual([]);
+  });
+
+  it("refuses a question without rare or size", () => {
+    const { rare, size, ...bare } = question();
+    expect(rare).toHaveLength(6);
+    expect(size).toBe(40);
+    expect(checkClockPuzzle("d", day(bare))).toEqual(["d q1: missing \"rare\"", "d q1: missing \"size\"", "d q2: missing \"rare\"", "d q2: missing \"size\"", "d q3: missing \"rare\"", "d q3: missing \"size\""]);
+  });
+
+  it("refuses rare that is not exactly six thing IDs, holds a level's answer, or repeats", () => {
+    expect(checkClockPuzzle("d", day(question({ rare: ids(10, 5) })))[0]).toBe('d q1: "rare" must be 6 thing IDs');
+    expect(checkClockPuzzle("d", day(question({ rare: ids(10, 7) })))[0]).toBe('d q1: "rare" must be 6 thing IDs');
+    expect(checkClockPuzzle("d", day(question({ rare: [...ids(10, 5), "cat"] })))[0]).toBe('d q1: "rare" must be 6 thing IDs');
+    expect(checkClockPuzzle("d", day(question({ rare: [id(1), ...ids(10, 5)] })))[0]).toBe(`d q1 thing "${id(1)}": rare, but it is in levels`);
+    expect(checkClockPuzzle("d", day(question({ rare: [id(10), ...ids(10, 5)] })))[0]).toBe(`d q1 thing "${id(10)}": listed twice in rare`);
+  });
+
+  it("refuses a size that is not a positive integer", () => {
+    for (const size of [0, -3, 2.5, "40"]) expect(checkClockPuzzle("d", day(question({ size })))[0]).toBe('d q1: "size" must be a positive integer');
   });
 });

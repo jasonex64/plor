@@ -124,7 +124,7 @@ export async function stateOf(db: Db, side: Side, date: string, puzzle: ClockPuz
     [side.key, GAME_ID, date],
   );
   const { status, answered, ms_left, ms_to_reset, day_over, answers } = rows[0];
-  const names = await thingNames(db, clockNameIds(puzzle, answers, status));
+  const names = await thingNames(db, clockNameIds(date, puzzle, answers, status));
   return buildClockState(date, puzzle, answers, { status, answered, msLeft: ms_left, msToReset: ms_to_reset, dayOver: day_over }, names);
 }
 

@@ -33,7 +33,7 @@
   font-weight: 600;
 }
 
-/* The answers a question was given, on the end screen: one per line, its tier beside it. */
+/* The answers a question was given, on the result: one per line, its tier beside it. The missed answers use it too. */
 .given {
   display: flex;
   flex-direction: column;
@@ -48,4 +48,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* What a question's answers missed, under the answers given: a small label, a line per tier and the count of the rest, 4px
+   apart as the answers given are. */
+.missed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
