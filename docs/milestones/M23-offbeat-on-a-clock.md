@@ -96,6 +96,21 @@ Second round (2026-11-25):
 56. Where an edited wording goes: "That day only". Not the recommended "The list keeps it": the list's wording comes back the next time it is drafted.
 57. How the six rare examples are chosen: "At random, I can re-roll (Recommended)". The same six for a date every time; the approval page shows them with a button to draw again.
 
+23f's rounds (2026-11-26, "Start 23f"):
+
+58. The old seven-question Offbeat days already played on plor.app: "Wipe them". Not the recommended "Keep them, read-only". The option's stated cost: beta players lose a week of results, and it is a deletion on plor.app that cannot be undone.
+59. Offbeat's boards from the switch day: "Start fresh from the switch day (Recommended)".
+60. Offbeat's par for the combined board: "Leave Offbeat off until you set par (Recommended)".
+61. Days drafted and approved before the switch goes live: "7 days (Recommended)".
+62. What goes with the wipe, all three chosen: "Comments on those results", "The old days themselves", "The log of missed texts". Fragments is untouched.
+63. A copy before deleting: "No copy". Not the recommended "Yes, a file I keep".
+64. How the wipe runs on plor.app: "Inside the database push". Not the recommended "A command you run by hand". The option's stated cost: it deletes as soon as the human pushes, with no count shown first.
+65. What plor.app shows until the switch: "A short 'back soon' note", in a line the human approves; removed by the switch.
+66. What "Your Offbeat" and Me show for the clock game: "Points and answers (Recommended)". Day streak, best score, average points a day, a chart of points for the last 7 days.
+67. A finished clock run in the feed: "Points and answer count (Recommended)", as "scored 340 points with 14 answers".
+68. Yesterday, for the clock game: "Top answers per question (Recommended)". The answers most players gave and the rarest anyone found, with how many players.
+69. The note's line: "Plor is being rebuilt. Back soon."
+
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
 
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
@@ -138,7 +153,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 merged, #316). The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 merged, #321; 23e-2 merged, #322). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
-- **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
+- **23f, the switch** (`M23-23f-the-switch.md`, designed 2026-11-26 from answers 58 to 69, waits on the human's approval). Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
 ## Acceptance criteria
 - [ ] Every question a day uses has a researched list that passed both passes, and the human has seen its borderline list (a check in the draft that refuses a question without one).
@@ -171,7 +186,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 | 21 | Questions researched before the first week can be drafted | 7 days of 3 (answer 5) |
 | | Offbeat's new par | Blank: the human picks after the first week of real runs (answer 14) |
 | 1 s | The least time an accepted answer adds | Human, 2026-11-24, answer 31 |
-| | How many days must be ready before the switch | Blank: ask in 23f |
+| 7 | Days approved before the switch | Answer 61 |
 
 ## Still to ask (each in its sub-ticket, before that part is designed)
 - 23a: where a tier comes from once players' shares exist (today rarity is pooled per category from play); what a brand and an "other reading" do.
