@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. Next: 24b.
+**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. 24b, the Groups tab, is built and reviewed, in its PR (answers 17 to 19 asked first). Next: 24c.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
@@ -9,7 +9,7 @@ The Groups tab opens the group a player starred, with a dropdown on its name to 
 - Used by: every signed-in player who is in a group or has friends. Inbox #263 and #264 (the human, 2026-11-17).
 - Breaks without it: the Groups tab is a list of buttons, so seeing your one group's board takes a tap every visit, and moving to another group means going back to the list. The human: "instead of having to click a group to show it, I think by default it should automatically like show the group, a default group if you have one, as its main kind of page, and then you should be able to switch between groups. So you can also like maybe favorite them as well." And: "Maybe the ability to favorite friends as well."
 
-## The human's answers (2026-11-25, four rounds)
+## The human's answers (2026-11-25, five rounds)
 | # | Question | Answer (quoted) |
 |---|---|---|
 | 1 | Which inbox items now? | "Groups tab (#263)", "Less on the page (#267)", "Post like X (#269)", "Free replays (#254)", and a new one: "make the page more playful but still easy to read" |
@@ -28,13 +28,16 @@ The Groups tab opens the group a player starred, with a dropdown on its name to 
 | 14 | Where Create group goes | "Last line of the dropdown (Recommended)": the switcher ends with "New group…" |
 | 15 | Where a group is starred | "A star beside the group's name (Recommended)": starring another group moves the star |
 | 16 | Where a friend is favourited | "A star on their row (Recommended)": only the player sees their favourites; the friend is not told |
+| 17 | (After 24a merged.) Tapping the star of a group that already has it | "Clear it (Recommended)": the star empties, the player has no default, and the tab opens the first group joined |
+| 18 | The star's words, for a screen reader and the hover hint | "Open this group first (Recommended)": "Open this group first" when empty, "Opens first" when filled |
+| 19 | Where favourites come first, besides Your friends | "Friends today card too (Recommended)": not the feed, not a leaderboard |
 
 ## Design (Claude's, from the answers; for approval)
 - **The Groups tab** (`/groups`, `Groups` in `src/app/groups.tsx`): a player in at least one group sees a group's page at once (its leaderboard, comments and members, as `GroupPage` shows them today): the starred group, or with no star the group they joined first (`group_member.joined_at`). A player in no group sees what the tab shows today: "No groups yet…" and the Create box.
 - **The group's name is the kit's Dropdown** (`.select`, as the leaderboard's group picker, M20 answer 39): the player's groups by name, the starred one marked, then "New group…" as the last line, which opens the name box and Create group. Choosing a group goes to `/groups/<id>`, which keeps working as a link (invite links, the feed and the place strip point at it).
-- **The star** sits beside the dropdown: an outline star on a group that isn't the default, filled on the one that is. Tapping the outline makes this group the default; tapping the filled one clears it. *Whether a filled star can be cleared is Claude's choice, for approval.* Its accessible names: "Make this my default group", "Your default group". *Words are Claude's, for approval.*
+- **The star** sits beside the dropdown: an outline star on a group that isn't the default, filled on the one that is. Tapping the outline makes this group the default; tapping the filled one clears it (answer 17). Its accessible name and hover hint: "Open this group first", and "Opens first" when filled (answer 18).
 - **Leaving or being removed** from the starred group removes the star with the membership (the same row); the tab then falls back to the first group joined.
-- **Favourite friends:** every row of Your friends (`src/app/friends-list.tsx`) gets a star, outline or filled, before the ⋯. Favourites come first in Your friends, then the rest, each part in today's order. **Open, asked before 24c is built:** which other lists "my lists" covers. Claude's reading: the "Friends today" card as well; not the feed (it is in time order, and putting favourites first would break "newest first") and not any leaderboard (answer 12).
+- **Favourite friends:** every row of Your friends (`src/app/friends-list.tsx`) gets a star, outline or filled, before the ⋯. Favourites come first in Your friends, then the rest, each part in today's order. The "Friends today" card puts favourites first as well (answer 19); the feed stays newest first and no leaderboard changes (answer 12).
 - **Nobody else learns of a star.** No route returns another player's stars; no broadcast is sent when one changes.
 - **Data** (one migration, the final shape confirmed at build):
   - `private.group_member.starred boolean not null default false`, with a unique index on `(user_id) where starred`, so the database keeps "one star". The star goes when the membership row does.
@@ -66,9 +69,9 @@ What this exposes: a fault in either new route could flip another player's star 
 - [x] **24a** `POST /api/groups/star` moves the star in one step, refuses a group the player isn't in (404, as the group page) and a signed-out caller (401); a player cannot change another player's star. Route db tests.
 - [x] **24a** `POST /api/friends/favourite` sets and clears the caller's own flag for a friend whichever side of the pair they are, refuses a non-friend and a signed-out caller, and leaves the friend's flag alone. Route db tests.
 - [x] **24a** `npm run verify -- group-membership` passes (the change touches `private.group_member`; the skill's coverage table is read first and the model changed only if a covered step changed).
-- [ ] **24b** `/groups` shows the starred group's page; with no star, the first group joined; with no groups, the Create box. Playwright, `@visual`.
-- [ ] **24b** The dropdown lists the player's groups and "New group…"; choosing a group shows it; "New group…" creates one. Playwright, `@visual`.
-- [ ] **24b** Tapping the star makes the group the default and it is still the default after a reload and in a second browser signed in as the same player. Playwright.
+- [x] **24b** `/groups` shows the starred group's page; with no star, the first group joined; with no groups, the Create box. Playwright, `@visual`.
+- [x] **24b** The dropdown lists the player's groups and "New group…"; choosing a group shows it; "New group…" creates one. Playwright, `@visual`.
+- [x] **24b** Tapping the star makes the group the default and it is still the default after a reload and in a second browser signed in as the same player. Playwright.
 - [ ] **24c** A favourited friend is first in Your friends after a reload; the friend's own page shows nothing of it. Playwright, `@visual`.
 - [ ] Each PR's e2e videos are linked from its CI run and sent to the human.
 
@@ -109,7 +112,7 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 |---|---|---|
 | M10 G10: `plor_app` may read, insert and delete memberships | 24a: it may also update `starred`, and `favourite_of_a` and `favourite_of_b` on a friendship | The stars are kept on the account (answer 13); approved with the ticket (DECISIONS.md, Log, 2026-11-25) |
 | This ticket as drafted: the favourite route names the friend by username | 24a: by user ID | A username can change hands after the page was drawn (M19 19e); Remove already names a friend by ID |
-| DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row and the protocol stays | An older page ignores a field it does not read; nothing it reads changed |
+| DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row, and 24b: `GET /api/groups` gains `defaultId`, and the protocol stays | An older page ignores a field it does not read; nothing it reads changed |
 
 ## Evidence
 **24a** (slot 3's local stack, 2026-11-25; CI's run is on the PR):
@@ -119,6 +122,14 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 - **The one failed file is not this change's, unverified:** `scripts/research.db.test.ts` (M23), "Hook timed out in 10000ms" in its `beforeAll`, which loads the 21 researched lists on a stack with no base loaded (13 s here). The diff touches nothing it reads. Not rerun on `main`; CI's `db` job is the check.
 - The model: `npm run verify -- group-membership`: `GroupMembership.cfg: every rule holds (97961 distinct states, 12.5 s)`. The hypothesis held: no covered function changed, so the model is unchanged.
 - `npm run lint` and `npx tsc --noEmit -p .`: no output.
+**24b** (slot 3, 2026-11-25; the built app, as CI runs it):
+- Failing first: `npm run test:e2e -- groups -g "Groups tab opens" --project=chromium` before the screen: `1 failed`, at the dropdown (`expect(locator).toHaveText(["Alpha", "New group…"])`: no dropdown on the page).
+- All three criteria, one test at both sizes: `npm run test:e2e -- groups -g "Groups tab opens"`: `2 passed (2.3m)` (chromium 1280 × 720 and phone 390 × 844): in no group the Create box; "New group…" makes Beta; `/groups` opens Alpha, the first joined, with its board; choosing Beta shows it; the star makes Beta the default after a reload, on the tab, and in a second browser with the same sign-in; tapping it again clears it and the tab is back on Alpha. The name and the star are on one line inside the card, the star at least 24px.
+- The rest of `e2e/groups.e2e.ts` (the group made and joined, whose Groups-tab step now expects the group's page; the reset; Share): `3 passed` in the full file's run. In that run the new test failed on its own way of finding the dropdown (by an exact label, which a label holding a `select` doesn't have), not on the screen; the test now finds it by role.
+- The default group from the server: `src/app/api/groups/route.db.test.ts` (`defaultId` null in no group, the first joined with no star, the starred one, the first joined again once cleared), in `npm run test:db`: `Tests 1 failed | 594 passed (595)`. **The one failure is not this change's:** `src/app/api/admin/bank/route.db.test.ts`, "answers 401 to a signed-out request", past its 5 s limit (5.8 s). Run alone four times: failed twice (6.9 s, 8.8 s) and passed once with this change, passed once without it. `scripts/research.db.test.ts`, which timed out under 24a, passed.
+- `npm test`: 79 files, 945 passed. `npm run lint` and `npx tsc --noEmit -p .`: no output.
+- **Not looked at by eye:** the dropdown and star were measured by the test, not seen; CI's `e2e-videos` show them.
+- `verify-group-membership`: not rerun. 24b adds one read of `group_member` (`defaultGroupId`) and changes no step that creates, removes or hands over a membership.
 
 ## Review
 - **24a** (the `reviewer` agent, 2026-11-25, read the code, ran nothing): no blocking finding in the code. Blocking, docs: the handoff and the ROADMAP row still said "nothing built", and Evidence was empty: fixed in the same PR.
