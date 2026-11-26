@@ -100,7 +100,7 @@ export function StatsCards({
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
           {/* The game's emblem in its colour block beside its name (M20 20n-10, answers 115 and 116). */}
-          <span className={styles.block}>
+          <span className={styles.block} aria-hidden="true">
             <Emblem game={GAME.id} />
           </span>
           <h2>{GAME.name}</h2>
@@ -120,7 +120,7 @@ export function StatsCards({
       {fragments && (
         <section aria-label={SUBSTRINGS.name} className={kit.card}>
           <div className={styles.game}>
-            <span className={`${styles.block} ${styles.plum}`}>
+            <span className={`${styles.block} ${styles.plum}`} aria-hidden="true">
               <Emblem game={SUBSTRINGS.id} />
             </span>
             <h2>{SUBSTRINGS.name}</h2>
