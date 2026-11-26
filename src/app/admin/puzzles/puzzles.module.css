@@ -53,11 +53,15 @@
   border: 0;
 }
 
+/* A control, a checkbox drawn as a chip, so it keeps the ink outline on the card's fill that the kit's chip, a fact,
+   lost when it went soft-filled (M20 20n-9, answer 110: what can be pressed keeps its outline). */
 .chips .chip {
   box-sizing: border-box;
   min-height: 30px;
   margin: 0;
   padding: 0 10px;
+  border-color: var(--ink);
+  background: var(--surface);
   font-size: var(--text-caption);
   cursor: pointer;
 }

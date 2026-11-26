@@ -36,6 +36,30 @@ test("an admin finds every piece of the Rules and the four looks on /admin/kit",
     await expect(page.getByRole("region", { name: look, exact: true })).toBeVisible();
   }
 
+  // A chip is soft-filled (20n-9, answers 108 to 113): the theme's tint with a clear edge; on your own tinted row the
+  // stronger tint; the danger chip the one outlined chip, on the card's fill; a badge keeps its ink.
+  const slot = (name: string) =>
+    page.evaluate((n) => {
+      const probe = document.body.appendChild(document.createElement("i"));
+      probe.style.background = `var(--${n})`;
+      const color = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return color;
+    }, name);
+  const drawn = (el: import("@playwright/test").Locator) =>
+    el.evaluate((e) => {
+      const s = getComputedStyle(e);
+      return { edge: s.borderTopColor, fill: s.backgroundColor, ink: s.color };
+    });
+  const row = page.getByRole("region", { name: "Row", exact: true });
+  const text = await slot("text");
+  expect(await drawn(row.getByText("Question 3"))).toEqual({ edge: "rgba(0, 0, 0, 0)", fill: await slot("soft"), ink: text });
+  expect(await drawn(row.getByText("620"))).toEqual({ edge: "rgba(0, 0, 0, 0)", fill: await slot("soft-strong"), ink: text });
+  expect(await slot("soft-strong")).not.toBe(await slot("soft"));
+  const warn = await slot("danger");
+  expect(await drawn(page.getByRole("region", { name: "Danger", exact: true }).getByText("Not drafted"))).toEqual({ edge: warn, fill: await slot("surface"), ink: warn });
+  expect((await drawn(row.locator("[data-place='2']"))).fill).toBe(text);
+
   // A danger button keeps its danger text under the pointer: the hover rule changes the fill, not the warning (20a's
   // review).
   const danger = page.getByRole("region", { name: "Danger", exact: true });

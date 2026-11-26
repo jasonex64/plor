@@ -101,7 +101,9 @@ type Row = {
 //
 // When a result is at: a game 1 run ended by its last answer, so at that answer's time (a catch, or the 7th question);
 // by its clock, so at the deadline the status view reads (nothing is written when time runs out, M19 19f: the deadline
-// is the question's open time plus its 20 seconds, which doesn't change). A game 2 run is finished when its last round
+// is the question's open time plus its 20 seconds, which doesn't change). A run on a clock (a format 4 day) has no answer
+// events: it is finished at its Finish, or at the clock's end, the start plus the clock's own time and every answer's added time
+// (M23 23d-2). A game 2 run is finished when its last round
 // is done, so at that round's word, or at that round's deadline when it had none.
 const PAGE_SQL = `
   select i.kind, i.tie, i.game_id as game, i.puzzle_date::text as date,
@@ -135,6 +137,13 @@ const PAGE_SQL = `
            where w.user_id = s.user_id and w.game_id = s.game_id and w.puzzle_date = s.puzzle_date and w.round_idx = s.questions - 1),
           private.question_deadline(private.question_started_at(s.user_id, s.game_id, s.puzzle_date, s.questions - 1)))
         when s.status = 'timed_out' then s.deadline
+        when exists (select from private.puzzle z where z.game_id = s.game_id and z.puzzle_date = s.puzzle_date and z.content ->> 'format' = '4') then
+          (select least(
+             coalesce((select f.finished_at from private.clock_finish f
+                       where f.user_id = s.user_id and f.game_id = s.game_id and f.puzzle_date = s.puzzle_date), 'infinity'),
+             r.started_at + (private.clock_start_ms() + coalesce((select sum(a.added_ms) from private.clock_answer a
+                       where a.user_id = s.user_id and a.game_id = s.game_id and a.puzzle_date = s.puzzle_date), 0)) * interval '1 millisecond')
+           from private.run r where r.user_id = s.user_id and r.game_id = s.game_id and r.puzzle_date = s.puzzle_date)
         else (select max(e.created_at) from private.run_event e
               where e.user_id = s.user_id and e.game_id = s.game_id and e.puzzle_date = s.puzzle_date)
       end as at

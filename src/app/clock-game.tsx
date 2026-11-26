@@ -1,13 +1,15 @@
 "use client";
 
 // The clock game's screens (docs/milestones/M23-23d-the-screens.md, 23d-1; M23-23c-the-run-on-a-clock.md for the state and the
-// routes): today's one card before the run, the full-screen play on the run's clock, and a plain end with the points and
-// the answers given. Game (src/app/game.tsx) hands over to it when today's state says `format: 4`. The server decides every
+// routes): today's one card before the run, the full-screen play on the run's clock, and the result with the points, the answers
+// given and the ones missed, and Share. Game (src/app/game.tsx) hands over to it when today's state says `format: 4`. The server decides every
 // move, so this screen holds only the state it was last given and the last thing typed's outcome; a reload or a second tab
 // reads the same run from the server (answer 32), and a tab that is behind is brought up to date by asking again.
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import type { ClockAnswer, ClockState } from "@/game/clock-state";
+import type { Tier } from "@/content/puzzle";
+import type { ClockAnswer, ClockState, MissedQuestion } from "@/game/clock-state";
+import { clockShareText } from "@/game/share";
 import { api, ApiError } from "@/lib/api-client";
 import { GuestPeek } from "./guest-peek";
 import { ButtonLink } from "./button-link";
@@ -16,6 +18,7 @@ import { Countdown } from "./countdown-bar";
 import { answersText, addedText, TIER_WORD } from "./clock-text";
 import { CLOCK_STEPS, HowToPlay } from "./how-to-play";
 import { PlayFrame } from "./play-frame";
+import { ShareResult } from "./share";
 import { errorText } from "./messages";
 import { startBody, runRoutes, type RunFamily } from "./run-routes";
 import { BACK, FORWARD } from "./slide";
@@ -274,8 +277,9 @@ function Said({ outcome }: { outcome: Outcome | null }) {
   );
 }
 
-// The end, in the card: the points, the count of answers and each question's answers given with their tier, then the time
-// to the next puzzle. The missed answers, Share and the live board are 23d-2's.
+// The result, in the card (docs/milestones/M23-23d-the-screens.md, "The result"): the points, the count of answers, Share, and per
+// question a stacked row (M20 20n-5's shape): the question, its count and points, the answers given each with its tier, and the
+// answers missed, then the time to the next puzzle.
 function End({ run, focus }: { run: ClockState; focus: boolean }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -289,6 +293,7 @@ function End({ run, focus }: { run: ClockState; focus: boolean }) {
         <h2 ref={heading} tabIndex={-1}>
           Your answers
         </h2>
+        <ShareResult text={clockShareText(run)} />
         <ol className={kit.rows}>
           {run.missed!.map((q) => {
             const answers = run.answers.filter((a) => a.index === q.index);
@@ -309,6 +314,7 @@ function End({ run, focus }: { run: ClockState; focus: boolean }) {
                       ))}
                     </ul>
                   )}
+                  <Missed question={q} />
                 </div>
               </li>
             );
@@ -317,6 +323,28 @@ function End({ run, focus }: { run: ClockState; focus: boolean }) {
       </div>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
     </>
+  );
+}
+
+const TIERS: Tier[] = ["common", "uncommon", "rare"];
+
+// What the player missed on a question: up to three of each tier, the same for every player (answer 45), and the count of the rest.
+function Missed({ question }: { question: MissedQuestion }) {
+  const groups = TIERS.map((tier) => ({ tier, names: question.answers.filter((a) => a.tier === tier).map((a) => a.name) })).filter((g) => g.names.length > 0);
+  if (groups.length === 0 && question.more <= 0) return null;
+  return (
+    <div className={styles.missed}>
+      <span className={game.small}>You missed</span>
+      <ul className={styles.given}>
+        {groups.map((g) => (
+          <li key={g.tier}>
+            <span className={kit.chip}>{TIER_WORD[g.tier]}</span>
+            <span>{g.names.join(", ")}</span>
+          </li>
+        ))}
+      </ul>
+      {question.more > 0 && <span className={game.small}>and {question.more} more</span>}
+    </div>
   );
 }
 

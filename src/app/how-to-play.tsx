@@ -40,7 +40,7 @@ export const CLOCK_STEPS = [
   "One clock runs for the whole run. Name answers to each question: every answer adds time to the clock, and the rarer the answer, the more time and the more points.",
   "Type an answer and press Enter. Text that isn't on the list, or an answer you've already said, adds nothing.",
   "Next opens the next question, and there is no going back. On the last question, Finish ends your run.",
-  "When the clock reaches zero, your run is over. Your points are the total of your answers, and the result lists each one with how rare it was.",
+  "When the clock reaches zero, your run is over. Your points are the total of your answers. The result lists each one with how rare it was, shows some you missed, and lets you share your run as a row of coloured squares.",
 ];
 
 // steps: the game's four (GAME_1_STEPS, GAME_2_STEPS, CLOCK_STEPS).

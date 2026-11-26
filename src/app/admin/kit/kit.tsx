@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import admin from "../admin.module.css";
 import kit from "../../kit.module.css";
 import { ButtonLink } from "../../button-link";
+import { PlaceBadge } from "../../place-badge";
 import { Reactions } from "../../reactions";
 import type { Reactions as ReactionsData } from "@/reactions/reactions";
 import { Looks } from "./looks";
@@ -36,6 +37,10 @@ const SIZES = [
 ];
 // The names box's sample, not a rule: three 😂, one of them yours, and one ❤️ (docs/milestones/M20-design-rules-and-clean-up.md, 20j).
 const SAMPLE_REACTIONS: ReactionsData = { counts: [{ emoji: "😂", count: 3, names: ["Ana", "Sam"] }, { emoji: "❤️", count: 1, names: ["Ben"] }], mine: "😂" };
+
+// The board's places on the sample: the top three, each with its drawing, and the first plain one
+// (docs/milestones/M20-design-rules-and-clean-up.md, 20n-6a, answers 94 to 96).
+const PLACES = [1, 2, 3, 4];
 
 export function Kit() {
   return (
@@ -136,10 +141,15 @@ export function Kit() {
           <span className={`${kit.chip} ${kit.caught}`}>Caught</span>
         </div>
       </Piece>
-      <Piece name="Badge" when="A place or a count in a round badge; the first is the accent one.">
+      <Piece name="Badge" when="A place or a count in a round badge; the first is the accent one. On a board the top three stand out: a crown, then ribbon tails.">
         <div className={kit.chips}>
           <span className={`${kit.badge} ${kit.hot}`} data-place="1" />
           <span className={kit.badge} data-place="2" />
+        </div>
+        <div className={`${kit.chips} ${styles.places}`}>
+          {PLACES.map((place) => (
+            <PlaceBadge key={place} place={place} />
+          ))}
         </div>
       </Piece>
       <Piece name="Names box" when="Who used a reaction, under its line: hover or focus a reaction, or hold it on a phone.">

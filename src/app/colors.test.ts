@@ -90,7 +90,7 @@ describe("Fragments' colour", () => {
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {
-    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "danger", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "surface", "text"]);
+    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "danger", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "soft-strong", "surface", "text"]);
   });
 
   it.each([
@@ -114,6 +114,14 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
   // The current tab: text and the accent icon on the soft pill, over the tab bar and sidebar's surface.
   it.each(["text", "accent"])("%s on the soft pill is at least 4.5:1", (fg) => {
     expect(ratio(rgb(t[fg]), over(t.soft, t.surface))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  // A chip on a tinted thing: the stronger tint over the soft one, over the card for your own row and a row under the
+  // pointer, and over the background for the soft card, whose tint replaces the card's own fill
+  // (docs/milestones/M20-design-rules-and-clean-up.md, 20n-9, answer 108 and the review).
+  it.each(["surface", "bg"])("text on the stronger tint over the soft tint over the %s is at least 4.5:1", (base) => {
+    const tinted = `#${over(t.soft, t[base]).map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+    expect(ratio(rgb(t.text), over(t["soft-strong"], tinted))).toBeGreaterThanOrEqual(4.5);
   });
 
   // The streak's number on its soft pill, which sits on the phone's top bar (the background) as well as the sidebar

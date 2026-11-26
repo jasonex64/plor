@@ -11,6 +11,12 @@
   color: var(--muted);
 }
 
+/* The board's place badges: room for the crown above and the tails below, which show outside the badge. */
+.places {
+  padding-block: 12px;
+  gap: 16px;
+}
+
 .sample,
 .small {
   margin: 0;

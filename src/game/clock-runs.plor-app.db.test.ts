@@ -10,7 +10,7 @@ import type { ClockPuzzle } from "@/content/puzzle";
 import type { ClockState } from "./clock-state";
 import { hashKey } from "@/lib/auth-limits";
 import { GAME_ID } from "@/platform/game";
-import { fixtureClockDay, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "@/test/answer-fixture";
+import { FIXTURE_NAMES, fixtureClockDay, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "@/test/answer-fixture";
 import { answerClockRun, clockState, finishClockRun, isClockRun, nextClockRun, startClock } from "./clock-runs";
 import { answerGuestClock, finishGuestClock, guestClockState, isClockGuestRun, nextGuestClock, startGuestClockRun } from "./guest-clock-runs";
 import { localStack } from "../../scripts/slot.ts";
@@ -77,7 +77,7 @@ const missesOf = async (client: PoolClient, userId: string) =>
 
 describe("a player's run on a clock as plor_app", () => {
   it("starts with 20 seconds, adds each tier's time less 5% an answer, ignores repeats and misses, never goes back, and Finish ends it", async () => {
-    await onClockDay(async ({ client }) => {
+    await onClockDay(async ({ client, day }) => {
       const userId = await newPlayer(client);
       expect(await isClockRun(client, userId)).toBe(true);
       expect(await clockState(client, userId)).toMatchObject({ format: 4, status: "not_started", question: null, answers: [], missed: null });
@@ -142,7 +142,14 @@ describe("a player's run on a clock as plor_app", () => {
           { id: name("bear", 0), name: "bear", tier: "common" },
           { id: name("fish", 0), name: "fish", tier: "uncommon" },
           { id: name("horse", 0), name: "horse", tier: "uncommon" },
+          // The day's first three rare answers the player did not give (they gave horde).
+          ...day.questions[0].rare
+            .filter((id) => id !== name("horde", 0))
+            .slice(0, 3)
+            .map((id) => ({ id, name: FIXTURE_NAMES.get(id)!, tier: "rare" })),
         ],
+        // The day's count of the animal list's answers, less the 3 given and the 6 shown.
+        more: day.questions[0].size - 3 - 6,
       });
       // A second Finish returns the state; an answer or a Next after it is the end of the run.
       expect(await finishClockRun(client, userId)).toEqual(sameRun(done));
@@ -289,5 +296,47 @@ describe("two connections answering at once", () => {
       await removeFixtureBase(client);
       client.release();
     }
+  });
+});
+
+// The result's missed answers (docs/milestones/M23-23d-the-screens.md, answers 45, 48 and 49): the same for every player of a day.
+describe("the missed answers of a run that is over, as plor_app reads them", () => {
+  // Plays a player's run to its end through Finish, giving the typed answers on question 1.
+  async function played(client: PoolClient, userId: string, typed: string[]): Promise<ClockState> {
+    await startClock(client, userId);
+    for (const text of typed) await answerClockRun(client, userId, 0, text);
+    await nextClockRun(client, userId, 0);
+    await nextClockRun(client, userId, 1);
+    return finishClockRun(client, userId);
+  }
+
+  it("gives two players the same nine, but for the ones a player gave, each with the answer's name", async () => {
+    await onClockDay(async ({ client, day }) => {
+      const first = await played(client, await newPlayer(client), []);
+      const second = await played(client, await newPlayer(client), ["dog"]);
+      // Question 1: two common answers (bear, dog), three uncommon, six rare in the day's order; the second player gave dog.
+      expect(first.missed![0].answers.map((a) => a.tier)).toEqual(["common", "common", "uncommon", "uncommon", "uncommon", "rare", "rare", "rare"]);
+      expect(second.missed![0].answers.map((a) => a.id)).toEqual(first.missed![0].answers.map((a) => a.id).filter((id) => id !== name("dog", 0)));
+      expect(first.missed![0].answers.slice(5).map((a) => a.id)).toEqual(day.questions[0].rare.slice(0, 3));
+      // Every question's lists are the same for the two players where neither gave anything, and every shown answer has its name.
+      expect(second.missed![1]).toEqual(first.missed![1]);
+      expect(second.missed![2]).toEqual(first.missed![2]);
+      for (const q of first.missed!) for (const a of q.answers) expect(a.name).not.toBe(a.id);
+      // The rest of the list: its size less the answers given and the ones shown.
+      expect(first.missed!.map((q) => q.more)).toEqual([day.questions[0].size - 0 - 8, day.questions[1].size - 0 - 7, day.questions[2].size - 0 - 7]);
+      expect(second.missed![0].more).toBe(day.questions[0].size - 1 - 7);
+    });
+  });
+
+  it("gives a guest the same nine as a player who gave nothing", async () => {
+    await onClockDay(async ({ client }) => {
+      const player = await played(client, await newPlayer(client), []);
+      const hash = newHash();
+      await startGuestClockRun(client, hash);
+      await nextGuestClock(client, hash, 0);
+      await nextGuestClock(client, hash, 1);
+      const guest = await finishGuestClock(client, hash);
+      expect(guest.missed).toEqual(player.missed);
+    });
   });
 });

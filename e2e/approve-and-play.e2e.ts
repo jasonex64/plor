@@ -78,6 +78,8 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(cherry).not.toBeChecked();
   await expect(cherry).toHaveAttribute("aria-disabled", "true");
   await expect(cherry).toBeFocused();
+  // The dash is drawn: the picker's chips keep an outline, as controls (M20 20n-9's review).
+  expect(await chip("cherry, has C: players can't type it").evaluate((el) => [getComputedStyle(el).borderTopStyle, getComputedStyle(el).borderTopColor !== "rgba(0, 0, 0, 0)"])).toEqual(["dashed", true]);
   await chip("apple").click();
   await expect(day.getByRole("checkbox", { name: "apple", exact: true })).toBeChecked();
   // Ticking and unticking moved no chip (answer 16).

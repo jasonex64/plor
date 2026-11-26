@@ -108,6 +108,13 @@
   background: var(--soft);
 }
 
+/* On a tinted thing, your own row or the soft card, a chip's fill is the stronger tint, twice the soft one, so it
+   still shows there (M20 20n-9, answers 108 and 113). A row under the pointer likewise, below. */
+.row.you,
+.soft {
+  --chip-fill: var(--soft-strong);
+}
+
 /* The hover rule (docs/milestones/M20-design-rules-and-clean-up.md, 20a): anything pressable that isn't the main
    button takes the soft fill and the text colour under the pointer, over --quick with --ease, as the sidebar tabs did
    (the human, 2026-11-16: "I want that to be something that's like a design rule"); a state still changes under
@@ -126,6 +133,10 @@
   .hover:not(.primary):hover {
     background: var(--soft);
     color: var(--text);
+  }
+
+  .row:hover {
+    --chip-fill: var(--soft-strong);
   }
 
   /* A warning keeps its danger text under the pointer: the rule changes the fill, not the warning (20a's review). */
@@ -159,15 +170,17 @@
 }
 
 /* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. Its text wraps rather than push the page
-   sideways when it can't fit (14b-17, answer 6). */
+   sideways when it can't fit (14b-17, answer 6). Soft-filled, the theme's tint with no outline (M20 20n-8, the human's
+   pick; 20n-9): the 1.5px border stays, clear, so a chip is the size it was and still has an edge where the system
+   draws its own colours. The badge below keeps its ink (answer 112). */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 9px;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid transparent;
   border-radius: var(--r-small);
-  background: var(--surface);
+  background: var(--chip-fill, var(--soft));
   color: var(--text);
   font-size: 0.75rem;
   font-weight: 700;
@@ -310,6 +323,11 @@ button.link {
 :is(button, a, span).danger {
   border-color: var(--danger);
   color: var(--danger);
+}
+
+/* The one outlined chip: a warning keeps its edge, on the card's own fill (M20 20n-9, answer 109). */
+.chip.danger {
+  background: var(--surface);
 }
 
 @media (prefers-reduced-motion: reduce) {
