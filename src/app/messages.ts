@@ -92,6 +92,8 @@ const MESSAGES: Record<string, string> = {
   audit_invalid: "That decision no longer fits this answer. Reload the page.",
   // The review of a researched list (docs/milestones/M23-23b-research-and-review.md, 23b-2).
   list_invalid: "That change doesn't fit this list any more. Reload the page.",
+  // Drafting a day on a clock (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1): Redraft has shown every list there is.
+  no_lists_left: "There are no more lists to redraft with. Swap a question for one from the menu instead.",
 };
 
 export function messageFor(code: string): string {

@@ -4,24 +4,26 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
-import { avoids, checkHostNames, checkPuzzle, checkPuzzleFile, parsePuzzle, stolenLetters, type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
+import { avoids, checkDayFile, checkHostNames, checkPuzzle, isClockDay, parseDay, stolenLetters, type ApprovedPuzzle, type ClockDraft, type DraftedDay, type Puzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { thingNames, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { STATUS } from "@/lib/status";
+import { clockContext, draftSide, liveSide, type ClockSides } from "./clock-days";
 
-// Every drafted day in the deployment, by date. CI validates these files, so one that fails here is a bug: it throws.
+// Every drafted day in the deployment, by date, of either format (seven questions, or a clock's three: the old game's days stay
+// until 23f). CI validates these files, so one that fails here is a bug: it throws.
 // The folder is written out in full ("content", "offbeat") so the build can see which folder is read; a path built from
 // a variable made it trace the whole project (observed, `next build`, 2026-10-21). next.config.ts includes the folder in
 // the routes that read it.
-export function readDrafts(): Map<string, Puzzle> {
-  const drafts = new Map<string, Puzzle>();
+export function readDrafts(): Map<string, DraftedDay> {
+  const drafts = new Map<string, DraftedDay>();
   for (const name of readdirSync(join(process.cwd(), "content", "offbeat")).filter((n) => n.endsWith(".json")).sort()) {
     const file = `${GAME_ID}/${name}`;
     const text = readFileSync(join(process.cwd(), "content", "offbeat", name), "utf8");
-    const errors = checkPuzzleFile(file, text);
-    const { puzzle } = parsePuzzle(file, text);
+    const errors = checkDayFile(file, text);
+    const { puzzle } = parseDay(file, text);
     if (errors.length || !puzzle) throw new Error(`drafted day ${file} is invalid:\n${errors.join("\n")}`);
     drafts.set(puzzle.date, puzzle);
   }
@@ -44,6 +46,8 @@ export type DayView = {
   // The approved day players get, if any.
   live: QuestionView[] | null;
   started: boolean;
+  // A day on a clock has no host answers: its draft and live are null here, and this holds them (23e-1).
+  clock?: ClockSides;
 };
 
 // Approving a host answer missing from this database is refused (checkHostNames).
@@ -63,26 +67,38 @@ function view(puzzle: Puzzle, names: Names): QuestionView[] {
   });
 }
 
-// Every day from today on that has a draft or an approved puzzle, oldest first.
-export async function listDays(db: Db, drafts: Map<string, Puzzle>): Promise<{ today: string; days: DayView[] }> {
+// Every day from today on that has a draft or an approved puzzle, oldest first. adminId: whose review of the lists a day on a clock
+// is built with (src/admin/clock-days.ts).
+export async function listDays(db: Db, drafts: Map<string, DraftedDay>, adminId: string): Promise<{ today: string; days: DayView[] }> {
   const today = (await db.query<{ today: string }>("select private.today()::text as today")).rows[0].today;
-  const live = await db.query<{ date: string; content: Puzzle }>(
+  const live = await db.query<{ date: string; content: DraftedDay }>(
     "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date >= private.today()",
     [GAME_ID],
   );
   const approved = new Map(live.rows.map((r) => [r.date, r.content]));
   const dates = new Set([...approved.keys(), ...[...drafts.keys()].filter((d) => d >= today)]);
-  const names = await thingNames(db, [...dates].flatMap((d) => [drafts.get(d), approved.get(d)].flatMap((p) => p?.questions.flatMap((q) => q.host_bank) ?? [])));
-  const days = [...dates].sort().map((date) => {
+  const hosted = (p: DraftedDay | undefined): Puzzle | null => (p && !isClockDay(p) ? p : null);
+  const clocked = (p: DraftedDay | undefined): ClockDraft | null => (p && isClockDay(p) ? p : null);
+  const names = await thingNames(db, [...dates].flatMap((d) => [hosted(drafts.get(d)), hosted(approved.get(d))].flatMap((p) => p?.questions.flatMap((q) => q.host_bank) ?? [])));
+  // What a day on a clock is built from is read once, and only when there is one.
+  const context = [...dates].some((d) => clocked(drafts.get(d)) || clocked(approved.get(d))) ? await clockContext(db, adminId, drafts) : null;
+  const days: DayView[] = [];
+  for (const date of [...dates].sort()) {
     const draft = drafts.get(date);
     const puzzle = approved.get(date);
-    return {
+    const day: DayView = {
       date,
-      draft: draft ? view(draft, names) : null,
-      live: puzzle ? view(puzzle, names) : null,
+      draft: hosted(draft) && view(hosted(draft)!, names),
+      live: hosted(puzzle) && view(hosted(puzzle)!, names),
       started: puzzle !== undefined && date <= today,
     };
-  });
+    const clockDraft = clocked(draft);
+    const clockLive = clocked(puzzle);
+    if (clockDraft || clockLive) {
+      day.clock = { draft: clockDraft && draftSide(clockDraft, context!), live: clockLive && (await liveSide(db, clockLive)) };
+    }
+    days.push(day);
+  }
   return { today, days };
 }
 
@@ -99,7 +115,7 @@ function guarded(err: unknown): never {
 // Approves a day, or returns the problems private.approve_puzzle found against the base (OB009), one per question as it
 // names them ("question 3: ..."), reworded to the "q3" the page files them under. They come as a JSON list in the
 // error's detail, so a problem whose category name holds "; " stays one (13f-3b-2).
-export async function approvePuzzle(db: Db, userId: string, puzzle: Puzzle): Promise<string[]> {
+export async function approvePuzzle(db: Db, userId: string, puzzle: DraftedDay): Promise<string[]> {
   try {
     await db.query("select private.approve_puzzle($1, $2)", [userId, puzzle]);
     return [];

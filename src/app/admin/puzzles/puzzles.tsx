@@ -25,7 +25,8 @@ import pool from "../pool.module.css";
 import { AnswerPool } from "../pool";
 import { Line, Skeleton } from "../../skeleton";
 import { tomorrowOf } from "../tomorrow";
-import { slotDates } from "../puzzle-dates";
+import { hasDraft, isApproved, slotDates } from "../puzzle-dates";
+import { ClockDay, LEAVE_WARNING } from "./clock-day";
 import { SubstringDay } from "./substring-days";
 
 // The table's columns, so a row spanning them stays right when one is added (docs/milestones/PROCESS-lint-rules.md, answer 21).
@@ -38,7 +39,7 @@ const SHOWN = 5; // kept as built (human, 2026-11-17, docs/milestones/PROCESS-li
 
 function stateOf(day: DayView): { label: string; tone: string } {
   if (day.started) return { label: "Live", tone: kit.chip };
-  if (day.live) return { label: "Approved", tone: kit.chip };
+  if (isApproved(day)) return { label: "Approved", tone: kit.chip };
   return { label: "Draft", tone: `${kit.chip} ${admin.decide}` };
 }
 
@@ -46,6 +47,8 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
   const [data, setData] = useState<DaysResponse | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // A day on a clock with changes not approved yet: leaving it for another day asks first (src/app/admin/puzzles/clock-day.tsx).
+  const [unsaved, setUnsaved] = useState(false);
 
   const load = useCallback(() => {
     api<DaysResponse>("/api/admin/puzzles", { method: "GET" }).then(
@@ -78,10 +81,16 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
   );
   if (offbeat.length === 0 && data.substringDays.length === 0) return <p>No {GAME.name} days yet: a Claude session drafts them from the question bank.</p>;
   // At first, the first day waiting for approval, else today, else the first Offbeat day, else the first date listed.
-  const first = offbeat.find((d) => d.draft && !d.live)?.date ?? offbeat.find((d) => d.date === data.today)?.date ?? offbeat[0]?.date ?? dates[0];
+  const first = offbeat.find((d) => hasDraft(d) && !isApproved(d))?.date ?? offbeat.find((d) => d.date === data.today)?.date ?? offbeat[0]?.date ?? dates[0];
   const date = chosen !== null && dates.includes(chosen) ? chosen : first;
   const day = offbeat.find((d) => d.date === date);
   const substringDay = data.substringDays.find((d) => d.date === date);
+  // Stay on the day just approved, so its message stays in view (14b-2b-2a review).
+  const stay = () => {
+    setChosen(date);
+    load();
+    onChanged();
+  };
   return (
     <>
       <nav aria-label="Days" className={styles.days}>
@@ -90,7 +99,16 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
           const offbeatDay = offbeat.find((o) => o.date === d);
           const { label, tone } = offbeatDay ? stateOf(offbeatDay) : { label: "Not drafted", tone: `${kit.chip} ${kit.danger}` };
           return (
-            <button key={d} type="button" className={picked ? `${styles.day} ${styles.chosen}` : styles.day} aria-pressed={picked} onClick={() => setChosen(d)}>
+            <button
+              key={d}
+              type="button"
+              className={picked ? `${styles.day} ${styles.chosen}` : styles.day}
+              aria-pressed={picked}
+              onClick={() => {
+                if (!picked && unsaved && !window.confirm(LEAVE_WARNING)) return;
+                setChosen(d);
+              }}
+            >
               <span>{dayText(d)}</span>
               <span className={tone}>{label}</span>
             </button>
@@ -99,16 +117,11 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
       </nav>
       <EarlierDay today={data.today} />
       {day ? (
-        <Day
-          key={day.date}
-          day={day}
-          onApproved={() => {
-            // Stay on the day just approved, so its message stays in view (14b-2b-2a review).
-            setChosen(day.date);
-            load();
-            onChanged();
-          }}
-        />
+        day.clock ? (
+          <ClockDay key={day.date} day={day} onDirty={setUnsaved} onApproved={stay} />
+        ) : (
+          <Day key={day.date} day={day} onApproved={stay} />
+        )
       ) : (
         // Answer 29: how days get drafted, as the page says when it has none.
         <p>Nothing drafted for {dayText(date)}. A Claude session drafts days from the question bank.</p>

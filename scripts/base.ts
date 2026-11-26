@@ -33,7 +33,7 @@ import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VI
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { type ListEdit, type ListSeen, unfoldedEdits } from "../src/content/list-edits.ts";
-import { LISTS_DIR, parseList, type ResearchList } from "../src/content/list.ts";
+import { LISTS_DIR, RESEARCH_SOURCE, parseList, researchKey, type ResearchList } from "../src/content/list.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
@@ -1387,13 +1387,13 @@ async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<voi
 // content/lists/ are what a load reads. A list becomes a root thing named by its category key, and each answer a thing
 // directly under it, so judging reads it as it reads any tree. A category on a list says `"source": "research"` and its
 // own key as the root in data/categories.json.
-const RESEARCH = "research";
+const RESEARCH = RESEARCH_SOURCE;
 const RESEARCH_SNAPSHOT = "lists"; // the label import_source keeps in source_ref; the list's own history is git's
 const listsDir = join("content", LISTS_DIR);
 
 export function researchItems(list: ResearchList): Item[] {
   const root: Item = { id: list.category, name: `${list.category} (researched list)`, aliases: [] };
-  const answers = list.answers.map((a): Item => ({ id: `${list.category}/${normalize(a.name)}`, name: a.name, aliases: aliasesFor([a.name], a.aliases), kind_of: [list.category] }));
+  const answers = list.answers.map((a): Item => ({ id: researchKey(list.category, a.name), name: a.name, aliases: aliasesFor([a.name], a.aliases), kind_of: [list.category] }));
   return [root, ...answers];
 }
 

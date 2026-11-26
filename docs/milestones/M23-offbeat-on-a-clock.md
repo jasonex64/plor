@@ -85,6 +85,17 @@ Second round (2026-11-25):
 49. How many the day holds per question: "6 per question (Recommended)". A player who gave up to three of them still sees three.
 47. A friend's row on the live board mid-run: "Question and points (Recommended)", as "Question 2 of 3 · 180 points". The option's stated cost: a friend still to play sees scores before their own run.
 
+23e's rounds (2026-11-25, "Start 23e"):
+
+50. How the draft chooses a clock day's three questions from the researched lists: "Least recently used, random". Not "Easiest first, hardest last", not "I name them".
+51. What the human can do with a question while approving (inbox #251), all four chosen: "Swap for another list", "Edit the wording", "Move questions up or down", "Redraft the whole day".
+52. Whether what players type changes the tiers: "No, research decides (Recommended)". A tier that feels wrong is changed by the human on the Lists page.
+53. A text enough players type that is on no list, on a clock day: "Queue them for your review (Recommended)". Still logged; the Lists page shows the most typed for Add or dismiss; nothing joins a list without the human.
+54. Repeats while the lists are few (21 lists, three a day, round again in 7 days): "Repeat, and warn me (Recommended)". The draft says how many days ago each list last appeared.
+55. How a swapped question's replacement is chosen: "I pick from a menu (Recommended)", least recently used first, with when each last appeared.
+56. Where an edited wording goes: "That day only". Not the recommended "The list keeps it": the list's wording comes back the next time it is drafted.
+57. How the six rare examples are chosen: "At random, I can re-roll (Recommended)". The same six for a date every time; the approval page shows them with a button to draw again.
+
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
 
 Carried from 2026-11-17 (the bed-question session; HANDOFF of that date), still standing: a good list is "What players type first"; a prompt that reads two ways: "Drop such questions"; additions go through the "Admin page (#252)".
@@ -125,8 +136,8 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23a, the list's format and its way into the database** (`M23-23a-researched-lists.md`, built and reviewed). The file's shape, the loader, how an everyday question's list replaces its tree, SOURCES.md and DECISIONS.md entries. The three pilot lists are its test data.
 - **23b, the research procedure, the first 21 lists and the review page** (`M23-23b-research-and-review.md`, approved; 23b-1 merged, #302; 23b-2 merged, #307): a two-pass research skill, the 18 lists, the admin's review page with Strike, Add (#252) and Seen. #251 (edit or replace a question while approving) moves to 23e.
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
-- **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 built, in its PR). The play screen, the result screen, the share text, the live board's wording.
-- **23e, drafting and approving a day.** `npm run draft` for three questions, the admin's approval of the new format.
+- **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 merged, #316). The play screen, the result screen, the share text, the live board's wording.
+- **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 built, in its PR). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
 - **23f, the switch.** Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
 ## Acceptance criteria

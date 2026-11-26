@@ -228,3 +228,36 @@ describe("content:validate on researched lists", () => {
     expect(withList("{ nope").errors).toEqual([expect.stringMatching(/^lists\/animal\.json: not valid JSON/)]);
   });
 });
+
+// A day on a clock, in the same folder as the days of seven questions until 23f (docs/milestones/M23-23e-drafting-and-approving.md,
+// 23e-1): held to its own rules, and exempt from the 30-day gap, which three lists a day over twenty-one could never keep.
+describe("content:validate on a day on a clock", () => {
+  const clockDay = (date: string, categories: string[]) => ({
+    format: 4,
+    game_id: "offbeat",
+    date,
+    questions: categories.map((category, i) => ({
+      prompt: `Name a ${category}`,
+      category,
+      levels: { [id(i * 10 + 1)]: "common", [id(i * 10 + 2)]: "uncommon" },
+      rare: Array.from({ length: 6 }, (_, k) => id(i * 10 + 3 + k)),
+      size: 40,
+    })),
+  });
+  const files = (...days: ReturnType<typeof clockDay>[]) => Object.fromEntries(days.map((d) => [`offbeat/${d.date}.json`, JSON.stringify(d)]));
+
+  it("passes a valid day, beside a day of seven questions", () => {
+    expect(validateRoot(root({ ...files(clockDay("2026-12-01", ["animal", "fruit", "color"])), [FILE]: JSON.stringify(valid()) }), CATS).errors).toEqual([]);
+  });
+
+  it("does not hold a list to the 30-day gap: the same list on the next day is fine", () => {
+    expect(validateRoot(root(files(clockDay("2026-12-01", ["animal", "fruit", "color"]), clockDay("2026-12-02", ["animal", "metal", "sport"]))), CATS).errors).toEqual([]);
+  });
+
+  it("refuses a day whose list is asked twice, and one with an empty wording", () => {
+    expect(errorsFor(clockDay("2026-12-01", ["animal", "fruit", "fruit"]), "offbeat/2026-12-01.json")).toEqual(['offbeat/2026-12-01.json q3: "fruit" is asked by q2 too']);
+    const empty = clockDay("2026-12-01", ["animal", "fruit", "color"]);
+    empty.questions[0].prompt = " ";
+    expect(errorsFor(empty, "offbeat/2026-12-01.json")).toEqual(['offbeat/2026-12-01.json q1: "prompt" must be a non-empty string']);
+  });
+});

@@ -2,7 +2,7 @@ import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { isAdmin } from "@/insights/queries";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
-import { isCalendarDate } from "@/content/puzzle";
+import { isCalendarDate, isClockDay } from "@/content/puzzle";
 import { withHostAnswers } from "@/admin/puzzle-entry";
 import { approvePuzzle, draftProblems, isHostAnswerLists, readDrafts } from "@/admin/puzzles";
 import { STATUS } from "@/lib/status";
@@ -20,6 +20,8 @@ export const POST = handle(async (request) => {
   if (!isCalendarDate(date)) throw new AppError("bad_request", STATUS.badRequest, "date");
   const draft = readDrafts().get(date);
   if (!draft) throw new AppError("no_draft", STATUS.notFound);
+  // A day on a clock has no host answers: it is approved by its own route (clock/approve).
+  if (isClockDay(draft)) throw new AppError("bad_request", STATUS.badRequest, "date");
   if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", STATUS.badRequest, "hostAnswers");
   const puzzle = withHostAnswers(draft, hostAnswers);
   const db = getPool();
