@@ -15,6 +15,8 @@ export type Friend = { username: string; name: string };
 // A player whom the page acts on later: the ID is what the action names, as a username can change hands in between
 // (M19 19e).
 export type FriendWithId = Friend & { userId: string };
+// A friend in the player's own list: favourite is the player's own star on them, which the friend never sees (M24 24a).
+export type ListedFriend = FriendWithId & { favourite: boolean };
 
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -47,11 +49,26 @@ export async function removeFriend(db: Db, userId: string, friendId: string): Pr
   if (rowCount === 0) throw new AppError("not_friends", STATUS.notFound);
 }
 
-export async function listFriends(db: Db, userId: string): Promise<FriendWithId[]> {
-  const { rows } = await db.query<FriendWithId>(
-    `select p.user_id::text as "userId", p.username, coalesce(p.display_name, p.username::text) as name
+// Sets or clears the player's own star on a friend (M24 24a). The pair has one row with the smaller ID first, so the
+// player's flag is favourite_of_a or favourite_of_b by which side they are; the friend's flag is left as it is.
+export async function setFavourite(db: Db, userId: string, friendId: string, favourite: boolean): Promise<void> {
+  const { rowCount } = await db.query(
+    `update private.friendship
+     set favourite_of_a = case when user_a = $1 then $3 else favourite_of_a end,
+         favourite_of_b = case when user_b = $1 then $3 else favourite_of_b end
+     where user_a = least($1::uuid, $2::uuid) and user_b = greatest($1::uuid, $2::uuid)`,
+    [userId, friendId, favourite],
+  );
+  if (rowCount === 0) throw new AppError("not_friends", STATUS.notFound);
+}
+
+export async function listFriends(db: Db, userId: string): Promise<ListedFriend[]> {
+  const { rows } = await db.query<ListedFriend>(
+    `select p.user_id::text as "userId", p.username, coalesce(p.display_name, p.username::text) as name,
+            case when f.user_a = $1 then f.favourite_of_a else f.favourite_of_b end as favourite
      from (${circleSql("$1")}) c
      join private.profile p on p.user_id = c.user_id
+     join private.friendship f on f.user_a = least($1::uuid, c.user_id) and f.user_b = greatest($1::uuid, c.user_id)
      where c.user_id <> $1
      order by lower(coalesce(p.display_name, p.username::text)), p.username`,
     [userId],

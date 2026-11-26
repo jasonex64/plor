@@ -13,6 +13,7 @@ import { GET as preview } from "./preview/route";
 import { POST as remove } from "./remove/route";
 import { POST as rename } from "./rename/route";
 import { GET as groups } from "./route";
+import { POST as star } from "./star/route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -40,6 +41,7 @@ describe("/api/groups routes (M10 10b, 10c)", () => {
     ["POST /api/groups/rename", () => rename(apiRequest("/api/groups/rename", { method: "POST", body: { id: ID, name: "Club" } }))],
     ["POST /api/groups/invite", () => invite(apiRequest("/api/groups/invite", { method: "POST", body: { id: ID } }))],
     ["POST /api/groups/remove", () => remove(apiRequest("/api/groups/remove", { method: "POST", body: { id: ID, userId: "abc" } }))],
+    ["POST /api/groups/star", () => star(apiRequest("/api/groups/star", { method: "POST", body: { id: ID, starred: true } }))],
     ["POST /api/groups/delete", () => del(apiRequest("/api/groups/delete", { method: "POST", body: { id: ID } }))],
   ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
     const response = await call();

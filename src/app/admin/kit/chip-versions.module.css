@@ -1,0 +1,53 @@
+/* The chip's two versions on the kit's sample page (docs/milestones/M20-design-rules-and-clean-up.md, 20n-8). */
+.about {
+  color: var(--muted);
+}
+
+.themes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* One theme's strip: its own page background and text colour, from the [data-theme] it carries. */
+.theme {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.name {
+  margin: 0 0 8px;
+  font-size: var(--text-subheading);
+}
+
+/* Side by side where two cards fit, one under the other on a phone. */
+.versions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 16px;
+}
+
+.label {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: var(--text-note);
+}
+
+/* The soft-filled version (answer 104: "The theme's blue tint"): no outline, the border kept at its width and made
+   clear so nothing changes size. A plain chip and a plain badge take the theme's --soft; the kinds keep their own
+   fills. On your own row, itself --soft, the chip's tint lies over the row's and so reads one step stronger. */
+.soft [data-piece] {
+  border-color: transparent;
+}
+
+.soft [data-piece="chip"] {
+  background: var(--soft);
+}
+
+.soft [data-piece="badge"] {
+  background: var(--soft);
+  color: var(--text);
+}

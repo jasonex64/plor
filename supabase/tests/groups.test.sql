@@ -5,7 +5,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(25);
+select plan(27);
 
 -- Players 1 to 4 by name, and 101 to 160 to fill a group.
 create function pg_temp.u(n int) returns uuid language sql immutable
@@ -97,6 +97,14 @@ delete from private.player_group where id = (select id from ids where name = 'bi
 select is((select count(*)::int from private.group_member where group_id = (select id from ids where name = 'big')), 0,
   'deleting a group deletes its memberships');
 select lives_ok($$select pg_temp.check_creators()$$, 'every remaining group has its creator as a member');
+
+-- One star per player, their default group (M24 24a; the human, 2026-11-25: "Just one star: the default").
+insert into ids select 'star1', pg_temp.make_group(pg_temp.u(1), 'Star One', pg_temp.code(7));
+insert into ids select 'star2', pg_temp.make_group(pg_temp.u(1), 'Star Two', pg_temp.code(8));
+select lives_ok($$update private.group_member set starred = true where user_id = pg_temp.u(1) and group_id = (select id from ids where name = 'star1')$$,
+  'a player stars one group');
+select throws_ok($$update private.group_member set starred = true where user_id = pg_temp.u(1) and group_id = (select id from ids where name = 'star2')$$,
+  '23505', null, 'a second starred group is refused');
 
 -- The same paths as plor_app, which the routes connect as, are in src/groups/groups.plor-app.db.test.ts: pgTAP can't
 -- switch to it.
