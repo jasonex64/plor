@@ -20,7 +20,7 @@ Every screen builds from these; a piece not named here is added here and to the 
 | Row (`.rows`, `.row`, `.you`) | One item in a list; `.you` is the player's own | 8px 10px, 1.5px ink border, 8px apart (`kit.module.css:48-65`); `.you` the soft tint (`:86-88`) | the hover rule | — | — | — |
 | Board row (`.board`) | A row on any board: Friends today, Where everyone ended, the leaderboards (M20 answers 34 and 56) | the row, its border a hairline in `--line`, with its game's 4px edge inside its left (`--game`, set once on the board by `.offbeat` or `.fragments`, none on the overall board); your own row the accent edge, in bold (`kit.module.css:349-374`, `src/app/game-colour.ts`) | the hover rule | — | — | — |
 | Comment row (`.bare`) | A comment, in the feed and every comment list | the row with no border, so the card's ink edge is the one strong line (`kit.module.css:376-378`; M20 answer 56) | the hover rule | — | — | — |
-| Chip (`.chip`, `.dark`, `.safe`, `.caught`) | A short fact beside something else | 12px 700, 1.5px ink border (`kit.module.css:144-182`) | — | — | — | — |
+| Chip (`.chip`, `.dark`, `.safe`, `.caught`) | A short fact beside something else | 12px 700, soft-filled: the theme's `--soft` tint with a clear 1.5px edge; `--soft-strong` on a tinted thing (your own row, a row under the pointer, the soft card); the dark, safe and caught kinds keep their fills; a danger chip is the one outlined chip, on the card's fill (M20 20n-9, answers 108 to 113; `kit.module.css`, `.chip`, `--chip-fill`, `.chip.danger`) | — | — | — | — |
 | Badge (`.badge`, `.hot`) | A place or a count; the first is `.hot` | 24px round, the ink fill (`kit.module.css:197-219`) | — | — | — | — |
 | Names box (`.tip`) | Who used a reaction (M20 20j, answers 28 and 51 to 53): "You" first, then the others A to Z by the name shown | hidden; under the reactions' line and as wide, the reaction chip's 1px 8px, 1.5px ink border and small corners on the surface, 13px (`kit.module.css:334-349`, `src/app/reactions.tsx`, `Used`) | shown while the pointer is on the reaction | on a phone, shown once a finger has held the reaction 500ms (`LONG_PRESS_MS`, Apple's default; a scroll cancels it) | shown while the reaction has focus, which also reads the names as its description | — |
 | Text sizes (`--text-display` to `--text-label`) | Every text, by its role: a page's name or a big number 30px, a card's heading 24px, a heading in a card 18px, the body 16px, a note, a label or a flat button 14px, the reactions line and dates 13px, a chip or a badge 12px (M20 answers 60 to 62) | declared once in the kit on the root (`kit.module.css`); every module names one, but the kit's and the game screens', held by `src/app/font-sizes.test.ts` | — | — | — | — |
@@ -47,7 +47,7 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | `--danger` | `#b4232f` | `#ff5c5c` | `#b4232f` | `#ff5c5c` | `#ff5c5c` |
 | Lines | `globals.css:9-41` | `:73-97` | `:103-127` | `:129-153` | `:155-179` |
 
-- Each theme also sets `--soft` (the accent at low strength), `--safe`, `--safe-bg`, `--caught`, `--caught-bg`, four shades `--shade-1` to `--shade-4` (Me's calendar uses the fourth for a played day; the guest peek's drawn calendar uses all four, `src/app/guest-peek.module.css:75-89`), in the same blocks.
+- Each theme also sets `--soft` (the accent at low strength), `--soft-strong` (twice that, 20% in Paper and Sky and 30% in Night and Ink; 25% in Moonlit, the most its text stays 4.5:1 at on the soft card; a chip's fill on a tinted thing, M20 20n-9, answer 113), `--safe`, `--safe-bg`, `--caught`, `--caught-bg`, four shades `--shade-1` to `--shade-4` (Me's calendar uses the fourth for a played day; the guest peek's drawn calendar uses all four, `src/app/guest-peek.module.css:75-89`), in the same blocks.
 - Paper is the default (`:root`, `globals.css:8`); with no theme chosen, a dark device gets Night's values (`globals.css:45-71`). A chosen theme is a `[data-theme]` attribute on `<html>`.
 - Each game's banner has its own colour in every theme: Offbeat's `--offbeat: #2f3d5c` with `--on-offbeat: #ffffff` (`globals.css:35-36`), Fragments' `--fragments: #5a2f5e` with `--on-fragments: #ffffff` (`globals.css:39-40`; M16 16f-2, answer 31). A card or a board takes them through `--game` and `--on-game`, set by the kit's `.offbeat` or `.fragments` (`kit.module.css`; `src/app/game-colour.ts`): a game's card on its band, a board on its rows' edges.
 - `src/app/colors.test.ts` checks the pairings' contrast.
@@ -76,12 +76,12 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | A row that opens (`.row > details`, "Where everyone ended") | its summary is the whole row, 44px tall for one line (`calc((44px - 1lh) / 2)` above and below); 8px under the open list | 69-83 |
 | Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 86-88 |
 | A row's second line (`.below`) | 6px gap, 6px above | 134-142 |
-| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips. A soft-filled version, the theme's tint with no outline, is drawn beside it on `/admin/kit` in the five themes for the human's pick (M20 20n-8); no screen uses it | 144-162 |
+| Chip | 2px 9px, a clear 1.5px border, small corners, 12px 700, the `--soft` fill (`--soft-strong` on a tinted thing); 8px between chips | 144-162 |
 | Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: the game screen's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:88`) | 188-194 |
 | Badge | 24px round, ink fill, 12px 800; the first in the accent | 197-219 |
 | Main button (`.primary`) | 0 18px, accent fill, 17px, the 2px ink border and 4px edge; a 40px face | 235-269 |
 | Flat button in a row (`.link`) | the base button (`globals.css:453-464`) without its 8px above and below | 284-286 |
-| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 290-293 |
+| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips; the chip on the card's fill, the one outlined chip | 290-293 |
 
 Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 

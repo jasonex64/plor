@@ -102,7 +102,7 @@ test("the tab bar and the sidebar's current item take the ink rules", async ({ b
   expect(await look(nav.getByRole("link", { name: "Today" }))).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
 });
 
-test("a card and a chip take the kit's border and corners, flat", async ({ browser }) => {
+test("a card takes the kit's border and corners, flat, and a chip its soft fill", async ({ browser }) => {
   // From 768px: phones have no leaderboard card on Today (M16 16f-5, answer 19).
   const page = await (await browser.newContext({ viewport: { width: 768, height: 1024 } })).newPage();
   await page.goto("/");
@@ -113,12 +113,14 @@ test("a card and a chip take the kit's border and corners, flat", async ({ brows
   // The card's date chip, once its scores have loaded.
   const chip = card.getByText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+ \w+$|^From /).first();
   await expect(chip).toBeVisible();
-  // Mockup 3's 1.5px edge, which Chromium floors to whole CSS pixels (1px), as it did in the mockup itself.
-  expect(await look(chip)).toEqual({ border: `1px ${color}`, corners: "4px", shadow: "none" });
+  // Soft-filled since M20 20n-9: the 1.5px edge is still there, clear (Chromium floors it to 1px), and the fill is the
+  // theme's tint, not the card's.
+  expect(await look(chip)).toEqual({ border: "1px rgba(0, 0, 0, 0)", corners: "4px", shadow: "none" });
+  expect(await chip.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(await card.evaluate((el) => getComputedStyle(el).backgroundColor));
 });
 
 // Signed in, Today starts with the game: the introduction is gone (answer 12); since M20 20k-3 the game's card is white
-// with its colour in a band (answer 54), so its chips are the kit's plain chip, in the ink; and with no
+// with its colour in a band (answer 54), so its chips are the kit's plain chip, soft-filled since 20n-9, their text in the ink; and with no
 // friends Today says nothing of it, on a phone or from 768px: "Plor is better with friends" went from Today with the
 // invite link (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
 test("signed-in Today: no introduction, the banner's own chips, and no words about friends", async ({ browser }) => {
@@ -130,7 +132,7 @@ test("signed-in Today: no introduction, the banner's own chips, and no words abo
   await expect(chip).toBeVisible();
   await expect(page.getByText("Plor is a small site with two daily word games.")).toBeHidden();
   const color = await ink(page);
-  expect(await chip.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el).borderTopColor])).toEqual([color, color]);
+  expect(await chip.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el).borderTopColor])).toEqual([color, "rgba(0, 0, 0, 0)"]);
 
   // The feed has loaded, so a card that came after it would be there by now.
   await expect(page.getByRole("region", { name: "Feed" })).toBeVisible();
