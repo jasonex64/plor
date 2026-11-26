@@ -397,7 +397,7 @@ test("Offbeat's result rows are stacked: the question in bold with a Safe or Cau
 // name, the same 24px as on Today's band, hidden from screen readers.
 test("Me's game cards each have the game's emblem inside its colour block", { tag: "@visual" }, async ({ page }) => {
   await page.goto("/");
-  await signInAndPick(page, "gce");
+  await signInAndPick(page, "gcm");
   await page.goto("/me");
   const slot = (name: string) =>
     page.evaluate((n) => {
