@@ -8,7 +8,7 @@
 // a player: a username opens that player's profile, which is the search (17b, E1 and E6); each friend's row opens theirs.
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
-import type { Friend, FriendWithId } from "@/friends/friends";
+import type { Friend, ListedFriend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
@@ -19,7 +19,7 @@ import { Line, Skeleton } from "./skeleton";
 type Who = { username: string } | { userId: string };
 const byName = (p: Friend): Who => ({ username: p.username });
 
-type Lists = { friends: FriendWithId[]; requests: Friend[]; sent: Friend[] };
+type Lists = { friends: ListedFriend[]; requests: Friend[]; sent: Friend[] };
 
 // What a block does, said before it happens, as it ends a friendship and is undone only from Settings (answers 12, 13,
 // 20 and 21).
@@ -54,7 +54,7 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
   // One change to a player, named by `who`, then the lists again. A refusal is shown, and the lists are still read
   // again: it usually means they changed elsewhere (a request its sender cancelled). Removing a friend names the ID, not
   // the username, which can change hands while the page is open (M19 19e).
-  async function change(path: string, who: Who, question?: string) {
+  async function change(path: string, who: Who | { userId: string; favourite: boolean }, question?: string) {
     if (question && !window.confirm(question)) return;
     setBusy(true);
     setError(null);
@@ -153,6 +153,19 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
             {friends.map((f) => (
               <li key={f.username} className={kit.row}>
                 <PlayerLink name={f.name} username={f.username} />
+                {/* The player's own star on a friend, whom it puts first here and on Friends today; the friend isn't
+                    told (M24 24c, answers 16 and 19). Filled or outlined, not only coloured (WCAG 1.4.1). */}
+                <button
+                  type="button"
+                  className={kit.star}
+                  aria-label={`Favourite ${f.name}`}
+                  title="Favourite"
+                  aria-pressed={f.favourite}
+                  disabled={busy}
+                  onClick={() => void change("/api/friends/favourite", { userId: f.userId, favourite: !f.favourite })}
+                >
+                  {f.favourite ? "★" : "☆"}
+                </button>
                 {/* Remove and Block are behind the row's ⋯, so a phone's row keeps the name whole (M20 answer 79). */}
                 <ReactMenu
                   label={`Actions for ${f.name}`}

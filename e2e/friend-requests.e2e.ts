@@ -144,3 +144,59 @@ test("on a phone a friend's row is their name on one line, the link to their pro
   await link.click();
   await expect(page).toHaveURL(new RegExp(`/u/frf${RUN}$`));
 });
+
+// M24 24c (docs/milestones/M24-groups-tab-and-favourites.md, answers 16 and 19): a star on a friend's row makes them a
+// favourite, first in Your friends and on the Friends today card, kept after a reload; the friend sees nothing of it.
+test("a starred friend comes first in Your friends and on Friends today, after a reload too, and isn't told", { tag: "@visual" }, async ({ page, browser }) => {
+  test.slow(); // three sign-ins and two friendships made on the screens
+  // The test runs at phone and desktop size at once, so each size has its own three players.
+  const size = page.viewportSize()!.width < 600 ? "p" : "d";
+  const [me, abe, zed] = [`fv${size}m`, `fv${size}a`, `fv${size}z`];
+  await page.goto("/friends");
+  await signInAndPick(page, me);
+  let zedsPage = page;
+  for (const [name, shown] of [[abe, "Abe"], [zed, "Zed"]] as const) {
+    const other = await (await browser.newContext({ viewport: page.viewportSize() })).newPage();
+    await other.goto("/friends");
+    await signInAndPick(other, name);
+    await befriend(page, me, other, name);
+    await DB.query("update private.profile set display_name = $2 where username = $1", [`${name}${RUN}`, shown]);
+    if (name === abe) await other.context().close();
+    else zedsPage = other;
+  }
+  await page.goto("/friends");
+  const rows = friends(page).getByRole("listitem");
+  const today = page.getByRole("region", { name: "Friends today" }).getByRole("listitem");
+  await expect(rows).toContainText(["Abe", "Zed"]);
+  await expect(today).toContainText(["Abe", "Zed"]);
+
+  const star = friends(page).getByRole("button", { name: "Favourite Zed", exact: true });
+  await expect(star).toHaveAttribute("aria-pressed", "false");
+  await expect(star).toHaveText("☆");
+  // The star is a 44px control in the row, which stays one line with no sideways scroll.
+  const [box, row] = [(await star.boundingBox())!, (await rows.filter({ hasText: "Zed" }).boundingBox())!];
+  expect(box.width).toBeGreaterThanOrEqual(44);
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(box.x + box.width).toBeLessThanOrEqual(row.x + row.width);
+  expect(row.height).toBeLessThan(70);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+  await star.click();
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+  await expect(star).toHaveText("★");
+  await expect(rows).toContainText(["Zed", "Abe"]);
+  await expect(today).toContainText(["Zed", "Abe"]);
+  await page.reload();
+  await expect(rows).toContainText(["Zed", "Abe"]);
+  await expect(today).toContainText(["Zed", "Abe"]);
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+  // Zed's own list says nothing of it: their star on the player is still empty.
+  await zedsPage.goto("/friends");
+  await expect(friends(zedsPage).getByRole("button", { name: /^Favourite / })).toHaveAttribute("aria-pressed", "false");
+
+  // Tapped again, the star clears and the names are in their usual order.
+  await star.click();
+  await expect(star).toHaveAttribute("aria-pressed", "false");
+  await expect(rows).toContainText(["Abe", "Zed"]);
+  await expect(today).toContainText(["Abe", "Zed"]);
+});
