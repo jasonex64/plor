@@ -26,10 +26,7 @@ export default function Page() {
       </Signed>
       <div data-signed-out className="reading">
         <h2>How {GAME.name} works</h2>
-        <p>
-          Seven questions, such as &quot;Name an animal&quot;. For each one, give an answer the host didn&apos;t pick:
-          if you match the host, your run ends. Unusual answers are your way through.
-        </p>
+        <p>Three questions, one clock. Name as many as you can.</p>
         <h2>How {SUBSTRINGS.name} works</h2>
         <p>
           Seven rounds, each with a few letters, such as &quot;cks&quot;. Type a word that holds them together, in that

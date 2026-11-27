@@ -1,6 +1,6 @@
 # M23, 23e: drafting and approving a day on a clock
 
-**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23e"), security changes included**. 23e-1 (draft and approve) is built, reviewed and merged 2026-11-26 (#321, on green checks and the human's "Merge when green"); its migration reaches plor.app by the human's own `npx supabase db push`. 23e-2 (texts on no list, Dismiss, a tier change) is built and reviewed 2026-11-26, in its PR.
+**Status:** designed 2026-11-25 from answers 50 to 57 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-25 (the human: "Approve 23e"), security changes included**. 23e-1 (draft and approve) is built, reviewed and merged 2026-11-26 (#321, on green checks and the human's "Merge when green"); its migration reaches plor.app by the human's own `npx supabase db push`. 23e-2 (texts on no list, Dismiss, a tier change) is built, reviewed and merged 2026-11-26 (#322, on green checks and the human's "Merge when green"); its two migrations reach plor.app by the human's own `npx supabase db push`. 23e is done.
 
 ## Goal
 The human can draft a day on a clock (format 4) from the researched lists, change it while approving, and approve it; and a text players type that is on no list waits for the human instead of joining a list by itself.

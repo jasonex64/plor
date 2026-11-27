@@ -10,6 +10,10 @@ import {
 } from "@/config/tunables";
 import { ApiError } from "@/lib/api-client";
 
+// What both games say while the site is paused and neither has an approved day (docs/milestones/M23-23f-the-switch.md,
+// answers 69 and 70). 23f-3 puts Offbeat's old "no puzzle" line back for a day missed after the switch.
+export const PAUSED_NOTE = "Plor is being rebuilt. Back soon.";
+
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
   email_invalid: "That doesn't look like an email address.",
