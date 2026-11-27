@@ -16,7 +16,7 @@ import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import { Band, BigScore } from "./game";
 import { gameColour } from "./game-colour";
-import { errorText } from "./messages";
+import { errorText, PAUSED_NOTE } from "./messages";
 import { ordinal } from "./ordinal";
 import { startBody, substringRoutes, type RunFamily } from "./run-routes";
 import { GuestPeek } from "./guest-peek";
@@ -155,7 +155,7 @@ export function SubstringsScreen({
       {run === undefined ? (
         !error && <LoadingStatus>Loading the game</LoadingStatus>
       ) : run === null ? (
-        <p>There&apos;s no puzzle today.</p>
+        <p>{PAUSED_NOTE}</p>
       ) : run.status === "not_started" ? (
         <>
           <p>{run.total} rounds. Each gives you a few letters and 20 seconds to type a word that holds them.</p>

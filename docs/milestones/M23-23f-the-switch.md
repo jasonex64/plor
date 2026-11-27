@@ -1,6 +1,6 @@
 # M23, 23f: the switch
 
-**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **waits on the human's approval**. Nothing is built.
+**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-26** (the human: "Approve 23f"), the security changes below and the two reused numbers included. **23f-1 is built and reviewed, PR open.** Next: 23f-2.
 
 ## Goal
 Offbeat on plor.app is the game on a clock and nothing else: every page reads a clock day rightly, the old seven-question game and its data are gone, and the boards start from the switch day.
@@ -52,8 +52,9 @@ Three PRs, in this order, so that plor.app is never showing a half-switched game
 - No clock day is approved on plor.app before 23f-3's push; the wipe does not touch one if it is.
 - Removing the Bank admin page loses nothing the clock game needs (the Lists page replaced it).
 
-## Still to ask, before 23f-1 is built
-- Whether Fragments' "no puzzle today" also becomes the note (both games are paused).
+## Asked before 23f-1 (2026-11-26; answers 70 and 71 in the M23 ticket)
+- Fragments shows the note too: "Yes, both games (Recommended)". Its own line comes back by hand when Fragments gets days again (ROADMAP, For M23).
+- The front page's line changes now, with the note: "Now, with the note (Recommended)".
 
 ## Acceptance criteria
 - [ ] 23f-1: with no day approved, /play, the Today card and the guest front page show the note → `e2e/`, `@visual`.
@@ -74,12 +75,33 @@ Three PRs, in this order, so that plor.app is never showing a half-switched game
 | existing `RAREST_ANSWERS_SHOWN` | how many of each yesterday shows | existing tunable, reused: the human confirms with approval |
 
 ## Plan
-Written as `<step> → verify: <check>` per PR when the human approves, 23f-1 first.
+Written as `<step> → verify: <check>` per PR, 23f-1 first.
+
+**23f-1.** Assumptions: the one `NoPuzzleBanner` (`src/app/game.tsx`) serves Offbeat's Today card and /play for players and guests, and `src/app/substrings.tsx` holds Fragments' line (both read 2026-11-26). The error text "There's no puzzle today yet. Check back later." (`src/app/messages.ts`), shown only when a Start races a missing day, stays.
+1. An e2e test, `@visual`: with no day approved for either game, the guest front page, a player's Today, /play and Fragments' page each show "Plor is being rebuilt. Back soon.", none shows "A new day starts in", and the guest front page shows "Three questions, one clock. Name as many as you can." → verify: `npx playwright test e2e/paused-note.e2e.ts` fails on the old wording.
+2. The note in one constant, used by Offbeat's banner (its countdown removed) and Fragments' card; the front page's line → verify: the test in 1 passes.
+3. The e2e tests that wait on the old line read the new one; DESIGN.md's lines for it → verify: `npx playwright test e2e/play2.e2e.ts e2e/admin-base.e2e.ts e2e/bank.e2e.ts`; `grep -rn "no puzzle today\." src e2e docs/DESIGN.md` finds nothing.
+4. → verify: `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, `npm test`.
 
 ## Removes
 23f-1: the "no puzzle today" line, until 23f-3. 23f-2: the old stats' wording and `PAR_POINTS.offbeat`. 23f-3: the old game, as design 7, and the old data, as design 8.
 
 ---
 ## Source diff
+**23f-1.**
+- As designed: the note's words are answer 69's, on both games (answer 70); Offbeat's countdown beside it is gone; the front page's line is answer 71's.
+- Deviation: with neither game's day approved, Today and the guest front page show one card, Offbeat's (`src/app/today-games.ts`, as before this change), so the note shows once there, not on two cards. Fragments' own page shows it.
+- Not changed: the error text "There's no puzzle today yet. Check back later." (`src/app/messages.ts`), as the plan said.
+
 ## Evidence
+**23f-1** (2026-11-26, slot 1, the builder's runs unless said):
+- Failing first: `npx playwright test e2e/paused-note.e2e.ts` on the old wording: 8 failed (`getByText('Plor is being rebuilt. Back soon.')`, element(s) not found). The builder did not keep the full output.
+- After: the same command, 8 passed (4 tests at 390 × 844 and 1280 × 720); again with `CI=1`, 8 passed.
+- `npx playwright test e2e/play2.e2e.ts e2e/admin-base.e2e.ts e2e/bank.e2e.ts`: 11 passed.
+- `grep -rn "no puzzle today\." src e2e docs/DESIGN.md`: nothing (the orchestrator's run too).
+- `npx tsc --noEmit` clean, `npx eslint src e2e scripts --quiet` clean (the orchestrator's runs too); `npm test`: 80 files, 1004 passed.
+- Videos of the four screens at both sizes were sent to the human; CI's are in the PR run's `e2e-videos` artifact.
+- Not verified: the whole e2e suite locally (CI runs it); the note on a real phone.
+
 ## Review
+**23f-1:** the `reviewer` agent, fresh context, 2026-11-26: no blocking finding in the code or tests (it did not run Playwright). Its smaller items are in ROADMAP, "Next revision", For M23.
