@@ -4,7 +4,7 @@
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, draftArgs, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
+import { blockRange, clockArgs, clockLines, draftArgs, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -211,5 +211,32 @@ describe("the script under plain Node", () => {
     const run = spawnSync(process.execPath, ["scripts/draft.ts"], { encoding: "utf8" });
     expect(run.stderr).not.toContain("ERR_MODULE_NOT_FOUND");
     expect(run.stderr).toContain("usage: npm run draft");
+  });
+});
+
+// `npm run draft -- clock <date>` (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1): the command line, and what it prints.
+describe("clockArgs", () => {
+  it("reads the clock command and its date", () => {
+    expect(clockArgs(["clock", "2026-12-01"])).toBe("2026-12-01");
+  });
+
+  it("returns null for anything else: another command, no date, a date that isn't one, a flag", () => {
+    expect(clockArgs(["2026-12-01"])).toBeNull();
+    expect(clockArgs(["clock"])).toBeNull();
+    expect(clockArgs(["clock", "2026-02-30"])).toBeNull();
+    expect(clockArgs(["clock", "2026-12-01", "--not", "a"])).toBeNull();
+    expect(draftArgs(["clock", "2026-12-01"])).toBeNull();
+  });
+});
+
+describe("clockLines", () => {
+  it("says for each question its wording and list, and how many days ago the list last appeared, or never", () => {
+    const day = { format: 4 as const, game_id: "offbeat" as const, date: "2026-12-01", questions: [{ prompt: "Name a bread", category: "bread" }, { prompt: "Name a soup", category: "soup" }, { prompt: "Name a tool", category: "tool" }] };
+    const lines = clockLines(day as never, [{ category: "bread", last: "2026-11-19" }, { category: "soup", last: null }, { category: "tool", last: "2026-11-30" }]);
+    expect(lines).toEqual([
+      '  q1 "Name a bread" (bread): last appeared 12 days ago',
+      '  q2 "Name a soup" (soup): last appeared never',
+      '  q3 "Name a tool" (tool): last appeared 1 day ago',
+    ]);
   });
 });

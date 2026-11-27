@@ -20,11 +20,12 @@ import pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, leftOutQuestions, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
-import { avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { approvedDays, buildChecked, pickLists, whenText, type ClockSource, type ListUse, type UseDay } from "../src/content/clock-day.ts";
+import { avoids, checkDayFile, checkHostNames, checkPuzzle, isCalendarDate, isClockDay, normalize, parseDay, stolenLetters, type ClockDraft, type DraftedDay, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { GAME_ID } from "../src/platform/game.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
-import { localClient } from "./base.ts";
+import { localClient, readEdits, readLists } from "./base.ts";
 
 // The host answers for question index: HOST_ANSWERS_PER_QUESTION[index] of the bank, drawn at random but the same for
 // a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank"). The draft passes only the bank
@@ -511,6 +512,29 @@ async function checkBank(db: pg.Client, bank: Bank): Promise<void> {
   if (problems.length) process.exitCode = 1;
 }
 
+// `npm run draft -- clock <date>` (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1; answers 50 and 54): a day on a clock, its
+// three lists the ones asked longest ago (never first, ties at random by the date), the last asking read from the approved days
+// in the database and from the drafted files (`drafted`, every day on disk of either format). It builds the day as the approval
+// page does (src/content/clock-day.ts) and says for each list how long ago it last appeared, so a repeat while the lists are few is
+// seen. The old draft above stays until 23f, when it is removed and this takes its name.
+export async function draftClock(db: pg.Client, date: string, source: Pick<ClockSource, "lists" | "prompts">, drafted: UseDay[]): Promise<{ day: ClockDraft; lines: string[] }> {
+  const used = [...(await approvedDays(db)), ...drafted];
+  const picked = pickLists(date, source.lists.map((l) => l.category), used);
+  const checked = buildChecked(date, picked.map((p) => ({ category: p.category, reroll: 0 })), { ...source, edits: await readEdits(db) });
+  if ("problems" in checked) throw new Error(`the drafted day breaks the rules:\n${checked.problems.join("\n")}`);
+  return { day: checked.built.day, lines: clockLines(checked.built.day, picked) };
+}
+
+// The summary's line for each question: its wording and list, and when the list last appeared (answer 54).
+export function clockLines(day: ClockDraft, picked: ListUse[]): string[] {
+  return day.questions.map((q, i) => `  q${i + 1} "${q.prompt}" (${q.category}): last appeared ${whenText(day.date, picked[i].last)}`);
+}
+
+// The clock command's date, or null for usage it doesn't take. The date is user input, as draftArgs' is.
+export function clockArgs(args: string[]): string | null {
+  return args.length === 2 && args[0] === "clock" && isCalendarDate(args[1]) ? args[1] : null;
+}
+
 // The command line, or null for usage it doesn't take. The date is user input: a malformed one would make every gap NaN
 // and let any category through (13d review). --not and --questions naming one question is a contradiction, refused.
 export function draftArgs(args: string[]): { date: string; ids: string[] | undefined; not: string[] } | null {
@@ -532,32 +556,54 @@ export function draftArgs(args: string[]): { date: string; ids: string[] | undef
   return { date, ids, not };
 }
 
+// Every drafted day on disk, of either format, each checked as content:validate checks it.
+function readDays(dir: string): DraftedDay[] {
+  return readdirSync(dir).filter((n) => n.endsWith(".json")).map((n) => {
+    const file = `${GAME_ID}/${n}`;
+    const text = readFileSync(join(dir, n), "utf8");
+    const problems = checkDayFile(file, text);
+    if (problems.length) throw new Error(problems.join("\n"));
+    return parseDay(file, text).puzzle!;
+  });
+}
+
 async function main(): Promise<void> {
-  const args = draftArgs(process.argv.slice(2));
-  if (!args) {
-    console.error("usage: npm run draft -- <date> [--questions <id>,…] [--not <id>,…]\n       npm run draft -- simulate\n       npm run draft -- check-bank");
+  const clockDate = clockArgs(process.argv.slice(2));
+  const args = clockDate ? null : draftArgs(process.argv.slice(2));
+  if (!clockDate && !args) {
+    console.error("usage: npm run draft -- <date> [--questions <id>,…] [--not <id>,…]\n       npm run draft -- clock <date>\n       npm run draft -- simulate\n       npm run draft -- check-bank");
     process.exit(2);
   }
-  const { date, ids, not } = args;
-  const simulating = date === "simulate";
-  const checking = date === "check-bank";
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
   if (!bank) throw new Error(errors.join("\n"));
   const dir = join("content", GAME_ID);
-  const days = readdirSync(dir).filter((n) => n.endsWith(".json")).map((n) => {
-    const file = `${GAME_ID}/${n}`;
-    const text = readFileSync(join(dir, n), "utf8");
-    const problems = checkPuzzleFile(file, text);
-    if (problems.length) throw new Error(problems.join("\n"));
-    return parsePuzzle(file, text).puzzle!;
-  });
+  const days = readDays(dir);
+  if (clockDate) {
+    const db = await localClient();
+    try {
+      const prompts = new Map(bank.questions.map((q) => [q.category, q.prompt]));
+      const { day, lines } = await draftClock(db, clockDate, { lists: readLists(), prompts }, days);
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
+      console.log(`DRAFTED ${dir}/${day.date}.json: a day on a clock`);
+      console.log(lines.join("\n"));
+    } finally {
+      await db.end();
+    }
+    return;
+  }
+  const { date, ids, not } = args!;
+  const simulating = date === "simulate";
+  const checking = date === "check-bank";
+  // The old draft's gap and families are the days of seven questions' rules: a day on a clock is not one of them.
+  const sevens = days.filter((d): d is Puzzle => !isClockDay(d));
   const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
   if (!categories) throw new Error(categoryErrors.join("\n"));
   const db = await localClient();
   try {
-    if (simulating) return await simulate(db, bank, days, familyOf(categories));
+    if (simulating) return await simulate(db, bank, sevens, familyOf(categories));
     if (checking) return await checkBank(db, bank);
-    const { day, guide } = await draft(db, bank, days, date, familyOf(categories), ids, not);
+    const { day, guide } = await draft(db, bank, sevens, date, familyOf(categories), ids, not);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
     console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);

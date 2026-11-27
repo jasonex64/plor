@@ -1,6 +1,6 @@
 # M24 — The Groups tab opens your group, and favourites
 
-**Status:** in progress: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. 24b, the Groups tab, is built and reviewed, in its PR (answers 17 to 19 asked first). Next: 24c.
+**Status:** done: approved 2026-11-25, security change included (the human: "Approve M24", to "Approve M24, its security change included?"); 24a is built, reviewed and merged (#313, 2026-11-25, merge commit `705b00f`, on nine green checks and the human's "Pushed, merge on green"; it changes nothing a player sees). Its migration is on the hosted database by the human's own `npx supabase db push` from slot 3, seen there through the connector before the merge. 24c, favourite friends, is built, reviewed and merged (#320, 2026-11-26, merge commit `771ccac`, on nine green checks at `dba9076` and the human's "merge", after main was merged into the branch); it is on plor.app and needed no database push. 24b, the Groups tab, is built, reviewed and merged (#315, 2026-11-25, merge commit `690ba06`, on nine green checks at `01de3eb` and the human's "Merge when green", after main was merged into the branch); it is on plor.app and needed no database push (answers 17 to 19 asked first). All three sub-tickets are merged; slot 3 is freed and the branch deleted once this line is on `main`.
 
 ## Goal
 The Groups tab opens the group a player starred, with a dropdown on its name to switch groups, and a player's favourite friends come first in their lists.
@@ -72,7 +72,7 @@ What this exposes: a fault in either new route could flip another player's star 
 - [x] **24b** `/groups` shows the starred group's page; with no star, the first group joined; with no groups, the Create box. Playwright, `@visual`.
 - [x] **24b** The dropdown lists the player's groups and "New group…"; choosing a group shows it; "New group…" creates one. Playwright, `@visual`.
 - [x] **24b** Tapping the star makes the group the default and it is still the default after a reload and in a second browser signed in as the same player. Playwright.
-- [ ] **24c** A favourited friend is first in Your friends after a reload; the friend's own page shows nothing of it. Playwright, `@visual`.
+- [x] **24c** A favourited friend is first in Your friends after a reload; the friend's own page shows nothing of it. Playwright, `@visual`.
 - [ ] Each PR's e2e videos are linked from its CI run and sent to the human.
 
 ## Out of scope
@@ -112,7 +112,7 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 |---|---|---|
 | M10 G10: `plor_app` may read, insert and delete memberships | 24a: it may also update `starred`, and `favourite_of_a` and `favourite_of_b` on a friendship | The stars are kept on the account (answer 13); approved with the ticket (DECISIONS.md, Log, 2026-11-25) |
 | This ticket as drafted: the favourite route names the friend by username | 24a: by user ID | A username can change hands after the page was drawn (M19 19e); Remove already names a friend by ID |
-| DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row, and 24b: `GET /api/groups` gains `defaultId`, and the protocol stays | An older page ignores a field it does not read; nothing it reads changed |
+| DECISIONS.md, Network messages: a changed response shape raises the protocol | 24a: `GET /api/groups` and `GET /api/friends` gain one field per row, and 24b: `GET /api/groups` gains `defaultId`, and the protocol stays | An older page ignores a field it does not read; nothing it reads changed. 24c changes only the order of `GET /api/friends`' and the board's friends, no shape |
 
 ## Evidence
 **24a** (slot 3's local stack, 2026-11-25; CI's run is on the PR):
@@ -130,9 +130,21 @@ Hypothesis for step 5: the star adds no step that creates, removes or hands over
 - `npm test`: 79 files, 945 passed. `npm run lint` and `npx tsc --noEmit -p .`: no output.
 - **CI's first e2e run on the PR failed, on two older tests the agent had not run** (only `e2e/groups.e2e.ts` was run here): `e2e/calm.e2e.ts` waited for "Create group" on the Groups tab of a player in a group, and `e2e/frame.e2e.ts` expected that tab not to scroll at 400px tall. Both expectations were the old tab's. Now calm waits for the creator's Rename there, and frame measures the short tab on a second player in no group and holds the first player's tab to the stacked pages' 16px gaps. `npm run test:e2e -- calm frame --project=chromium -g "only what can be pressed|every tab starts"`: `2 passed (4.4m)`, so the star and the dropdown are 44px controls with no stray shadow at 390px and 1280px.
 - **Not looked at by eye:** the dropdown and star were measured by the test, not seen; CI's `e2e-videos` show them.
+- CI on the merged branch (`01de3eb`, main's M23 and M20 merges included): nine checks green; the Groups tab's test at desktop and phone size is in the run's `e2e-videos` artifact, https://github.com/jasonex64/plor/actions/runs/45759112498 (both clips sent to the human in the app).
 - `verify-group-membership`: not rerun. 24b adds one read of `group_member` (`defaultGroupId`) and changes no step that creates, removes or hands over a membership.
+
+**24c** (slot 3, 2026-11-25; the built app, as CI runs it):
+- Failing first: `npm run test:e2e -- friend-requests --project=chromium -g "starred friend"`: `1 failed`, no button named "Favourite …" on a friend's row.
+- Then `npm run test:e2e -- friend-requests calm`: `7 passed (3.5m)`, among them "a starred friend comes first in Your friends and on Friends today, after a reload too, and isn't told" at desktop and phone size (the star 44px and inside its one-line row, no sideways scroll; starred, Zed is above Abe in both lists and after a reload, and Zed's own list shows their star on the player still empty; cleared, the order is by name again), and calm's "every control is 44px tall".
+- `npx vitest run src/app/api/friends/route.db.test.ts src/app/api/board src/groups/stars.plor-app.db.test.ts`: `Test Files 6 passed`, `Tests 31 passed`.
+- Assumptions, Claude's, not asked: the star's words for a screen reader are "Favourite <name>", pressed or not; the live board orders by the star on the server and sends no new field, so the protocol stays.
+- After the review: `npx vitest run src/groups/stars.plor-app.db.test.ts`: `Tests 3 passed`, the new one "puts a player's favourites first in their friends list and on their live board, from either side of the pair, and nobody else's" (as `plor_app`; three players all friends, so one viewer is the first of both her pairs and another the second; the board's friends carry no `favourite`).
+- The wider files that open the Friends tab, `npm run test:e2e -- look.e2e frame headings screen-readers alive controls-and-state jumps-and-finds live-board boards feel account`: `75 passed`, `2 failed (15.5m)`: `alive.e2e.ts:94` (a hovered button lifts) and `controls-and-state.e2e.ts:290` (the game screen's feed), neither on the Friends tab; one stopped in the sign-in helper at "Pick a username" (`e2e/players.ts:67`), the other's error wasn't kept. Run again alone, both passed (`2 passed (42.1s)`). Taken as the sign-in flake CI showed on #315, unverified.
+- `verify-group-membership`: not rerun; 24c touches no group.
+- CI on the merged branch (`dba9076`, main's M23 merges included): nine checks green; the starred friend's test at desktop and phone size is in the run's `e2e-videos` artifact, https://github.com/jasonex64/plor/actions/runs/45911731554 (both clips sent to the human in the app). Not looked at by eye by the agent: the star was measured by the test.
 
 ## Review
 - **24a** (the `reviewer` agent, 2026-11-25, read the code, ran nothing): no blocking finding in the code. Blocking, docs: the handoff and the ROADMAP row still said "nothing built", and Evidence was empty: fixed in the same PR.
 - **24b** (the `reviewer` agent, 2026-11-25, read the code; ran neither the e2e suite nor, to the end, lint or the type check): no blocking finding. Six items deferred to ROADMAP "Next revision", For M24.
 - 24a's, deferred to ROADMAP "Next revision", For M24: a star move meeting the same player's account deletion can be the deadlock's victim (40P01, a 500); the race test rarely reaches the 23505 path, and no test of its own shows a star going with its membership; the protocol stays at its number.
+- **24c** (the `reviewer` agent, 2026-11-25, read the diff; ran lint and the type check, no test and no browser): two blocking findings, both fixed before the PR. The handoff still said 24c was next: rewritten. The order had only the e2e test, where the viewer's side of the pair's row is chance, so a wrong-side read would pass about half the runs: the db test above was added. One non-blocking item, a comment in `src/friends/requests.ts` that this change made untrue ("in its order"), corrected in the same change as the text it orphaned. Nothing deferred.

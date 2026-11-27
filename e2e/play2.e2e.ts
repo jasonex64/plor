@@ -60,7 +60,7 @@ test("a day with no puzzle says so", async ({ page }) => {
   await signInAndPick(page, "pn");
   await page.goto("/play2");
   await expect(page.getByRole("heading", { name: SUBSTRINGS.name, exact: true })).toBeVisible();
-  await expect(page.getByText("There's no puzzle today.")).toBeVisible();
+  await expect(page.getByText("Plor is being rebuilt. Back soon.")).toBeVisible();
 });
 
 // Signed out, the page is the bare guest game, not sign-in first (docs/milestones/M18-guest-play.md, 18d; e2e/guest-play.e2e.ts

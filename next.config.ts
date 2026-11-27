@@ -13,9 +13,12 @@ const nextConfig: NextConfig = {
   // M06-puzzle-entry.md), so the files must be in those routes' server traces (next.config.js "output",
   // outputFileTracingIncludes).
   outputFileTracingIncludes: {
-    "/api/admin/puzzles": ["./content/offbeat/*.json", "./content/substrings/*.json"],
+    "/api/admin/puzzles": ["./content/offbeat/*.json", "./content/substrings/*.json", "./content/lists/*.json", "./content/bank.json"],
     "/api/admin/puzzles/substrings": ["./content/substrings/*.json"],
     "/api/admin/puzzles/approve": ["./content/offbeat/*.json"],
+    // A day on a clock is built from the lists, with the bank's wording, and the drafted days say when each list last appeared (M23 23e-1).
+    "/api/admin/puzzles/clock": ["./content/offbeat/*.json", "./content/lists/*.json", "./content/bank.json"],
+    "/api/admin/puzzles/clock/approve": ["./content/offbeat/*.json", "./content/lists/*.json", "./content/bank.json"],
     // The question bank page reads the bank and the drafted days it ran on (M13 13d).
     "/api/admin/bank": ["./content/bank.json", "./content/offbeat/*.json"],
     // The review of researched lists reads the lists' files and the bank's prompts (M23 23b-2).

@@ -10,6 +10,10 @@ import {
 } from "@/config/tunables";
 import { ApiError } from "@/lib/api-client";
 
+// What both games say while the site is paused and neither has an approved day (docs/milestones/M23-23f-the-switch.md,
+// answers 69 and 70). 23f-3 puts Offbeat's old "no puzzle" line back for a day missed after the switch.
+export const PAUSED_NOTE = "Plor is being rebuilt. Back soon.";
+
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
   email_invalid: "That doesn't look like an email address.",
@@ -92,6 +96,8 @@ const MESSAGES: Record<string, string> = {
   audit_invalid: "That decision no longer fits this answer. Reload the page.",
   // The review of a researched list (docs/milestones/M23-23b-research-and-review.md, 23b-2).
   list_invalid: "That change doesn't fit this list any more. Reload the page.",
+  // Drafting a day on a clock (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1): Redraft has shown every list there is.
+  no_lists_left: "There are no more lists to redraft with. Swap a question for one from the menu instead.",
 };
 
 export function messageFor(code: string): string {

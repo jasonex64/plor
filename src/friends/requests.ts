@@ -139,7 +139,7 @@ export async function unblockPlayer(pool: Pool, userId: string, username: string
   });
 }
 
-// Players as the friends list gives them, and in its order (src/friends/friends.ts, listFriends). `source` is SQL
+// Players as the friends list gives them, by name as it orders each of its parts (src/friends/friends.ts, listFriends). `source` is SQL
 // giving one user_id per row for the player $1.
 async function listPlayers(db: Db, userId: string, source: string): Promise<Friend[]> {
   const { rows } = await db.query<Friend>(

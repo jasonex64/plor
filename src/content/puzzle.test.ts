@@ -1,6 +1,7 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fixtureClockDay } from "../test/answer-fixture.ts";
-import { checkClockPuzzle, checkHostNames, normalize, parsePuzzle, type ClockPuzzle, type ClockQuestion, type Puzzle } from "./puzzle.ts";
+import { checkClockDay, checkClockPuzzle, checkDayFile, checkHostNames, normalize, parseClockDraft, parseDay, parsePuzzle, type ClockDraft, type ClockPuzzle, type ClockQuestion, type Puzzle } from "./puzzle.ts";
 
 describe("normalize", () => {
   it.each([
@@ -125,5 +126,53 @@ describe("checkClockPuzzle (a day on a clock)", () => {
 
   it("refuses a size that is not a positive integer", () => {
     for (const size of [0, -3, 2.5, "40"]) expect(checkClockPuzzle("d", day(question({ size })))[0]).toBe('d q1: "size" must be a positive integer');
+  });
+});
+
+// A drafted day on a clock (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1): the file the draft writes and the
+// approval page reads, which holds no root and no member_of (approval adds them).
+describe("a drafted day on a clock", () => {
+  const ids = (from: number, n: number) => Array.from({ length: n }, (_, i) => id(from + i));
+  const question = (n: number, over: Record<string, unknown> = {}) => ({
+    prompt: `Name a thing ${n}`,
+    category: `thing_${"abc"[n]}`,
+    levels: { [id(1)]: "common", [id(2)]: "uncommon" },
+    rare: ids(10, 6),
+    size: 40,
+    ...over,
+  });
+  const draft = (questions: object[] = [question(0), question(1), question(2)]) => ({ format: 4, game_id: "offbeat", date: "2026-12-01", questions });
+  const text = (day: object) => JSON.stringify(day);
+
+  it("reads a good day, by its own parser and by the one that reads either format", () => {
+    expect(parseClockDraft("offbeat/2026-12-01.json", text(draft())).errors).toEqual([]);
+    expect(parseDay("offbeat/2026-12-01.json", text(draft())).puzzle).toEqual(draft());
+    expect(checkDayFile("offbeat/2026-12-01.json", text(draft()))).toEqual([]);
+  });
+
+  it("still reads a day of seven questions as before, and refuses another format", () => {
+    expect(parseDay("offbeat/2026-11-24.json", readFileSync("content/offbeat/2026-11-24.json", "utf8")).puzzle?.format).toBe(3);
+    expect(parseDay("f", text({ ...draft(), format: 5 })).errors[0]).toBe('f: "format" must be 3');
+  });
+
+  it("refuses a file with a missing or unknown field, a bad id or a bad tier", () => {
+    const { rare, ...noRare } = question(0);
+    expect(rare).toHaveLength(6);
+    expect(parseClockDraft("f", text(draft([noRare, question(1), question(2)]))).errors).toEqual(['f q1: missing "rare"']);
+    expect(parseClockDraft("f", text(draft([question(0, { root: id(9) }), question(1), question(2)]))).errors).toEqual(['f q1: unknown field "root"']);
+    expect(parseClockDraft("f", text(draft([question(0, { rare: ["cat"] }), question(1), question(2)]))).errors).toEqual(['f q1: "rare" must be a list of thing IDs']);
+    expect(parseClockDraft("f", text(draft([question(0, { levels: { [id(1)]: "rare" } }), question(1), question(2)]))).errors).toEqual(['f q1: "levels" must map thing IDs to "common" or "uncommon"']);
+    expect(parseClockDraft("f", text(draft([question(0, { prompt: " " }), question(1), question(2)]))).errors).toEqual(['f q1: "prompt" must be a non-empty string']);
+  });
+
+  it("checks the day: three questions, three different lists, a wording that is not empty, and each question's rare and size", () => {
+    expect(checkClockDay("d", draft([question(0), question(1)]) as ClockDraft)).toEqual(["d: has 2 questions, expected 3"]);
+    expect(checkClockDay("d", draft([question(0), question(1), question(1)]) as ClockDraft)).toEqual(['d q3: "thing_b" is asked by q2 too']);
+    expect(checkClockDay("d", draft([question(0), question(1, { prompt: "  " }), question(2)]) as ClockDraft)).toEqual(["d q2: the wording is empty"]);
+    expect(checkClockDay("d", draft([question(0), question(1, { size: 0 }), question(2)]) as ClockDraft)).toEqual(['d q2: "size" must be a positive integer']);
+  });
+
+  it("holds a file to its path, as a day of seven questions is", () => {
+    expect(checkDayFile("offbeat/2026-12-02.json", text(draft()))).toEqual(["offbeat/2026-12-02.json: path must be offbeat/2026-12-01.json to match its game_id and date"]);
   });
 });

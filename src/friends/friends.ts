@@ -62,6 +62,7 @@ export async function setFavourite(db: Db, userId: string, friendId: string, fav
   if (rowCount === 0) throw new AppError("not_friends", STATUS.notFound);
 }
 
+// The player's favourites first, then the rest, each part by name (M24 24c, answer 19).
 export async function listFriends(db: Db, userId: string): Promise<ListedFriend[]> {
   const { rows } = await db.query<ListedFriend>(
     `select p.user_id::text as "userId", p.username, coalesce(p.display_name, p.username::text) as name,
@@ -70,7 +71,7 @@ export async function listFriends(db: Db, userId: string): Promise<ListedFriend[
      join private.profile p on p.user_id = c.user_id
      join private.friendship f on f.user_a = least($1::uuid, c.user_id) and f.user_b = greatest($1::uuid, c.user_id)
      where c.user_id <> $1
-     order by lower(coalesce(p.display_name, p.username::text)), p.username`,
+     order by favourite desc, lower(coalesce(p.display_name, p.username::text)), p.username`,
     [userId],
   );
   return rows;

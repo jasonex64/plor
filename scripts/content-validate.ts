@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 import { gapProblems, parseBank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
 import { LISTS_DIR, parseList } from "../src/content/list.ts";
-import { checkPuzzleFile, normalize, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
+import { checkDayFile, isClockDay, normalize, parseDay, type Puzzle } from "../src/content/puzzle.ts";
 import { checkSubstringsFile, parseSubstringDay, substringGapProblems, type SubstringDay } from "../src/content/substrings.ts";
 import { SUBSTRINGS_ID } from "../src/platform/game.ts";
 
@@ -46,9 +46,11 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
   // them (M16 16c).
   const secondGame = allTexts.filter(({ file }) => file.startsWith(`${SUBSTRINGS_ID}/`));
   const texts = allTexts.filter(({ file }) => !file.startsWith(`${SUBSTRINGS_ID}/`));
-  const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text)), ...secondGame.flatMap(({ file, text }) => checkSubstringsFile(file, text))];
+  const errors = [...strays, ...texts.flatMap(({ file, text }) => checkDayFile(file, text)), ...secondGame.flatMap(({ file, text }) => checkSubstringsFile(file, text))];
   errors.push(...substringGapProblems(secondGame.flatMap(({ file, text }) => parseSubstringDay(file, text).day ?? []) as SubstringDay[]));
-  const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
+  // The 30-day gap and one family a day are the old game's rules, for the days of seven questions: a day on a clock asks three of
+  // twenty-one lists, which come round again in a week (answer 54: "Repeat, and warn me").
+  const days = texts.flatMap(({ file, text }) => parseDay(file, text).puzzle ?? []).filter((d): d is Puzzle => !isClockDay(d));
   const { categories, errors: categoryErrors } = parseCategories(categoriesFile, readFileSync(categoriesFile, "utf8"));
   errors.push(...categoryErrors);
   const keys = categories && { file: categoriesFile, keys: new Set(categories.map((c) => c.key)) };

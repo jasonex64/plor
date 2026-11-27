@@ -36,6 +36,20 @@ describe("foldList", () => {
     expect(folded.answers).toHaveLength(4);
   });
 
+  it("gives an answer found by any of its names another tier, and changes nothing else about its line", () => {
+    const folded = foldList(HATS, [{ category: "hat", name: "knit cap", kind: "tier", tier: "rare" }, { category: "hat", name: "stetson", kind: "tier", tier: "common" }], null);
+    expect(folded.answers.map((a) => a.tier)).toEqual(["common", "rare", "common"]);
+    const text = formatList(folded);
+    expect(text).toContain('{"name":"beanie","aliases":["knit cap"],"tier":"rare","borderline":true}');
+    expect(text).toContain('{"name":"stetson","aliases":[],"tier":"common","brand":true,"borderline":true}');
+  });
+
+  it("takes the last of two tier edits, and does nothing for an answer the list does not have", () => {
+    const folded = foldList(HATS, [{ category: "hat", name: "beanie", kind: "tier", tier: "rare" }, { category: "hat", name: "beanie", kind: "tier", tier: "uncommon" }, { category: "hat", name: "fez", kind: "tier", tier: "rare" }], null);
+    expect(folded.answers.map((a) => a.tier)).toEqual(["common", "uncommon", "uncommon"]);
+    expect(folded.answers).toHaveLength(3);
+  });
+
   it("sets the date the list was seen, and leaves it alone when there is none", () => {
     expect(foldList(HATS, [], "2026-11-26").borderline_seen).toBe("2026-11-26");
     expect(foldList({ ...HATS, borderline_seen: "2026-11-25" }, [], null).borderline_seen).toBe("2026-11-25");
@@ -70,6 +84,11 @@ describe("unfoldedEdits (the load's guard)", () => {
     expect(unfoldedEdits([missing, { category: "hat", name: "Knit Cap", kind: "add" }], lists)).toEqual([missing]);
   });
 
+  it("holds back a tier change while the file gives the answer another tier, and lets it through once it gives that one or no longer has the answer", () => {
+    const change = (name: string, tier: "common" | "uncommon" | "rare") => ({ category: "hat", name, kind: "tier" as const, tier });
+    expect(unfoldedEdits([change("topper", "rare"), change("stetson", "uncommon"), change("fedora", "rare")], lists)).toEqual([change("topper", "rare")]);
+  });
+
   it("keeps the extra fields an edit came with", () => {
     expect(unfoldedEdits([{ id: 7, category: "hat", name: "fez", kind: "add" as const }], lists)).toEqual([{ id: 7, category: "hat", name: "fez", kind: "add" }]);
   });
@@ -80,7 +99,13 @@ describe("parseReview (the file a session exports from the hosted database)", ()
   it("reads what private.list_edits returns", () => {
     expect(parseReview("review.json", JSON.stringify(good))).toEqual(good);
   });
+  it("reads a tier edit with its tier", () => {
+    const tiered = { ...good, edits: [{ category: "hat", name: "fez", kind: "tier", tier: "rare", at: "2026-11-25T10:00:00Z" }] };
+    expect(parseReview("review.json", JSON.stringify(tiered))).toEqual(tiered);
+  });
   it.each([
+    ["a tier edit with no tier", JSON.stringify({ ...good, edits: [{ ...good.edits[0], kind: "tier" }] })],
+    ["a tier edit with a tier that is none of the three", JSON.stringify({ ...good, edits: [{ ...good.edits[0], kind: "tier", tier: "epic" }] })],
     ["not JSON", "{"],
     ["no edits", JSON.stringify({ seen: [] })],
     ["a kind that is neither", JSON.stringify({ ...good, edits: [{ ...good.edits[0], kind: "remove" }] })],
@@ -103,6 +128,7 @@ describe("foldFiles", () => {
       writeFileSync(join(root, "lists", "bag.json"), formatList({ ...HATS, category: "bag" }));
       const review = { edits: [{ category: "hat", name: "topper", kind: "strike" as const, at: "2026-11-25T10:00:00.000Z" }, { category: "hat", name: "Fez", kind: "add" as const, at: "2026-11-25T10:01:00.000Z" }], seen: [{ category: "hat", at: "2026-11-25T23:30:00.000Z" }] };
       expect(foldFiles(review, root)).toEqual(["FOLDED hat: 1 struck, 1 added, 3 → 3 answers, seen 2026-11-25"]);
+      expect(foldFiles({ edits: [{ category: "hat", name: "stetson", kind: "tier", tier: "rare", at: "2026-11-25T10:00:00.000Z" }], seen: [] }, root)).toEqual(["FOLDED hat: 0 struck, 0 added, 1 given another tier, 3 → 3 answers"]);
       const hat = readFileSync(join(root, "lists", "hat.json"), "utf8");
       expect(hat).toContain('"borderline_seen": "2026-11-25"');
       expect(hat).toContain('{"name":"Fez","aliases":[],"tier":"rare"}');

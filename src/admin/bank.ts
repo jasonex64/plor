@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseBank, usesOf, type Bank } from "@/content/bank";
-import { type Puzzle } from "@/content/puzzle";
+import { isClockDay, type DraftedDay, type Puzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { dayInsights } from "@/insights/queries";
 import type { Db } from "@/lib/db";
@@ -24,9 +24,10 @@ export function readBank(): Bank {
   return bank;
 }
 
-// drafts: the drafted days, by date. A day counts as played once its approved puzzle has started.
-export async function bankView(db: Db, bank: Bank, drafts: Map<string, Puzzle>): Promise<BankView> {
-  const days = [...drafts.values()];
+// drafts: the drafted days, by date. A day counts as played once its approved puzzle has started. The page counts the days of seven
+// questions, whose catch rates the insights read; a day on a clock has none to show yet (23e).
+export async function bankView(db: Db, bank: Bank, drafts: Map<string, DraftedDay>): Promise<BankView> {
+  const days = [...drafts.values()].filter((d): d is Puzzle => !isClockDay(d));
   const { rows: started } = await db.query<{ date: string | null; today: string }>(
     `select p.puzzle_date::text as date, t.today from (select private.today()::text as today) t
      left join private.puzzle p on p.game_id = $1 and p.puzzle_date <= private.today() and p.puzzle_date = any($2::date[])`,
@@ -43,7 +44,7 @@ export async function bankView(db: Db, bank: Bank, drafts: Map<string, Puzzle>):
     themes: q.themes,
     addedBy: q.added_by,
     uses: usesOf(q, days).map((date) => {
-      const index = drafts.get(date)!.questions.findIndex((x) => x.prompt === q.prompt && x.category === q.category);
+      const index = days.find((d) => d.date === date)!.questions.findIndex((x) => x.prompt === q.prompt && x.category === q.category);
       const played = insights.get(date)?.questions[index];
       const day = date < today ? "past" : date === today ? "today" : "future";
       return { date, day, answered: played?.answered ?? 0, catchRate: played?.catchRate ?? null } satisfies BankUse;
