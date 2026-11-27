@@ -83,6 +83,26 @@ Written as `<step> → verify: <check>` per PR, 23f-1 first.
 3. The e2e tests that wait on the old line read the new one; DESIGN.md's lines for it → verify: `npx playwright test e2e/play2.e2e.ts e2e/admin-base.e2e.ts e2e/bank.e2e.ts`; `grep -rn "no puzzle today\." src e2e docs/DESIGN.md` finds nothing.
 4. → verify: `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, `npm test`.
 
+**23f-2.** The code as a search agent read it on 2026-11-26 (*unverified* until the build reads each): a clock run's answers are in `private.clock_answer` and never in `run_event`; `private.run_status` calls every finished clock run 'survived' with 3 answered; a closed clock day has a `points_ledger` row like any day; `getYesterday` (`src/game/offbeat.ts`) reads `host_answers`, which a clock day has not, so it would throw and take the whole "Your Offbeat" card with it; today's board (`offbeatToday`, `src/friends/leaderboard.ts`) reads `run_event` only, so a clock finisher scores 0.
+
+Readings chosen where the design left room, each in the Source diff when built:
+- **No "clock days only" filter is written** (design 5). Until 23f-3's wipe the old days are still in the database and no clock day exists on plor.app, and after it no old day can exist, so a filter would guard a state that cannot happen. Stats and boards read points from the ledger whatever the day's kind; 23f-3's wipe makes "a day on a clock" true and its tests show it.
+- **Yesterday** shows the new view when yesterday was a day on a clock and the old view when it was an old day (nothing is removed yet). "Enough players" is per question: players who gave at least one answer on it, against `ANSWER_SHARE_MIN_PLAYERS`. Top is most players first, rarest is fewest first and never repeats a top one, ties by name; `RAREST_ANSWERS_SHOWN` of each. Only a day before today can be read. The answer search is not drawn on a clock day (it counts the old game's answers).
+- **The chart's** bars are measured against the highest of its seven days (no par exists to measure against).
+- **The feed's** points and answers stop at the day's midnight, as the ledger's do.
+
+Steps, part A (stats, feed, today's score, the combined board):
+1. A db test: a player with closed days has `best`, `average` (points a day) and seven days of points from `/api/offbeat` and `/api/me`, and neither answers "full runs" or "survived" → verify: `npx vitest run src/app/api/offbeat/route.db.test.ts src/app/api/me/route.db.test.ts --no-file-parallelism` fails first, then passes.
+2. "Your Offbeat" and Me draw them: streak, best score, average points a day, the points chart; a named day reads its points → verify: `e2e/offbeat.e2e.ts`, `e2e/me.e2e.ts`, `e2e/profile.e2e.ts`, `@visual`, changed to the new words, pass.
+3. A db test: a finished clock run's feed item carries its points and its number of answers; a unit test: it reads "scored 340 points with 14 answers" → verify: `npx vitest run src/comments/feed-page.clock.db.test.ts --no-file-parallelism` and the unit test fail first, then pass; an `@visual` e2e shows the line.
+4. A db test: on a clock day, today's board gives a finished friend their run's points → verify: `npx vitest run src/app/api/leaderboard/today/route.db.test.ts --no-file-parallelism` fails first, then passes.
+5. A db test: the combined board, today's and the week's, has no Offbeat part; `PAR_POINTS.offbeat` is gone; the board says under it that Offbeat joins once its typical score is known → verify: `npx vitest run src/app/api/leaderboard/overall.db.test.ts src/app/api/leaderboard/today/route.db.test.ts --no-file-parallelism` fails first, then passes; `e2e/overall-board.e2e.ts` passes with the line.
+
+Steps, part B (Yesterday):
+6. A db test: with a clock day yesterday, `/api/offbeat` answers (it threw before) with, per question, the top and the rarest answers and their players; a question under the minimum gives none; today's day cannot be read → verify: `npx vitest run src/app/api/offbeat/route.db.test.ts --no-file-parallelism` fails first, then passes.
+7. The card draws it → verify: an `@visual` e2e with enough players shows a top and a rarest answer with their counts, and with too few the "too few players" words.
+8. → verify: `npx tsc --noEmit`, `npx eslint src e2e scripts --quiet`, `npm test`, `npm run test:sql`, the db tests of every file touched; the whole e2e suite in CI.
+
 ## Removes
 23f-1: the "no puzzle today" line, until 23f-3. 23f-2: the old stats' wording and `PAR_POINTS.offbeat`. 23f-3: the old game, as design 7, and the old data, as design 8.
 
