@@ -169,7 +169,8 @@ export const AUTH_LIMITS = {
 export const STATS_CHART_DAYS = 7;
 
 // The Me tab (docs/milestones/M14-14a-3a-me.md, Numbers): how many of the player's rarest answers it shows, from closed
-// days (human, 2026-10-25: "3, from closed days (Recommended)").
+// days (human, 2026-10-25: "3, from closed days (Recommended)"). Also how many of each, most common and rarest, Yesterday's
+// answers show per question of a day on a clock (docs/milestones/M23-23f-the-switch.md, Numbers: reused, the human confirms with approval).
 export const RAREST_ANSWERS_SHOWN = 3;
 
 // The streak's ranks (docs/milestones/M14-14b-2a-streak-ranks.md, Numbers): the first day of each, Seed to Sakura. 1, 5,
@@ -225,8 +226,10 @@ export const SUBSTRING_BONUS_LETTER_POINTS = 120; // docs/milestones/M16-16e-poi
 // A game's par, by its permanent ID: the day's points that count as a full 100 on the overall board
 // (docs/milestones/M15-15i-par-scores.md; each game's own board is in points since issue #265; human, 2026-11-15: Offbeat "1,250: perfect plus half the bonus", Fragments
 // "1,500"). A new game joins the overall board by naming its par. The human reviews them after the beta's first week
-// (answer 7); boards work the score out on each read, so a changed par rescores past days (answer 8).
-export const PAR_POINTS = { offbeat: 1250, substrings: 1500 } as const;
+// (answer 7); boards work the score out on each read, so a changed par rescores past days (answer 8). Offbeat has none
+// while it is on a clock: the human's "Leave Offbeat off until you set par" (M23, answer 60), so the overall board
+// counts only the games named here, and setting Offbeat's par is its own change, on the human's word and number.
+export const PAR_POINTS: Partial<Record<string, number>> = { substrings: 1500 };
 
 // Players a day of a game needs before "Better than X% of players" shows (human, 2026-11-07: "10 players";
 // docs/milestones/M16-16e-points-and-boards.md, answer 16).

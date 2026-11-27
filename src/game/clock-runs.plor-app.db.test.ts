@@ -7,7 +7,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import type { ClockPuzzle } from "@/content/puzzle";
-import type { ClockState } from "./clock-state";
+import { missedOrder, type ClockState } from "./clock-state";
 import { hashKey } from "@/lib/auth-limits";
 import { GAME_ID } from "@/platform/game";
 import { FIXTURE_NAMES, fixtureClockDay, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "@/test/answer-fixture";
@@ -77,7 +77,7 @@ const missesOf = async (client: PoolClient, userId: string) =>
 
 describe("a player's run on a clock as plor_app", () => {
   it("starts with 20 seconds, adds each tier's time less 5% an answer, ignores repeats and misses, never goes back, and Finish ends it", async () => {
-    await onClockDay(async ({ client, day }) => {
+    await onClockDay(async ({ client, today, day }) => {
       const userId = await newPlayer(client);
       expect(await isClockRun(client, userId)).toBe(true);
       expect(await clockState(client, userId)).toMatchObject({ format: 4, status: "not_started", question: null, answers: [], missed: null });
@@ -140,8 +140,8 @@ describe("a player's run on a clock as plor_app", () => {
         prompt: "Name an animal",
         answers: [
           { id: name("bear", 0), name: "bear", tier: "common" },
-          { id: name("fish", 0), name: "fish", tier: "uncommon" },
-          { id: name("horse", 0), name: "horse", tier: "uncommon" },
+          // The two uncommon answers not given, in the day's own order, which changes with the date (missedOrder).
+          ...missedOrder(today, 0, [name("fish", 0), name("horse", 0)]).map((id) => ({ id, name: FIXTURE_NAMES.get(id)!, tier: "uncommon" })),
           // The day's first three rare answers the player did not give (they gave horde).
           ...day.questions[0].rare
             .filter((id) => id !== name("horde", 0))

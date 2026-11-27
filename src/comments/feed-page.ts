@@ -6,8 +6,9 @@
 // (the board withholds both too, src/friends/board.ts); comments come whole (answer 21); earlier days never blur.
 // Today's feed screen reads it (src/app/feed.tsx).
 import { FEED_PAGE_SIZE } from "@/config/tunables";
+import { CLOCK_FORMAT } from "@/content/puzzle";
 import { blockedSql, circleSql, seesCommentSql } from "@/friends/circle";
-import { ended, type Ended } from "@/friends/board";
+import { ended, type Ended, type Scored } from "@/friends/board";
 import { runTotals } from "@/game/substring-places";
 import { thingNames } from "@/game/payload";
 import { FINISHED } from "@/game/status";
@@ -34,7 +35,7 @@ export type FeedCommentItem = Base & {
 // userId is what a reaction on the run names (M19 19e); results are only the viewer's own and friends'.
 type ResultBase = Base & { kind: "result"; userId: string };
 export type FeedResultItem =
-  | (ResultBase & { game: typeof GAME_ID; blurred: false; ended: Ended; reactions: Reactions })
+  | (ResultBase & { game: typeof GAME_ID; blurred: false; ended: Ended | Scored; reactions: Reactions })
   | (ResultBase & { game: typeof SUBSTRINGS_ID; blurred: false; score: number; reactions: Reactions })
   | (ResultBase & { blurred: true });
 
@@ -191,6 +192,24 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
   }
   const names = await thingNames(db, [...caught.values()].map((e) => e.entry_id));
 
+  // A run on a clock (a format 4 day) says what it scored and how many answers it gave, by the answers given before the
+  // day's midnight, as the ledger counts them (src/game/ledger.ts); a run with none has no rows, so 0 and 0.
+  const clockRuns = offbeat.length === 0 ? [] : (await db.query<{ key: string; points: number; answers: number }>(
+    `select a.user_id::text || ':' || a.puzzle_date::text as key, sum(a.points)::int as points, count(*)::int as answers
+     from private.clock_answer a
+     where a.game_id = $1 and (a.user_id, a.puzzle_date) in (select * from unnest($2::uuid[], $3::date[]))
+       and private.day_of(a.created_at) = a.puzzle_date
+     group by a.user_id, a.puzzle_date`,
+    [GAME_ID, offbeat.map((r) => r.user_id), offbeat.map((r) => r.date)],
+  )).rows;
+  const clockDays = new Set(
+    (await db.query<{ date: string }>("select puzzle_date::text as date from private.puzzle where game_id = $1 and puzzle_date = any($2::date[]) and (content ->> 'format')::int = $3", [
+      GAME_ID,
+      [...new Set(offbeat.map((r) => r.date))],
+      CLOCK_FORMAT,
+    ])).rows.map((d) => d.date),
+  );
+
   const fragments = wholeOf(SUBSTRINGS_ID);
   const scores = fragments.length === 0 ? new Map<string, number>() : await runTotals(db, fragments.map((r) => r.user_id), fragments.map((r) => r.date));
 
@@ -222,7 +241,12 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
     const result = { ...base, kind: "result" as const, userId: r.user_id };
     if (r.blurred) return { ...result, blurred: true };
     if (r.game === SUBSTRINGS_ID) return { ...result, game: SUBSTRINGS_ID, blurred: false, score: scores.get(`${r.user_id}:${r.date}`)!, reactions: reactionsOf(r) };
-    return { ...result, game: GAME_ID, blurred: false, ended: ended(r, caught.get(`${r.user_id}:${r.date}`), names), reactions: reactionsOf(r) };
+    const own = `${r.user_id}:${r.date}`;
+    if (clockDays.has(r.date)) {
+      const run = clockRuns.find((c) => c.key === own);
+      return { ...result, game: GAME_ID, blurred: false, ended: { result: "scored", points: run?.points ?? 0, answers: run?.answers ?? 0 }, reactions: reactionsOf(r) };
+    }
+    return { ...result, game: GAME_ID, blurred: false, ended: ended(r, caught.get(own), names), reactions: reactionsOf(r) };
   });
   return { items, next, today: day[0].today, finishedToday: day[0].finished };
 }

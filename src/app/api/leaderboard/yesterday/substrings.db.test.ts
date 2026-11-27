@@ -1,8 +1,9 @@
 // Yesterday's standings for each game against the local stack (`npm run test:db`;
 // docs/milestones/M16-16f-the-shared-pieces.md, 16f-6; the human's answer 20): Today's leaderboard card switches between
 // Offbeat, Fragments and Overall, so the route names its game. Fragments' yesterday is each player's points that day (the
-// human, 2026-11-17, issue #265), and Overall's adds both games' par scores for that day, Offbeat's against 1,250 and
-// Fragments' against 1,500, as the weekly boards do (src/app/api/leaderboard/substrings.db.test.ts; docs/milestones/M15-15i-par-scores.md).
+// human, 2026-11-17, issue #265), and Overall's adds the par scores of the games that have a par for that day, which is
+// Fragments' against 1,500 alone while Offbeat has none (M23 23f-2, answer 60), as the weekly boards do
+// (src/app/api/leaderboard/substrings.db.test.ts; docs/milestones/M15-15i-par-scores.md).
 // Yesterday's runs are written directly, as it can't be played now. A is the viewer and B A's friend; C and D are
 // strangers who played too, so they aren't on A's board. C is in A's group only from today.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -125,11 +126,11 @@ describe("yesterday's standings for each game", () => {
     ]);
   });
 
-  it("adds both games' par scores for yesterday on the overall board", async () => {
-    // Offbeat: B 16, A 8. Fragments: B 8.3, A 4.3.
+  it("counts only Fragments' par score for yesterday on the overall board, Offbeat having no par", async () => {
+    // Fragments: B 8.3, A 4.3. Offbeat's points are written all the same, and add nothing.
     expect(await standings("/api/leaderboard/yesterday?game=overall")).toEqual([
-      [B.username, 24.3, false],
-      [A.username, 12.3, true],
+      [B.username, 8.3, false],
+      [A.username, 4.3, true],
     ]);
   });
 });

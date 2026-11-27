@@ -5,8 +5,8 @@
 // SideColumn). Laid out from round 5's mockup.
 import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { QUESTIONS_PER_DAY } from "@/config/tunables";
-import type { Stats, Yesterday } from "@/game/offbeat";
+import type { Counted, Stats, Yesterday } from "@/game/offbeat";
+import { givenText } from "./given";
 import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
@@ -18,7 +18,7 @@ import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
 import kit from "./kit.module.css";
-import { SurvivedChart } from "./survived-chart";
+import { PointsChart } from "./points-chart";
 import { CountUp } from "./count-up";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
@@ -168,7 +168,7 @@ function OffbeatInfo() {
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 
-// The stats as round 5 shows them: "1,050 best score", "5.2/7 avg. survived", and the questions survived each day.
+// The stats (M23 23f-2, answer 66): "1,050 best score", "310 avg. points a day", and the points of each day.
 function YourOffbeat({ stats }: { stats: Stats }) {
   return (
     <section aria-label={`Your ${GAME.name}`} className={kit.card}>
@@ -185,17 +185,22 @@ function YourOffbeat({ stats }: { stats: Stats }) {
           <dd>{stats.best === null ? "–" : <CountUp name="offbeat.best" value={stats.best} />}</dd>
         </div>
         <div className={kit.stat}>
-          <dt>avg. survived</dt>
-          <dd>{stats.average === null ? "–" : `${stats.average.toFixed(1)}/${QUESTIONS_PER_DAY}`}</dd>
+          <dt>avg. points a day</dt>
+          <dd>{stats.average === null ? "–" : stats.average.toLocaleString("en-US")}</dd>
         </div>
       </dl>
-      <SurvivedChart days={stats.days} />
+      <PointsChart days={stats.days} />
     </section>
   );
 }
 
+// "dog · 6 players, cat · 1 player": a clock day's answers with how many players gave each.
+const countedText = (counted: Counted[]) => counted.map((c) => `${c.answer.name} · ${c.players} ${c.players === 1 ? "player" : "players"}`).join(", ");
+
 // Yesterday's questions with the host's answers, for everyone once the day is closed (L34), and the player's own
-// answer and how it went where they gave one.
+// answer and how it went where they gave one. A day on a clock (M23 23f-2, answer 68) shows each question's most
+// common and rarest answers with their players instead, with no answer search (it counts the old game's answers) and
+// no answer of the player's own.
 function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
   return (
     <section aria-label="Yesterday's answers" className={kit.card}>
@@ -205,6 +210,20 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
       </div>
       {yesterday.state === "none" && <p>There was no puzzle yesterday.</p>}
       {yesterday.state === "in_play" && <p>Your run from yesterday is still going. Finish it to see the host&apos;s answers.</p>}
+      {yesterday.state === "clock" && (
+        <ol className={`${kit.rows} ${styles.answers}`}>
+          {yesterday.questions.map((q) => (
+            <li key={q.index} className={kit.row}>
+              <strong>
+                {q.index + 1} · {q.prompt}
+              </strong>
+              {q.counts === null && <span className={styles.muted}>{givenText(null)}</span>}
+              {q.counts && <span className={styles.muted}>Most players gave: {countedText(q.counts.top)}</span>}
+              {q.counts && q.counts.rarest.length > 0 && <span className={styles.muted}>Rarest answers: {countedText(q.counts.rarest)}</span>}
+            </li>
+          ))}
+        </ol>
+      )}
       {yesterday.state === "shown" && (
         <ol className={`${kit.rows} ${styles.answers}`}>
           {yesterday.questions.map((q) => (

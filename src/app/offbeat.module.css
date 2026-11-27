@@ -109,7 +109,7 @@
   font-size: 0.8125rem;
 }
 
-/* Seven bars, each as tall as the questions survived out of 7; a day not played has none, and a dash. */
+/* Seven bars, each as tall as its points against the highest of the seven; a day with none has no bar, and a dash. */
 .bars {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
