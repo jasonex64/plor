@@ -25,7 +25,7 @@ import { Countdown } from "./countdown-bar";
 import { BACK, FORWARD } from "./slide";
 import { givenText } from "./given";
 import { AnswerSearch } from "./answer-search";
-import { errorText } from "./messages";
+import { errorText, PAUSED_NOTE } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
@@ -124,7 +124,7 @@ export function TodayBanner({ skip, main, family = "account", ...hooks }: DayHoo
   const { run, clock, noPuzzle, error, over } = useRun(hooks, family);
   const starting = useStartRun();
   if (clock) return <ClockTodayBanner run={clock} main={main} family={family} />;
-  if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
+  if (noPuzzle) return <NoPuzzleBanner />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <>
@@ -417,7 +417,7 @@ function Run({
     onLeave();
   };
 
-  if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
+  if (noPuzzle) return <NoPuzzleBanner />;
   // The frame is up while the state loads on the way into a run, so the page doesn't show its cards for a moment first.
   if (!run)
     return error ? (
@@ -514,11 +514,10 @@ function Run({
   );
 }
 
-function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
+function NoPuzzleBanner() {
   return (
     <Banner>
-      <Facts facts={["There's no puzzle today."]} />
-      <ResetCountdown label="A new day starts in" msToReset={msToReset} />
+      <Facts facts={[PAUSED_NOTE]} />
     </Banner>
   );
 }
