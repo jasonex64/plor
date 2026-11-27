@@ -1,6 +1,6 @@
 # M23, 23f: the switch
 
-**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-26** (the human: "Approve 23f"), the security changes below and the two reused numbers included. **23f-1 is built and reviewed, PR open.** Next: 23f-2.
+**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-26** (the human: "Approve 23f"), the security changes below and the two reused numbers included. **23f-1 is built and reviewed, #325 open.** Next: 23f-2.
 
 ## Goal
 Offbeat on plor.app is the game on a clock and nothing else: every page reads a clock day rightly, the old seven-question game and its data are gone, and the boards start from the switch day.
