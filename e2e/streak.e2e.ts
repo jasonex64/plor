@@ -43,7 +43,7 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   const pill = top.getByRole("link", { name: "0 day streak, Seed" });
   await expect(pill).toBeVisible();
   // Between the wordmark and the gear.
-  const [word, box, gear] = await Promise.all([top.getByText("Plor", { exact: true }), pill, top.getByRole("button", { name: "Settings" })].map((l) => l.boundingBox()));
+  const [word, box, gear] = await Promise.all([top.locator("svg[data-logo]"), pill, top.getByRole("button", { name: "Settings" })].map((l) => l.boundingBox()));
   expect(word!.x + word!.width).toBeLessThan(box!.x);
   expect(box!.x + box!.width).toBeLessThanOrEqual(gear!.x);
   // Today's old line is gone (criterion 4).
@@ -97,7 +97,7 @@ test("from 768px the sidebar shows the avatar slot and the streak's pill under t
   const slot = nav.locator("[data-initial='S']");
   await expect(slot).toBeVisible();
   const [word, slotBox, box, today] = await Promise.all(
-    [nav.getByText("Plor", { exact: true }), slot, pill, nav.getByRole("link", { name: "Today" })].map((l) => l.boundingBox()),
+    [nav.locator("svg[data-logo]"), slot, pill, nav.getByRole("link", { name: "Today" })].map((l) => l.boundingBox()),
   );
   // Slot then pill, side by side, under the wordmark and above the tabs.
   expect(slotBox!.x + slotBox!.width).toBeLessThan(box!.x);
