@@ -1,0 +1,99 @@
+<title>Plor Dollop Sketches</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fafaf8;color:#1a1a18;font-family:'Baloo 2',system-ui,sans-serif;line-height:1.35}
+p,h1,h2,figure{margin:0}
+svg{display:block}
+.sheet{max-width:1248px;margin:0 auto;padding:16px 16px 40px}
+.intro h1{font-size:22px;font-weight:800;line-height:1.2}
+.intro p{font-size:14px;color:#5f5f5a;max-width:70ch;margin-top:4px}
+.pair{margin-top:28px;padding-top:16px;border-top:1px solid #e2e2dc}
+.pair h2{font-size:20px;font-weight:800;line-height:1.2}
+.pair h2 b{display:inline-block;min-width:1.5em;font-weight:800;color:#5f5f5a}
+.idea{font-size:15px;max-width:75ch;margin-top:2px}
+.small{font-size:13px;color:#5f5f5a;max-width:75ch}
+.panels{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+@media (min-width:900px){.panels{grid-template-columns:1fr 1fr;gap:16px}}
+.panel{--m1:var(--text);--m2:var(--accent);--hole:#fff;--pupil:#1a1a18;min-width:0;padding:12px 14px 16px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:5px;display:flex;flex-direction:column;gap:14px}
+.paper{--bg:#fafaf8;--surface:#fff;--text:#1a1a18;--muted:#5f5f5a;--line:#e2e2dc;--accent:#2457d6}
+.night{--bg:#121212;--surface:#1c1c1c;--text:#ededea;--muted:#a3a39d;--line:#3a3a37;--accent:#7ea6ff}
+.th,.cap{font-size:12px;color:var(--muted);line-height:1.25}
+.th{font-weight:700}
+.row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px}
+figure{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.big{width:min(512px,100%);aspect-ratio:1}
+.big svg{width:100%;height:100%}
+.ico{border-radius:0}
+.ico.round{border-radius:50%}
+.ico.squircle{border-radius:22%}
+.safe{fill:none;stroke:#fff;stroke-opacity:.6;stroke-width:.5;stroke-dasharray:1.5 1.5}
+.side{width:280px;max-width:100%;padding:28px 28px 20px;background:var(--surface);border-right:2px solid var(--text)}
+.lock{display:flex;align-items:center;gap:9px;color:var(--text);min-height:40px}
+.w2{font-size:30px;font-weight:800;line-height:1;letter-spacing:-.01em;padding-top:.12em}
+.body{fill:var(--hole);stroke:var(--m2);stroke-linejoin:round;stroke-linecap:round}
+.sil{fill:var(--m2);stroke:var(--m2);stroke-width:3;stroke-linejoin:round}
+.hole{fill:var(--hole)}
+.eyes{fill:var(--pupil)}
+.fold{fill:none;stroke:var(--fold,var(--m2));stroke-linecap:round}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<path id="pA" fill-rule="evenodd" d="M32 60A22 22 0 0 1 24.5 17.3C29 15.7 32.5 12.5 35 9C37 6 41 4 45 5.5C41.5 7.5 40.5 11 41 14C41.3 16 42 18 43.3 19.2A22 22 0 0 1 32 60ZM45.5 38a13.5 13.5 0 1 0-27 0a13.5 13.5 0 1 0 27 0Z"/>
+<path id="pAs" fill-rule="evenodd" d="M32 61A21 21 0 0 1 23.1 21C28.5 18.5 31 14 33.5 9.5C36 5 42 2 48 4.5C43.5 7 42 11 42.5 15C42.8 19 44 22.3 45.5 23.9A21 21 0 0 1 32 61ZM45.5 40a13.5 13.5 0 1 0-27 0a13.5 13.5 0 1 0 27 0Z"/>
+<path id="pB" d="M21 56C12 56 7.5 51 7.5 45C7.5 36 16 31.5 23 27C28.5 23.5 29 17 33 12C36 8 41 6 46 8.5C41 10 38.5 14 39.5 19C40.5 24.5 46 27.5 50 31.5C54 35.5 56.5 40 56.5 45C56.5 51 52 56 43 56Z"/>
+<path id="pC" d="M22 57C12 57 6.5 52 6.5 45.5C6.5 39 11 34.5 17 33.5C14 27 19 21 26 18.5C30 17 31 13 34 9.5C37 6 42 5 46 7.5C42 9 40.5 12 41.5 15.5C42.5 19 47 20.5 48.5 25C49.5 28 49 31 47 33.5C53 34.5 57.5 39 57.5 45.5C57.5 52 52 57 42 57Z"/>
+<path id="pD" d="M24 58C15 58 10 54.5 10 49.5C10 45 13 41.5 17 40.5C14.5 35.5 17.5 30 23 28.5C21.5 24 24.5 19.5 29 18C32 17 33 13.5 35 10.5C37.5 6.5 42 5 46 7.5C42.5 8.5 41 11.5 41.5 14.5C42 18 45.5 20 46 24C46.3 26.5 45.5 29 44 31C49 32.5 51.5 37.5 49 43.5C52.5 44.5 54 47 54 49.5C54 54.5 49 58 40 58Z"/>
+<path id="pCs" d="M22 57C12 57 6 52 6 45.5C6 38.5 12 34 20 34C16.5 27 20.5 21 27 18.5C31 17 31.5 13 34 9.5C37 5.5 42.5 4.5 47 7.5C42.5 9 41 12 42 15.5C43 19 46 21 47 25C47.8 28 47 31.5 44.5 34C52 34 58 38.5 58 45.5C58 52 52 57 42 57Z"/>
+<path id="pDs" d="M24 58C14 58 8 54.5 8 49.5C8 44.5 12.5 41 19 41C15.5 36.5 18 29.5 25.5 29.5C22.5 25 25 19.5 29.5 18C32.5 17 33 13.5 35 10.5C37.5 6.5 42.5 4.5 47 7.5C43 8.5 41.5 11.5 42 14.5C42.5 18 45.5 20 46 24C46.4 27 45 29.5 42.5 31C49.5 31 53 37 48.5 42.5C54 42.5 56 46 56 49.5C56 54.5 50 58 40 58Z"/>
+</defs>
+
+<!-- A Spoon peak: ring -->
+<symbol id="dA" viewBox="0 0 64 64"><circle class="hole" cx="32" cy="38" r="14"/><use href="#pA" class="sil"/><g class="eyes"><ellipse cx="33.5" cy="36.5" rx="2.7" ry="3.9"/><ellipse cx="40.6" cy="36.5" rx="2.7" ry="3.9"/></g></symbol>
+<symbol id="dAs" viewBox="0 0 64 64"><circle class="hole" cx="32" cy="40" r="14"/><use href="#pAs" class="sil"/><g class="eyes"><ellipse cx="32" cy="39" rx="3.6" ry="4.8"/><ellipse cx="40.6" cy="39" rx="3.6" ry="4.8"/></g></symbol>
+
+<!-- B Meringue kiss: ring -->
+<symbol id="dB" viewBox="0 0 64 64"><use href="#pB" class="body" stroke-width="9"/><g class="eyes"><ellipse cx="34.5" cy="43" rx="2.8" ry="4"/><ellipse cx="42.5" cy="43" rx="2.8" ry="4"/></g></symbol>
+<symbol id="dBs" viewBox="0 0 64 64"><use href="#pB" class="body" stroke-width="10"/><g class="eyes"><ellipse cx="33" cy="43" rx="3.7" ry="5"/><ellipse cx="42.5" cy="43" rx="3.7" ry="5"/></g></symbol>
+
+<!-- C Soft double: solid -->
+<symbol id="dC" viewBox="0 0 64 64"><use href="#pC" class="body" stroke-width="6.5"/><path class="fold" stroke-width="4" d="M17 33.5C21 36 26 37 31 36"/><g class="eyes"><ellipse cx="35" cy="45.5" rx="2.8" ry="4"/><ellipse cx="43.5" cy="45.5" rx="2.8" ry="4"/></g></symbol>
+<symbol id="dCs" viewBox="0 0 64 64"><use href="#pCs" class="body" stroke-width="8"/><g class="eyes"><ellipse cx="33.5" cy="45.5" rx="3.7" ry="4.8"/><ellipse cx="43.5" cy="45.5" rx="3.7" ry="4.8"/></g></symbol>
+
+<!-- D Full swirl: solid -->
+<symbol id="dD" viewBox="0 0 64 64"><use href="#pD" class="body" stroke-width="5.5"/><g class="fold" stroke-width="3.4"><path d="M17 40.5C20.5 43.3 25 44.6 30 44.4"/><path d="M23 28.5C25.5 30.8 28.5 31.8 32 31.6"/></g><g class="eyes"><ellipse cx="37" cy="38.5" rx="2.5" ry="3.6"/><ellipse cx="44" cy="38.5" rx="2.5" ry="3.6"/></g></symbol>
+<symbol id="dDs" viewBox="0 0 64 64"><use href="#pDs" class="body" stroke-width="7"/><g class="eyes"><ellipse cx="32.5" cy="47" rx="3.5" ry="4.4"/><ellipse cx="41.8" cy="47" rx="3.5" ry="4.4"/></g></symbol>
+</svg>
+
+<div class="sheet">
+<div class="intro">
+<h1>Plor logo: the peeking o with a dollop on top</h1>
+<p>Four versions of the same character, A to D, from least to most dollop. Each is shown on Paper and on Night: alone at 16, 32, 180 and 512 px, as an app icon with the maskable safe circle (radius 40% of the icon's width) dotted over it, and twice with the word as it would sit at the top of the 280 px sidebar, once standing in for the o and once beside the word. Rough on purpose: react to the shapes, not the finish.</p>
+</div>
+<div id="vers"></div>
+</div>
+<script>
+const VERS=[
+{l:'A',name:'Spoon peak',idea:'Still the round o, with one small peak on top that leans to the right, like the point left when a spoon lifts away. A ring with a hole, the eyes inside the hole.',small:'At 16 and 32 px the peak is drawn taller and the eyes bigger.',ico:'--m2:#fff;--hole:#0000;--pupil:#fff',k:.8,cx:32,cy:32.5,e:[9.5,54.5,1,62.5],s:.72},
+{l:'B',name:'Meringue kiss',idea:'The whole body tapers up into the point, like a meringue kiss sitting on a flat base. Still a ring: one thick line around a white middle, the eyes in the middle.',small:'At 16 and 32 px the line is a little thicker and the eyes bigger.',ico:'--m2:#fff;--hole:#0000;--pupil:#fff',k:.76,cx:32,cy:31,e:[2.5,61.5,2,61],s:.7},
+{l:'C',name:'Soft double',idea:'Two tiers: a plump base, one clear shoulder, and a smaller dollop on top that curls into the point. A solid white body with a blue outline, the eyes on the base.',small:'At 16 and 32 px the outline is thicker, the shoulder is cut deeper, the fold line is left out and the eyes are bigger.',ico:'--m2:#fff;--hole:#fff;--pupil:#2457d6;--fold:#2457d6',k:.75,cx:32,cy:32,e:[2,62,1.5,61],s:.7},
+{l:'D',name:'Full swirl',idea:'Three stacked tiers, like piped cream or soft serve, with the point curling at the top. Taller than it is wide. A solid white body with a blue outline, the eyes on the middle tier.',small:'At 16 and 32 px the outline is thicker, the steps are cut deeper, the fold lines are left out and the eyes drop to the bottom tier.',ico:'--m2:#fff;--hole:#fff;--pupil:#2457d6;--fold:#2457d6',k:.8,cx:32,cy:32.5,e:[4.5,59.5,2,61.5],s:.72}
+];
+const mark=(id,px)=>'<svg viewBox="0 0 64 64" width="'+px+'" height="'+px+'" aria-hidden="true"><use href="#'+id+'"/></svg>';
+const fig=(inner,cap)=>'<figure>'+inner+'<span class="cap">'+cap+'</span></figure>';
+const icon=(v,px,cls,safe)=>'<svg class="ico '+cls+'" data-icon="'+v.l+'" viewBox="0 0 64 64" width="'+px+'" height="'+px+'" style="'+v.ico+'" aria-hidden="true"><rect width="64" height="64" fill="#2457d6"/><g transform="translate(32 32) scale('+v.k+') translate('+(-v.cx)+' '+(-v.cy)+')"><use href="#d'+v.l+'" width="64" height="64"/></g>'+(safe?'<circle class="safe" cx="32" cy="32" r="25.6"/>':'')+'</svg>';
+const r1=n=>Math.round(n*10)/10;
+const isO=v=>{const [l,r,t,b]=v.e,s=v.s,x=52-l*s,y=54-b*s,w=64*s,rx=r1(52+(r-l)*s+8);
+return '<svg viewBox="4 -2 '+r1(rx+14)+' 60" height="38" role="img" aria-label="Plor"><g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--m1)"><path d="M10 14V50M10 14h9a9.5 9.5 0 0 1 0 19H10"/><path d="M44 4V50"/><path d="M'+rx+' 26V50M'+rx+' 37a11 11 0 0 1 11-11h1"/></g><use href="#d'+v.l+'s" x="'+r1(x)+'" y="'+r1(y)+'" width="'+r1(w)+'" height="'+r1(w)+'"/></svg>'};
+const beside=v=>'<svg viewBox="0 0 64 64" width="36" height="36" aria-hidden="true"><use href="#d'+v.l+'s"/></svg><span class="w2">Plor</span>';
+const side=(v,inner,kind,cap)=>'<figure><div class="side" data-lock="'+kind+'"><div class="lock">'+inner+'</div></div><span class="cap">'+cap+'</span></figure>';
+const panel=(v,t)=>'<div class="panel '+t+'"><p class="th">'+(t=='paper'?'Paper (light)':'Night (dark)')+'</p>'+
+'<div class="row" data-sizes><div class="row" data-small>'+fig(mark('d'+v.l+'s',16),'16 px')+fig(mark('d'+v.l+'s',32),'32 px')+'</div>'+fig(mark('d'+v.l,180),'180 px')+'</div>'+
+'<figure><div class="big">'+mark('d'+v.l,512).replace(' width="512" height="512"','')+'</div><span class="cap">512 px (drawn smaller where the screen is narrower than that)</span></figure>'+
+'<div class="row">'+fig(icon(v,128,'',1),'App icon, with the safe circle')+fig(icon(v,60,'round',0),'cut to a circle')+fig(icon(v,60,'squircle',0),'cut to a rounded square')+'</div>'+
+side(v,isO(v),'o','1. He is the o, at the top of the 280 px sidebar')+
+side(v,beside(v),'beside','2. Beside the word (Baloo 2, weight 800)')+'</div>';
+document.getElementById('vers').innerHTML=VERS.map(v=>'<section class="pair" data-v="'+v.l+'"><h2><b>'+v.l+'</b>'+v.name+'</h2><p class="idea">'+v.idea+'</p><p class="small">'+v.small+'</p><div class="panels">'+panel(v,'paper')+panel(v,'night')+'</div></section>').join('');
+</script>
