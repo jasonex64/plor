@@ -153,6 +153,17 @@ Nothing is built into the app from these.
 
 **What they guessed, and limits to weigh:** every threshold. E1 opens deep in a run (16 answers, 275 points) because one sticker an answer shows little before that, and only about 23px of cover shows beside the page on a phone, so its stickers hang partly off the screen and the page is less crowded than the design asked; its top edge holds two stickers and the rosette, not a full row. E2's first step fits only the top 90px of the page, its cover doodles are about 7px, and its corner stars about 21px. Each strip is two rows now, so the play area is about 36px shorter than mock E's.
 
+**Criterion 6, the human's judgement (2026-11-26):** "1. let's do parts of both and for 2. the outer blue part should be a circle, and the inner part can be slightly raised like this image" (with a picture of a round glowing creature whose top comes to a small soft point). So: one album that takes parts of E1 and E2; which parts, from guided questions.
+
+## Round four: one album from both (2026-11-26)
+
+- 125, "For the sticker album, which parts of each version should the combined one take?": "Fancier page, plus my stickers (Recommended)": E2's three steps on the page, and E1's small stickers for the player's answers collecting in the strip between the page and the keyboard.
+- 126, "When should the album's first step arrive?": "Early, about 100 points (Recommended)".
+
+**The design:** mock E3, a copy of E2 (steps at 100, 175 and 250 points, still guesses beyond "about 100") with one row added: each accepted answer leaves a small sticker of its kind in the band of cover between the page and the keyboard, from the run's first answer, in the order given; when the row is full it overlaps, as stickers do. E2's cover doodles and studs leave that band to the stickers. The same ceiling, protected elements and checks as round three. Source `docs/research/mocks/20m-3/e3-fancier-page-and-stickers.html`.
+
+**Built 2026-11-26** by a design agent on Fable, its changes from E2 read line by line by the main session before it was published: https://claude.ai/artifact/VwYoxRnwT7NtePHfEb7gnP. The band between the page and the keys is 35px (20px in E2 on a phone, 18px on a desktop), taken from the answer slot's spare height (110.7 to 96.5px on a phone, 122.3 to 105.3px on a desktop); the keyboard is not smaller. Stickers are 36 to 39px wide and 17 to 19px tall; the row holds 8 on a phone before later ones go on top, and the round ends with 11. At step 3 the row's Rare stickers gain a 17px foil star. **As the agent measured** (Playwright, 390 × 844 and 1280 × 720, about 1,120 samples a round): no console error, no sideways scroll, Gochi Hand on the question and score only, no sticker's box over the page, the keys or any protected element (smallest gap 7.5px to the page, 2.4px to the keys, mid-landing), no running animation with Reduce motion on. Unverified: the contrast figure (its script gave 12.7 to 1 where E2's gave 5.89 for the same text), a real phone, frame rate, the published link, the star's pop frame by frame. **Differs from the brief:** a sticker arrives from 16px to its right inside the band, not from the answer slot, since that path would cross the count and Next; the answer slot is shorter than E2's, as above.
+
 **Criterion 6:** waits for the human.
 
 ## Review
