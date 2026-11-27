@@ -59,7 +59,7 @@ const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 
 // Criteria 1, 2, 3 and 5.
-test("Me shows the header, totals, calendar and Offbeat's card, and counts a run once it's over", async ({ browser }) => {
+test("Me shows the header, totals, calendar and Offbeat's card, and counts a run once it's over", { tag: "@visual" }, async ({ browser }) => {
   const page = await player(browser, "ma");
   await page.goto("/me");
   // The header: the large slot with the initial, the username, and the day the profile was made.
@@ -95,7 +95,7 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   expect(await plum.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(90, 47, 94)");
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
-  // Caught on question 1: a finished run with 0 survived, a played day.
+  // Caught on question 1: a finished run, a played day; its points come once the day closes.
   await page.goto("/");
   await play(page);
   await caughtToCards(page, puzzle.hostAnswer);
@@ -103,13 +103,13 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   await page.goto("/me");
   await expect(total(page, "All games", "days played")).toHaveText("1");
   await expect(total(page, "All games", "day streak now")).toHaveText("1");
-  await expect(total(page, GAME.name, "avg. survived")).toHaveText("0.0/7");
-  await expect(total(page, GAME.name, "full runs")).toHaveText("0");
+  await expect(total(page, GAME.name, "avg. points a day")).toHaveText("–");
+  await expect(page.getByRole("region", { name: GAME.name, exact: true })).not.toContainText(/survived|full runs/);
   await expect(calendar.getByText(`1 of ${sofar} days`)).toBeVisible();
-  // The text alternative names the day and how far it went (docs/milestones/M14-14a-3b-settings.md, criterion 6).
+  // The text alternative names the day, and its points once it has them (docs/milestones/M14-14a-3b-settings.md, criterion 6).
   await expect(calendar.getByRole("img")).toHaveAttribute(
     "aria-label",
-    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 survived`,
+    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}`,
   );
   // A played day takes Paper's strongest shade, the accent itself (16f-1, "Played or not").
   expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(36, 87, 214)");

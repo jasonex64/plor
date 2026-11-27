@@ -5,12 +5,12 @@
 // those days can't be played now.
 //
 // A is the viewer; B and C are A's friends, C playing game 1 alone; S is a stranger; G is in A's group from Tuesday.
-// Par scores by hand, points ÷ par × 100, game 1's par 1,250 and game 2's 1,500:
-// - Monday, game 1: C 1300, A 1000, S 750, B 500: C 100 (over the par), A 80, S 60, B 40.
+// Par scores by hand, points ÷ par × 100, game 2's par 1,500 (game 1 has none: its points are written and count for nothing):
+// - Monday, game 1: C 1300, A 1000, S 750, B 500.
 // - Monday, game 2: G 1200, B 900, S 600, A 300: G 80, B 60, S 40, A 20.
-// - Tuesday, game 1: B 1000, G 625, A 250: B 80, G 50, A 20.
+// - Tuesday, game 1: B 1000, G 625, A 250.
 // - Tuesday, game 2: A 1410, G 1350, B 150: A 94, G 90, close as their points are, B 10.
-// - Wednesday, in the last test: game 1, B 10 and A's run still going, settled at 0; game 2, B 50 alone, 3.3, not 100.
+// - Wednesday, in the last test: game 1, B 10 and A's run still going; game 2, B 50 alone, 3.3, not 100.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
@@ -122,19 +122,19 @@ describe("the overall board", () => {
     useSession((await signIn(A.email)).session);
   });
 
-  it("adds up each player's par scores in both games, and averages them over the game-days played", async () => {
+  it("adds up each player's par scores in the games that have a par, and averages them over the game-days played", async () => {
     const r = await call(friendsBoard, "/api/leaderboard?game=overall");
     expect(r.status).toBe(200);
     // Nothing but who, the Sum and the Average: no score of anyone's, no days.
     expect(Object.keys(r.body).sort()).toEqual(["lastWeek", "ok", "thisWeek"]);
     expect(Object.keys(r.body.lastWeek).sort()).toEqual(["entries", "from"]);
     for (const e of r.body.lastWeek.entries) expect(Object.keys(e).sort()).toEqual(["average", "name", "points", "username", "you"]);
-    // Ranked by Sum. A: 80 + 20 + 20 + 94 = 214 over 4 game-days, 53.5. B: 40 + 60 + 80 + 10 = 190 over 4, 47.5.
-    // C played game 1 on Monday alone: 100 over 1, 100. S, a stranger, isn't on A's board.
+    // Ranked by Sum, game 2's only. A: 20 + 94 = 114 over 2 game-days, 57. B: 60 + 10 = 70 over 2, 35. C played game 1
+    // alone, which has no par: listed, on 0. S, a stranger, isn't on A's board.
     expect(lastWeek(r.body)).toEqual([
-      [A.username, 214, 53.5],
-      [B.username, 190, 47.5],
-      [C.username, 100, 100],
+      [A.username, 114, 57],
+      [B.username, 70, 35],
+      [C.username, 0, 0],
     ]);
     expect(r.body.lastWeek.from).toBe(monday);
     // This week has nothing yet from these players.
@@ -145,33 +145,25 @@ describe("the overall board", () => {
     ]);
   });
 
-  it("counts a group member's par scores in both games from the day they joined", async () => {
-    // G's Monday, 80 in game 2, came before G joined: Tuesday's 50 + 90 = 140 over 2 game-days, 70.
+  it("counts a group member's par scores from the day they joined", async () => {
+    // G's Monday, 80 in game 2, came before G joined: Tuesday's 90 alone, over 1 game-day, 90.
     expect(lastWeek((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=overall`)).body)).toEqual([
-      [A.username, 214, 53.5],
-      [G.username, 140, 70],
+      [A.username, 114, 57],
+      [G.username, 90, 90],
     ]);
   });
 
-  it("leaves out every game 1 score of a day the viewer is still playing, and keeps game 2's", async () => {
+  it("leaves out game 1 whatever it holds, a day the viewer is still playing included, and counts game 2's", async () => {
     // Wednesday: B played both games. A started Wednesday's game 1 just now, as if resumed: its first question's 20
-    // seconds have only begun, so it's still going.
+    // seconds have only begun, so it's still going. Game 1 has no part in the board, so B's game 2 score alone counts,
+    // 3.3 for a day played alone: 70 + 3.3 = 73.3 over 3 game-days, 24.4, and A stays on 114.
     await scored(B, GAME_ID, wednesday, 10);
     await scored(B, SUBSTRINGS_ID, wednesday, 50);
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [A.userId, GAME_ID, wednesday]);
-    // The read settles A's run at 0 (answer 38); B's game 1 score, 0.8, is left out, like A's own 0. B's game 2 score
-    // counts, 3.3 for a day played alone: 190 + 3.3 = 193.3 over 5 game-days, 38.7. Counting game 1 too would give B
-    // 194.1 over 6 and A 214 over 5, 42.8.
     expect(lastWeek((await call(friendsBoard, "/api/leaderboard?game=overall")).body)).toEqual([
-      [A.username, 214, 53.5],
-      [B.username, 193.3, 38.7],
-      [C.username, 100, 100],
+      [A.username, 114, 57],
+      [B.username, 73.3, 24.4],
+      [C.username, 0, 0],
     ]);
-    const { rows } = await getPool().query("select points from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date", [
-      A.userId,
-      GAME_ID,
-      wednesday,
-    ]);
-    expect(rows).toEqual([{ points: 0 }]);
   });
 });

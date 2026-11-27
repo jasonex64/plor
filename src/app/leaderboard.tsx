@@ -185,8 +185,15 @@ export function Leaderboard({
         </Skeleton>
       )}
       {period === "today" ? todayError && <p role="alert">{todayError}</p> : error && <p role="alert">{error}</p>}
+      {overall && <OffbeatJoins />}
     </section>
   );
+}
+
+// Offbeat has no par on a clock, so it is no part of the overall board for now (M23 23f-2, answer 60): under every
+// overall board, the line the ticket's approval gave.
+function OffbeatJoins() {
+  return <p className={styles.note}>Offbeat joins once its typical score is known.</p>;
 }
 
 const BOARD_PERIODS = { today: "Today", this: "This week", last: "Last week" } as const;
@@ -284,6 +291,7 @@ export function LeaderboardCard() {
           </Skeleton>
         )}
       </section>
+      {game === OVERALL.id && <OffbeatJoins />}
       {groupsError && <p role="alert">{groupsError}</p>}
       {error && <p role="alert">{error}</p>}
     </section>
@@ -298,8 +306,7 @@ function TodayStandings({ board, game, average }: { board: TodayBoard; game: (ty
   // Claude's words for Overall and for a day with no game (M22, Design), the human's for a game (answer 10).
   if (board.games.length === 0) return <p className={styles.note}>{game === OVERALL.id ? "No games today." : `No ${named(game)} today.`}</p>;
   if (!board.open) {
-    const what = board.games.length === 2 ? "both of today's games" : `today's ${named(board.games[0])}`;
-    return <p className={styles.note}>Finish {what} to see today&apos;s board.</p>;
+    return <p className={styles.note}>Finish today&apos;s {named(board.games[0])} to see today&apos;s board.</p>;
   }
   const entries =
     game === OVERALL.id && average ? ranked((board.entries as OverallEntry[]).map((e) => ({ ...e, points: e.average })), (e) => e.points) : board.entries;

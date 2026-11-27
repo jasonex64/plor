@@ -6,15 +6,14 @@ import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { ANSWER_SHARE_MIN_PLAYERS, RAREST_ANSWERS_SHOWN } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { allTimePoints, dayCounts } from "./ledger";
-import { FINISHED_RUNS, readStats, type Stats } from "./offbeat";
+import { readStats, type Stats } from "./offbeat";
 import { named, thingNames, type Named } from "./payload";
 import { settleSubstringRuns } from "./substring-places";
-import { FINISHED } from "./status";
 import { playedDays } from "./streak";
 
 // since: the day the profile was made, by the Pacific day boundary. month: every day of today's month, oldest first,
-// whether the player started a run in either game that day (human, 2026-11-13: "Played or not") and the questions
-// survived on a finished Offbeat run, or null, for the calendar's text alternative (days after today included, so the
+// whether the player started a run in either game that day (human, 2026-11-13: "Played or not") and the points of
+// their Offbeat day from the ledger, or null while it has none, for the calendar's text alternative (days after today included, so the
 // calendar can draw them). fragments: Fragments' card, its best and average score from its ledger rows
 // (a day's score is in once the day is closed, as Offbeat's best) and the days it was started.
 // rarest: the player's lowest-share answers from closed days (human, 2026-10-25: "3, from closed days").
@@ -22,8 +21,8 @@ export type Me = {
   username: string;
   since: string;
   totals: { points: number; daysPlayed: number; streak: number; longestStreak: number };
-  month: { today: string; days: { date: string; played: boolean; survived: number | null }[] };
-  offbeat: { best: number | null; average: number | null; fullRuns: number };
+  month: { today: string; days: { date: string; played: boolean; points: number | null }[] };
+  offbeat: { best: number | null; average: number | null };
   fragments: { best: number | null; average: number | null; daysPlayed: number };
   rarest: { answer: Named; prompt: string; date: string; share: number }[];
 };
@@ -47,29 +46,27 @@ export async function getPlayerStats(db: Db, userId: string): Promise<{ me: Me; 
     username: string;
     since: string;
     days_played: number;
-    full_runs: number;
     longest: number;
     today: string;
     month: Me["month"]["days"];
   }>(
-    `with ${FINISHED_RUNS},
+    `with
      -- The streak's days (src/game/streak.ts); each unplayed day starts a new group.
-     ${playedDays("$1", "$4")},
+     ${playedDays("$1", "$3")},
      groups as (select played, count(*) filter (where not played) over (order by d) as g from days)
      select p.username::text,
             private.day_of(p.created_at)::text as since,
             (select count(*) from days where played)::int as days_played,
-            (select count(*) from finished where status = 'survived')::int as full_runs,
             (select coalesce(max(n), 0) from (select count(*)::int as n from groups where played group by g) as runs)::int as longest,
-            $4::text as today,
-            (select json_agg(json_build_object('date', m.day::text, 'played', coalesce(d.played, false), 'survived', f.survived) order by m.day)
-             from (select generate_series(date_trunc('month', $4::date), date_trunc('month', $4::date) + interval '1 month - 1 day',
+            $3::text as today,
+            (select json_agg(json_build_object('date', m.day::text, 'played', coalesce(d.played, false), 'points', l.points) order by m.day)
+             from (select generate_series(date_trunc('month', $3::date), date_trunc('month', $3::date) + interval '1 month - 1 day',
                                           interval '1 day')::date as day) as m
              left join days d on d.d = m.day
-             left join finished f on f.puzzle_date = m.day) as month
+             left join private.points_ledger l on l.user_id = $1 and l.game_id = $2 and l.puzzle_date = m.day) as month
      from private.profile p
      where p.user_id = $1`,
-    [userId, GAME_ID, FINISHED, day],
+    [userId, GAME_ID, day],
   );
   const row = rows[0];
   const { rows: fragments } = await db.query<{ points: number; best: number | null; average: number | null; days_played: number }>(
@@ -83,7 +80,7 @@ export async function getPlayerStats(db: Db, userId: string): Promise<{ me: Me; 
     since: row.since,
     totals: { points: points + fragments[0].points, daysPlayed: row.days_played, streak: stats.streak, longestStreak: row.longest },
     month: { today: row.today, days: row.month },
-    offbeat: { best: stats.best, average: stats.average, fullRuns: row.full_runs },
+    offbeat: { best: stats.best, average: stats.average },
     fragments: { best: fragments[0].best, average: fragments[0].average, daysPlayed: fragments[0].days_played },
     rarest: await rarestAnswers(db, userId, day),
   };

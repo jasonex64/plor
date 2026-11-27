@@ -1,6 +1,6 @@
 # M23, 23f: the switch
 
-**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-26** (the human: "Approve 23f"), the security changes below and the two reused numbers included. **23f-1 is merged, #325.** Next: 23f-2.
+**Status:** designed 2026-11-26 from answers 58 to 69 in `M23-offbeat-on-a-clock.md`; **approved 2026-11-26** (the human: "Approve 23f"), the security changes below and the two reused numbers included. **23f-1 is merged, #325. 23f-2 is built and reviewed, PR open.** Next: 23f-3.
 
 ## Goal
 Offbeat on plor.app is the game on a clock and nothing else: every page reads a clock day rightly, the old seven-question game and its data are gone, and the boards start from the switch day.
@@ -113,7 +113,31 @@ Steps, part B (Yesterday):
 - Deviation: with neither game's day approved, Today and the guest front page show one card, Offbeat's (`src/app/today-games.ts`, as before this change), so the note shows once there, not on two cards. Fragments' own page shows it.
 - Not changed: the error text "There's no puzzle today yet. Check back later." (`src/app/messages.ts`), as the plan said.
 
+**23f-2.**
+- As designed: stats (streak, best score, average points a day, a 7-day points chart; "full runs" and "survived" gone), the feed's "scored 340 points with 14 answers", Yesterday's top and rarest answers per question with their players, today's board reading a clock run's points, the combined board without Offbeat and its line.
+- **No "clock days only" filter** (design 5): stats and boards read the ledger whatever the day's kind; the wipe in 23f-3 is what leaves only days on a clock. Until then an old day's points still count on Offbeat's own boards and stats, as before.
+- **No new database access.** The design proposed a new read for Yesterday; `plor_app` could already read `private.clock_answer` (`20261124235832_clock_run.sql`), so no migration, function or grant was added. Recorded in DECISIONS.md's log as the approved read.
+- Yesterday: "enough players" is per question, players who gave an answer on it before the day's midnight; a rarest answer never repeats a top one, so a question with few different answers shows no rarest line; the answer search is not drawn on a clock day; an old day keeps the old view. The words "Most players gave:", "Rarest answers:" and "N players" are the builder's, for the human to confirm.
+- Not changed: "Your run from yesterday is still going. Finish it to see the host's answers." also shows for a clock run still going after midnight, where no host exists (ROADMAP, For M23).
+- Stats: a day's points join the average and the chart once the day is closed, as the ledger has them; the chart's bars are against the highest of the seven days; the average is over every closed day, a whole number.
+- The feed's points and answers stop at the day's midnight, as the ledger's do; a clock run's line shows on the player's own item too.
+- The combined board: it is Fragments' score alone for now; a player of Offbeat only is listed on 0; its closed line reads "Finish today's Fragments to see today's board."; it no longer settles Offbeat's runs (Offbeat's own board, stats and Me still do). The line under it shows under every combined board, Today's card included.
+- Words the builders chose, for the human to confirm: the chips "avg. points a day" and "best score", the chart's caption "Points, last 7 days" and its "not scored" / "not scored yet", a calendar day's ", 340 points".
+
 ## Evidence
+**23f-2** (2026-11-26 and 27, slot 1; the builders' runs unless said):
+- Stats, failing first: `npx vitest run src/app/api/offbeat/route.db.test.ts src/app/api/me/route.db.test.ts --no-file-parallelism`, 7 failed (`expected { date, survived: 4 } to deeply equal { date, points: 400 }`); then passed.
+- Feed, failing first: `src/app/ended-text.test.ts` (`expected 'ran out of time on question undefined' to be 'scored 340 points with 14 answers'`) and `src/comments/feed-page.clock.db.test.ts` (`expected { result: 'survived' } to deeply equal { result: 'scored', points: 340, answers: 2 }`); then 17 passed across the feed's files. The feed's e2e was seen failing on the old `feed-page.ts`.
+- Today's score, failing first: `src/app/api/leaderboard/today/route.db.test.ts`'s clock case gave 0 for both players on the old code; then 9 passed.
+- Combined board, failing first: `overall.db.test.ts` and `today/route.db.test.ts` (`expected [ 'offbeat', 'substrings' ] to deeply equal [ 'substrings' ]`); then every file under `src/app/api/leaderboard` passed.
+- Yesterday, failing first: `npx vitest run src/app/api/offbeat/route.db.test.ts --no-file-parallelism`, 1 failed: `TypeError: Cannot read properties of undefined (reading 'map') ❯ hostAnswers src/game/payload.ts:31` (the crash the plan expected); then 10 passed: a question of 6 players shows three top and three rarest, one of 4 players none, an answer after midnight and today's answers never.
+- The orchestrator's own runs after both halves: `npx tsc --noEmit` and `npx eslint src e2e scripts --quiet` clean; `npm test` 81 files, 1007 passed; `npm run test:db` 623 passed and 1 failed, `src/app/api/admin/bank/route.db.test.ts` timing out at 5 s on a signed-out request, a file this change does not touch: alone it failed once more and then passed twice. Not shown unrelated; CI's `db` check decides.
+- After the review's fixes: `npx playwright test e2e/offbeat.e2e.ts e2e/me.e2e.ts e2e/boards.e2e.ts`, 25 passed. Before them (builders): `e2e/offbeat`, `me`, `profile`, `overall-board`, `boards`, `clock` 40 passed; `e2e/yesterday-clock.e2e.ts` 2 passed.
+- Not seen failing first: the e2e tests of the stats, the combined board's line and Yesterday (written after the code; their db tests were).
+- No migration, so `npm run test:sql` was not run.
+- Videos (stats, the feed line, the combined board's line, Yesterday, each at both sizes) were sent to the human; CI's are in the PR run's `e2e-videos` artifact.
+- Not verified: the whole e2e suite locally (CI runs it); any of it on a real phone.
+
 **23f-1** (2026-11-26, slot 1, the builder's runs unless said):
 - Failing first: `npx playwright test e2e/paused-note.e2e.ts` on the old wording: 8 failed (`getByText('Plor is being rebuilt. Back soon.')`, element(s) not found). The builder did not keep the full output.
 - After: the same command, 8 passed (4 tests at 390 × 844 and 1280 × 720); again with `CI=1`, 8 passed.
@@ -124,4 +148,6 @@ Steps, part B (Yesterday):
 - Not verified: the whole e2e suite locally (CI runs it); the note on a real phone.
 
 ## Review
+**23f-2:** the `reviewer` agent, fresh context, 2026-11-27 (it ran the type check, lint and unit tests, not the db or e2e tests). Blocking, fixed: a branch of today's closed line for two games on the combined board, which can no longer happen (`src/app/leaderboard.tsx`). Taken now though filed as next revision: `{ tag: "@visual" }` on the two changed tests in `e2e/offbeat.e2e.ts` and `e2e/me.e2e.ts`. It judged each changed assertion as made untrue by the ticket, not weakened, and found Yesterday's read exposes no player, no guest answer, nothing of today and nothing under the minimum. The rest is in ROADMAP, "Next revision", For M23.
+
 **23f-1:** the `reviewer` agent, fresh context, 2026-11-26: no blocking finding in the code or tests (it did not run Playwright). Its smaller items are in ROADMAP, "Next revision", For M23.

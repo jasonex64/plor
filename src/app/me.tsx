@@ -5,7 +5,6 @@
 // in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 import { ButtonLink } from "./button-link";
 import { useEffect, useState, type ReactNode } from "react";
-import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Me } from "@/game/me";
 import type { Stats } from "@/game/offbeat";
 import { api } from "@/lib/api-client";
@@ -19,7 +18,7 @@ import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { FORWARD } from "./slide";
-import { SurvivedChart } from "./survived-chart";
+import { PointsChart } from "./points-chart";
 
 // Calendar dates, read in UTC so they can't shift by a day: "2 Oct 2026", "12 Oct", "October 2026".
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
@@ -107,10 +106,9 @@ export function StatsCards({
         </div>
         <dl className={styles.stats}>
           <Chip value={me.offbeat.best === null ? "–" : me.offbeat.best.toLocaleString("en-US")} label="best score" />
-          <Chip value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. survived" />
-          <Chip value={String(me.offbeat.fullRuns)} label="full runs" />
+          <Chip value={me.offbeat.average === null ? "–" : me.offbeat.average.toLocaleString("en-US")} label="avg. points a day" />
         </dl>
-        {recent && <SurvivedChart days={recent} />}
+        {recent && <PointsChart days={recent} />}
         {own && (
           <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
             {GAME.name}&apos;s game screen
@@ -193,7 +191,7 @@ function Chip({ value, label }: { value: string; label: string }) {
 // today outlined thick, and the days after it dashed (human, 2026-11-13: "Played or not"; it was four shades of
 // questions survived, M14 L46; the number setting was removed, human, 2026-11-13: "Remove the setting"). The shade reaches 3:1 on
 // the card (WCAG 2.2 1.4.11; globals.css), and one text
-// alternative names each played day and, when it has one, how far it went, so the shade isn't the only way to tell (1.1.1, 1.4.1; human, 2026-10-25: "Meet
+// alternative names each played day and, when it has one, its points, so the shade isn't the only way to tell (1.1.1, 1.4.1; human, 2026-10-25: "Meet
 // 3:1").
 function Calendar({ month }: { month: Me["month"] }) {
   const first = month.days[0].date;
@@ -201,7 +199,7 @@ function Calendar({ month }: { month: Me["month"] }) {
   const days = sofar.filter((d) => d.played);
   const played = days.length;
   const name = dateText(first, { month: "long" });
-  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}${d.survived === null ? "" : `, ${d.survived} of ${QUESTIONS_PER_DAY} survived`}`);
+  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}${d.points === null ? "" : `, ${d.points} ${d.points === 1 ? "point" : "points"}`}`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
     <section aria-label="Calendar" className={kit.card}>

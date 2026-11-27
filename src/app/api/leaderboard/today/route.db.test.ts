@@ -2,10 +2,13 @@
 // viewer; F and P are V's friends; S is in V's group but not V's friend; X is in neither. Runs are played through the
 // routes, so each score is checked against what the player's own result screen was given. Fragments' runs use a few
 // words of this file's own, as the real list isn't in git. P only starts Fragments: a Fragments run between rounds stays
-// in progress whatever its clock says, so P stays "playing" however long the file takes.
+// in progress whatever its clock says, so P stays "playing" however long the file takes. Overall counts only the games
+// with a par, which is Fragments alone while Offbeat has none (M23 23f-2, answer 60). The last test turns today's Offbeat
+// day into one on a clock, and plays it.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
+import { POST as finishRoute } from "@/app/api/run/finish/route";
 import { POST as offbeatNext } from "@/app/api/run/next/route";
 import { POST as startOffbeat } from "@/app/api/run/start/route";
 import { POST as fragmentsNext } from "@/app/api/substrings/next/route";
@@ -18,6 +21,7 @@ import { scoreRun } from "@/game/substring-scoring";
 import { getPool } from "@/lib/db";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
+import { fixtureClockDay, loadFixtureBase } from "@/test/answer-fixture";
 import { ensurePuzzle, hostName, removeFixtures, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as todayRoute } from "./route";
@@ -74,7 +78,7 @@ async function playFragments() {
   }
 }
 const fragmentsPoints = scoreRun(WORDS, "j").total;
-const fragmentsPar = parScore(fragmentsPoints, PAR_POINTS.substrings);
+const fragmentsPar = parScore(fragmentsPoints, PAR_POINTS.substrings!);
 
 beforeAll(async () => {
   useLocalStack();
@@ -174,10 +178,11 @@ describe("today's board", () => {
     await playFragments();
     useSession(V.session);
     expect(await board(SUBSTRINGS_ID)).toEqual({ date: today, games: [SUBSTRINGS_ID], open: false, entries: [], rest: [] });
-    expect(await board("overall")).toEqual({ date: today, games: [GAME_ID, SUBSTRINGS_ID], open: false, entries: [], rest: [] });
+    // Offbeat has no par, so it is no part of Overall: only Fragments is asked, and V has not finished it.
+    expect(await board("overall")).toEqual({ date: today, games: [SUBSTRINGS_ID], open: false, entries: [], rest: [] });
   });
 
-  it("shows Fragments as points (issue #265), and Overall as both games' par scores, with a one-game player's one", async () => {
+  it("shows Fragments as points (issue #265), and Overall as Fragments' par scores alone, Offbeat having none", async () => {
     useSession(V.session);
     await playFragments();
     const fragments = await board(SUBSTRINGS_ID);
@@ -188,27 +193,54 @@ describe("today's board", () => {
     expect(waiting(fragments)).toEqual([[P.username, "playing"]]);
 
     const overall = await board("overall");
-    const both = (p: Player) => scoreTotal([parScore(shown.get(p.username)!, PAR_POINTS.offbeat), fragmentsPar]);
-    expect(rows(overall)).toEqual(
-      [
-        [F.username, both(F), false],
-        [V.username, both(V), true],
-      ].sort((a, b) => (b[1] as number) - (a[1] as number) || String(a[0]).localeCompare(String(b[0]))),
-    );
-    expect(overall.entries.find((e: { you: boolean }) => e.you).average).toBe(scoreAverage([parScore(shown.get(V.username)!, PAR_POINTS.offbeat), fragmentsPar]));
+    expect(overall.games).toEqual([SUBSTRINGS_ID]);
+    expect(rows(overall)).toEqual([
+      [F.username, scoreTotal([fragmentsPar]), false],
+      [V.username, scoreTotal([fragmentsPar]), true],
+    ]);
+    expect(overall.entries.find((e: { you: boolean }) => e.you).average).toBe(scoreAverage([fragmentsPar]));
     // P has started Fragments only: playing.
     expect(waiting(overall)).toEqual([[P.username, "playing"]]);
 
-    // S played Offbeat only: on the group's Overall with that game's par score.
+    // S played Offbeat only, which is no part of Overall: on the group's Overall still to play Fragments.
     useSession(S.session);
     await playOffbeat(S);
     useSession(V.session);
     const group = await board("overall", club);
-    expect(group.entries.map((e: { username: string; points: number }) => [e.username, e.points])).toContainEqual([
-      S.username,
-      parScore(shown.get(S.username)!, PAR_POINTS.offbeat),
+    expect(rows(group)).toEqual([[V.username, scoreTotal([fragmentsPar]), true]]);
+    expect(waiting(group)).toEqual([[S.username, "not_played"]]);
+  });
+
+  // A day on a clock has no result screen with a ladder and a bonus: a finished run's score is the points of its
+  // answers (23f-2, design 4). Today's fixture day is replaced by one, after the runs on it are deleted (a started
+  // day can't change); F and V play it for real, P never started it.
+  it("gives a finished player's run on a clock its points, and not 0", async () => {
+    const db = getPool();
+    await db.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+    await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, today, fixtureClockDay(today, await loadFixtureBase(db))]);
+    const post = (route: (r: Request) => Promise<Response>, path: string, body?: unknown) => call(route(apiRequest(path, { method: "POST", body })));
+    // F: cat, uncommon, 25 points, then apple, common, 10: 35. V: dog, common, 10.
+    useSession(F.session);
+    expect((await post(startOffbeat, "/api/run/start")).status).toBe(200);
+    expect((await post(answerRoute, "/api/run/answer", { index: 0, text: "cat" })).body.run.points).toBe(25);
+    expect((await post(offbeatNext, "/api/run/next", { index: 0 })).status).toBe(200);
+    expect((await post(answerRoute, "/api/run/answer", { index: 1, text: "apple" })).body.run.points).toBe(35);
+    expect((await post(offbeatNext, "/api/run/next", { index: 1 })).status).toBe(200);
+    expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
+    useSession(V.session);
+    expect((await post(startOffbeat, "/api/run/start")).status).toBe(200);
+    expect((await post(answerRoute, "/api/run/answer", { index: 0, text: "dog" })).body.run.points).toBe(10);
+    expect((await post(offbeatNext, "/api/run/next", { index: 0 })).status).toBe(200);
+    expect((await post(offbeatNext, "/api/run/next", { index: 1 })).status).toBe(200);
+    expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
+
+    const open = await board(GAME_ID);
+    expect(rows(open)).toEqual([
+      [F.username, 35, false],
+      [V.username, 10, true],
     ]);
-    expect(group.rest).toEqual([]);
+    expect(waiting(open)).toEqual([[P.username, "not_played"]]);
   });
 
   it("writes no ledger row for today", async () => {

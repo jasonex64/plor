@@ -33,7 +33,7 @@ async function find(page: Page, typed: string) {
   await card.getByRole("button", { name: "Find" }).click();
 }
 
-test("a player is found by username, sent a request from their profile, and shows more once a friend", async ({ page, browser }) => {
+test("a player is found by username, sent a request from their profile, and shows more once a friend", { tag: "@visual" }, async ({ page, browser }) => {
   test.slow();
   const other = await (await browser.newContext()).newPage();
   await page.goto("/friends");
@@ -71,7 +71,7 @@ test("a player is found by username, sent a request from their profile, and show
   await expect(you(other)).toContainText("You're friends.");
   await expect(other.getByRole("region", { name: "Calendar" })).toBeVisible();
   await expect(other.getByRole("region", { name: "Rarest answers" })).toContainText("None yet.");
-  await expect(other.getByText("Questions survived, last 7 days")).toBeVisible();
+  await expect(other.getByText("Points, last 7 days")).toBeVisible();
   await expect(other.getByText(/^Playing since /)).toBeVisible();
   await expect(tab(other)).toHaveAccessibleName("Friends");
 
