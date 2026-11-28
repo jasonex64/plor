@@ -1,6 +1,6 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
-import { isAdmin } from "@/insights/queries";
+import { isAdmin } from "@/admin/is-admin";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { isCalendarDate } from "@/content/puzzle";
 import { clockContext, previewDay, readPicks, redraftDay } from "@/admin/clock-days";

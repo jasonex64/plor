@@ -17,7 +17,7 @@ import { Pool } from "pg";
 import { GAME, OVERALL, SUBSTRINGS } from "../src/platform/game";
 import { THEME_KEY } from "../src/app/theme";
 import { RUN, signInAndPick } from "./players";
-import { answer, asked, caughtToCards, next, safe } from "./game";
+import { asked, finishClockRun, say } from "./game";
 import { fixtureId } from "../src/test/answer-fixture";
 import { todayPuzzle, removePuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
@@ -129,16 +129,15 @@ async function player(name: string, display: string, viewerId: string | null): P
   return id;
 }
 
-// Offbeat caught on question 1, and Fragments with a word in its last round, written as e2e/feed.e2e.ts writes them.
-const offbeatCaught = (q: Query, userId: string) =>
-  q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [userId]).then(() =>
-    q(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       select $1, 'offbeat', private.today(), 0, content #>> '{questions,0,host_answers,0}', true, now() - interval '30 minutes'
-       from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()`,
-      [userId],
-    ),
-  );
+// Offbeat finished with two answers, 35 points (dog, cat), and Fragments with a word in its last round, written as e2e/feed.e2e.ts writes them.
+const offbeatDone = async (q: Query, userId: string) => {
+  await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [userId]);
+  for (const [slug, tier, points] of [["dog", "common", 10], ["cat", "uncommon", 25]] as const)
+    await q(
+      "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, 'offbeat', private.today(), 0, $2, $3, 3000, $4, now() - interval '50 minutes')",
+      [userId, fixtureId(0, slug), tier, points],
+    );
+};
 async function fragmentsDone(q: Query, userId: string) {
   await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'substrings', private.today(), now() - interval '1 hour')", [userId]);
   await q("insert into private.question_open (user_id, game_id, puzzle_date, question_idx, opened_at) values ($1, 'substrings', private.today(), 6, now() - interval '50 minutes')", [userId]);
@@ -156,17 +155,12 @@ async function comment(q: Query, userId: string, game: string, body: string, ago
   }
 }
 
-// The viewer's real runs, played on the screens: Offbeat safe twice and caught on the third question, Fragments two words and
+// The viewer's real runs, played on the screens: Offbeat with dog and cat on question 1, Fragments two words and
 // five rounds run out (their clocks moved on in the database, as e2e/play2.e2e.ts does).
 async function playBoth(page: Page, viewerId: string) {
   await page.goto("/play");
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await safe(page, puzzle.safeAnswer);
-  await next(page, "Name a fruit");
-  await safe(page, "banana");
-  await next(page, "Name a color");
-  await caughtToCards(page, "red");
+  await finishClockRun(page, ["dog", "cat"]);
 
   await page.goto(SUBSTRINGS.path);
   const game = page.getByRole("region", { name: SUBSTRINGS.name, exact: true });
@@ -274,11 +268,15 @@ test("the look audit: every screen, at both sizes, in each theme", async ({ brow
     }
     await points(q, viewer, LAST.you, lastMonday);
     await points(q, viewer, THIS.you.slice(0, thisOver), weekStart(today));
-    await offbeatCaught(q, ana);
+    await offbeatDone(q, ana);
     await fragmentsDone(q, ana);
-    // Ben is partway: Offbeat begun five minutes ago, safe on question 1 and waiting on its reveal (which has no deadline).
-    await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '5 minutes')", [ben]);
-    await q("insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at) values ($1, 'offbeat', private.today(), 0, $2, false, now() - interval '4 minutes')", [ben, fixtureId(0, "dog")]);
+    // Ben is partway: Offbeat begun just now, on question 1 with a dog that added an hour to his clock, so he is still playing
+    // while the pictures are taken.
+    await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now())", [ben]);
+    await q(
+      "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, 'offbeat', private.today(), 0, $2, 'common', 3600000, 10, now())",
+      [ben, fixtureId(0, "dog")],
+    );
     await q("insert into private.friend_request (sender, receiver) values ($1, $2)", [dee, viewer]);
   });
   await playBoth(first, viewer);
@@ -293,9 +291,9 @@ test("the look audit: every screen, at both sizes, in each theme", async ({ brow
   await seed(async (q) => {
     for (const member of [ana, ben]) await q("insert into private.group_member (group_id, user_id) values ($1, $2)", [groupId, member]);
     // The friends' thread, then the group's own.
-    await comment(q, ana, "offbeat", "Caught on the first one. Bear, obviously.", 25, null, [[viewer, "😂"], [ben, "👍"]]);
+    await comment(q, ana, "offbeat", "Dog, then cat, then nothing. Bear, obviously.", 25, null, [[viewer, "😂"], [ben, "👍"]]);
     await comment(q, ana, "substrings", "qyzx saved my last round", 20, null, [[viewer, "❤️"]]);
-    await comment(q, viewer, "offbeat", "Dog was safe for me, then a fruit, then red got me.", 12, null, [[ana, "😮"]]);
+    await comment(q, viewer, "offbeat", "Dog and cat on the first one, then the clock got me.", 12, null, [[ana, "😮"]]);
     await comment(q, ben, "offbeat", "Still on question 1, no spoilers please", 4, null, []);
     await comment(q, ana, "offbeat", "Book Club: who got furthest?", 15, groupId, [[viewer, "👍"], [ben, "😂"]]);
     await comment(q, viewer, "offbeat", "Three questions, then red.", 8, groupId, [[ana, "❤️"]]);
@@ -387,7 +385,8 @@ test("the look audit: every screen, at both sizes, in each theme", async ({ brow
       await shoot(rookie, look, "today-not-played", visit(rookie, "/", seen(rookie.getByRole("region", { name: GAME.name, exact: true }))));
       for (const [name, game] of [["offbeat", GAME.name], ["fragments", SUBSTRINGS.name]] as const) {
         const howTo = async (steps: number) => {
-          await rookie.goto("/");
+          // Offbeat's How to play is on its game screen, Fragments' on Today's card.
+          await rookie.goto(name === "offbeat" ? GAME.path : "/");
           await rookie.getByRole("region", { name: game, exact: true }).getByRole("button", { name: "How to play" }).click();
           const dialog = rookie.getByRole("dialog");
           await expect(dialog).toBeVisible();
@@ -402,9 +401,9 @@ test("the look audit: every screen, at both sizes, in each theme", async ({ brow
         await rookie.getByRole("button", { name: "Start", exact: true }).click();
         await asked(rookie, "Name an animal");
       });
-      await shoot(rookie, look, "offbeat-reveal", async () => {
-        await answer(rookie, puzzle.safeAnswer);
-        await expect(rookie.getByRole("heading", { name: "Safe!", exact: true })).toBeVisible();
+      await shoot(rookie, look, "offbeat-answer", async () => {
+        await say(rookie, "dog");
+        await expect(rookie.getByRole("status", { name: "Last answer" })).toContainText("dog");
       });
       await shoot(rookie, look, "today-offbeat-started", visit(rookie, "/", seen(rookie.getByRole("region", { name: GAME.name, exact: true }))));
       await shoot(rookie, look, "fragments-start", visit(rookie, SUBSTRINGS.path, seen(rookie.getByRole("button", { name: "Start", exact: true }))));

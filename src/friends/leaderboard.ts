@@ -17,11 +17,9 @@
 // a par, each day's points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), and averages
 // them over the game-days played; Offbeat has none for now (M23 23f-2, answer 60).
 import { PAR_POINTS } from "@/config/tunables";
-import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/puzzle";
 import { GAME_ID, OVERALL, SUBSTRINGS_ID } from "@/platform/game";
-import { pooledCounts, settleRuns } from "@/game/ledger";
+import { settleRuns } from "@/game/ledger";
 import { parScore, scoreAverage, scoreTotal } from "@/game/par";
-import { scoreRun } from "@/game/scoring";
 import { FINISHED, type RunStatus } from "@/game/status";
 import { runTotals, settleSubstringRuns } from "@/game/substring-places";
 import type { Db } from "@/lib/db";
@@ -147,8 +145,8 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
   if (!circle) throw new AppError("group_not_found", STATUS.notFound);
   const asked: BoardGame[] = game === OVERALL.id ? PAR_GAMES : [game];
-  const { rows: days } = await db.query<{ game_id: BoardGame; content: ApprovedPuzzle | ClockPuzzle }>(
-    "select game_id, content from private.puzzle where puzzle_date = $1::date and game_id = any($2::text[])",
+  const { rows: days } = await db.query<{ game_id: BoardGame }>(
+    "select game_id from private.puzzle where puzzle_date = $1::date and game_id = any($2::text[])",
     [circle.today, asked],
   );
   // Today's games among those asked, in the switch's order.
@@ -172,7 +170,7 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
   const scores = new Map<string, number[]>();
   for (const g of games) {
     const finished = people.filter((p) => done(p.statuses, g)).map((p) => p.user_id);
-    const points = g === GAME_ID ? await offbeatToday(db, days.find((d) => d.game_id === g)!.content, finished) : await runTotals(db, finished, finished.map(() => circle.today));
+    const points = g === GAME_ID ? await offbeatToday(db, circle.today, finished) : await runTotals(db, finished, finished.map(() => circle.today));
     for (const id of finished) {
       const score = g === GAME_ID ? points.get(id)! : points.get(`${id}:${circle.today}`)!;
       // Shown as the boards show each game: a game's own board in points (issue #265), Overall as par scores (M15 15i),
@@ -203,37 +201,16 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
   return { ...closed, open: true, entries, rest };
 }
 
-// Today's Offbeat score of each of these players' finished runs, by user ID: on a day on a clock the sum of its answers'
-// points (M23 23f-2); otherwise the ladder and the provisional rarity bonus, the result screen's points + bonus
-// (src/game/runs.ts, buildState), from the same events and pooled counts.
-async function offbeatToday(db: Db, puzzle: ApprovedPuzzle | ClockPuzzle, userIds: string[]): Promise<Map<string, number>> {
-  if (puzzle.format === CLOCK_FORMAT) {
-    const { rows } = await db.query<{ user_id: string; points: number }>(
-      `select user_id::text, sum(points)::int as points from private.clock_answer
-       where game_id = $1 and puzzle_date = $2::date and user_id = any($3::uuid[]) group by user_id`,
-      [GAME_ID, puzzle.date, userIds],
-    );
-    // A run with no answer scores 0.
-    const byUser = new Map(userIds.map((id) => [id, 0]));
-    for (const r of rows) byUser.set(r.user_id, r.points);
-    return byUser;
-  }
-  const { rows } = await db.query<{ user_id: string; events: { index: number; entryId: string; matched: boolean; inDay: boolean }[] }>(
-    `select e.user_id::text,
-            jsonb_agg(jsonb_build_object('index', e.question_idx, 'entryId', e.entry_id, 'matched', e.matched,
-                                         'inDay', private.day_of(e.created_at) = e.puzzle_date) order by e.question_idx) as events
-     from private.run_event e
-     where e.game_id = $1 and e.puzzle_date = $2::date and e.user_id = any($3::uuid[])
-     group by e.user_id`,
-    [GAME_ID, puzzle.date, userIds],
+// Today's Offbeat score of each of these players' finished runs, by user ID: the sum of its answers' points (M23 23f-2).
+async function offbeatToday(db: Db, date: string, userIds: string[]): Promise<Map<string, number>> {
+  const { rows } = await db.query<{ user_id: string; points: number }>(
+    `select user_id::text, sum(points)::int as points from private.clock_answer
+     where game_id = $1 and puzzle_date = $2::date and user_id = any($3::uuid[]) group by user_id`,
+    [GAME_ID, date, userIds],
   );
-  const pooled = await pooledCounts(db, puzzle, false);
-  // A run that ran out of time on question 1 has no answer, and scores 0.
+  // A run with no answer scores 0.
   const byUser = new Map(userIds.map((id) => [id, 0]));
-  for (const r of rows) {
-    const score = scoreRun(puzzle, r.events, pooled);
-    byUser.set(r.user_id, score.ladder + score.bonus);
-  }
+  for (const r of rows) byUser.set(r.user_id, r.points);
   return byUser;
 }
 

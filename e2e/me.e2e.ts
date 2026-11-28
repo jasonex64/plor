@@ -1,46 +1,25 @@
 // The Me tab's stats (docs/milestones/M14-14a-3a-me.md): the header, totals, this month's calendar, Offbeat's and
-// Fragments' cards (M16 16f-1) and the rarest answers, before and after a run; the avatar slots by names; and the Friends tab's empty state. Yesterday's
-// answers are written with the answer triggers off, as the database tests do, so they need the local superuser.
+// Fragments' cards (M16 16f-1), before and after a run; the avatar slots by names; and the Friends tab's empty state.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
-import { RUN, play, signInAndPick } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, signInAndPick, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
-const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 let today = "";
-let yesterday = "";
-let yesterdayAdded = false;
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
-  const { rows } = await DB.query<{ today: string; yesterday: string; content: { questions: { category: string }[] } | null }>(
-    `select private.today()::text as today, (private.today() - 1)::text as yesterday,
-            (select content from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today() - 1) as content`,
-  );
-  ({ today, yesterday } = rows[0]);
-  const { content } = rows[0];
-  if (content && !isFixtureDay(content)) throw new Error(`${yesterday} has a real puzzle; this file needs yesterday free for the fixture day`);
-  if (!content) {
-    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [
-      yesterday,
-      fixtureDay(yesterday, await loadFixtureBase(DB)),
-    ]);
-    yesterdayAdded = true;
-  }
+  today = puzzle.created;
 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removePuzzle(DB, puzzle);
-  if (yesterdayAdded) await DB.query("delete from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [yesterday]);
   await DB.end();
-  await ADMIN.end();
 });
 
 const PHONE = { width: 360, height: 800 };
@@ -93,18 +72,15 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   // Fragments' own colour, #5A2F5E, in its block, whatever the theme (16f-2).
   const plum = page.getByRole("region", { name: SUBSTRINGS.name, exact: true }).locator("span[aria-hidden='true']").first();
   expect(await plum.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(90, 47, 94)");
-  await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
-  // Caught on question 1: a finished run, a played day; its points come once the day closes.
+  // A finished run with no answer, a played day; its points come once the day closes.
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await playToEnd(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
   await page.goto("/me");
   await expect(total(page, "All games", "days played")).toHaveText("1");
   await expect(total(page, "All games", "day streak now")).toHaveText("1");
   await expect(total(page, GAME.name, "avg. points a day")).toHaveText("–");
-  await expect(page.getByRole("region", { name: GAME.name, exact: true })).not.toContainText(/survived|full runs/);
   await expect(calendar.getByText(`1 of ${sofar} days`)).toBeVisible();
   // The text alternative names the day, and its points once it has them (docs/milestones/M14-14a-3b-settings.md, criterion 6).
   await expect(calendar.getByRole("img")).toHaveAttribute(
@@ -115,45 +91,6 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(36, 87, 214)");
   // No numbers until the player turns them on (L46).
   await expect(todayCell).toHaveText("");
-});
-
-// Criterion 4: yesterday, the player and four others answered question 1, the player with an answer none of them gave.
-test("Me lists the rarest answers from closed days, with their share", async ({ browser }) => {
-  const page = await player(browser, "mb");
-  const { rows } = await DB.query<{ id: string }>("select id from auth.users where email = $1", [`${RUN}-mb@example.test`]);
-  const q = FIXTURE[0];
-  const client = await ADMIN.connect();
-  try {
-    await client.query("begin");
-    await client.query("set local session_replication_role = replica");
-    const noon = `(($2::date + time '12:00') at time zone 'America/Los_Angeles')`;
-    const answer = async (userId: string, slug: string) => {
-      await client.query(`insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', $2::date, ${noon})`, [userId, yesterday]);
-      await client.query(
-        `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-         values ($1, 'offbeat', $2::date, 0, $3, false, ${noon})`,
-        [userId, yesterday, fixtureId(0, slug)],
-      );
-    };
-    await answer(rows[0].id, "cat");
-    for (let i = 1; i <= 4; i++) {
-      const { rows: made } = await client.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
-        `${RUN}-mo${i}@example.test`,
-      ]);
-      await answer(made[0].id, "dog");
-    }
-    await client.query("commit");
-  } catch (err) {
-    await client.query("rollback");
-    throw err;
-  } finally {
-    client.release();
-  }
-
-  await page.goto("/me");
-  const item = page.getByRole("region", { name: "Your rarest answers" }).getByRole("listitem");
-  await expect(item).toHaveCount(1);
-  await expect(item).toHaveText(`${q.members.cat.names[0]} ${q.prompt} · 20% gave this · ${dateText(yesterday, { day: "numeric", month: "short" })}`);
 });
 
 // Criteria 6 and 7.
@@ -183,8 +120,7 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
 
   // A comment, once the run is over.
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await page.getByLabel("Comment to your friends").fill(`slots ${RUN}`);
   await page.getByRole("button", { name: "Post" }).click();
   const comment = page.getByRole("region", { name: `${GAME.name} comments` }).getByRole("listitem").filter({ hasText: `slots ${RUN}` });

@@ -1,11 +1,11 @@
 // What Offbeat's game screen shows besides the run (docs/milestones/M14-14a-2b-game-screen.md): the player's stats and
 // yesterday's answers. Dates are read as text and "today" comes from private.today() alone (M00 §8).
-import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/puzzle";
+import type { ClockPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { ANSWER_SHARE_MIN_PLAYERS, RAREST_ANSWERS_SHOWN, STATS_CHART_DAYS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { settleRuns } from "./ledger";
-import { hostAnswers, named, thingNames, type Named } from "./payload";
+import { named, thingNames, type Named } from "./payload";
 import { type RunStatus } from "./status";
 import { getStreak } from "./streak";
 
@@ -20,21 +20,14 @@ export type Stats = {
   days: { date: string; points: number | null }[];
 };
 
-export type YesterdayQuestion = { index: number; prompt: string; hostAnswers: Named[]; yours: { answer: Named; matched: boolean } | null };
-
-// A day on a clock (M23 23f-2, answer 68): per question the answers most players gave and the rarest, each with how many
+// Per question (M23 23f-2, answer 68) the answers most players gave and the rarest, each with how many
 // players gave it. counts is null while fewer than ANSWER_SHARE_MIN_PLAYERS players gave an answer to the question.
 export type Counted = { answer: Named; players: number };
 export type YesterdayClockQuestion = { index: number; prompt: string; counts: { top: Counted[]; rarest: Counted[] } | null };
 
 // "none": no puzzle yesterday. "in_play": the player's own run yesterday is still going, so its answers stay hidden
-// until they finish it (human, 2026-10-25: "Hide from that player (Recommended)"). "shown": every question, with the
-// host's answers, and the player's own where they gave one (L34). "clock": yesterday was a day on a clock, so counts
-// instead, with no host's answers and none of the player's own.
-export type Yesterday =
-  | { date: string; state: "none" | "in_play" }
-  | { date: string; state: "shown"; questions: YesterdayQuestion[] }
-  | { date: string; state: "clock"; questions: YesterdayClockQuestion[] };
+// until they finish it (human, 2026-10-25: "Hide from that player (Recommended)"). "clock": yesterday's answers, as counts.
+export type Yesterday = { date: string; state: "none" | "in_play" } | { date: string; state: "clock"; questions: YesterdayClockQuestion[] };
 
 export async function getStats(db: Db, userId: string): Promise<Stats> {
   // The ledger has a day's row only once a read after its midnight settles it (DECISIONS.md, Points ledger). The day
@@ -60,7 +53,7 @@ export async function readStats(db: Db, userId: string, day: string): Promise<St
 }
 
 export async function getYesterday(db: Db, userId: string): Promise<Yesterday> {
-  const { rows } = await db.query<{ date: string; content: ApprovedPuzzle | ClockPuzzle | null; status: RunStatus | null }>(
+  const { rows } = await db.query<{ date: string; content: ClockPuzzle | null; status: RunStatus | null }>(
     `select (private.today() - 1)::text as date,
             (select content from private.puzzle where game_id = $2 and puzzle_date = private.today() - 1) as content,
             (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = private.today() - 1) as status`,
@@ -69,25 +62,7 @@ export async function getYesterday(db: Db, userId: string): Promise<Yesterday> {
   const { date, content, status } = rows[0];
   if (!content) return { date, state: "none" };
   if (status === "in_progress") return { date, state: "in_play" };
-  if (content.format === CLOCK_FORMAT) return { date, state: "clock", questions: await clockCounts(db, date, content) };
-  const { rows: events } = await db.query<{ question_idx: number; entry_id: string; matched: boolean }>(
-    "select question_idx, entry_id, matched from private.run_event where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
-    [userId, GAME_ID, date],
-  );
-  const names = await thingNames(db, [...content.questions.flatMap((q) => q.host_answers), ...events.map((e) => e.entry_id)]);
-  return {
-    date,
-    state: "shown",
-    questions: content.questions.map((question, index) => {
-      const own = events.find((e) => e.question_idx === index);
-      return {
-        index,
-        prompt: question.prompt,
-        hostAnswers: hostAnswers(question, names),
-        yours: own ? { answer: named(names, own.entry_id), matched: own.matched } : null,
-      };
-    }),
-  };
+  return { date, state: "clock", questions: await clockCounts(db, date, content) };
 }
 
 // How many signed-in players gave each answer to each of a closed clock day's questions, up to the day's midnight as the

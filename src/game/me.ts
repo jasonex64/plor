@@ -1,13 +1,10 @@
 // The player's own stats for the Me tab (docs/milestones/M14-14a-3a-me.md; L45): totals across games, this month's
-// calendar, a card per game and the rarest answers. Dates are read as text and "today" comes from private.today()
+// calendar and a card per game. Dates are read as text and "today" comes from private.today()
 // alone (M00 §8). "Across games" adds Offbeat's and Fragments' (docs/milestones/M16-16f-the-shared-pieces.md, 16f-1).
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
-import { ANSWER_SHARE_MIN_PLAYERS, RAREST_ANSWERS_SHOWN } from "@/config/tunables";
 import type { Db } from "@/lib/db";
-import { allTimePoints, dayCounts } from "./ledger";
+import { allTimePoints } from "./ledger";
 import { readStats, type Stats } from "./offbeat";
-import { named, thingNames, type Named } from "./payload";
 import { settleSubstringRuns } from "./substring-places";
 import { playedDays } from "./streak";
 
@@ -16,7 +13,6 @@ import { playedDays } from "./streak";
 // their Offbeat day from the ledger, or null while it has none, for the calendar's text alternative (days after today included, so the
 // calendar can draw them). fragments: Fragments' card, its best and average score from its ledger rows
 // (a day's score is in once the day is closed, as Offbeat's best) and the days it was started.
-// rarest: the player's lowest-share answers from closed days (human, 2026-10-25: "3, from closed days").
 export type Me = {
   username: string;
   since: string;
@@ -24,7 +20,6 @@ export type Me = {
   month: { today: string; days: { date: string; played: boolean; points: number | null }[] };
   offbeat: { best: number | null; average: number | null };
   fragments: { best: number | null; average: number | null; daysPlayed: number };
-  rarest: { answer: Named; prompt: string; date: string; share: number }[];
 };
 
 export async function getMe(db: Db, userId: string): Promise<Me> {
@@ -82,46 +77,7 @@ export async function getPlayerStats(db: Db, userId: string): Promise<{ me: Me; 
     month: { today: row.today, days: row.month },
     offbeat: { best: stats.best, average: stats.average },
     fragments: { best: fragments[0].best, average: fragments[0].average, daysPlayed: fragments[0].days_played },
-    rarest: await rarestAnswers(db, userId, day),
   };
   return { me, recent: stats.days };
 }
 
-// The player's answers that survived (a caught one is the host's, not theirs: human, 2026-10-25, "Leave caught out
-// (Recommended)"; docs/milestones/M14-14a-3b-settings.md), given before their day's midnight on closed days, by their
-// share of that question's answers then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a
-// share here is the one the result showed once the day was over. Only questions at least ANSWER_SHARE_MIN_PLAYERS
-// answered have a share.
-async function rarestAnswers(db: Db, userId: string, day: string): Promise<Me["rarest"]> {
-  const { rows: events } = await db.query<{ date: string; question_idx: number; entry_id: string }>(
-    `select puzzle_date::text as date, question_idx, entry_id from private.run_event
-     where user_id = $1 and game_id = $2 and puzzle_date < $3::date and private.day_of(created_at) = puzzle_date
-       and not matched`,
-    [userId, GAME_ID, day],
-  );
-  const dates = [...new Set(events.map((e) => e.date))];
-  if (dates.length === 0) return [];
-  const counts = await dayCounts(db, dates);
-  const shared = events.flatMap((e) => {
-    const question = counts.get(e.date)!.get(e.question_idx);
-    if (!question || question.answered < ANSWER_SHARE_MIN_PLAYERS) return [];
-    return [{ ...e, share: (question.byEntry.get(e.entry_id) ?? 0) / question.answered }];
-  });
-  // Lowest share first; on a tie, the later day, then the earlier question (Claude's, kept by the human, 2026-10-25:
-  // "Keep it (Recommended)").
-  const picked = shared
-    .sort((a, b) => a.share - b.share || b.date.localeCompare(a.date) || a.question_idx - b.question_idx)
-    .slice(0, RAREST_ANSWERS_SHOWN);
-  if (picked.length === 0) return [];
-  const { rows: puzzles } = await db.query<{ date: string; content: ApprovedPuzzle }>(
-    "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])",
-    [GAME_ID, [...new Set(picked.map((p) => p.date))]],
-  );
-  const names = await thingNames(db, picked.map((p) => p.entry_id));
-  return picked.map((p) => ({
-    answer: named(names, p.entry_id),
-    prompt: puzzles.find((z) => z.date === p.date)!.content.questions[p.question_idx].prompt,
-    date: p.date,
-    share: p.share,
-  }));
-}

@@ -6,13 +6,11 @@
 import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Counted, Stats, Yesterday } from "@/game/offbeat";
-import { givenText } from "./given";
 import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
-import { AnswerSearch } from "./answer-search";
-import { Game, TestGame } from "./game";
+import { Game } from "./game";
 import { expectingPlay } from "./to-play";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
@@ -86,56 +84,6 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
   );
 }
 
-// A test run's screen (docs/milestones/M14-14b-11-test-runs.md): the game screen as players see it (human, 2026-10-29,
-// answer 3: "i need the real screen and animations so i can critique it"), under a "Test run" label and Restart, which
-// stay in view the whole run (answer 12): in a run they ride above the question in the play frame, whose × goes back to the admin
-// puzzles page (14c-6, answers 11 and 26). Back goes to the admin puzzles
-// page, where Play test is. After the run the cards come back as on the game screen; the comments don't (answer 6).
-export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: string[][] | null }) {
-  const [playing, setPlaying] = useState(false);
-  const [restarts, setRestarts] = useState(0);
-  const label = `Test run${hostAnswers ? " of the draft" : ""}: nothing is saved`;
-  const again = () => setRestarts((n) => n + 1);
-  const restart = (
-    <button type="button" onClick={again}>
-      Restart
-    </button>
-  );
-  return (
-    <div className={styles.screen}>
-      {!playing && (
-        <div className={`${styles.back} ${styles.testBar}`}>
-          <ButtonLink href="/admin/puzzles" transitionTypes={BACK}>
-            <span aria-hidden="true">‹ </span>Puzzles
-          </ButtonLink>
-          <span className={kit.chip}>{label}</span>
-          {restart}
-        </div>
-      )}
-      <section aria-label={`${GAME.name} test run`} className={styles.game}>
-        {/* Restart mounts the run again, from the rules (answer 12). */}
-        <TestGame
-          key={restarts}
-          date={date}
-          hostAnswers={hostAnswers}
-          onPlaying={setPlaying}
-          onRestart={again}
-          label={
-            <p>
-              {label} {restart}
-            </p>
-          }
-        />
-      </section>
-      {!playing && (
-        <div className={styles.cards}>
-          <OffbeatInfo />
-        </div>
-      )}
-    </div>
-  );
-}
-
 function OffbeatInfo() {
   const [info, setInfo] = useState<{ stats: Stats; yesterday: Yesterday } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -197,10 +145,8 @@ function YourOffbeat({ stats }: { stats: Stats }) {
 // "dog · 6 players, cat · 1 player": a clock day's answers with how many players gave each.
 const countedText = (counted: Counted[]) => counted.map((c) => `${c.answer.name} · ${c.players} ${c.players === 1 ? "player" : "players"}`).join(", ");
 
-// Yesterday's questions with the host's answers, for everyone once the day is closed (L34), and the player's own
-// answer and how it went where they gave one. A day on a clock (M23 23f-2, answer 68) shows each question's most
-// common and rarest answers with their players instead, with no answer search (it counts the old game's answers) and
-// no answer of the player's own.
+// Yesterday's questions, once the day is closed (L34): each question's most common and rarest answers with their players
+// (M23 23f-2, answer 68), and no answer of the player's own.
 function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
   return (
     <section aria-label="Yesterday's answers" className={kit.card}>
@@ -217,29 +163,9 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
               <strong>
                 {q.index + 1} · {q.prompt}
               </strong>
-              {q.counts === null && <span className={styles.muted}>{givenText(null)}</span>}
+              {q.counts === null && <span className={styles.muted}>too few players yet</span>}
               {q.counts && <span className={styles.muted}>Most players gave: {countedText(q.counts.top)}</span>}
               {q.counts && q.counts.rarest.length > 0 && <span className={styles.muted}>Rarest answers: {countedText(q.counts.rarest)}</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-      {yesterday.state === "shown" && (
-        <ol className={`${kit.rows} ${styles.answers}`}>
-          {yesterday.questions.map((q) => (
-            <li key={q.index} className={kit.row}>
-              <div className={styles.titled}>
-                <strong>
-                  {q.index + 1} · {q.prompt}
-                </strong>
-                {q.yours && (
-                  <span className={q.yours.matched ? `${kit.chip} ${kit.caught}` : `${kit.chip} ${kit.safe}`}>{q.yours.matched ? "Caught" : "Safe"}</span>
-                )}
-              </div>
-              <span className={styles.muted}>
-                {q.yours && `You: ${q.yours.answer.name} · `}The host: {q.hostAnswers.map((h) => h.name).join(", ")}
-              </span>
-              <AnswerSearch date={yesterday.date} index={q.index} prompt={q.prompt} />
             </li>
           ))}
         </ol>

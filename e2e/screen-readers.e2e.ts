@@ -5,10 +5,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, play, sent, signInAndPick, befriend } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, play, sent, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -25,8 +24,7 @@ test.afterAll(async () => {
 
 async function caught(page: Page) {
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await expect(page.locator("#result")).toBeVisible();
   await page.goto("/");
 }

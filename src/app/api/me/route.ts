@@ -5,8 +5,7 @@ import { getProfile } from "@/lib/profile";
 import { getMe } from "@/game/me";
 import { STATUS } from "@/lib/status";
 
-// The signed-in player's own stats for the Me tab (docs/milestones/M14-14a-3a-me.md). Only their own runs and answers;
-// the shares beside the rarest answers are the result's, from closed days with enough players (M11 H5). A player who
+// The signed-in player's own stats for the Me tab (docs/milestones/M14-14a-3a-me.md). Only their own runs and answers. A player who
 // hasn't picked a username has no profile yet, refused as the other routes refuse it.
 export const GET = handle(async (request) => {
   checkProtocol(request);

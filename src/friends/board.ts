@@ -1,28 +1,20 @@
-// The live board (docs/milestones/M07-friends-and-live-board.md, 7c): each friend's run today, and how it ended
-// once the viewer's own run is over. Until then, only whether each friend has started (M12 12d,
-// docs/milestones/M12-12d-decided-fixes.md): a friend's question, or that they've finished, would tell the viewer
-// which one caught them. (A day on a clock has no catch: a friend's question and points are shown from the start, which the human
-// accepted knowing a friend still to play sees scores before their own run, 2026-11-25, answer 47: docs/milestones/
-// M23-23d-the-screens.md, "The live board".) Live updates arrive over Realtime (supabase/migrations/20261028140000_baseline.sql); this is
+// The live board (docs/milestones/M07-friends-and-live-board.md, 7c): each friend's run today. On Offbeat a friend's question and
+// points are shown from the start, which the human accepted knowing a friend still to play sees scores before their own run
+// (2026-11-25, answer 47: docs/milestones/M23-23d-the-screens.md, "The live board"); on Fragments, until the viewer has
+// finished, only whether each friend has started (M12 12d, docs/milestones/M12-12d-decided-fixes.md). Live updates arrive over Realtime (supabase/migrations/20261028140000_baseline.sql); this is
 // the full picture the page loads first and refetches after a reconnect.
-import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/puzzle";
+import type { ClockPuzzle } from "@/content/puzzle";
 import type { SubstringDay } from "@/content/substrings";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { runTotals } from "@/game/substring-places";
 import type { BoardGame } from "./leaderboard";
-import { named, thingNames, type Names } from "@/game/payload";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, runReactions, type Reactions } from "@/reactions/reactions";
 import { circleSql } from "./circle";
 
-// How a friend's run ended, given only once the viewer's own run is over (no spoilers: DECISIONS.md, Game 1).
-// question is 1-based, as players count.
-export type Ended = { result: "caught"; question: number; answer: string } | { result: "survived" } | { result: "timed_out"; question: number };
-
-// How a finished run on a clock reads in the feed: what it scored and how many answers it gave, by the answers given
-// before the day's midnight, as the ledger counts them (M23 23f-2, answer 67). Its own word, as a day on a clock has no
-// catch to say.
+// How a finished Offbeat run reads in the feed: what it scored and how many answers it gave, by the answers given
+// before the day's midnight, as the ledger counts them (M23 23f-2, answer 67).
 export type Scored = { result: "scored"; points: number; answers: number };
 
 export type BoardFriend = {
@@ -33,14 +25,12 @@ export type BoardFriend = {
   name: string;
   // started: before the viewer has finished, for any friend with a run today (12d). playing and finished come after.
   state: "not_started" | "started" | "playing" | "finished";
-  // While playing, once the viewer has finished: the question they're on, 1-based; on Fragments' board, the round.
+  // While playing: the question they're on, 1-based; on Fragments' board, once the viewer has finished, the round.
   question: number | null;
-  // Offbeat's board: how it ended. Always null on Fragments', whose run has no catch.
-  ended: Ended | null;
   // Fragments' board: the friend's score, once they and the viewer have both finished (answer 33). Never their words.
   score: number | null;
-  // A day on a clock: the points of their run so far, or all of it once it has ended, from their first answer, whether or not the
-  // viewer has finished. Absent on every other board, and null for a friend with no run.
+  // Offbeat's board: the points of their run so far, or all of it once it has ended, from their first answer, whether or not the
+  // viewer has finished. Absent on Fragments', and null for a friend with no run.
   points?: number | null;
   // Reactions on their run today (M08 8b), once the viewer's own run is over and the friend has a run.
   reactions: Reactions | null;
@@ -48,17 +38,16 @@ export type BoardFriend = {
 
 // Each game has its own board (M16 16f-6, answer 4). rounds: Fragments' rounds today, read from the day, for "round k of
 // n"; null on Offbeat's board and on a day with no Fragments. games: the games with an approved day today, Offbeat first,
-// for the board's switch (answers 56 and 57). mine: how the viewer's own run ended, once it has (M07 7d places the viewer
-// among their friends; Offbeat's only). reactionsOnMine: friends' reactions on it, from then on too (M08 8b).
+// for the board's switch (answers 56 and 57). reactionsOnMine: friends' reactions on the viewer's run, once it has ended
+// (M08 8b).
 export type Board = {
   game: BoardGame;
   date: string;
   finished: boolean;
   rounds: number | null;
-  // A day on a clock (Offbeat on a clock): its number of questions, for "Question 2 of 3"; null on every other board.
+  // Offbeat's day's number of questions, for "Question 2 of 3"; null on Fragments' board.
   questions: number | null;
   games: BoardGame[];
-  mine: Ended | null;
   reactionsOnMine: Reactions | null;
   friends: BoardFriend[];
 };
@@ -66,7 +55,7 @@ export type Board = {
 type Row = { user_id: string; username: string; name: string; status: RunStatus | null; answered: number | null; favourite: boolean };
 
 export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promise<Board> {
-  const { rows: today } = await db.query<{ date: string; content: ApprovedPuzzle | ClockPuzzle | SubstringDay | null; games: BoardGame[] }>(
+  const { rows: today } = await db.query<{ date: string; content: ClockPuzzle | SubstringDay | null; games: BoardGame[] }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content,
             array(select p.game_id from private.puzzle p where p.puzzle_date = private.today() and p.game_id = any($2::text[])
@@ -74,7 +63,8 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
     [game, [GAME_ID, SUBSTRINGS_ID]],
   );
   const { date, content, games } = today[0];
-  const clock = game === GAME_ID && (content as ClockPuzzle | null)?.format === CLOCK_FORMAT;
+  // Offbeat's board with a day to play: every day of Offbeat is on a clock.
+  const offbeat = game === GAME_ID && content !== null;
   // The viewer and each friend, with today's run status if they started one, and the viewer's own star on them (M24 24c).
   const { rows } = await db.query<Row>(
     `with people as (${circleSql("$1")})
@@ -90,20 +80,9 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
   const finished = viewer?.status != null && FINISHED.includes(viewer.status);
   const friends = rows.filter((r) => r.user_id !== viewerId);
 
-  // What each caught player typed, the viewer included, read only once the viewer may see it.
-  const caught = new Map<string, { question_idx: number; entry_id: string }>();
-  if (finished && content && game === GAME_ID && !clock) {
-    const { rows: events } = await db.query<{ user_id: string; question_idx: number; entry_id: string }>(
-      `select user_id, question_idx, entry_id from private.run_event
-       where game_id = $1 and puzzle_date = $2::date and matched and user_id = any($3::uuid[])`,
-      [GAME_ID, date, rows.map((r) => r.user_id)],
-    );
-    for (const e of events) caught.set(e.user_id, e);
-  }
-  const names = await thingNames(db, [...caught.values()].map((e) => e.entry_id));
-  // A day on a clock shows each run's points as it goes: the sum of its answers' points, never the answers.
+  // Offbeat shows each run's points as it goes: the sum of its answers' points, never the answers.
   const points = new Map<string, number>();
-  if (clock) {
+  if (offbeat) {
     const { rows: sums } = await db.query<{ user_id: string; points: number }>(
       `select user_id, sum(points)::int as points from private.clock_answer
        where game_id = $1 and puzzle_date = $2::date and user_id = any($3::uuid[]) group by user_id`,
@@ -124,9 +103,8 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
     date,
     finished,
     rounds: game === SUBSTRINGS_ID && content ? (content as SubstringDay).rounds.length : null,
-    questions: clock ? (content as ClockPuzzle).questions.length : null,
+    questions: offbeat ? (content as ClockPuzzle).questions.length : null,
     games,
-    mine: finished && content && game === GAME_ID && !clock ? ended(viewer!, caught.get(viewerId), names) : null,
     reactionsOnMine: finished ? (reactions.get(viewerId) ?? NO_REACTIONS) : null,
     // The viewer's favourites first, then the rest, each part by name (M24 24c, answer 19). The star itself isn't sent:
     // the card only orders by it.
@@ -134,26 +112,18 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
       .toSorted((a, b) => Number(b.favourite) - Number(a.favourite) || a.name.localeCompare(b.name) || a.username.localeCompare(b.username))
       .map((f): BoardFriend => {
         const state =
-          f.status === null ? "not_started" : !finished && !clock ? "started" : FINISHED.includes(f.status) ? "finished" : "playing";
+          f.status === null ? "not_started" : !finished && !offbeat ? "started" : FINISHED.includes(f.status) ? "finished" : "playing";
         return {
           userId: f.user_id,
           username: f.username,
           name: f.name,
           state,
           question: state === "playing" ? f.answered! + 1 : null,
-          ended: state === "finished" && game === GAME_ID && !clock ? ended(f, caught.get(f.user_id), names) : null,
           score: state === "finished" && game === SUBSTRINGS_ID ? scores.get(`${f.user_id}:${date}`)! : null,
-          ...(clock ? { points: state === "not_started" ? null : (points.get(f.user_id) ?? 0) } : {}),
+          ...(offbeat ? { points: state === "not_started" ? null : (points.get(f.user_id) ?? 0) } : {}),
           reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
         };
       }),
   };
 }
 
-export function ended(f: Pick<Row, "username" | "status" | "answered">, event: { question_idx: number; entry_id: string } | undefined, names: Names): Ended {
-  if (f.status === "survived") return { result: "survived" };
-  if (f.status === "timed_out") return { result: "timed_out", question: f.answered! + 1 };
-  // A died run always has its matched event (run_status: died = bool_or(matched)).
-  if (!event) throw new Error(`run of ${f.username} is died with no matched event`);
-  return { result: "caught", question: event.question_idx + 1, answer: named(names, event.entry_id).name };
-}

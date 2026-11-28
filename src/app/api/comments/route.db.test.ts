@@ -3,14 +3,12 @@
 // 8a). A is the viewer; B is A's friend; C is no one's friend; D is B's friend but not A's.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
 import { COMMENT_MAX_LENGTH } from "@/config/tunables";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
+import { finishTodaysRun, startTodaysRun } from "@/test/clock-routes";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures, safeEntry } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as deleteRoute } from "./delete/route";
 import { POST as reportRoute } from "./report/route";
@@ -28,8 +26,6 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `c${k}${RUN}`
 >;
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
-let puzzleYesterday: ApprovedPuzzle;
 
 async function call(response: Promise<Response>) {
   const r = await response;
@@ -41,16 +37,15 @@ const remove = (id: unknown) => call(deleteRoute(apiRequest("/api/comments/delet
 const bodies = (r: { body: { thread: { comments: { body: string }[] } } }) => r.body.thread.comments.map((c) => c.body);
 
 async function start() {
-  expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
+  expect((await startTodaysRun()).status).toBe(200);
 }
-async function getCaught() {
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
-  expect(r.body.run.status).toBe("died");
+async function finishRun() {
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 // As whoever is signed in now.
 async function finishAndPost(key: (typeof keys)[number]) {
   await start();
-  await getCaught();
+  await finishRun();
   const r = await post(`hello from ${key}`);
   expect(r.status).toBe(201);
   expect(r.body.comment).toMatchObject({ username: players[key].username, name: players[key].username, body: `hello from ${key}` });
@@ -68,8 +63,8 @@ beforeAll(async () => {
     "select private.today()::text as today, (private.today() - 1)::text as yesterday",
   );
   ({ today, yesterday } = rows[0]);
-  puzzle = await ensurePuzzle(today);
-  puzzleYesterday = await ensurePuzzle(yesterday);
+  await ensurePuzzle(today);
+  await ensurePuzzle(yesterday);
 });
 
 afterAll(async () => {
@@ -118,7 +113,7 @@ describe("comments on the day's game", () => {
 
   it("shows A their own comments and their friends', oldest first, and no one else's", async () => {
     useSession(players.a.session);
-    await getCaught();
+    await finishRun();
     expect((await post("  hello from a \n")).body.comment.body).toBe("hello from a");
     const r = await thread();
     expect(r.body.thread).toMatchObject({ date: today, canPost: true });
@@ -207,12 +202,8 @@ describe("comments on the day's game", () => {
   });
 
   it("hides a past day's thread while the viewer's run that day is still going (a run can be finished after midnight)", async () => {
-    // A started yesterday, answered question 1 and waits at the reveal: no deadline, so still in progress.
+    // A's run on yesterday's day started just now, so its clock is still running: in progress.
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [players.a.userId, GAME_ID, yesterday]);
-    await getPool().query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
-      [players.a.userId, GAME_ID, yesterday, safeEntry(puzzleYesterday, 0)],
-    );
     useSession(players.a.session);
     const r = await thread(yesterday);
     expect(r).toEqual({ status: 200, body: { ok: true, thread: { date: yesterday, canPost: false, comments: null } } });

@@ -7,7 +7,6 @@
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { FEED_PAGE_SIZE } from "@/config/tunables";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { scoreRun } from "@/game/substring-scoring";
@@ -15,7 +14,7 @@ import { getPool } from "@/lib/db";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { commentReactions, runReactions } from "@/reactions/reactions";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, nameOf, removeFixtures } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as itemsRoute } from "./route";
 import { localStack } from "../../../../../scripts/slot.ts";
@@ -29,7 +28,6 @@ const [V, F, S, K, L, G, W, P, E] = ["pv", "pf", "ps", "pk", "pl", "pg", "pw", "
 const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
 let club = "";
 
 type Item = {
@@ -94,16 +92,10 @@ type Q = Parameters<Parameters<typeof seed>[0]>[0];
 
 const runOf = (q: Q, p: { userId: string }, game: string, date: string, startedAt?: string) =>
   q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, $2, $3::date, coalesce($4::timestamptz, now()))", [p.userId, game, date, startedAt ?? null]);
-// Offbeat, caught on question 1 at an instant.
-async function caught(q: Q, p: { userId: string }, date: string, at: string) {
-  await runOf(q, p, GAME_ID, date);
-  await q("insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at) values ($1, $2, $3::date, 0, $4, true, $5::timestamptz)", [
-    p.userId,
-    GAME_ID,
-    date,
-    puzzle.questions[0].host_answers[0],
-    at,
-  ]);
+// Offbeat, finished by Finish at an instant, with no answer: the run started a second before.
+async function finishedOffbeat(q: Q, p: { userId: string }, date: string, at: string) {
+  await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, $2, $3::date, $4::timestamptz - interval '1 second')", [p.userId, GAME_ID, date, at]);
+  await q("insert into private.clock_finish (user_id, game_id, puzzle_date, finished_at) values ($1, $2, $3::date, $4::timestamptz)", [p.userId, GAME_ID, date, at]);
 }
 const WORD = "qyzx";
 // Fragments, finished with a word in the last round at an instant.
@@ -126,7 +118,7 @@ beforeAll(async () => {
   const { rows } = await db.query<{ today: string; yesterday: string }>("select private.today()::text as today, (private.today() - 1)::text as yesterday");
   ({ today, yesterday } = rows[0]);
   await ensurePuzzle(today);
-  puzzle = await ensurePuzzle(yesterday);
+  await ensurePuzzle(yesterday);
   // These Fragments days must be this test's own: an existing one fails the insert.
   for (const date of [today, yesterday]) {
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [
@@ -184,12 +176,12 @@ describe("the feed's pages", () => {
     const when = async (date: string, m: number) => minute(date, m);
     await seed(async (q) => {
       // Results: V's own and F's; the minutes 3 and 4 are shared with comments, so ties are broken by kind and tie.
-      await caught(q, V, today, await when(today, 40));
+      await finishedOffbeat(q, V, today, await when(today, 40));
       await fragments(q, V, today, await when(today, 41));
-      await caught(q, V, yesterday, await when(yesterday, 40));
-      await caught(q, F, today, await when(today, 3));
+      await finishedOffbeat(q, V, yesterday, await when(yesterday, 40));
+      await finishedOffbeat(q, F, today, await when(today, 3));
       await fragments(q, F, today, await when(today, 4));
-      await caught(q, F, yesterday, await when(yesterday, 3));
+      await finishedOffbeat(q, F, yesterday, await when(yesterday, 3));
       await fragments(q, F, yesterday, await when(yesterday, 4));
       for (const [p, game, date] of [
         [V, GAME_ID, today],
@@ -213,14 +205,14 @@ describe("the feed's pages", () => {
       await batch(F, SUBSTRINGS_ID, today, 8, 1);
       await batch(F, GAME_ID, yesterday, 6, 1);
       await batch(F, SUBSTRINGS_ID, yesterday, 4, 1);
-      await caught(q, G, today, await when(today, 5));
+      await finishedOffbeat(q, G, today, await when(today, 5));
       await batch(V, GAME_ID, today, 5, 20);
       await batch(G, GAME_ID, today, 5, 30, club);
 
       // Not for V: a stranger's, the blocked pair's, and a comment V reported.
-      await caught(q, S, today, await when(today, 6));
-      await caught(q, K, today, await when(today, 6));
-      await caught(q, L, today, await when(today, 6));
+      await finishedOffbeat(q, S, today, await when(today, 6));
+      await finishedOffbeat(q, K, today, await when(today, 6));
+      await finishedOffbeat(q, L, today, await when(today, 6));
       await fragments(q, S, today, await when(today, 7));
       await fragments(q, K, yesterday, await when(yesterday, 7));
       await comment(q, S, GAME_ID, today, "stranger", await when(today, 6));
@@ -335,7 +327,7 @@ describe("the feed's pages", () => {
 
   it("blurs today's result of a game W hasn't finished: name, game and time, and nothing of the run or its reactions", async () => {
     await seed(async (q) => {
-      await caught(q, W, today, await minute(today, 50));
+      await finishedOffbeat(q, W, today, await minute(today, 50));
       await comment(q, F, SUBSTRINGS_ID, today, "words about fragments", await minute(today, 60));
       // W reacts to F's runs and F's Fragments comment, so there is something to withhold.
       await q("insert into private.reaction (user_id, game_id, puzzle_date, run_user_id, emoji) values ($1, $2, $3::date, $4, '😂'), ($1, $5, $3::date, $4, '😢'), ($1, $5, $6::date, $4, '❤️')", [
@@ -366,7 +358,7 @@ describe("the feed's pages", () => {
     expect(Object.keys(hidden).sort()).toEqual(["at", "blurred", "date", "game", "kind", "mine", "name", "userId", "username"]);
 
     // Offbeat is W's own finished game: whole. Yesterday's Fragments is whole whatever W played then.
-    expect(find(GAME_ID, today)).toMatchObject({ blurred: false, ended: { result: "caught", question: 1, answer: nameOf(puzzle.questions[0].host_answers[0]) } });
+    expect(find(GAME_ID, today)).toMatchObject({ blurred: false, ended: { result: "scored", points: 0, answers: 0 } });
     expect(find(GAME_ID, today).reactions).toEqual((await runReactions(getPool(), W.userId, GAME_ID, today, [F.userId])).get(F.userId));
     const yest = find(SUBSTRINGS_ID, yesterday);
     expect(yest).toMatchObject({ blurred: false, score: scoreRun([WORD], "j").total });
@@ -402,30 +394,26 @@ describe("the feed's pages", () => {
     expect((await page()).body.feed.finishedToday).toEqual([GAME_ID, SUBSTRINGS_ID]);
   });
 
-  it("orders a run that ran out of time by its deadline, a finished one by its last answer or round, and gives their endings", async () => {
+  it("orders a run whose clock ran out by its end, a finished one by its Finish or last round, and gives their endings", async () => {
     await seed(async (q) => {
       // P: Offbeat yesterday started at minute 10 with no answer, so its 20 seconds ended at 10 minutes 20 seconds.
       await runOf(q, P, GAME_ID, yesterday, await minute(yesterday, 10));
-      // E: Offbeat yesterday survived, its seventh answer at minute 20; Fragments yesterday with no word in its last round,
-      // opened at minute 30, so ended at its 20 seconds.
-      await runOf(q, E, GAME_ID, yesterday);
-      for (let i = 0; i < puzzle.questions.length; i++) {
-        await q("insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at) values ($1, $2, $3::date, $4, 'x', false, $5::timestamptz)", [
-          E.userId,
-          GAME_ID,
-          yesterday,
-          i,
-          await minute(yesterday, 14 + i),
-        ]);
-      }
+      // E: Offbeat yesterday started a second before minute 20, gave one answer then and finished at minute 20; Fragments yesterday
+      // with no word in its last round, opened at minute 30, so ended at its 20 seconds.
+      await runOf(q, E, GAME_ID, yesterday, await stamp(yesterday, 1199));
+      await q(
+        "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, $2, $3::date, 0, 'x', 'common', 3000, 10, $4::timestamptz)",
+        [E.userId, GAME_ID, yesterday, await stamp(yesterday, 1199)],
+      );
+      await q("insert into private.clock_finish (user_id, game_id, puzzle_date, finished_at) values ($1, $2, $3::date, $4::timestamptz)", [E.userId, GAME_ID, yesterday, await minute(yesterday, 20)]);
       await runOf(q, E, SUBSTRINGS_ID, yesterday);
       await q("insert into private.question_open (user_id, game_id, puzzle_date, question_idx, opened_at) values ($1, $2, $3::date, 6, $4::timestamptz)", [E.userId, SUBSTRINGS_ID, yesterday, await minute(yesterday, 30)]);
     });
     useSession(W.session);
     const items = await flat();
     const find = (p: typeof P, game: string) => items.find((i) => i.kind === "result" && i.userId === p.userId && i.game === game && i.date === yesterday)!;
-    expect(find(P, GAME_ID)).toMatchObject({ at: await stamp(yesterday, 620), ended: { result: "timed_out", question: 1 } });
-    expect(find(E, GAME_ID)).toMatchObject({ at: await minute(yesterday, 20), ended: { result: "survived" } });
+    expect(find(P, GAME_ID)).toMatchObject({ at: await stamp(yesterday, 620), ended: { result: "scored", points: 0, answers: 0 } });
+    expect(find(E, GAME_ID)).toMatchObject({ at: await minute(yesterday, 20), ended: { result: "scored", points: 10, answers: 1 } });
     expect(find(E, SUBSTRINGS_ID)).toMatchObject({ at: await stamp(yesterday, 1820), score: 0 });
     // P's run today is still going, so it is no item.
     expect(items.some((i) => i.kind === "result" && i.userId === P.userId && i.date === today)).toBe(false);

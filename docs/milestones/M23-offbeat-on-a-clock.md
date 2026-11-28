@@ -113,6 +113,12 @@ Second round (2026-11-25):
 70. Whether Fragments, paused too, shows the note as well: "Yes, both games (Recommended)". Its own line is put back by hand when Fragments gets days again.
 71. When the front page's "How Offbeat works" becomes "Three questions, one clock. Name as many as you can.": "Now, with the note (Recommended)".
 
+Before 23f-3 (2026-11-28, "Build 23f-3"):
+72. The admin Audit page, which reviews texts typed in the old Offbeat and gets nothing from a clock day: "Remove it (Recommended)". Its tab, routes, database functions and table go with the old game; Admin, Lists stays the one place for unlisted texts.
+73. The three tables only the old game used (signed-in answers, guest answers, guest answer tallies), emptied by the wipe: "Drop them (Recommended)".
+74. Records of comments an admin deleted name no game, so the wipe cannot pick out Offbeat's (plor.app held 0 of them, and 0 kept records, on 2026-11-28): "Leave them alone (Recommended)".
+75. `scripts/research.db.test.ts`'s setup, which timed out at 10 s in CI on #325 and #326: "Yes, 30 seconds (Recommended)", as its own quick fix.
+
 The human approved 23f on 2026-11-26: "Approve 23f".
 
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
@@ -157,7 +163,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 merged, #316). The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 merged, #321; 23e-2 merged, #322). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
-- **23f, the switch** (`M23-23f-the-switch.md`, approved 2026-11-26, "Approve 23f"; answers 58 to 71; 23f-1, the note, merged, #325; 23f-2, every page reads a clock day, built and reviewed, #326 open). Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
+- **23f, the switch** (`M23-23f-the-switch.md`, approved 2026-11-26, "Approve 23f"; answers 58 to 71; 23f-1, the note, merged, #325; 23f-2, every page reads a clock day, merged, #326; 23f-3a, the old game's code out, built and reviewed, its PR open; 23f-3b, the wipe, next). Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
 ## Acceptance criteria
 - [ ] Every question a day uses has a researched list that passed both passes, and the human has seen its borderline list (a check in the draft that refuses a question without one).

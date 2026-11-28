@@ -1,6 +1,6 @@
 // A run on a clock as plor_app really does it (docs/milestones/M23-23c-the-run-on-a-clock.md): its grants, its RLS policies,
 // the triggers that judge every move and the status view, for a player and for a guest. Locally the routes connect as
-// postgres (ROADMAP), so this file switches to plor_app as runs.plor-app.db.test.ts does. Every test is rolled back but the
+// postgres (ROADMAP), so this file switches to plor_app as src/groups/groups.plor-app.db.test.ts does. Every test is rolled back but the
 // two-connections one, which needs rows both connections see and removes them again. The database's own rules are in
 // supabase/tests/clock_run.test.sql; this file asks that the TypeScript says them right.
 import { randomBytes, randomUUID } from "node:crypto";
@@ -10,9 +10,9 @@ import type { ClockPuzzle } from "@/content/puzzle";
 import { missedOrder, type ClockState } from "./clock-state";
 import { hashKey } from "@/lib/auth-limits";
 import { GAME_ID } from "@/platform/game";
-import { FIXTURE_NAMES, fixtureClockDay, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "@/test/answer-fixture";
-import { answerClockRun, clockState, finishClockRun, isClockRun, nextClockRun, startClock } from "./clock-runs";
-import { answerGuestClock, finishGuestClock, guestClockState, isClockGuestRun, nextGuestClock, startGuestClockRun } from "./guest-clock-runs";
+import { FIXTURE_NAMES, fixtureClockDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "@/test/answer-fixture";
+import { answerClockRun, clockState, finishClockRun, nextClockRun, startClock } from "./clock-runs";
+import { answerGuestClock, finishGuestClock, guestClockState, nextGuestClock, startGuestClockRun } from "./guest-clock-runs";
 import { localStack } from "../../scripts/slot.ts";
 
 const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 4 });
@@ -79,7 +79,6 @@ describe("a player's run on a clock as plor_app", () => {
   it("starts with 20 seconds, adds each tier's time less 5% an answer, ignores repeats and misses, never goes back, and Finish ends it", async () => {
     await onClockDay(async ({ client, today, day }) => {
       const userId = await newPlayer(client);
-      expect(await isClockRun(client, userId)).toBe(true);
       expect(await clockState(client, userId)).toMatchObject({ format: 4, status: "not_started", question: null, answers: [], missed: null });
 
       const started = await startClock(client, userId);
@@ -178,17 +177,6 @@ describe("a player's run on a clock as plor_app", () => {
       expect(await missesOf(client, userId)).toBe(before);
     });
   });
-
-  it("is not a clock run on a day of the old format", async () => {
-    await onClockDay(async ({ client, today }) => {
-      const userId = await newPlayer(client);
-      await client.query("reset role");
-      await client.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
-      await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, today, fixtureDay(today, new Date().toISOString())]);
-      await client.query("set local role plor_app");
-      expect(await isClockRun(client, userId)).toBe(false);
-    });
-  });
 });
 
 const newHash = () => hashKey(randomBytes(20).toString("base64url"));
@@ -197,7 +185,6 @@ describe("a guest's run on a clock as plor_app", () => {
   it("plays the same run: start, answers, a repeat, Next, Finish, then over", async () => {
     await onClockDay(async ({ client }) => {
       const hash = newHash();
-      expect(await isClockGuestRun(client)).toBe(true);
       expect(await guestClockState(client, null)).toMatchObject({ format: 4, status: "not_started" });
       expect(await guestClockState(client, hash)).toMatchObject({ status: "not_started" });
       expect(await startGuestClockRun(client, hash)).toMatchObject({ status: "in_progress", question: { index: 0, prompt: "Name an animal" } });

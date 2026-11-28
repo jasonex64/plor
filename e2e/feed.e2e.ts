@@ -9,8 +9,8 @@ import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { FEED_PAGE_SIZE } from "../src/config/tunables";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
-import { asked, caughtToCards } from "./game";
-import { RUN, sent, signInAndPick } from "./players";
+import { fixtureId } from "../src/test/answer-fixture";
+import { RUN, playToEnd, sent, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
 
@@ -96,16 +96,15 @@ const comment = (userId: string, body: string, minutesAgo: number, game = "offbe
     ]);
   });
 
-// A finished run of Offbeat, caught on question 1, and of Fragments, a word in its last round: written as the db tests do.
-const offbeatCaught = (userId: string) =>
+// A finished run of Offbeat, two answers for 35 points (dog, cat), and of Fragments, a word in its last round: written as the db tests do.
+const offbeatDone = (userId: string) =>
   seed(async (q) => {
     await q("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [userId]);
-    await q(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       select $1, 'offbeat', private.today(), 0, content #>> '{questions,0,host_answers,0}', true, now() - interval '30 minutes'
-       from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()`,
-      [userId],
-    );
+    for (const [slug, tier, points] of [["dog", "common", 10], ["cat", "uncommon", 25]] as const)
+      await q(
+        "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, 'offbeat', private.today(), 0, $2, $3, 3000, $4, now() - interval '50 minutes')",
+        [userId, fixtureId(0, slug), tier, points],
+      );
   });
 const fragmentsDone = (userId: string) =>
   seed(async (q) => {
@@ -114,13 +113,9 @@ const fragmentsDone = (userId: string) =>
     await q("insert into private.round_word (user_id, game_id, puzzle_date, round_idx, word_key, word, created_at) values ($1, 'substrings', private.today(), 6, 'qyzx', 'qyzx', now() - interval '45 minutes')", [userId]);
   });
 
-// Plays Offbeat's run to a caught first answer, from Today's card, and leaves the player on Today.
+// Plays Offbeat's run on a clock from Today's card to its result, and leaves the player on Today.
 async function finishOffbeat(page: Page) {
-  await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
-  await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await page.goto("/");
 }
 
@@ -189,7 +184,7 @@ test("a friend's result is blurred until the viewer finishes that game, and 'Pla
   test.slow();
   const page = await viewer(browser, "fc");
   const friend = await friendOf("fd", "fc");
-  await offbeatCaught(friend);
+  await offbeatDone(friend);
   await fragmentsDone(friend);
   await page.goto("/");
   const name = `fd${RUN}`;
@@ -199,9 +194,9 @@ test("a friend's result is blurred until the viewer finishes that game, and 'Pla
     await expect(item(game)).toHaveCount(1);
     await expect(item(game).getByRole("link", { name: "Play to see", exact: true })).toBeVisible();
     await expect(item(game).locator("time")).toBeVisible();
-    await expect(item(game)).not.toContainText(/caught|points|survived/);
+    await expect(item(game)).not.toContainText(/scored|points/);
   }
-  expect(await feedOf(page).innerHTML()).not.toMatch(/caught on question|\d+ points/);
+  expect(await feedOf(page).innerHTML()).not.toMatch(/scored|\d+ points/);
   await expect(item(SUBSTRINGS.name).getByRole("link", { name: "Play to see" })).toHaveAttribute("href", SUBSTRINGS.path);
 
   // It opens that game.
@@ -211,7 +206,7 @@ test("a friend's result is blurred until the viewer finishes that game, and 'Pla
 
   // Finishing Offbeat clears Offbeat's alone.
   await finishOffbeat(page);
-  await expect(item(GAME.name)).toContainText(/caught on question 1 by "/);
+  await expect(item(GAME.name)).toContainText("scored 35 points with 2 answers");
   await expect(item(GAME.name).getByRole("link", { name: "Play to see" })).toHaveCount(0);
   await expect(item(SUBSTRINGS.name).getByRole("link", { name: "Play to see" })).toBeVisible();
 
@@ -226,7 +221,7 @@ test("a friend's result today takes a reaction from its menu, and it stays", asy
   test.slow();
   const page = await viewer(browser, "fe");
   const friend = await friendOf("ff", "fe");
-  await offbeatCaught(friend);
+  await offbeatDone(friend);
   await page.goto("/");
   await finishOffbeat(page);
   const item = articles(page).filter({ hasText: `ff${RUN}` });
@@ -415,9 +410,9 @@ test("a group's page lists both games' comments for the day, each tagged, and it
 test("a friend's result carries its game's colour on its row, and a comment none", async ({ browser }) => {
   const page = await viewer(browser, "fh");
   const friend = await friendOf("fi", "fh");
-  await offbeatCaught(friend);
+  await offbeatDone(friend);
   await fragmentsDone(friend);
-  await offbeatCaught(await idOf("fh"));
+  await offbeatDone(await idOf("fh"));
   await fragmentsDone(await idOf("fh"));
   const words = `that last one ${RUN}`;
   await comment(friend, words, 5);
@@ -434,7 +429,7 @@ test("a friend's result carries its game's colour on its row, and a comment none
   const edge = (item: ReturnType<typeof articles>) => item.locator("[class*='row']").first().evaluate((el) => getComputedStyle(el).boxShadow);
   const name = `fi${RUN}`;
   const result = (game: string) => articles(page).filter({ hasText: name }).filter({ hasText: game }).filter({ hasNotText: words });
-  await expect(result(GAME.name)).toContainText(/caught on question 1/);
+  await expect(result(GAME.name)).toContainText("scored 35 points with 2 answers");
   await expect(result(SUBSTRINGS.name)).toContainText(/\d+ points/);
   expect(await edge(result(GAME.name))).toBe(`${await slot("--offbeat")} 4px 0px 0px 0px inset`);
   expect(await edge(result(SUBSTRINGS.name))).toBe(`${await slot("--fragments")} 4px 0px 0px 0px inset`);
@@ -450,7 +445,7 @@ test("a reaction names who used it on hover, on focus and after a long press", a
   const amy = await friendOf("fl", "fj");
   await DB.query("update private.profile set display_name = $2 where user_id = $1", [zed, "Zed"]);
   await DB.query("update private.profile set display_name = $2 where user_id = $1", [amy, "Amy"]);
-  await offbeatCaught(await idOf("fj"));
+  await offbeatDone(await idOf("fj"));
   const words = `who reacted ${RUN}`;
   await comment(zed, words, 5);
   await seed(async (q) => {
@@ -499,7 +494,7 @@ test("a reaction names who used it on hover, on focus and after a long press", a
 test("a comment has no box, in the feed and in the result screen's thread", async ({ browser }) => {
   const page = await viewer(browser, "fm");
   const friend = await friendOf("fn", "fm");
-  await offbeatCaught(await idOf("fm"));
+  await offbeatDone(await idOf("fm"));
   const words = `no box ${RUN}`;
   await comment(friend, words, 5);
   const border = (item: ReturnType<typeof page.locator>) => item.evaluate((el) => getComputedStyle(el).borderTopColor);

@@ -5,10 +5,9 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { REACTIONS } from "../src/config/tunables";
-import { RUN, play, sent, signInAndPick, befriend } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, sent, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -26,9 +25,8 @@ test.afterAll(async () => {
 
 async function caught(page: Page) {
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await playToEnd(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
 }
 
 async function comment(page: Page, body: string) {

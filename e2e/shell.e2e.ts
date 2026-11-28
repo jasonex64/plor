@@ -29,7 +29,7 @@ const TABS = [
   { name: "Today", path: "/", sections: [GAME.name, "Leaderboard", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Find a player", "Your friends"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, SUBSTRINGS.name, "Your rarest answers"] },
+  { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, SUBSTRINGS.name] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.

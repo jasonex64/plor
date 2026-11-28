@@ -1,26 +1,26 @@
 // A player's all-time points against the local stack (run with `npm run test:db`; docs/milestones/M12-account.md, 12a,
 // where the account page showed them; Me's totals since M14 14a-3a, which moved this case from GET /api/account's test
 // in 14a-3b). A real player signs in; their runs are written directly (yesterday can't be played now), as the friends
-// leaderboard test does. A closed day's are answered at its noon, as an answer after its midnight counts nothing
-// (M16 16e-3a).
-// Each safe answer is the fixture's common one: its first-guess share is 0.2, exactly RARITY_ZERO_SHARE, so it earns
-// no rarity bonus unless other fixture days' answers left in the pool lower its share (M09 N1, N2). So the expected
-// totals add the bonus each ledger row holds, which settling's own test works by hand (src/game/ledger.db.test.ts),
-// and what's checked here is the ladder of the answers before midnight.
+// leaderboard test does. A closed day's answers are given at its noon, as an answer after its midnight counts nothing
+// (M16 16e-3a). A day on a clock scores each answer by its tier, with no bonus (docs/milestones/M23-23c-the-run-on-a-clock.md).
+import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeFixtures, safeEntry } from "@/test/puzzles";
+import { writeClockRun } from "@/test/clock-runs";
+import { fixtureId } from "@/test/answer-fixture";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { allTimePoints } from "./ledger";
+import { localStack } from "../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 const email = `${RUN}-acct@example.test`;
 const username = `acct${RUN}`;
 let userId = "";
@@ -33,51 +33,18 @@ const days: Record<"today" | "yesterday" | "twoAgo" | "earlier" | "longAgo", str
 };
 
 const ledgerRows = async () => (await getPool().query("select from private.points_ledger where user_id = $1", [userId])).rows.length;
-// The bonus the rows settled from runs hold: the two written directly hold none.
-const bonuses = async () =>
-  (await getPool().query<{ bonus: number }>("select coalesce(sum(bonus), 0)::int as bonus from private.points_ledger where user_id = $1", [userId])).rows[0]
-    .bonus;
-
-// A run on that day: safe on question 1, then caught by the host on question 2, so its ladder is question 1's points.
-// A past day's answers are given at its noon, today's now.
-async function survivedOne(date: string, puzzle: ApprovedPuzzle) {
-  const db = getPool();
-  await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [userId, GAME_ID, date]);
-  await db.query(
-    `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-     values ($1, $2, $3::date, 0, $4, false, least(statement_timestamp(), (($3::date + time '12:00') at time zone 'America/Los_Angeles')))`,
-    [userId, GAME_ID, date, safeEntry(puzzle, 0)],
-  );
-  await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [
-    userId,
-    GAME_ID,
-    date,
-  ]);
-  await db.query(
-    `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-     values ($1, $2, $3::date, 1, $4, true, least(statement_timestamp(), (($3::date + time '12:00') at time zone 'America/Los_Angeles')))`,
-    [userId, GAME_ID, date, puzzle.questions[1].host_answers[0]],
-  );
+// A run on that day: one common answer (10 points) given at the day's noon, today's now.
+async function gaveOne(date: string) {
+  await writeClockRun(admin, userId, date, [{ question: 0, entry: fixtureId(0, "dog"), tier: "common", points: 10, when: date === days.today ? "now" : "noon" }]);
 }
 
-// A run played past its day's midnight: safe on question 1 at the day's noon, safe on question 2 after its midnight,
-// then caught on question 3. It counts question 1's points alone (M16 16e-3a, answer 35).
-async function lateTwo(date: string, puzzle: ApprovedPuzzle) {
-  const db = getPool();
-  const answer = (index: number, entryId: string, matched: boolean, onTheDay: boolean) =>
-    db.query(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       values ($1, $2, $3::date, $4, $5, $6, case when $7 then (($3::date + time '12:00') at time zone 'America/Los_Angeles') else statement_timestamp() end)`,
-      [userId, GAME_ID, date, index, entryId, matched, onTheDay],
-    );
-  const open = (index: number) =>
-    db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [userId, GAME_ID, date, index]);
-  await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [userId, GAME_ID, date]);
-  await answer(0, safeEntry(puzzle, 0), false, true);
-  await open(1);
-  await answer(1, safeEntry(puzzle, 1), false, false);
-  await open(2);
-  await answer(2, puzzle.questions[2].host_answers[0], true, false);
+// A run played past its day's midnight: a common answer (10 points) at the day's noon, an uncommon one (25) after its midnight. It
+// counts the first alone (M16 16e-3a, answer 35).
+async function lateTwo(date: string) {
+  await writeClockRun(admin, userId, date, [
+    { question: 0, entry: fixtureId(0, "dog"), tier: "common", points: 10, when: "noon" },
+    { question: 0, entry: fixtureId(0, "cat"), tier: "uncommon", points: 25, when: "afterMidnight" },
+  ]);
 }
 
 // A run and its ledger row written directly, as if settled long ago.
@@ -105,6 +72,7 @@ afterAll(async () => {
   await getPool().query("delete from auth.users where email = $1", [email]);
   await removeFixtures();
   await getPool().end();
+  await admin.end();
 });
 
 describe("all-time points", () => {
@@ -117,19 +85,22 @@ describe("all-time points", () => {
   });
 
   it("sums every week's ledger rows, settling a finished run on a closed day first, and not today's (M09 D3, D9)", async () => {
-    // Two settled days weeks apart: 1000 and 100. Yesterday's run survived question 1 and isn't settled yet. Today's
-    // did the same, and today isn't closed.
+    // Two settled days weeks apart: 1000 and 100. Yesterday's run gave one answer and isn't settled yet. Today's did the same,
+    // and today isn't closed.
     await settled(days.longAgo, 1000);
     await settled(days.earlier, 100);
-    await survivedOne(days.yesterday, await ensurePuzzle(days.yesterday));
-    await lateTwo(days.twoAgo, await ensurePuzzle(days.twoAgo));
-    await survivedOne(days.today, await ensurePuzzle(days.today));
+    await ensurePuzzle(days.yesterday);
+    await ensurePuzzle(days.twoAgo);
+    await ensurePuzzle(days.today);
+    await gaveOne(days.yesterday);
+    await lateTwo(days.twoAgo);
+    await gaveOne(days.today);
     expect(await ledgerRows()).toBe(2);
 
-    // 1000 + 100 + yesterday's 25 (question 1's points) + two days ago's 25, not 75, as its question 2 came after its
-    // midnight, and their bonus; today's 25 waits for midnight.
+    // 1000 + 100 + yesterday's 10 + two days ago's 10, not 35, as its second answer came after its midnight; today's 10 waits
+    // for midnight.
     const total = await allTimePoints(getPool(), userId);
-    expect(total).toBe(1150 + (await bonuses()));
+    expect(total).toBe(1120);
     expect(await ledgerRows()).toBe(4);
     // Again: the same total, and nothing settled twice.
     expect(await allTimePoints(getPool(), userId)).toBe(total);

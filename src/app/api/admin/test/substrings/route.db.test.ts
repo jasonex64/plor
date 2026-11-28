@@ -57,7 +57,7 @@ const writeDraft = (date: string, content: unknown) => {
 };
 
 // What a test run must leave as it was ("Nothing at all", the ticket's answer 3).
-const TABLES = ["puzzle", "run", "run_event", "question_open", "round_word", "round_reject", "points_ledger", "guest_run", "dictionary_word"];
+const TABLES = ["puzzle", "run", "question_open", "round_word", "round_reject", "points_ledger", "guest_run", "dictionary_word"];
 async function counts(): Promise<number[]> {
   const { rows } = await getPool().query<{ n: number[] }>(`select array[${TABLES.map((t) => `(select count(*)::int from private.${t})`).join(", ")}] as n`);
   return rows[0].n;

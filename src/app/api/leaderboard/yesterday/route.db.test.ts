@@ -2,15 +2,19 @@
 // H7). V is the viewer; F is V's friend, and joins V's group for one test; G is in V's group but not V's friend; D is in
 // neither. Yesterday's and an
 // earlier day's ledger rows are written directly, as the friends leaderboard test's W1 case does.
+import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { GAME_ID } from "@/platform/game";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeFixtures, safeEntry } from "@/test/puzzles";
+import { fixtureId } from "@/test/answer-fixture";
+import { writeClockRun } from "@/test/clock-runs";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as yesterdayRoute } from "./route";
+import { localStack } from "../../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -29,6 +33,7 @@ const D = player("yd");
 const N = player("yn");
 let yesterday = "";
 let club = "";
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 
 async function call(path: string) {
   const response = await yesterdayRoute(apiRequest(path, { method: "GET" }));
@@ -55,6 +60,7 @@ afterAll(async () => {
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removeFixtures();
   await getPool().end();
+  await admin.end();
 });
 
 describe("yesterday's standings", () => {
@@ -151,46 +157,23 @@ describe("yesterday's standings", () => {
     expect(await points(`/api/leaderboard/yesterday?game=offbeat&group=${club}`)).toContainEqual([N.username, 0, false]);
   });
 
-  // M16 16e-3a (answers 35, 36): D, V's friend from now, survived question 1 at yesterday's noon and question 2 only
-  // after its midnight, then was caught on question 3: D's yesterday is question 1's 25, not 75, plus the bonus D's row
-  // holds. That answer is the fixture's common one, at a first-guess share of exactly RARITY_ZERO_SHARE, so its bonus is
-  // 0 unless other fixture days' answers left in the pool lower its share (M09 N1, N2); settling's own test works the
-  // bonus by hand (src/game/ledger.db.test.ts).
+  // M16 16e-3a (answers 35, 36): D, V's friend from now, gave an uncommon answer at yesterday's noon and a rare one only after its
+  // midnight: D's yesterday is the uncommon answer's 25, not 75 (docs/milestones/M23-23c-the-run-on-a-clock.md: 25 and 50 points).
   it("counts a friend's run played past its midnight only up to it", async () => {
     const db = getPool();
     await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [
       V.userId,
       D.userId,
     ]);
-    const puzzle = await ensurePuzzle(yesterday);
-    const answer = (index: number, entryId: string, matched: boolean, onTheDay: boolean) =>
-      db.query(
-        `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-         values ($1, $2, $3::date, $4, $5, $6, case when $7 then (($3::date + time '12:00') at time zone 'America/Los_Angeles') else statement_timestamp() end)`,
-        [D.userId, GAME_ID, yesterday, index, entryId, matched, onTheDay],
-      );
-    const open = (index: number) =>
-      db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
-        D.userId,
-        GAME_ID,
-        yesterday,
-        index,
-      ]);
-    await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [D.userId, GAME_ID, yesterday]);
-    await answer(0, safeEntry(puzzle, 0), false, true);
-    await open(1);
-    await answer(1, safeEntry(puzzle, 1), false, false);
-    await open(2);
-    await answer(2, puzzle.questions[2].host_answers[0], true, false);
+    await ensurePuzzle(yesterday);
+    await writeClockRun(admin, D.userId, yesterday, [
+      { question: 0, entry: fixtureId(0, "cat"), tier: "uncommon", points: 25, when: "noon" },
+      { question: 0, entry: fixtureId(0, "horde"), tier: "rare", points: 50, when: "afterMidnight" },
+    ]);
     useSession(V.session);
-    const standings = await points("/api/leaderboard/yesterday?game=offbeat");
-    const { rows } = await db.query<{ bonus: number }>(
-      "select bonus from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
-      [D.userId, GAME_ID, yesterday],
-    );
-    expect(standings).toEqual([
+    expect(await points("/api/leaderboard/yesterday?game=offbeat")).toEqual([
       [F.username, 300, false],
-      [D.username, 25 + rows[0].bonus, false],
+      [D.username, 25, false],
       [V.username, 0, true],
     ]);
   });

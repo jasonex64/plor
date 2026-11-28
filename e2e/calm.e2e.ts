@@ -4,10 +4,9 @@
 // board, the streak pill and Me's "All games" card (since 14b-15) take the soft tint; a stat's number shrinks to fit a phone (answer 23).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, sent, signInAndPick, befriend } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, sent, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -97,9 +96,8 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   const group = new URL(page.url()).pathname;
   for (const [player, body] of [[friend, "Bear, first question."], [page, "Bear for me too."]] as const) {
     await player.goto("/");
-    await play(player);
-    await caughtToCards(player, puzzle.hostAnswer);
-    await expect(player.locator("#result")).toContainText("You survived 0 of 7 questions");
+    await playToEnd(player);
+    await expect(player.getByText("0 points", { exact: true })).toBeVisible();
     await player.goto("/");
     await player.getByLabel("Comment to your friends").fill(body);
     await player.getByRole("button", { name: "Post" }).click();
@@ -108,7 +106,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
 
   for (const viewport of [PHONE, WIDE]) {
     await page.setViewportSize(viewport);
-    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/play", "/admin/puzzles", "/admin/insights"]) {
+    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/play", "/admin/puzzles", "/admin/lists"]) {
       await page.goto(path);
       // Measured once every section has loaded: no skeleton left, and the page's own small controls on screen.
       await expect(page.locator("[data-loading]")).toHaveCount(0);
@@ -131,7 +129,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   expect(Math.abs(a.y - b.y)).toBeLessThan(0.5);
   expect(Math.abs(a.y + a.height - (b.y + b.height))).toBeLessThan(0.5);
 
-  // Your own row takes the soft tint: on the leaderboard ("(you)") and in "Where everyone ended" on Friends.
+  // Your own row takes the soft tint: on the leaderboard ("(you)").
   // On a tablet's width: phones have no leaderboard card on Today (M16 16f-5, answer 19).
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto("/");
@@ -139,10 +137,6 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   const yours = page.getByRole("region", { name: "Leaderboard" }).getByRole("listitem").filter({ hasText: "(you)" });
   await expect(yours).toBeVisible();
   expect(await yours.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(soft);
-  await page.goto("/friends");
-  const ended = page.getByRole("region", { name: "Where everyone ended" }).locator(":scope > ul > li").filter({ hasText: "You" });
-  await expect(ended).toBeVisible();
-  expect(await ended.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(soft);
 
   // The same in every theme, on Today.
   await page.setViewportSize(PHONE);
@@ -173,9 +167,8 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
   await page.goto("/");
   await signInAndPick(page, "kc");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await playToEnd(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
   const soft = await slot(page, "--soft");
 
   const pill = page.getByRole("banner").getByRole("link", { name: /day streak/ });

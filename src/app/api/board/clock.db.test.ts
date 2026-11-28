@@ -73,9 +73,9 @@ describe("the live board on a day on a clock", () => {
 
     useSession(players.a.session);
     const mid = await board();
-    expect(mid).toMatchObject({ game: "offbeat", finished: false, mine: null, questions: 3, rounds: null });
+    expect(mid).toMatchObject({ game: "offbeat", finished: false, questions: 3, rounds: null });
     expect(mid.friends).toEqual([
-      expect.objectContaining({ username: players.b.username, state: "playing", question: 1, points: 25, ended: null, score: null, reactions: null }),
+      expect.objectContaining({ username: players.b.username, state: "playing", question: 1, points: 25, score: null, reactions: null }),
     ]);
 
     useSession(players.b.session);
@@ -89,7 +89,7 @@ describe("the live board on a day on a clock", () => {
     expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
     useSession(players.a.session);
     const done = await board();
-    expect(done.friends[0]).toMatchObject({ state: "finished", question: null, points: 35, ended: null });
+    expect(done.friends[0]).toMatchObject({ state: "finished", question: null, points: 35 });
     // No answer anywhere in what the viewer receives.
     expect(JSON.stringify(done)).not.toMatch(/cat|apple/);
   });

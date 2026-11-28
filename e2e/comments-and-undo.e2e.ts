@@ -3,10 +3,9 @@
 // staying signed in to say so when that fails.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, signInAndPick, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -25,8 +24,7 @@ test.afterAll(async () => {
 async function ready(page: Page, name: string) {
   await page.goto("/");
   await signInAndPick(page, name);
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await expect(page.locator("#result")).toBeVisible();
   await page.goto("/");
   await expect(page.getByLabel("Comment to your friends")).toBeVisible();

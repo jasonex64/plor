@@ -1,15 +1,14 @@
 // 14b-2c-1, the player screens' review items (docs/milestones/M14-14b-2c-review-items.md): the room the shell, the
 // clock bar and the right column leave goes with the page that shows them; the right column keeps a draft across
-// 1200px; a question's time running out away from the game opens the feed; text that names no entry stays in the box;
-// the bonus line, the result's jump, reactions at 320px, the leaderboard card on a new choice,
-// and Try again when the live channel can't be opened.
+// 1200px; a question's time running out away from the game opens the feed; the result's jump,
+// reactions at 320px, the leaderboard card on a new choice, and Try again when the live channel can't be opened.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick, befriend } from "./players";
-import { answer, answerBox, caughtToCards } from "./game";
+import { answerBox } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, play, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -35,11 +34,10 @@ async function player(browser: Browser, name: string, viewport: { width: number;
   return page;
 }
 
-// Starts today's run and is caught on question 1 by the host's answer.
+// Plays today's run to its end, with no answer given.
 async function caught(page: Page) {
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await playToEnd(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
 }
 
 const bodyPadding = (page: Page) =>
@@ -115,10 +113,10 @@ test("a question's time running out on another page opens the friends feed there
   await expect(feed.getByLabel("Comment to your friends")).toBeVisible();
 });
 
-// The same on Today from 768px, where the board sits in the page: once the run is over it shows where everyone ended
-// (the 14b-2c-1 review). On the real clock: a faked one also fires the Realtime client's own timers, and the rejoin
+// The same on Today from 768px, where the board sits in the page: once the run is over, today's card shows its end (the
+// 14b-2c-1 review). On the real clock: a faked one also fires the Realtime client's own timers, and the rejoin
 // that follows reloads the board whatever the page does.
-test("a question's time running out on Today shows where everyone ended on its board", async ({ browser }) => {
+test("a question's time running out on Today shows the run's end on its card", async ({ browser }) => {
   test.slow();
   const page = await player(browser, "xj", WIDE);
   await play(page);
@@ -128,30 +126,10 @@ test("a question's time running out on Today shows where everyone ended on its b
   await expect(page).toHaveURL(/\/$/);
   const board = page.getByRole("region", { name: "Friends today" });
   await expect(board).toBeVisible();
-  await expect(board.getByRole("region", { name: "Where everyone ended" })).toHaveCount(0);
   // Question 1's 20 seconds, then the clock bar's zero.
   await expect(page.getByRole("region", { name: "Question in play" }).getByRole("status")).toHaveText("Time's up on question 1", { timeout: 30_000 });
-  await expect(board.getByRole("region", { name: "Where everyone ended" })).toContainText("Ran out of time on question 1: You");
-});
-
-// Item 4 (answers 6 and 7): a typo is fixed in place, and a run with nothing survived has no bonus line.
-test("text that names no entry stays selected in the box, and a catch on question 1 has no bonus line", async ({ browser }) => {
-  const page = await player(browser, "xd", PHONE);
-  await play(page);
-  const input = answerBox(page);
-  await answer(page, "zzqqzz");
-  await expect(page.getByText('"zzqqzz" isn\'t in our list. Try another answer.')).toBeVisible();
-  await expect(input).toHaveValue("zzqqzz");
-  expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([0, 6]);
-
-  await caughtToCards(page, puzzle.hostAnswer);
-  const result = page.locator("#result");
-  await expect(result).toContainText("You survived 0 of 7 questions and scored 0 points.");
-  await expect(result).not.toContainText("bonus");
-  await page.goto("/");
-  // The banner's facts as chips since 14b-8b.
-  await expect(page.getByRole("region", { name: GAME.name }).getByText("caught on question 1", { exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: GAME.name }).getByText("0 points", { exact: true })).toBeVisible();
+  // The cards read the run again: today's card for the game has the run's end, with its Result.
+  await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Result" })).toBeVisible();
 });
 
 // Item 14: Result lands before the run has loaded; the result brings itself into view, below the phone's top bar.
@@ -160,14 +138,11 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await caught(page);
   await page.goto("/");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/play#result$/);
-  await expect(page.locator("#result")).toBeVisible();
-  const at = () =>
-    page.evaluate(() => ({
-      top: Math.round(document.getElementById("result")!.getBoundingClientRect().top),
-      scrolled: window.scrollY > 0,
-    }));
-  await expect.poll(at).toEqual({ top: 56, scrolled: true });
+  await expect(page).toHaveURL(/\/play$/);
+  await expect(page.locator("#result")).toBeInViewport();
+  // Below the phone's top bar (the clock game's result is where the page opens, with no jump to it).
+  const top = () => page.evaluate(() => Math.round(document.getElementById("result")!.getBoundingClientRect().top));
+  expect(await top()).toBeGreaterThanOrEqual(56);
 });
 
 // Item 10: friends who have both played see each other's reactions (behind a ⋯ since 14b-13), and a 320px phone still

@@ -25,10 +25,9 @@ export default function Privacy() {
           account. Plor doesn&apos;t show or use them.
         </li>
         <li>
-          <strong>Your games:</strong> each day you play, which answer you picked for each question, whether it matched
-          the host, and when. If you send an answer that isn&apos;t on our list, we keep what you typed (up to 40
-          characters). Once enough players type the same answer, it can become an answer everyone can give, shown
-          without who typed it.
+          <strong>Your games:</strong> each day you play, each answer you gave, how rare it was, the time and points it
+          earned, and when. If you send an answer that isn&apos;t on our list, we keep what you typed (up to 40
+          characters) so it can be reviewed.
         </li>
         {/* The next two, the guest cookie under "Sign-in cookies" and Cloudflare below: docs/milestones/M18-guest-play.md,
             "Privacy page draft" (approved 2026-11-13); the guest item's run-keeping words: docs/milestones/M19-pre-beta-fixes.md,
@@ -56,7 +55,7 @@ export default function Privacy() {
           username (not by display name or part of a username) and open your profile. A signed-in player who isn&apos;t
           your friend sees your username, your display name if you set one, your points, days played and streaks, and
           your best and average results in the daily game. Your friends also see when you started playing, your
-          calendar of days played this month, your rarest answers and a chart of your last 7 days. Nobody who is signed
+          calendar of days played this month and a chart of your last 7 days. Nobody who is signed
           out can see a profile. If you change your username, the old one still opens your profile for 30 days and no
           one else can take it; if you delete your account in that time, the old username is freed at once.
         </li>

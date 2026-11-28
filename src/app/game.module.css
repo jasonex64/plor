@@ -64,71 +64,15 @@
   gap: 16px;
 }
 
-.rules {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
 /* Start, full width under the stakes: mockup 3's main button (kit.module.css's .primary). */
 .start {
   width: 100%;
   margin: 0;
 }
 
-/* The question card (mockup 3's question screen; M14 14b-8b, answer 11): the prompt at 30px; the seconds and their bar
-   under it are countdown-bar.module.css's. */
-.ask {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-}
-
 .prompt {
   margin: 0;
   font-size: 1.875rem;
-}
-
-/* The stolen letters as mockup 3's struck tiles (.letters): the caught colours, a 2px ink border, small corners, the
-   letter struck through in the danger colour. */
-.taken {
-  margin: 0 0 6px;
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.letters {
-  display: flex;
-  gap: 6px;
-  margin: 0;
-}
-
-.letters span {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 38px;
-  border: 2px solid var(--ink);
-  border-radius: var(--r-small);
-  background: var(--caught-bg);
-  color: var(--caught);
-  font-size: 1.125rem;
-  font-weight: 800;
-  text-decoration: line-through;
-  text-decoration-color: var(--danger);
-  text-decoration-thickness: 3px;
-}
-
-/* A note under the answer box (a blocked letter, a word not in the list), as mockup 3's dashed box (.lock). */
-.note {
-  margin: 0;
-  padding: 10px 12px;
-  border: 1.5px dashed var(--ink);
-  border-radius: var(--r-small);
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
 /* The result's details inside the game screen's one card (M20 20n-4, answer 84): the card's width, read from the left

@@ -7,7 +7,7 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import type { ListView } from "@/admin/lists";
-import { readBank } from "@/admin/bank";
+import { readBank } from "@/admin/lists";
 import { readReview } from "@/admin/lists";
 import { listAnswers } from "@/content/clock-day";
 import { answerId, parseList } from "@/content/list";

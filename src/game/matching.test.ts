@@ -22,28 +22,24 @@ describe("oneEditAway", () => {
 });
 
 describe("pickAnswer", () => {
-  const c = (thing_id: string, caught = false, ancestors: string[] = [thing_id]): Candidate => ({ alias: "robin", thing_id, caught, ancestors });
+  const c = (thing_id: string, ancestors: string[] = [thing_id]): Candidate => ({ alias: "robin", thing_id, ancestors });
 
   it("is nothing for no candidates", () => {
     expect(pickAnswer([], {})).toBeNull();
   });
 
-  it("is caught if the host catches any meaning, and is that meaning", () => {
-    expect(pickAnswer([c("b"), c("a", true)], {})).toEqual({ thingId: "a", caught: true });
-  });
-
   it("is the highest member of one line of the tree", () => {
-    expect(pickAnswer([c("species", false, ["species", "genus"]), c("genus", false, ["genus"])], {})).toEqual({ thingId: "genus", caught: false });
+    expect(pickAnswer([c("species", ["species", "genus"]), c("genus", ["genus"])], {})).toEqual({ thingId: "genus" });
   });
 
   it("is the most common level, then the smallest ID, among unrelated members", () => {
-    expect(pickAnswer([c("a"), c("b")], { b: "uncommon" })).toEqual({ thingId: "b", caught: false });
-    expect(pickAnswer([c("b"), c("a")], {})).toEqual({ thingId: "a", caught: false });
+    expect(pickAnswer([c("a"), c("b")], { b: "uncommon" })).toEqual({ thingId: "b" });
+    expect(pickAnswer([c("b"), c("a")], {})).toEqual({ thingId: "a" });
   });
 });
 
 describe("answersAmong", () => {
-  const c = (thing_id: string, alias: string): Candidate => ({ alias, thing_id, caught: false, ancestors: [thing_id] });
+  const c = (thing_id: string, alias: string): Candidate => ({ alias, thing_id, ancestors: [thing_id] });
 
   it("counts names of one thing, and one name several things share, as one answer each", () => {
     expect(answersAmong([c("kiwi", "kiwi"), c("kiwi", "kiwis")])).toBe(1);

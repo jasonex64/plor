@@ -4,19 +4,19 @@
 // judge every move (private.check_clock_answer and its siblings, which raise the OB codes below); this module resolves
 // typed text as a run always has, asks, and shapes the result. "Today" is private.today() alone, never TypeScript's.
 import { DatabaseError } from "pg";
-import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/puzzle";
+import type { ClockPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { STATUS } from "@/lib/status";
 import { dayLookup, resolveTyped } from "./matching";
 import { thingNames } from "./payload";
-import { assertTypedLength, NOT_OPEN, OUT_OF_ORDER, RUN_OVER } from "./runs";
+import { assertTypedLength, NOT_OPEN, OUT_OF_ORDER, RUN_OVER } from "./run-shared";
 import { buildClockState, clockNameIds, type ClockState, type StoredClockAnswer } from "./clock-state";
 import type { RunStatus } from "./status";
 
-// The SQLSTATEs the clock triggers raise (supabase/migrations/20261124235832_clock_run.sql); OB002, OB003 and OB006 are
-// runs.ts's, and an answer's three rules are the same as there.
+// The SQLSTATE the clock triggers raise for Finish before the last question (supabase/migrations/20261124235832_clock_run.sql);
+// OB002, OB003 and OB006 are run-shared.ts's.
 export const NOT_LAST_QUESTION = "OB019";
 
 // Who is playing, and where their rows are. The identifiers are fixed here, never from a request.
@@ -46,7 +46,7 @@ export const playerSide = (userId: string): Side => ({
   noRun: () => new AppError("no_run", STATUS.notFound),
 });
 
-// A guest with no run or a closed day's run has no run to play: run_over, as guest-runs.ts.
+// A guest with no run or a closed day's run has no run to play: run_over.
 export const guestSide = (tokenHash: string | null): Side => ({
   key: tokenHash,
   keyColumn: "token_hash",
@@ -59,17 +59,17 @@ export const guestSide = (tokenHash: string | null): Side => ({
   noRun: () => new AppError("run_over", STATUS.conflict),
 });
 
-type Played = { date: string; puzzle: ApprovedPuzzle | ClockPuzzle };
+type Played = { date: string; puzzle: ClockPuzzle };
 
-// The day a run is read for: a player's run in progress, even from before midnight (runs.ts, todaysState), else today. null
+// The day a run is read for: a player's run in progress, even from before midnight (it is resumed), else today. null
 // when nothing is approved for that day.
 export async function playedDay(db: Db, side: Side): Promise<Played | null> {
   const { rows } = side.onlyToday
-    ? await db.query<{ date: string; content: Played["puzzle"] }>(
+    ? await db.query<{ date: string; content: ClockPuzzle }>(
         "select p.puzzle_date::text as date, p.content from private.puzzle p where p.game_id = $1 and p.puzzle_date = private.today()",
         [GAME_ID],
       )
-    : await db.query<{ date: string; content: Played["puzzle"] }>(
+    : await db.query<{ date: string; content: ClockPuzzle }>(
         `select p.puzzle_date::text as date, p.content
          from private.puzzle p
          where p.game_id = $2 and p.puzzle_date = coalesce(
@@ -81,17 +81,12 @@ export async function playedDay(db: Db, side: Side): Promise<Played | null> {
   return rows.length ? { date: rows[0].date, puzzle: rows[0].content } : null;
 }
 
-// The day's run is on a clock: the route's choice between this module and the seven-question game's.
-export async function isClockDay(db: Db, side: Side): Promise<boolean> {
-  return (await playedDay(db, side))?.puzzle.format === CLOCK_FORMAT;
-}
-
 // The side's latest clock run, which a move acts on: a player's latest, a guest's today's. null when there is none.
 async function latestRun(db: Db, side: Side): Promise<{ date: string; puzzle: ClockPuzzle } | null> {
   const { rows } = await db.query<{ date: string; content: ClockPuzzle }>(
     `select r.puzzle_date::text as date, p.content
      from private.${side.run} r join private.puzzle p on p.game_id = r.game_id and p.puzzle_date = r.puzzle_date
-     where r.${side.keyColumn} = $1 and r.game_id = $2 and p.content ->> 'format' = '4'
+     where r.${side.keyColumn} = $1 and r.game_id = $2
        ${side.onlyToday ? "and r.puzzle_date = private.today()" : ""}
      order by r.puzzle_date desc limit 1`,
     [side.key, GAME_ID],
@@ -131,7 +126,7 @@ export async function stateOf(db: Db, side: Side, date: string, puzzle: ClockPuz
 // The side's run in progress or today's day, not started: null when nothing is approved for it.
 export async function todaysClockState(db: Db, side: Side): Promise<ClockState | null> {
   const day = await playedDay(db, side);
-  return day && stateOf(db, side, day.date, day.puzzle as ClockPuzzle);
+  return day && stateOf(db, side, day.date, day.puzzle);
 }
 
 // Starts today's run, or returns it if it exists: the primary key allows one a day, and the date is pinned by private.today()
@@ -155,14 +150,14 @@ export async function startClockRun(db: Db, side: Side): Promise<ClockState> {
   return state;
 }
 
-// What logging a miss is for this side: a player's is logged (runs.ts, logMiss), a guest's is stored nowhere (M19 answer 19).
+// What logging a miss is for this side: a player's is logged (run-shared.ts, logMiss), a guest's is stored nowhere (M19 answer 19).
 export type LogMiss = ((puzzle: ClockPuzzle, index: number, typed: string) => Promise<void>) | null;
 
 export type ClockAnswerResult = { run: ClockState; notInList: boolean; repeat: boolean };
 
 // Answers the open question with typed text. The text is resolved only for the open question of a live run, so a later
-// question's list can't be probed. A run that is over (the clock passed zero, or Finish) returns its state, as a question's
-// time_up does in the seven-question game; text that names nothing, and a repeat, change nothing, and the first is a miss.
+// question's list can't be probed. A run that is over (the clock passed zero, or Finish) returns its state;
+// text that names nothing, and a repeat, change nothing, and the first is a miss.
 export async function answerClock(db: Db, side: Side, index: number, typed: string, logMiss: LogMiss): Promise<ClockAnswerResult> {
   const found = await latestRun(db, side);
   if (!found) throw side.noRun();
@@ -180,9 +175,7 @@ export async function answerClock(db: Db, side: Side, index: number, typed: stri
   if (current[0].status !== "in_progress") return over();
   if (current[0].answered !== index) throw new AppError("not_open", STATUS.conflict);
 
-  // No letter is taken on a clock day.
-  const resolved = await resolveTyped(dayLookup(db, puzzle), (ids) => thingNames(db, ids), puzzle, index, typed, []);
-  if (resolved !== null && "needs" in resolved) throw new Error("a clock day takes no letters, so no text needs one");
+  const resolved = await resolveTyped(dayLookup(db, puzzle), puzzle, index, typed);
   if (resolved === null) {
     if (logMiss) {
       try {

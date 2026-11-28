@@ -54,7 +54,6 @@ test("a player is found by username, sent a request from their profile, and show
   await expect(tab(page)).toHaveAttribute("aria-current", "true");
   await expect(page.getByRole("region", { name: "All games" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Calendar" })).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Rarest answers" })).toHaveCount(0);
   await expect(page.getByText(/^Playing since /)).toHaveCount(0);
 
   // A adds B from the profile; B's tab counts it, and A's profile says who asked.
@@ -67,10 +66,9 @@ test("a player is found by username, sent a request from their profile, and show
   await expect(you(other)).toContainText(`${A} sent you a friend request.`);
   await you(other).getByRole("button", { name: "Accept" }).click();
 
-  // Friends now: the calendar, the rarest answers and the last days' chart show, and the tab's count is gone.
+  // Friends now: the calendar and the last days' chart show, and the tab's count is gone.
   await expect(you(other)).toContainText("You're friends.");
   await expect(other.getByRole("region", { name: "Calendar" })).toBeVisible();
-  await expect(other.getByRole("region", { name: "Rarest answers" })).toContainText("None yet.");
   await expect(other.getByText("Points, last 7 days")).toBeVisible();
   await expect(other.getByText(/^Playing since /)).toBeVisible();
   await expect(tab(other)).toHaveAccessibleName("Friends");

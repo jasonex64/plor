@@ -51,17 +51,10 @@ describe("typed answers on the researched lists", () => {
   afterAll(() => admin.end());
 
   async function accepted(key: string, typed: string): Promise<boolean> {
-    await admin.query("begin");
-    try {
-      const { rows: made } = await admin.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id::text", [`${key}-${Date.now()}@example.test`]);
-      await admin.query("insert into private.admin (user_id) values ($1)", [made[0].id]);
-      const { rows: cat } = await admin.query<{ root: string }>("select root::text from private.category where key = $1", [key]);
-      const question = { category: key, root: cat[0].root, member_of: null, host_answers: [] };
-      const { rows } = await admin.query("select * from private.resolve_draft_answer($1, $2::jsonb, array[$3])", [made[0].id, JSON.stringify(question), normalize(typed)]);
-      return rows.length > 0;
-    } finally {
-      await admin.query("rollback");
-    }
+    const { rows: cat } = await admin.query<{ root: string }>("select root::text from private.category where key = $1", [key]);
+    const question = { category: key, root: cat[0].root, member_of: null };
+    const { rows } = await admin.query("select * from private.resolve_in($1::jsonb, now(), array[$2])", [JSON.stringify(question), normalize(typed)]);
+    return rows.length > 0;
   }
 
   it.each([["bed", "king"], ["bed", "twin"], ["acid", "citric"], ["acid", "nitric"], ["cake", "bundt"], ["cake", "chocolate"], ["hat", "beanie"], ["kitchen_utensil", "air fryer"], ["bone", "pelvic"], ["bone", "clavical"], ["bone", "distal metatarsal"], ["bag", "sleeping"], ["bag", "sling"], ["bag", "plastic"], ["knot", "dead"], ["cake", "tirimisu"], ["bed", "water"]])("accepts %s: %s", async (key, typed) => {
@@ -92,8 +85,8 @@ describe("a day approved before a load", () => {
     await loadResearch(db, [list(["alpha"])], "rs-test");
     await db.query("select private.define_category($1, 'demo', 'research', $1, null)", [KEY]);
     const { rows } = await db.query<{ root: string }>("select root::text from private.category where key = $1", [KEY]);
-    const question = { prompt: "Name a demo", category: KEY, root: rows[0].root, member_of: null, host_bank: [], host_answers: [], levels: {}, members: 1 };
-    const content = { format: 3, game_id: "offbeat", date: DATE, approved_at: (await db.query<{ now: string }>("select now()::text")).rows[0].now, questions: [question] };
+    const question = { prompt: "Name a demo", category: KEY, root: rows[0].root, member_of: null, levels: {}, rare: [], size: 1 };
+    const content = { format: 4, game_id: "offbeat", date: DATE, approved_at: (await db.query<{ now: string }>("select now()::text")).rows[0].now, questions: [question] };
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2::jsonb)", [DATE, JSON.stringify(content)]);
     // The load comes after the approval: pg_sleep keeps the two clocks apart.
     await db.query("select pg_sleep(0.05)");

@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fixtureClockDay } from "../test/answer-fixture.ts";
-import { checkClockDay, checkClockPuzzle, checkDayFile, checkHostNames, normalize, parseClockDraft, parseDay, parsePuzzle, type ClockDraft, type ClockPuzzle, type ClockQuestion, type Puzzle } from "./puzzle.ts";
+import { checkClockDay, checkClockPuzzle, checkDraftFile, normalize, parseClockDraft, type ClockDraft, type ClockPuzzle, type ClockQuestion } from "./puzzle.ts";
 
 describe("normalize", () => {
   it.each([
@@ -21,71 +20,6 @@ describe("normalize", () => {
 });
 
 const id = (n: number) => `00000000-0000-5000-8000-${String(n).padStart(12, "0")}`;
-
-describe("parsePuzzle (shape of untrusted files)", () => {
-  const file = "offbeat/2026-11-02.json";
-  const errorsOf = (value: unknown) => parsePuzzle(file, JSON.stringify(value)).errors;
-  const top = { format: 3, game_id: "offbeat", date: "2026-11-02", questions: [] };
-
-  it("rejects text that is not JSON", () => {
-    expect(parsePuzzle(file, "{").errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
-  });
-
-  it("rejects a missing field, an unknown field and a wrong format", () => {
-    expect(errorsOf({ game_id: "offbeat", date: "2026-11-02", questions: [], version: 1 })).toEqual([
-      `${file}: missing "format"`,
-      `${file}: unknown field "version"`,
-    ]);
-    expect(errorsOf({ ...top, format: 2 })).toEqual([`${file}: "format" must be 3`]);
-  });
-
-  it("rejects an unknown game and an impossible date", () => {
-    expect(errorsOf({ ...top, game_id: "ofbeat", date: "2026-02-30" })).toEqual([
-      `${file}: "game_id" must be "offbeat"`,
-      `${file}: "date" must be a calendar date YYYY-MM-DD`,
-    ]);
-  });
-
-  it("rejects malformed questions with their position", () => {
-    const question = { prompt: "", category: "Animal", host_bank: [id(1)], host_answers: id(1), levels: { lion: "common" }, entries: [] };
-    expect(errorsOf({ ...top, questions: [question] })).toEqual([
-      `${file} q1: unknown field "entries"`,
-      `${file} q1: "prompt" must be a non-empty string`,
-      `${file} q1: "category" must be a category key (lower-case letters and _)`,
-      `${file} q1: "host_answers" must be a list of thing IDs`,
-      `${file} q1: "levels" must map thing IDs to "common" or "uncommon"`,
-    ]);
-  });
-
-  it("rejects a stolen letter that isn't one lower-case letter (M04 13c-3)", () => {
-    const question = { prompt: "Name a pet", category: "pet", host_bank: [], host_answers: [], levels: {} };
-    for (const steals of ["E", "ab", "é", 5]) {
-      expect(errorsOf({ ...top, questions: [{ ...question, steals }] })).toEqual([`${file} q1: "steals" must be one lower-case letter a-z`]);
-    }
-  });
-});
-
-describe("checkHostNames", () => {
-  const day = (steals: (string | undefined)[], hosts: string[][]): Puzzle => ({
-    format: 3,
-    game_id: "offbeat",
-    date: "2026-11-02",
-    questions: hosts.map((h, i) => ({ prompt: `q${i}`, category: "thing", host_bank: h, host_answers: h, levels: {}, ...(steals[i] ? { steals: steals[i] } : {}) })),
-  });
-
-  it("refuses a host answer whose main name holds a letter stolen at or before its question", () => {
-    const names = new Map([
-      [id(1), "Chamomile"],
-      [id(2), "mint"],
-    ]);
-    expect(checkHostNames("d", day([undefined, "c"], [[id(2)], [id(1)]]), names)).toEqual([`d q2 thing "${id(1)}": host answer's name "Chamomile" can't be typed without C`]);
-    expect(checkHostNames("d", day([undefined, "c"], [[id(1)], [id(2)]]), names)).toEqual([]);
-  });
-
-  it("refuses a host answer the answer database doesn't know", () => {
-    expect(checkHostNames("d", day([undefined], [[id(9)]]), new Map())).toEqual([`d q1 thing "${id(9)}": host answer is not in the answer database`]);
-  });
-});
 
 describe("checkClockPuzzle (a day on a clock)", () => {
   const ids = (from: number, n: number) => Array.from({ length: n }, (_, i) => id(from + i));
@@ -144,15 +78,19 @@ describe("a drafted day on a clock", () => {
   const draft = (questions: object[] = [question(0), question(1), question(2)]) => ({ format: 4, game_id: "offbeat", date: "2026-12-01", questions });
   const text = (day: object) => JSON.stringify(day);
 
-  it("reads a good day, by its own parser and by the one that reads either format", () => {
+  it("reads a good day", () => {
     expect(parseClockDraft("offbeat/2026-12-01.json", text(draft())).errors).toEqual([]);
-    expect(parseDay("offbeat/2026-12-01.json", text(draft())).puzzle).toEqual(draft());
-    expect(checkDayFile("offbeat/2026-12-01.json", text(draft()))).toEqual([]);
+    expect(parseClockDraft("offbeat/2026-12-01.json", text(draft())).puzzle).toEqual(draft());
+    expect(checkDraftFile("offbeat/2026-12-01.json", text(draft()))).toEqual([]);
   });
 
-  it("still reads a day of seven questions as before, and refuses another format", () => {
-    expect(parseDay("offbeat/2026-11-24.json", readFileSync("content/offbeat/2026-11-24.json", "utf8")).puzzle?.format).toBe(3);
-    expect(parseDay("f", text({ ...draft(), format: 5 })).errors[0]).toBe('f: "format" must be 3');
+  it("refuses text that is not JSON, any other format, an unknown game and an impossible date", () => {
+    expect(parseClockDraft("f", "{").errors).toEqual([expect.stringMatching(/^f: not valid JSON/)]);
+    expect(parseClockDraft("f", text({ ...draft(), format: 3 })).errors).toEqual(['f: "format" must be 4']);
+    expect(parseClockDraft("f", text({ ...draft(), game_id: "ofbeat", date: "2026-02-30" })).errors).toEqual([
+      'f: "game_id" must be "offbeat"',
+      'f: "date" must be a calendar date YYYY-MM-DD',
+    ]);
   });
 
   it("refuses a file with a missing or unknown field, a bad id or a bad tier", () => {
@@ -172,7 +110,7 @@ describe("a drafted day on a clock", () => {
     expect(checkClockDay("d", draft([question(0), question(1, { size: 0 }), question(2)]) as ClockDraft)).toEqual(['d q2: "size" must be a positive integer']);
   });
 
-  it("holds a file to its path, as a day of seven questions is", () => {
-    expect(checkDayFile("offbeat/2026-12-02.json", text(draft()))).toEqual(["offbeat/2026-12-02.json: path must be offbeat/2026-12-01.json to match its game_id and date"]);
+  it("holds a file to its path", () => {
+    expect(checkDraftFile("offbeat/2026-12-02.json", text(draft()))).toEqual(["offbeat/2026-12-02.json: path must be offbeat/2026-12-01.json to match its game_id and date"]);
   });
 });

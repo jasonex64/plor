@@ -7,7 +7,7 @@
 // Average too, 30 over two game-days to 0; the board says under it that Offbeat joins once its typical score is known.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { fixtureDay } from "../src/test/answer-fixture";
+import { fixtureClockDay } from "../src/test/answer-fixture";
 import { RUN, signInAndPick } from "./players";
 import { localStack } from "../scripts/slot.ts";
 
@@ -22,7 +22,7 @@ test.beforeAll(async () => {
   days = [rows[0].thursday, rows[0].friday];
   // The days are this file's own: an existing day fails the insert.
   for (const date of days) {
-    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [date, fixtureDay(date, `${date}T00:00:00Z`)]);
+    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [date, fixtureClockDay(date, `${date}T00:00:00Z`)]);
     await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2)", [
       date,
       { format: 1, game_id: "substrings", date, rounds: ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"], bonus_letter: "j" },

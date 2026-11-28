@@ -1,10 +1,10 @@
 import { createAuthClient, currentUserId, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
-import { isAdmin } from "@/insights/queries";
+import { isAdmin } from "@/admin/is-admin";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { createProfile, getProfile } from "@/lib/profile";
 import { getStreak } from "@/game/streak";
-import { msToReset } from "@/game/runs";
+import { msToReset } from "@/game/run-shared";
 import { STATUS } from "@/lib/status";
 
 // Who is signed in, whether they have picked a username yet, and whether they're an admin, for the sidebar's Admin

@@ -53,7 +53,8 @@ test("the result comes into view when Result is tapped, and not again by itself 
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Result" }).click();
   const result = page.locator("#result");
   await expect(result).toBeInViewport();
-  await expect(page).toHaveURL(/\/play$/);
+  // The clock bar's Result link goes to the result's address, which stays in the address bar.
+  await expect(page).toHaveURL(/\/play#result$/);
 
   // Scrolled back up, away and back: the game page shown again stays where it was.
   await page.evaluate(() => window.scrollTo(0, 0));

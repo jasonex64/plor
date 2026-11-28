@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { expect, type Locator, type Page } from "@playwright/test";
 import { GAME } from "../src/platform/game";
+import { finishClockRun } from "./game";
 import { localStack } from "../scripts/slot.ts";
 
 const MAILPIT = localStack().mailpitUrl;
@@ -92,6 +93,15 @@ export async function play(page: Page): Promise<void> {
   await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play", exact: true }).click();
   await expect(page).toHaveURL(/\/play$/);
   await page.getByRole("button", { name: "Start", exact: true }).click();
+}
+
+// From Today, a whole run on a clock: Play, Start, then question 1 to the result (finishClockRun), giving `onFirst` on question 1. With
+// no answer the run scores 0 points, the points of the tests that only need a finished run.
+export async function playToEnd(page: Page, onFirst: string[] = []): Promise<void> {
+  await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play", exact: true }).click();
+  await expect(page).toHaveURL(/\/play$/);
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await finishClockRun(page, onFirst);
 }
 
 // Makes two signed-in players friends on the screens: one sends a friend request from the other's profile, who

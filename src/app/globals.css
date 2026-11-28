@@ -21,8 +21,6 @@
   /* A question's outcome on the game screen: Safe and Caught pills, text on its own tint (round 5's mockup). */
   --safe: #14532d;
   --safe-bg: #e3f4ea;
-  --caught: #8a1c26;
-  --caught-bg: #fbe4e6;
   /* Me's calendar: a played day shaded in four steps of questions survived (M14 L46), the accent at rising strength from
      the lightest that reaches 3:1 on the card, in even steps (human, 2026-10-25: "Use these (Recommended)";
      docs/milestones/M14-14a-3b-settings.md). */
@@ -58,8 +56,6 @@
     --soft-strong: #7ea6ff4d;
     --safe: #9be3b4;
     --safe-bg: #1f3b2a;
-    --caught: #ffb3b8;
-    --caught-bg: #4a1f24;
     --shade-1: #7ea6ff8a;
     --shade-2: #7ea6ffb1;
     --shade-3: #7ea6ffd8;
@@ -82,8 +78,6 @@
   --soft-strong: #7ea6ff4d;
   --safe: #9be3b4;
   --safe-bg: #1f3b2a;
-  --caught: #ffb3b8;
-  --caught-bg: #4a1f24;
   --shade-1: #7ea6ff8a;
   --shade-2: #7ea6ffb1;
   --shade-3: #7ea6ffd8;
@@ -109,8 +103,6 @@
   --soft-strong: #1f5fbf33;
   --safe: #14532d;
   --safe-bg: #e3f4ea;
-  --caught: #8a1c26;
-  --caught-bg: #fbe4e6;
   --shade-1: #1f5fbfa7;
   --shade-2: #1f5fbfc4;
   --shade-3: #1f5fbfe2;
@@ -134,8 +126,6 @@
   --soft-strong: #9ccfd840;
   --safe: #9be3b4;
   --safe-bg: #1f3b2a;
-  --caught: #ffb3b8;
-  --caught-bg: #4a1f24;
   --shade-1: #9ccfd872;
   --shade-2: #9ccfd8a1;
   --shade-3: #9ccfd8d0;
@@ -157,8 +147,6 @@
   --soft-strong: #ffd84d4d;
   --safe: #9be3b4;
   --safe-bg: #1f3b2a;
-  --caught: #ffb3b8;
-  --caught-bg: #4a1f24;
   --shade-1: #ffd84d65;
   --shade-2: #ffd84d98;
   --shade-3: #ffd84dcc;

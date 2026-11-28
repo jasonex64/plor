@@ -5,11 +5,11 @@
 // read again at the daily reset and Me after a time-up.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
+import { answerBox, countdown, expectCountdown, fillScale, finishClockRun } from "./game";
 import { GAME } from "../src/platform/game";
-import { RUN, play, signInAndPick, befriend } from "./players";
-import { answerBox, caughtToCards, countdown, expectCountdown, fillScale } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, play, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -41,8 +41,7 @@ const slot = (page: Page, name: string, property = "color") =>
 
 async function caught(page: Page) {
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await expect(page.locator("#result")).toBeVisible();
 }
 
@@ -298,8 +297,7 @@ test("the game screen's feed keeps the day it shows across Start and the run", a
   await expect(earlier).toBeVisible();
   const shown = await earlier.textContent();
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toBeVisible();
+  await finishClockRun(page);
   await expect(page.getByRole("heading", { level: 2, name: shown! })).toBeVisible();
 });
 

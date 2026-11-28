@@ -1,6 +1,6 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
 // with emailed codes, become friends by a friend request, and one sees the other start without reloading, and
-// nothing more until their own run is over (M12 12d).
+// the run's question and points as it goes, whether or not the watcher has played (M23 answer 47).
 // Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked once both have played.
 // The board is on the Friends tab and the game and the feed on Today (docs/milestones/M14-14a-1-shell.md), so the
 // players move between them. A second test restarts Realtime and checks that the page refetches the board with
@@ -8,19 +8,16 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, sent, signInAndPick, befriend, openBoard } from "./players";
-import { answerBox, caughtToCards, next, safe } from "./game";
+import { answerBox, finishClockRun } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { currentSlot, localStack } from "../scripts/slot.ts";
+import { RUN, play, sent, signInAndPick, befriend, openBoard, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
-let hostAnswer = "";
-let safeAnswer = "";
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
-  ({ hostAnswer, safeAnswer } = puzzle);
 });
 
 test.afterAll(async () => {
@@ -58,13 +55,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[playerName, watcherName]]);
 
   await openBoard(watcher);
-  // The plain list of friends, not the lists inside "where everyone ended".
+  // The plain list of friends, not the lists inside a row.
   const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
   await expect(row).toHaveText(`${playerName}: Not yet`);
 
-  // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
-  // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
-  const started = `${playerName}: started (you'll see how it's going once you finish)`;
+  // The player starts; the watcher's page shows the question and points without a reload, though the watcher hasn't played.
+  const started = `${playerName}: Question 1 of 3 · 0 points`;
   await player.goto("/");
   await play(player);
   await expect(row).toHaveText(started);
@@ -72,25 +68,16 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const status = row.locator("span[class*='status']");
   expect(await status.evaluate((el) => [/fade/.test(getComputedStyle(el).animationName), getComputedStyle(el).animationDuration])).toEqual([true, "0.4s"]);
   expect(await row.locator("a[class*='name']").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
-  await caughtToCards(player, hostAnswer);
-  await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
-  // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
-  // wherever it goes, and the watcher's frames hold only the start.
+  await finishClockRun(player);
+  await expect(player.getByText("0 points", { exact: true })).toBeVisible();
+  // The board as the server gives it: the run is over, with its points.
   await openBoard(watcher);
-  await expect(row).toHaveText(started);
-  const statuses = framesOf.get(watcher)!.filter((f) => f.includes("friend_status") && f.includes(playerName));
-  expect(statuses).toHaveLength(1);
-  expect(statuses[0]).toMatch(/"state": ?"started"/);
+  await expect(row).toHaveText(`${playerName}: 0 points`);
 
-  // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
-  // (7d): the watcher first, then the friend, with the full list behind the row.
+  // Once the watcher has played too, the friend's row can be reacted to.
   await watcher.goto("/");
-  await play(watcher);
-  await caughtToCards(watcher, hostAnswer);
-  // Caught on question 1: no survived answers, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
-  await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points.")).toBeVisible();
-  // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
-  await expect(watcher.getByText(/too few players yet$/)).toBeVisible();
+  await playToEnd(watcher);
+  await expect(watcher.getByText("0 points", { exact: true })).toBeVisible();
   // The streak's pill: today is the watcher's first day (M11 H4), the first rank's
   // (docs/milestones/M14-14b-2a-streak-ranks.md).
   await watcher.goto("/");
@@ -114,7 +101,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   ]);
   // The row ends with its ⋯ for reacting (M08 8b; 14b-13), which appears only now that the watcher has finished.
   const more = row.getByRole("button", { name: `React to ${playerName}'s run` });
-  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
+  await expect(row).toHaveText(`${playerName}: 0 points`);
   await expect(more).toBeVisible();
   // Hidden until the row is hovered, anywhere on it, not only over the ⋯'s own cell (inbox #270).
   const opacity = () => more.evaluate((el) => getComputedStyle(el).opacity);
@@ -128,7 +115,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Measured once the row has laid out again at the new width: straight after the resize it can still be the old one
   // (it failed twice that way, in PR #149's and #152's CI).
   await watcher.setViewportSize({ width: 390, height: 844 });
-  const chip = row.getByText(/^caught on/);
+  const chip = row.getByText("0 points", { exact: true });
   await expect
     .poll(async () => {
       const [dots, name] = [(await more.boundingBox())!, (await row.locator("a[class*='name']").boundingBox())!];
@@ -141,16 +128,6 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
       return box.x - (dots.x + dots.width);
     })
     .toBeGreaterThanOrEqual(0);
-  // Each row opens by a 44px summary, at both widths (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4).
-  const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
-  expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  await watcher.setViewportSize({ width: 1280, height: 720 });
-  await expect(place).toHaveCount(1);
-  expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  await expect(place.locator("summary")).toHaveText(`Caught on question 1: You, ${playerName}`);
-  await place.locator("summary").click();
-  await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
-
   // The watcher reacts to the friend's run by tapping (M08 8b): another emoji replaces the first, and the same one
   // again removes it. The player's open board shows each change without a reload (8d).
   await openBoard(player);
@@ -247,20 +224,6 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   expect(received).toContain("run_reactions_changed");
   expect(received).not.toContain(body);
   expect(received).not.toContain(kept);
-});
-
-// After a safe answer, the reveal shows the points it earned and the points so far, and the next question's card keeps
-// the points so far (M09 9a; docs/milestones/M14-14c-8-plain-game-1.md). The numbers themselves are the route test's
-// (src/game/runs.db.test.ts); this checks the page shows them.
-test("the reveal shows a safe answer's points, and the next question the points so far", async ({ browser }) => {
-  const page = await (await browser.newContext()).newPage();
-  await page.goto("/");
-  await signInAndPick(page, "s");
-  await play(page);
-  await safe(page, safeAnswer);
-  await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
-  await next(page, "Name a fruit");
-  await expect(page.getByText("25 points so far", { exact: true })).toBeVisible();
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted

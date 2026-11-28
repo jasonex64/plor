@@ -128,7 +128,7 @@ test("signed-in Today: no introduction, the banner's own chips, and no words abo
   await page.goto("/");
   await signInAndPick(page, "lt");
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
-  const chip = banner.getByText("7 questions", { exact: true });
+  const chip = banner.getByText("3 questions", { exact: true });
   await expect(chip).toBeVisible();
   await expect(page.getByText("Plor is a small site with two daily word games.")).toBeHidden();
   const color = await ink(page);
@@ -206,11 +206,11 @@ test("the admin area's current sub-tab, a card and the rail's warning, in the ki
   await page.goto("/");
   await signInAndPick(page, "la");
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-la@example.test`]);
-  await page.goto("/admin/insights");
+  await page.goto("/admin/lists");
   const color = await ink(page);
-  const tab = page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: "Insights" });
+  const tab = page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: "Lists" });
   expect(await look(tab)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
-  const card = page.getByRole("region", { name: "Caught per question" });
+  const card = page.getByRole("region", { name: "Researched questions" });
   await expect(card).toBeVisible();
   expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
   const { what } = await tomorrowWarning(DB);

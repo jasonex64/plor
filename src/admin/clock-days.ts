@@ -3,7 +3,7 @@
 // list comes from here, built by the one function the draft uses (src/content/clock-day.ts); the page never works from a list it
 // holds itself. The routes check the admin first; private.build_puzzle checks again.
 import { approvedDays, buildChecked, pickLists, rankLists, whenText, type ClockPick, type ClockSource, type UseDay } from "@/content/clock-day";
-import { CATEGORY_KEY, type ClockDraft, type DraftedDay } from "@/content/puzzle";
+import { CATEGORY_KEY, type ClockDraft } from "@/content/puzzle";
 import { QUESTIONS_PER_CLOCK_DAY } from "@/config/tunables";
 import { shownName, thingNames } from "@/game/payload";
 import type { Db } from "@/lib/db";
@@ -24,7 +24,7 @@ export type ClockSides = { draft: ClockDayView | null; live: ClockQuestionView[]
 // What a day is built from, and the days already asked, read once for a request.
 export type ClockContext = { source: ClockSource; used: UseDay[] };
 
-export async function clockContext(db: Db, adminId: string, drafts: Map<string, DraftedDay>): Promise<ClockContext> {
+export async function clockContext(db: Db, adminId: string, drafts: Map<string, ClockDraft>): Promise<ClockContext> {
   const source: ClockSource = { lists: readLists(), edits: (await readReview(db, adminId)).edits, prompts: promptsOf() };
   // Every day asked so far, approved or drafted, for when each list last appeared.
   return { source, used: [...(await approvedDays(db)), ...drafts.values()] };

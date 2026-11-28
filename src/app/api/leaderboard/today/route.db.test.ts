@@ -3,8 +3,8 @@
 // routes, so each score is checked against what the player's own result screen was given. Fragments' runs use a few
 // words of this file's own, as the real list isn't in git. P only starts Fragments: a Fragments run between rounds stays
 // in progress whatever its clock says, so P stays "playing" however long the file takes. Overall counts only the games
-// with a par, which is Fragments alone while Offbeat has none (M23 23f-2, answer 60). The last test turns today's Offbeat
-// day into one on a clock, and plays it.
+// with a par, which is Fragments alone while Offbeat has none (M23 23f-2, answer 60). Today's Offbeat day is the fixture's day on a
+// clock, which scores a run by the points of its answers: a common answer 10, an uncommon one 25.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -15,14 +15,12 @@ import { POST as fragmentsNext } from "@/app/api/substrings/next/route";
 import { POST as startFragments } from "@/app/api/substrings/start/route";
 import { POST as tryWord } from "@/app/api/substrings/try/route";
 import { PAR_POINTS } from "@/config/tunables";
-import type { ApprovedPuzzle } from "@/content/puzzle";
 import { parScore, scoreAverage, scoreTotal } from "@/game/par";
 import { scoreRun } from "@/game/substring-scoring";
 import { getPool } from "@/lib/db";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { fixtureClockDay, loadFixtureBase } from "@/test/answer-fixture";
-import { ensurePuzzle, hostName, removeFixtures, safeEntry, typeableName } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as todayRoute } from "./route";
 
@@ -36,9 +34,8 @@ type Player = { username: string; userId: string; session: Map<string, string> }
 const player = (tag: string): Player => ({ username: `${tag}${RUN}`, userId: "", session: new Map() });
 const [V, F, P, S, X] = ["tv", "tf", "tp", "ts", "tx"].map(player);
 let today = "";
-let puzzle: ApprovedPuzzle;
 let club = "";
-// What each player's result screen was given for their Offbeat run: points + bonus.
+// What each player's result screen was given for their Offbeat run: its points.
 const shown = new Map<string, number>();
 
 async function call(response: Promise<Response>) {
@@ -60,14 +57,22 @@ async function answer(index: number, text: string) {
   expect(r.status).toBe(200);
   return r.body.run;
 }
-// Survives question 1, then is caught on question 2: a score with a ladder and a bonus.
-async function playOffbeat(who: Player) {
+// Starts the run, gives each of these texts to its question, goes on to the last question and Finishes.
+async function playOffbeat(who: Player, texts: string[]) {
   expect((await call(startOffbeat(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
-  await answer(0, typeableName(puzzle, 0, safeEntry(puzzle, 0))!);
-  expect((await call(offbeatNext(apiRequest("/api/run/next", { method: "POST" })))).status).toBe(200);
-  const run = await answer(1, hostName(puzzle, 1));
-  expect(run.status).toBe("died");
-  shown.set(who.username, run.points + run.bonus);
+  let run;
+  for (const [index, text] of texts.entries()) {
+    if (index > 0) expect((await call(offbeatNext(apiRequest("/api/run/next", { method: "POST", body: { index: index - 1 } })))).status).toBe(200);
+    run = await answer(index, text);
+  }
+  for (let index = texts.length - 1; index < 2; index++) {
+    expect((await call(offbeatNext(apiRequest("/api/run/next", { method: "POST", body: { index } })))).status).toBe(200);
+  }
+  const finished = await call(finishRoute(apiRequest("/api/run/finish", { method: "POST" })));
+  expect(finished.status).toBe(200);
+  expect(finished.body.run.status).toBe("over");
+  shown.set(who.username, finished.body.run.points);
+  return run;
 }
 async function playFragments() {
   expect((await call(startFragments(apiRequest("/api/substrings/start", { method: "POST" })))).status).toBe(200);
@@ -84,7 +89,7 @@ beforeAll(async () => {
   useLocalStack();
   const db = getPool();
   today = (await db.query<{ d: string }>("select private.today()::text as d")).rows[0].d;
-  puzzle = await ensurePuzzle(today);
+  await ensurePuzzle(today);
   await db.query("insert into private.dictionary_word (word_key, spelling, plain, everyday) select w, w, w, true from unnest($1::text[]) as w on conflict do nothing", [WORDS]);
 });
 
@@ -127,7 +132,7 @@ describe("today's board", () => {
 
   it("is closed, with no score and no one's state, until the viewer has finished", async () => {
     useSession(F.session);
-    await playOffbeat(F);
+    await playOffbeat(F, ["cat", "apple"]);
     useSession(V.session);
     const closed = await board(GAME_ID);
     expect(closed).toEqual({ date: today, games: [GAME_ID], open: false, entries: [], rest: [] });
@@ -137,17 +142,15 @@ describe("today's board", () => {
 
   it("opens once the viewer has finished: finished players ranked with their result screen's score, then the rest", async () => {
     useSession(V.session);
-    await playOffbeat(V);
+    await playOffbeat(V, ["dog"]);
     const open = await board(GAME_ID);
     expect(open.open).toBe(true);
-    // Both played the same answers, so they tie: alphabetically by name.
-    expect(rows(open)).toEqual(
-      [
-        [F.username, shown.get(F.username), false],
-        [V.username, shown.get(V.username), true],
-      ].sort((a, b) => (b[1] as number) - (a[1] as number) || String(a[0]).localeCompare(String(b[0]))),
-    );
-    expect(shown.get(V.username)).toBeGreaterThan(0);
+    // F: cat (uncommon, 25) and apple (common, 10); V: dog (common, 10).
+    expect([shown.get(F.username), shown.get(V.username)]).toEqual([35, 10]);
+    expect(rows(open)).toEqual([
+      [F.username, 35, false],
+      [V.username, 10, true],
+    ]);
     // A friend who hasn't played; never a stranger.
     expect(waiting(open)).toEqual([[P.username, "not_played"]]);
     expect(JSON.stringify(open)).not.toContain(X.username);
@@ -204,43 +207,11 @@ describe("today's board", () => {
 
     // S played Offbeat only, which is no part of Overall: on the group's Overall still to play Fragments.
     useSession(S.session);
-    await playOffbeat(S);
+    await playOffbeat(S, ["dog"]);
     useSession(V.session);
     const group = await board("overall", club);
     expect(rows(group)).toEqual([[V.username, scoreTotal([fragmentsPar]), true]]);
     expect(waiting(group)).toEqual([[S.username, "not_played"]]);
-  });
-
-  // A day on a clock has no result screen with a ladder and a bonus: a finished run's score is the points of its
-  // answers (23f-2, design 4). Today's fixture day is replaced by one, after the runs on it are deleted (a started
-  // day can't change); F and V play it for real, P never started it.
-  it("gives a finished player's run on a clock its points, and not 0", async () => {
-    const db = getPool();
-    await db.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
-    await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
-    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, today, fixtureClockDay(today, await loadFixtureBase(db))]);
-    const post = (route: (r: Request) => Promise<Response>, path: string, body?: unknown) => call(route(apiRequest(path, { method: "POST", body })));
-    // F: cat, uncommon, 25 points, then apple, common, 10: 35. V: dog, common, 10.
-    useSession(F.session);
-    expect((await post(startOffbeat, "/api/run/start")).status).toBe(200);
-    expect((await post(answerRoute, "/api/run/answer", { index: 0, text: "cat" })).body.run.points).toBe(25);
-    expect((await post(offbeatNext, "/api/run/next", { index: 0 })).status).toBe(200);
-    expect((await post(answerRoute, "/api/run/answer", { index: 1, text: "apple" })).body.run.points).toBe(35);
-    expect((await post(offbeatNext, "/api/run/next", { index: 1 })).status).toBe(200);
-    expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
-    useSession(V.session);
-    expect((await post(startOffbeat, "/api/run/start")).status).toBe(200);
-    expect((await post(answerRoute, "/api/run/answer", { index: 0, text: "dog" })).body.run.points).toBe(10);
-    expect((await post(offbeatNext, "/api/run/next", { index: 0 })).status).toBe(200);
-    expect((await post(offbeatNext, "/api/run/next", { index: 1 })).status).toBe(200);
-    expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
-
-    const open = await board(GAME_ID);
-    expect(rows(open)).toEqual([
-      [F.username, 35, false],
-      [V.username, 10, true],
-    ]);
-    expect(waiting(open)).toEqual([[P.username, "not_played"]]);
   });
 
   it("writes no ledger row for today", async () => {

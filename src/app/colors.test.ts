@@ -90,7 +90,7 @@ describe("Fragments' colour", () => {
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {
-    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "danger", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "soft-strong", "surface", "text"]);
+    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "danger", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "soft-strong", "surface", "text"]);
   });
 
   it.each([
@@ -101,9 +101,8 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     ["accent", "bg"],
     ["accent", "surface"],
     ["on-accent", "accent"],
-    // The game screen's Safe and Caught pills (docs/milestones/M14-14a-2b-game-screen.md).
+    // The Safe chip (docs/milestones/M14-14a-2b-game-screen.md).
     ["safe", "safe-bg"],
-    ["caught", "caught-bg"],
     // Delete account in the settings sheet, which sits on the background, its button on a card.
     ["danger", "bg"],
     ["danger", "surface"],
@@ -137,18 +136,13 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
   });
 
   // The admin pages (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 7): Delete's confirm button, text on the
-  // danger colour; the insights chart's bars (muted, and caught for the dip) and its target line (accent) as graphics
-  // on the card (1.4.11), and the dip's words in the caught colour as text.
+  // danger colour; the points chart's bars (accent) as graphics on the card (1.4.11).
   it("on-accent on the danger colour is at least 4.5:1", () => {
     expect(ratio(rgb(t["on-accent"]), rgb(t.danger))).toBeGreaterThanOrEqual(4.5);
   });
 
-  it.each(["muted", "caught", "accent"])("the chart's %s on the surface is at least 3:1", (fg) => {
-    expect(ratio(rgb(t[fg]), rgb(t.surface))).toBeGreaterThanOrEqual(3);
-  });
-
-  it("the caught colour as text on the surface is at least 4.5:1", () => {
-    expect(ratio(rgb(t.caught), rgb(t.surface))).toBeGreaterThanOrEqual(4.5);
+  it("the points chart's accent on the surface is at least 3:1", () => {
+    expect(ratio(rgb(t.accent), rgb(t.surface))).toBeGreaterThanOrEqual(3);
   });
 
   // Also the other players' lines on the leaderboard graph, on its card (docs/milestones/M14-14b-14-leaderboard-graph.md).

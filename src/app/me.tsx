@@ -1,7 +1,7 @@
 "use client";
 
 // The Me tab's stats (docs/milestones/M14-14a-3a-me.md; L45): the player's header, totals across games, this month's
-// calendar of days played, a card per game and the rarest answers, laid out from round 7's Me boards. The account is
+// calendar of days played and a card per game, laid out from round 7's Me boards. The account is
 // in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 import { ButtonLink } from "./button-link";
 import { useEffect, useState, type ReactNode } from "react";
@@ -10,7 +10,6 @@ import type { Stats } from "@/game/offbeat";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { Emblem } from "./emblem";
-import { givenText } from "./given";
 import { errorText } from "./messages";
 import kit from "./kit.module.css";
 import { CountUp } from "./count-up";
@@ -47,11 +46,11 @@ export function MeStats({ timeUps }: { timeUps: number }) {
         </div>
       </Skeleton>
     );
-  return <StatsCards own name={me.username} since={me.since} totals={me.totals} offbeat={me.offbeat} fragments={me.fragments} month={me.month} rarest={me.rarest} />;
+  return <StatsCards own name={me.username} since={me.since} totals={me.totals} offbeat={me.offbeat} fragments={me.fragments} month={me.month} />;
 }
 
 // A player's stats as cards: the Me tab's (own), and another player's profile, which shows what Me shows
-// (docs/milestones/M17-profiles-and-friend-requests.md, 17b, E4). A stranger's profile has no since, month or rarest
+// (docs/milestones/M17-profiles-and-friend-requests.md, 17b, E4). A stranger's profile has no since or month
 // (answer 4, E7); a friend's also has recent, the last days' chart (E3). username: shown when the name is a display
 // name. children: the profile's actions, under the header. Only your own numbers count up and link to the game.
 // fragments: Fragments' card, which only Me has: game 2 isn't on another player's profile yet (DECISIONS.md, Log
@@ -65,11 +64,10 @@ export function StatsCards({
   offbeat,
   fragments,
   month,
-  rarest,
   recent,
   children,
 }: Pick<Me, "totals" | "offbeat"> &
-  Partial<Pick<Me, "since" | "month" | "rarest" | "fragments">> & { own?: boolean; name: string; username?: string; recent?: Stats["days"]; children?: ReactNode }) {
+  Partial<Pick<Me, "since" | "month" | "fragments">> & { own?: boolean; name: string; username?: string; recent?: Stats["days"]; children?: ReactNode }) {
   const count = (key: string, value: number) => (own ? <CountUp name={key} value={value} /> : value.toLocaleString("en-US"));
   const me = { totals, offbeat };
   return (
@@ -133,36 +131,7 @@ export function StatsCards({
           </ButtonLink>
         </section>
       )}
-      {rarest && <Rarest title={own ? "Your rarest answers" : "Rarest answers"} rarest={rarest} />}
     </div>
-  );
-}
-
-function Rarest({ title, rarest }: { title: string; rarest: Me["rarest"] }) {
-  return (
-    <section aria-label={title} className={kit.card}>
-      <h2>{title}</h2>
-      {rarest.length === 0 ? (
-        <p className={styles.muted}>None yet. Answers show here once their day is over and enough players have answered.</p>
-      ) : (
-        <ol className={kit.rows}>
-          {rarest.map((r, i) => (
-            <li key={`${r.date} ${r.prompt}`} className={kit.row}>
-              {/* The place as mockup 3's badge, drawn by CSS: the list's order says it (kit.module.css). */}
-              <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
-              <span className={`${kit.grow} ${styles.rare}`}>
-                {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
-                    docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
-                <strong>{r.answer.name}</strong>{" "}
-                <span className={styles.muted}>
-                  {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
-    </section>
   );
 }
 

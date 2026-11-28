@@ -1,10 +1,10 @@
-// Puzzle content format 3 and its validator (DECISIONS.md: Puzzle content format, Answer model; M00-data-design.md
-// §4; docs/milestones/M13-13a-the-base.md, "13a-2 and 13a-3"). A day names each question's category in the answer
-// database instead of listing its answers; the server resolves typed text against the base as of the day's approval
-// (src/game/matching.ts). Hand-written checks, no schema library (human, 2026-10-18). The server imports this same
-// module, so content is checked one way.
+// Puzzle content format 4, a day on a clock, and its validator (DECISIONS.md: Puzzle content format, Answer model;
+// M00-data-design.md §4; docs/milestones/M13-13a-the-base.md, "13a-2 and 13a-3"). A day names each question's category in the
+// answer database instead of listing its answers; the server resolves typed text against the base as of the day's approval
+// (src/game/matching.ts). Hand-written checks, no schema library (human, 2026-10-18). The server imports this same module,
+// so content is checked one way.
 import { GAME_ID } from "../platform/game.ts";
-import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_CLOCK_DAY, QUESTIONS_PER_DAY, RARE_PER_CLOCK_QUESTION } from "../config/tunables.ts";
+import { QUESTIONS_PER_CLOCK_DAY, RARE_PER_CLOCK_QUESTION } from "../config/tunables.ts";
 
 // The drafting session's first guess at how many players give an answer (M13 D5). Members it doesn't name are rare.
 export type Level = "common" | "uncommon";
@@ -13,35 +13,9 @@ export type Tier = Level | "rare";
 export const tierOf = (levels: Record<string, Level>, id: string): Tier => levels[id] ?? "rare";
 
 // Thing IDs are the answer database's permanent IDs (M13 D3).
-export type Question = {
-  prompt: string;
-  // The category key (private.category) whose members the question accepts.
-  category: string;
-  // The few most common answers, which the provisional bonus treats as the common tier (M09 D11 b) until 13c.
-  host_bank: string[];
-  host_answers: string[];
-  levels: Record<string, Level>;
-  // The letter taken at this question (M04 13c-3). It stays gone for the rest of the run.
-  steals?: string;
-};
-export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] }; // docs/DECISIONS.md, Puzzle content format
-
-// A day as approval builds it (private.build_puzzle): per question the category's root and member_of as approved, its
-// member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md, Puzzle content format). The stored day
-// also holds approved_at, which only SQL reads, so it's left out here and a draft built for a test run is one too
-// (docs/milestones/M14-14b-11-test-runs.md).
-export type Where = { trait: string; values: string[]; via?: "country" } | { number: "population"; at_least: number } | { starts_with: string };
-// members is the category's member count at approval, the rare tier's size in the bonus's first guess (scoring.ts),
-// not the answers the day accepts, which are fixed at the day's start (13b review; 13f-4c; counting it at approval is
-// For M15, with the rare tier).
-export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number; where?: Where };
-export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[] };
-
 // A day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md), as the run reads it once approved: three
 // questions, each with its category, root and tiers (`levels`: common or uncommon by answer, rare for every other
-// member). No host answers and no taken letters. Drafting and approving one is 23e, so there is no draft type here yet,
-// only the check on what the result reads (checkClockPuzzle); approved_at, which only SQL reads, is left out as in
-// ApprovedPuzzle.
+// member). The stored day also holds approved_at, which only SQL reads, so it is left out here.
 // rare: RARE_PER_CLOCK_QUESTION rare answers in an order picked when the day is drafted, which the result shows first
 // to last, skipping the ones the player gave (answers 48 and 49: no granted function lists a category's members for a
 // player). size: the list's count of answers when drafted, for the result's "and N more" (docs/milestones/M23-23d-the-screens.md,
@@ -57,25 +31,10 @@ export type ClockQuestion = {
 };
 export const CLOCK_FORMAT = 4; // docs/milestones/M23-23c-the-run-on-a-clock.md, Design (a day is on a clock by its format)
 export type ClockPuzzle = { format: typeof CLOCK_FORMAT; game_id: typeof GAME_ID; date: string; questions: ClockQuestion[] };
-// A day on a clock as it is drafted (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1), in content/offbeat/<date>.json
-// and in the approve request's building: as the run reads it, but for the root and member_of, which approval adds
-// (private.build_puzzle) as it does for a day of seven questions.
+// A day as it is drafted (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1), in content/offbeat/<date>.json and in the
+// approve request's building: as the run reads it, but for the root and member_of, which approval adds (private.build_puzzle).
 export type ClockDraftQuestion = Omit<ClockQuestion, "root" | "member_of">;
 export type ClockDraft = { format: typeof CLOCK_FORMAT; game_id: typeof GAME_ID; date: string; questions: ClockDraftQuestion[] };
-// A day as a file under content/offbeat holds it: seven questions (format 3) or a clock's three (format 4).
-export type DraftedDay = Puzzle | ClockDraft;
-export const isClockDay = (day: DraftedDay): day is ClockDraft => day.format === CLOCK_FORMAT;
-
-// The letters gone by question `index`: every letter stolen at it or before it.
-export function stolenLetters(puzzle: Pick<Puzzle, "questions">, index: number): string[] {
-  return puzzle.questions.slice(0, index + 1).flatMap((q) => (q.steals ? [q.steals] : []));
-}
-
-// Whether a name can be typed without the stolen letters, compared after normalization.
-export function avoids(name: string, stolen: string[]): boolean {
-  const text = normalize(name);
-  return !stolen.some((letter) => text.includes(letter));
-}
 
 // Normalization of names and typed text (human-approved format, 2026-10-18; SOURCES.md: Unicode normalization).
 // Lowercase first: lowercasing can produce combining marks (e.g. U+0130), which NFKD + \p{M} then remove.
@@ -128,126 +87,11 @@ export function isCalendarDate(v: unknown): v is string {
   return !Number.isNaN(d.getTime()) && d.toISOString().split("T")[0] === v;
 }
 
-function checkQuestion(errors: string[], where: string, v: unknown) {
-  if (!isObject(v)) {
-    errors.push(`${where}: must be an object`);
-    return;
-  }
-  checkKeys(errors, where, v, ["prompt", "category", "host_bank", "host_answers", "levels"], ["steals"]);
-  if ("prompt" in v && !isText(v.prompt)) errors.push(`${where}: "prompt" must be a non-empty string`);
-  if ("category" in v && (typeof v.category !== "string" || !CATEGORY_KEY.test(v.category))) {
-    errors.push(`${where}: "category" must be a category key (lower-case letters and _)`);
-  }
-  if ("steals" in v && (typeof v.steals !== "string" || !/^[a-z]$/.test(v.steals))) errors.push(`${where}: "steals" must be one lower-case letter a-z`);
-  for (const key of ["host_bank", "host_answers"]) {
-    if (key in v && !isThingIdList(v[key])) errors.push(`${where}: "${key}" must be a list of thing IDs`);
-  }
-  if ("levels" in v) {
-    const levels = v.levels;
-    if (!isObject(levels) || !Object.entries(levels).every(([id, level]) => UUID.test(id) && (level === "common" || level === "uncommon"))) {
-      errors.push(`${where}: "levels" must map thing IDs to "common" or "uncommon"`);
-    }
-  }
-}
-
-// Shape only: types, required and unknown fields. The rules between fields are checked in checkPuzzle; membership in
-// the base, when the day is approved (private.approve_puzzle).
-export function parsePuzzle(file: string, text: string): { puzzle: Puzzle; errors: [] } | { puzzle: null; errors: string[] } {
-  let data: unknown;
-  try {
-    data = JSON.parse(text);
-  } catch (err) {
-    return { puzzle: null, errors: [`${file}: not valid JSON (${(err as Error).message})`] };
-  }
-  if (!isObject(data)) return { puzzle: null, errors: [`${file}: must be a JSON object`] };
-  const errors: string[] = [];
-  checkKeys(errors, file, data, ["format", "game_id", "date", "questions"]);
-  if ("format" in data && data.format !== 3) errors.push(`${file}: "format" must be 3`); // docs/DECISIONS.md, Puzzle content format
-  if ("game_id" in data && data.game_id !== GAME_ID) errors.push(`${file}: "game_id" must be "${GAME_ID}"`);
-  if ("date" in data && !isCalendarDate(data.date)) errors.push(`${file}: "date" must be a calendar date YYYY-MM-DD`);
-  if ("questions" in data) {
-    if (!Array.isArray(data.questions)) errors.push(`${file}: "questions" must be a list`);
-    else data.questions.forEach((q, i) => checkQuestion(errors, `${file} q${i + 1}`, q));
-  }
-  return errors.length ? { puzzle: null, errors } : { puzzle: data as Puzzle, errors: [] };
-}
-
-// --- rules between fields ---
-
 function duplicates(ids: string[]): string[] {
   return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
 }
 
-// hosts: how many host answers the question's position takes (HOST_ANSWERS_PER_QUESTION), undefined past the 7th.
-function checkQuestionRules(where: string, q: Question, hosts: number | undefined): string[] {
-  const errors: string[] = [];
-  for (const id of duplicates(q.host_bank)) errors.push(`${where} thing "${id}": listed twice in host_bank`);
-  if (hosts !== undefined && q.host_answers.length !== hosts) errors.push(`${where}: has ${q.host_answers.length} host answers, expected ${hosts}`);
-  for (const id of duplicates(q.host_answers)) errors.push(`${where} thing "${id}": listed twice in host_answers`);
-  const bank = new Set(q.host_bank);
-  for (const id of q.host_answers) {
-    if (!bank.has(id)) errors.push(`${where} thing "${id}": host answer is not in host_bank`);
-  }
-  return errors;
-}
-
-// `file` is the path relative to the content root, with "/" separators: `<game_id>/<date>.json`.
-export function checkPuzzleFile(file: string, text: string): string[] {
-  const { puzzle, errors } = parsePuzzle(file, text);
-  if (!puzzle) return errors;
-  const out: string[] = [];
-  // The path is the puzzle's identity, so two files can never claim the same day (human, 2026-10-18).
-  const expected = `${puzzle.game_id}/${puzzle.date}.json`;
-  if (file !== expected) out.push(`${file}: path must be ${expected} to match its game_id and date`);
-  return [...out, ...checkPuzzle(file, puzzle)];
-}
-
-// The content rules for a parsed puzzle, wherever it came from: a file, or a drafted day whose host answers an admin
-// changed before approving it (docs/milestones/M06-puzzle-entry.md). `where` prefixes each message.
-export function checkPuzzle(where: string, puzzle: Puzzle): string[] {
-  const out: string[] = [];
-  if (puzzle.questions.length !== QUESTIONS_PER_DAY) {
-    out.push(`${where}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
-  }
-  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${where} q${i + 1}`, q, HOST_ANSWERS_PER_QUESTION[i])));
-  if (puzzle.questions.length === QUESTIONS_PER_DAY) out.push(...checkSchedule(where, puzzle));
-  return out;
-}
-
-// A host answer's main name must avoid every letter stolen at or before its question, or it adds no danger; an alias
-// that avoids them doesn't count, since players type the name (human, 2026-10-21, M06: "make sure the letter overlap
-// doesnt happen again"). names: the host answers' main names from the base (src/game/payload.ts, thingNames).
-export function checkHostNames(where: string, puzzle: Puzzle, names: Map<string, string>): string[] {
-  return puzzle.questions.flatMap((q, i) => {
-    const stolen = stolenLetters(puzzle, i);
-    return q.host_answers.flatMap((id) => {
-      const name = names.get(id);
-      if (name === undefined) return [`${where} q${i + 1} thing "${id}": host answer is not in the answer database`];
-      return avoids(name, stolen) ? [] : [`${where} q${i + 1} thing "${id}": host answer's name "${name}" can't be typed without ${stolen.join(", ").toUpperCase()}`];
-    });
-  });
-}
-
-// M04 "Rules to build", rule 6: the letters follow schedule A, each letter once. That a host answer can be typed
-// past them, and a safe answer is left, needs the base: the approve route and private.approve_puzzle check it.
-export function checkSchedule(file: string, puzzle: Puzzle): string[] {
-  const out: string[] = [];
-  const seen = new Set<string>();
-  puzzle.questions.forEach((q, i) => {
-    const where = `${file} q${i + 1}`;
-    const tier = LETTER_SCHEDULE[i];
-    if (tier === null && q.steals) out.push(`${where}: steals "${q.steals}", but schedule A steals nothing at question ${i + 1}`);
-    if (tier !== null && !q.steals) out.push(`${where}: schedule A steals a ${tier.replace("_", " ")} letter here, and "steals" is missing`);
-    if (tier !== null && q.steals && !LETTER_TIERS[tier].includes(q.steals)) {
-      out.push(`${where}: steals "${q.steals}", which is not a ${tier.replace("_", " ")} letter (${LETTER_TIERS[tier]})`);
-    }
-    if (q.steals && seen.has(q.steals)) out.push(`${where}: steals "${q.steals}", which an earlier question already stole`);
-    if (q.steals) seen.add(q.steals);
-  });
-  return out;
-}
-
-// The rules a day on a clock holds its questions to, for the result (docs/milestones/M23-23d-the-screens.md, "Found
+// The rules a day holds its questions to, for the result (docs/milestones/M23-23d-the-screens.md, "Found
 // 2026-11-25"): `rare` is exactly RARE_PER_CLOCK_QUESTION thing IDs with no repeat and none a key of `levels`, and `size` is a
 // positive integer. `where` prefixes each message.
 export function checkClockPuzzle(where: string, puzzle: Pick<ClockDraft, "questions">): string[] {
@@ -267,7 +111,7 @@ export function checkClockPuzzle(where: string, puzzle: Pick<ClockDraft, "questi
   });
 }
 
-// --- a drafted day on a clock ---
+// --- a drafted day ---
 
 function checkClockQuestion(errors: string[], where: string, v: unknown) {
   if (!isObject(v)) {
@@ -288,7 +132,7 @@ function checkClockQuestion(errors: string[], where: string, v: unknown) {
   if ("rare" in v && !isThingIdList(v.rare)) errors.push(`${where}: "rare" must be a list of thing IDs`);
 }
 
-// Shape only, as parsePuzzle is: the rules between fields are checkClockDay's.
+// Shape only: the rules between fields are checkClockDay's. The file is untrusted input from disk.
 export function parseClockDraft(file: string, text: string): { puzzle: ClockDraft; errors: [] } | { puzzle: null; errors: string[] } {
   let data: unknown;
   try {
@@ -309,20 +153,7 @@ export function parseClockDraft(file: string, text: string): { puzzle: ClockDraf
   return errors.length ? { puzzle: null, errors } : { puzzle: data as ClockDraft, errors: [] };
 }
 
-// A day's file of either format, as content/offbeat holds both until the old game goes (23f): a day of seven questions is
-// format 3, a day on a clock format 4.
-export function parseDay(file: string, text: string): { puzzle: DraftedDay; errors: [] } | { puzzle: null; errors: string[] } {
-  let data: unknown;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    return parsePuzzle(file, text); // which says the JSON is not valid
-  }
-  if (isObject(data) && data.format === CLOCK_FORMAT) return parseClockDraft(file, text);
-  return parsePuzzle(file, text); // any other format is refused as before
-}
-
-// The rules a drafted day on a clock holds, wherever it came from (a file, or the approval page's changes): three
+// The rules a drafted day holds, wherever it came from (a file, or the approval page's changes): three
 // questions of three different lists, each with a wording, and checkClockPuzzle's rules. Whether a list is a researched
 // one is the caller's to say, as it knows the lists. `where` prefixes each message.
 export function checkClockDay(where: string, day: ClockDraft): string[] {
@@ -336,11 +167,11 @@ export function checkClockDay(where: string, day: ClockDraft): string[] {
   return [...out, ...checkClockPuzzle(where, day)];
 }
 
-// checkPuzzleFile for a file of either format: `file` is `<game_id>/<date>.json`.
-export function checkDayFile(file: string, text: string): string[] {
-  const { puzzle, errors } = parseDay(file, text);
+// A drafted day's file, checked: `file` is `<game_id>/<date>.json`, the path being the day's identity, so two files can never
+// claim the same day (human, 2026-10-18).
+export function checkDraftFile(file: string, text: string): string[] {
+  const { puzzle, errors } = parseClockDraft(file, text);
   if (!puzzle) return errors;
-  if (!isClockDay(puzzle)) return checkPuzzleFile(file, text);
   const expected = `${puzzle.game_id}/${puzzle.date}.json`;
   return [...(file === expected ? [] : [`${file}: path must be ${expected} to match its game_id and date`]), ...checkClockDay(file, puzzle)];
 }
