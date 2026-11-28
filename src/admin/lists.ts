@@ -8,12 +8,12 @@ import { join } from "node:path";
 import { DatabaseError } from "pg";
 import { TYPED_ANSWER_MAX_LENGTH } from "@/config/tunables";
 import { formsOf, type ListEdit, type Review } from "@/content/list-edits";
+import { parseBank, type Bank } from "@/content/bank";
 import { LISTS_DIR, TIERS, parseList, type ListTier, type ResearchList } from "@/content/list";
 import { CATEGORY_KEY, normalize } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { STATUS } from "@/lib/status";
-import { readBank } from "./bank";
 
 // seen: the date the list was looked through, from the database or else the file. answers: its answers now, with the
 // edits waiting to be written into the file counted in.
@@ -115,6 +115,14 @@ function rowOf(list: ResearchList, answers: AnswerView[], prompts: Map<string, s
     passes: list.passes,
     seen: done,
   };
+}
+
+// CI validates the bank, so one that fails here is a bug: it throws. The path is written out in full so the build traces the
+// file (next.config.ts).
+export function readBank(): Bank {
+  const { bank, errors } = parseBank("bank.json", readFileSync(join(process.cwd(), "content", "bank.json"), "utf8"));
+  if (!bank) throw new Error(`content/bank.json is invalid:\n${errors.join("\n")}`);
+  return bank;
 }
 
 export const promptsOf = () => new Map(readBank().questions.map((q) => [q.category, q.prompt]));

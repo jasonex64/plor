@@ -1,9 +1,8 @@
 // Another player's profile, which is also the search: looking a username up is opening its profile
 // (docs/milestones/M17-profiles-and-friend-requests.md, "17b design", E1). The server picks the view and returns only
 // that view's fields (Security change 2): a signed-in stranger sees the name, the totals and the game's card (answers
-// 4, 11 and E7); a friend, and the player themself, also when they began, the month, the rarest answers and the last
-// days (answers 2, 25 and E3). Nothing here names an answer of an open day: rarest reads closed days only, and the
-// month and recent days are counts, which the live board already shows a friend who hasn't played.
+// 4, 11 and E7); a friend, and the player themself, also when they began, the month and the last
+// days (answers 2, 25 and E3). Nothing here names an answer: the month and recent days are counts, which the live board already shows a friend who hasn't played.
 import { getPlayerStats, type Me } from "@/game/me";
 import type { Stats } from "@/game/offbeat";
 import { takeAttempt } from "@/lib/auth-limits";
@@ -19,7 +18,7 @@ import { STATUS } from "@/lib/status";
 export type Relation = "self" | "friend" | "sent" | "received" | "blocked" | "none";
 
 // userId goes only with the full profile: a stranger sees names only (DECISIONS, 2026-11-12, E7).
-export type PlayerProfile = Friend & { relation: Relation } & Pick<Me, "totals" | "offbeat"> & Partial<Pick<Me, "since" | "month" | "rarest"> & { userId: string; recent: Stats["days"] }>;
+export type PlayerProfile = Friend & { relation: Relation } & Pick<Me, "totals" | "offbeat"> & Partial<Pick<Me, "since" | "month"> & { userId: string; recent: Stats["days"] }>;
 
 // The username rules (profile_username_format, supabase/migrations/20261028140000_baseline.sql): a name outside them
 // is nobody's, so the database isn't asked about it.
@@ -50,5 +49,5 @@ export async function getPlayer(db: Db, viewerId: string, name: string): Promise
   const { me, recent } = await getPlayerStats(db, them.user_id);
   const short = { username: them.username, name: them.name, relation, totals: me.totals, offbeat: me.offbeat };
   if (relation !== "self" && relation !== "friend") return short;
-  return { ...short, userId: them.user_id, since: me.since, month: me.month, rarest: me.rarest, recent };
+  return { ...short, userId: them.user_id, since: me.since, month: me.month, recent };
 }

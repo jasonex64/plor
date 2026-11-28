@@ -2,7 +2,7 @@ import { readSubstringDraft } from "@/admin/substrings";
 import { isCalendarDate } from "@/content/puzzle";
 import type { SubstringDay } from "@/content/substrings";
 import { substringTestRun } from "@/game/substring-test-run";
-import { isAdmin } from "@/insights/queries";
+import { isAdmin } from "@/admin/is-admin";
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";

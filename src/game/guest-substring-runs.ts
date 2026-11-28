@@ -17,7 +17,7 @@ import { STATUS } from "@/lib/status";
 
 // The state of the token's run on a date, as substring-runs.ts's stateOf builds it. A run that is over is not ended by a
 // read: its rows stay until the day's purge, so every read gives the result. The status, the words and the examples are one
-// statement, so one snapshot: the purge can't delete the words between two reads (as guest-runs.ts's stateOf). A null hash is
+// statement, so one snapshot: the purge can't delete the words between two reads (as the clock run's stateOf). A null hash is
 // a visitor with no run.
 async function stateOf(db: Db, tokenHash: string | null, date: string, day: SubstringDay): Promise<SubstringRun> {
   const { rows } = await db.query<{ status: string | null; answered: number | null; ms_left: number | null; words: PlayedWord[]; examples: { round_idx: number; words: string[] }[] }>(

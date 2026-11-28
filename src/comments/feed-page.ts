@@ -6,11 +6,9 @@
 // (the board withholds both too, src/friends/board.ts); comments come whole (answer 21); earlier days never blur.
 // Today's feed screen reads it (src/app/feed.tsx).
 import { FEED_PAGE_SIZE } from "@/config/tunables";
-import { CLOCK_FORMAT } from "@/content/puzzle";
 import { blockedSql, circleSql, seesCommentSql } from "@/friends/circle";
-import { ended, type Ended, type Scored } from "@/friends/board";
+import type { Scored } from "@/friends/board";
 import { runTotals } from "@/game/substring-places";
-import { thingNames } from "@/game/payload";
 import { FINISHED } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -35,7 +33,7 @@ export type FeedCommentItem = Base & {
 // userId is what a reaction on the run names (M19 19e); results are only the viewer's own and friends'.
 type ResultBase = Base & { kind: "result"; userId: string };
 export type FeedResultItem =
-  | (ResultBase & { game: typeof GAME_ID; blurred: false; ended: Ended | Scored; reactions: Reactions })
+  | (ResultBase & { game: typeof GAME_ID; blurred: false; ended: Scored; reactions: Reactions })
   | (ResultBase & { game: typeof SUBSTRINGS_ID; blurred: false; score: number; reactions: Reactions })
   | (ResultBase & { blurred: true });
 
@@ -90,8 +88,6 @@ type Row = {
   body: string | null;
   group_id: string | null;
   group_name: string | null;
-  status: "died" | "survived" | "timed_out" | null;
-  answered: number | null;
   blurred: boolean;
 };
 
@@ -100,22 +96,19 @@ type Row = {
 // exists. The day bound beside each branch is only to skip what can't come before the cursor: an item happens on or
 // after the start of its puzzle day, so its day is no later than the cursor's.
 //
-// When a result is at: a game 1 run ended by its last answer, so at that answer's time (a catch, or the 7th question);
-// by its clock, so at the deadline the status view reads (nothing is written when time runs out, M19 19f: the deadline
-// is the question's open time plus its 20 seconds, which doesn't change). A run on a clock (a format 4 day) has no answer
-// events: it is finished at its Finish, or at the clock's end, the start plus the clock's own time and every answer's added time
-// (M23 23d-2). A game 2 run is finished when its last round
+// When a result is at: an Offbeat run is finished at its Finish, or at the clock's end, the start plus the clock's own time
+// and every answer's added time (M23 23d-2). A game 2 run is finished when its last round
 // is done, so at that round's word, or at that round's deadline when it had none.
 const PAGE_SQL = `
   select i.kind, i.tie, i.game_id as game, i.puzzle_date::text as date,
          to_char(i.at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as at,
          i.user_id::text as user_id, i.username, i.name, i.user_id = $1::uuid as mine,
-         i.comment_id, i.body, i.group_id, i.group_name, i.status, i.answered, i.blurred
+         i.comment_id, i.body, i.group_id, i.group_name, i.blurred
   from (
     select 0 as kind, lpad(c.id::text, 19, '0') as tie, c.game_id, c.puzzle_date, c.created_at as at, c.user_id,
            p.username::text as username, coalesce(p.display_name, p.username::text) as name,
            c.id::text as comment_id, c.body, g.id::text as group_id, g.name as group_name,
-           null::text as status, null::int as answered, false as blurred
+           false as blurred
     from private.comment c
     join private.profile p on p.user_id = c.user_id
     left join private.player_group g on g.id = c.group_id
@@ -125,7 +118,7 @@ const PAGE_SQL = `
     union all
     select 1, s.game_id || ':' || s.user_id::text || ':' || s.puzzle_date::text, s.game_id, s.puzzle_date, t.at, s.user_id,
            p.username::text, coalesce(p.display_name, p.username::text),
-           null, null, null, null, s.status, s.answered,
+           null, null, null, null,
            s.puzzle_date = private.today() and not exists (
              select from private.run_status v
              where v.user_id = $1 and v.game_id = s.game_id and v.puzzle_date = s.puzzle_date and v.status = any($2::text[]))
@@ -137,16 +130,13 @@ const PAGE_SQL = `
           (select w.created_at from private.round_word w
            where w.user_id = s.user_id and w.game_id = s.game_id and w.puzzle_date = s.puzzle_date and w.round_idx = s.questions - 1),
           private.question_deadline(private.question_started_at(s.user_id, s.game_id, s.puzzle_date, s.questions - 1)))
-        when s.status = 'timed_out' then s.deadline
-        when exists (select from private.puzzle z where z.game_id = s.game_id and z.puzzle_date = s.puzzle_date and z.content ->> 'format' = '4') then
+        else
           (select least(
              coalesce((select f.finished_at from private.clock_finish f
                        where f.user_id = s.user_id and f.game_id = s.game_id and f.puzzle_date = s.puzzle_date), 'infinity'),
              r.started_at + (private.clock_start_ms() + coalesce((select sum(a.added_ms) from private.clock_answer a
                        where a.user_id = s.user_id and a.game_id = s.game_id and a.puzzle_date = s.puzzle_date), 0)) * interval '1 millisecond')
            from private.run r where r.user_id = s.user_id and r.game_id = s.game_id and r.puzzle_date = s.puzzle_date)
-        else (select max(e.created_at) from private.run_event e
-              where e.user_id = s.user_id and e.game_id = s.game_id and e.puzzle_date = s.puzzle_date)
       end as at
     ) t
     where s.user_id = any(array(select x.user_id from (${circleSql("$1")}) x))
@@ -179,21 +169,9 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
     rows.flatMap((r) => (r.comment_id === null ? [] : [r.comment_id])),
   );
 
-  // A caught player's matched answer, for Offbeat's "caught" result.
+  // An Offbeat run says what it scored and how many answers it gave, by the answers given before the day's midnight, as the
+  // ledger counts them (src/game/ledger.ts); a run with none has no rows, so 0 and 0.
   const offbeat = wholeOf(GAME_ID);
-  const caught = new Map<string, { question_idx: number; entry_id: string }>();
-  if (offbeat.length > 0) {
-    const { rows: events } = await db.query<{ key: string; question_idx: number; entry_id: string }>(
-      `select e.user_id::text || ':' || e.puzzle_date::text as key, e.question_idx, e.entry_id from private.run_event e
-       where e.game_id = $1 and e.matched and (e.user_id, e.puzzle_date) in (select * from unnest($2::uuid[], $3::date[]))`,
-      [GAME_ID, offbeat.map((r) => r.user_id), offbeat.map((r) => r.date)],
-    );
-    for (const e of events) caught.set(e.key, e);
-  }
-  const names = await thingNames(db, [...caught.values()].map((e) => e.entry_id));
-
-  // A run on a clock (a format 4 day) says what it scored and how many answers it gave, by the answers given before the
-  // day's midnight, as the ledger counts them (src/game/ledger.ts); a run with none has no rows, so 0 and 0.
   const clockRuns = offbeat.length === 0 ? [] : (await db.query<{ key: string; points: number; answers: number }>(
     `select a.user_id::text || ':' || a.puzzle_date::text as key, sum(a.points)::int as points, count(*)::int as answers
      from private.clock_answer a
@@ -202,13 +180,6 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
      group by a.user_id, a.puzzle_date`,
     [GAME_ID, offbeat.map((r) => r.user_id), offbeat.map((r) => r.date)],
   )).rows;
-  const clockDays = new Set(
-    (await db.query<{ date: string }>("select puzzle_date::text as date from private.puzzle where game_id = $1 and puzzle_date = any($2::date[]) and (content ->> 'format')::int = $3", [
-      GAME_ID,
-      [...new Set(offbeat.map((r) => r.date))],
-      CLOCK_FORMAT,
-    ])).rows.map((d) => d.date),
-  );
 
   const fragments = wholeOf(SUBSTRINGS_ID);
   const scores = fragments.length === 0 ? new Map<string, number>() : await runTotals(db, fragments.map((r) => r.user_id), fragments.map((r) => r.date));
@@ -241,12 +212,8 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
     const result = { ...base, kind: "result" as const, userId: r.user_id };
     if (r.blurred) return { ...result, blurred: true };
     if (r.game === SUBSTRINGS_ID) return { ...result, game: SUBSTRINGS_ID, blurred: false, score: scores.get(`${r.user_id}:${r.date}`)!, reactions: reactionsOf(r) };
-    const own = `${r.user_id}:${r.date}`;
-    if (clockDays.has(r.date)) {
-      const run = clockRuns.find((c) => c.key === own);
-      return { ...result, game: GAME_ID, blurred: false, ended: { result: "scored", points: run?.points ?? 0, answers: run?.answers ?? 0 }, reactions: reactionsOf(r) };
-    }
-    return { ...result, game: GAME_ID, blurred: false, ended: ended(r, caught.get(own), names), reactions: reactionsOf(r) };
+    const run = clockRuns.find((c) => c.key === `${r.user_id}:${r.date}`);
+    return { ...result, game: GAME_ID, blurred: false, ended: { result: "scored", points: run?.points ?? 0, answers: run?.answers ?? 0 }, reactions: reactionsOf(r) };
   });
   return { items, next, today: day[0].today, finishedToday: day[0].finished };
 }

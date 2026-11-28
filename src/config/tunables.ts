@@ -1,25 +1,7 @@
 // Every tunable number, each with its origin (DECISIONS.md: Config and tunables).
 
-// Origin: human, 2026-10-18 (docs/milestones/M01-puzzle-content.md, Numbers).
-export const QUESTIONS_PER_DAY = 7;
-
-// How many answers the host names at each question, Q1 to Q7, drawn at random from the host bank (human, 2026-10-24:
-// "1 1 1 1 2 2 3", "Random from the host bank"; docs/milestones/M13-13c-rarity-and-the-host.md). The validator holds
-// every day to it, drafted or written by hand.
-export const HOST_ANSWERS_PER_QUESTION = [1, 1, 1, 1, 2, 2, 3];
-// The fewest familiar answers (common or uncommon in the day's levels) a question must leave typeable past the stolen
-// letters and safe from the host (human, 2026-10-24: "3", M13 Numbers; "Typeable and safe (Recommended)", 13c; M04 G9).
-// scripts/draft.ts picks letters by it; private.approve_puzzle checks the same 3 (supabase/tests/puzzle_entry.test.sql).
-export const FAMILIAR_SAFE_MIN = 3;
-// The share of players each question would catch on a "Gentle" day, Q1 to Q7 (human, 2026-10-24, M13 Numbers: "Gentle:
-// 3→20%, ~45% finish"). Only shown next to a draft's expected catch rates (13c: "Show, never warn (Recommended)").
-export const CATCH_TARGETS = [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2];
-// The fewest days between two uses of a category (human, 2026-10-24, M13 D7: "not saying it should be EXACTLY 30 days just
-// at least 30 days"; 13d: "Same category (Recommended)"). npm run draft picks by it and content:validate checks it.
-export const REPEAT_GAP_DAYS = 30;
-
 // The longest typed answer, in characters (M02 ticket, Numbers; docs/milestones/M18-guest-play.md, Numbers). The
-// database's check constraint missed_answer_typed_length holds the same 40; assertTypedLength (src/game/runs.ts)
+// database's check constraint missed_answer_typed_length holds the same 40; assertTypedLength (src/game/run-shared.ts)
 // refuses longer text before it is matched, for signed-in and guest answers alike (M18 answer 23, 2026-11-11).
 export const TYPED_ANSWER_MAX_LENGTH = 40;
 
@@ -70,64 +52,14 @@ export const REACTIONS = ["👍", "😂", "😮", "😢", "❤️"] as const;
 // Apple's default for a long press, "The default duration is 0.5 seconds." (SOURCES.md, UIKit minimumPressDuration).
 export const LONG_PRESS_MS = 500;
 
-// "Where everyone ended": how many friends are named per place before "+ k more" (human, 2026-10-21;
-// docs/milestones/M07-friends-and-live-board.md, D2).
-export const FRIENDS_PER_PLACE = 3;
-
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
 // "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4; // docs/milestones/M02-sign-in-and-play.md, Numbers, "Did you mean"
 
-// Learning from misses (human, 2026-10-24; docs/milestones/M13-answer-lists-and-content.md, D4): a text becomes an
-// answer once at least this many distinct players typed it for a category, and at least this share (in percent) of the
-// players who answered the category's questions. private.record_miss applies both.
-export const MISS_ACCEPT_MIN_PLAYERS = 3;
-export const MISS_ACCEPT_SHARE_PERCENT = 1;
-
-// Points for surviving each question, Q1 to Q7 (the ladder): they rise with each harder question in growing jumps, to
-// 1000 for all seven (human, 2026-10-21; M04 G1). Replaces k points for question k. The rarity bonus comes on top.
-export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
-
-// The rarity bonus (human, 2026-10-22; docs/milestones/M09-points-and-leaderboard.md, Numbers N1–N4). Changing one
-// changes days settled afterwards; ledger rows already written keep their bonus.
-// The first guess (human, 2026-10-24, M13 D5: "40 / 40 / 20"; replaces M09's N5): the share of players expected to give
-// some common, uncommon or rare answer to a question, before play has counted any.
-export const FIRST_GUESS_SHARES = { common: 0.4, uncommon: 0.4, rare: 0.2 } as const;
-// N1: the first guess weighs as this many players against the pooled counts.
-export const RARITY_EXPECTATION_WEIGHT = 10; // docs/milestones/M09-points-and-leaderboard.md, N1
-// N4: a question's real counts are used once at least this many players answered it (as INSIGHTS_MIN_PLAYERS).
-export const RARITY_MIN_PLAYERS = 5; // docs/milestones/M09-points-and-leaderboard.md, N4
-// N2: an answer earns up to this fraction of its question's points, shrinking to 0 at RARITY_ZERO_SHARE of players.
-// Up to half keeps the human's rule without the cap ever cutting: getting further always beats rarer answers.
-export const RARITY_BONUS_FRACTION = 0.5; // docs/milestones/M09-points-and-leaderboard.md, N2
-export const RARITY_ZERO_SHARE = 0.2; // docs/milestones/M09-points-and-leaderboard.md, N2
-// N3: the most bonus a perfect run can earn (a missed question caps the others).
-export const PERFECT_RUN_BONUS_CAP = 500; // docs/milestones/M09-points-and-leaderboard.md, N3
-
 // How many players gave each of your answers (docs/milestones/M11-home-screen.md, H5, Numbers): a question's share
 // shows once at least this many players answered it; fewer is "too few players yet" (human, 2026-10-22).
 export const ANSWER_SHARE_MIN_PLAYERS = 5;
-
-// A question's answer search (docs/milestones/M14-14b-12-answer-lists.md, Numbers): the matches shown at once, and for
-// an empty box (human, 2026-10-30: "10").
-export const ANSWER_SEARCH_LIMIT = 10;
-
-// Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 4):
-// the tier a letter is taken from at each question, or null for none. Tiers are the M04 ticket's measured grouping
-// (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels
-// E A I O.
-export const LETTER_TIERS = { medium: "cphubdmg", heavy_consonant: "rnlts", vowel: "eaio" } as const;
-export const LETTER_SCHEDULE: (keyof typeof LETTER_TIERS | null)[] = [null, "medium", null, "medium", "heavy_consonant", null, "vowel"];
-
-// Puzzle insights report (human, 2026-10-19; docs/milestones/M03-puzzle-insights.md, Numbers).
-// A question's catch rate counts once this many players answered it; fewer is shown as "too few".
-export const INSIGHTS_MIN_PLAYERS = 5;
-// A later question that catches at least this many percentage points fewer players than an earlier one breaks the
-// day's gently rising shape (DECISIONS.md: Game 1).
-export const INSIGHTS_SHAPE_DROP_POINTS = 10; // docs/milestones/M03-puzzle-insights.md, Numbers
-// How many of a question's most common answers the report lists.
-export const INSIGHTS_TOP_ANSWERS = 5; // docs/milestones/M03-puzzle-insights.md, Numbers (human, 2026-10-19)
 
 // The answer database's imports (docs/milestones/M13-13a-the-base.md; scripts/base.ts).
 // BASE_REVIEW_SAMPLE: random members shown in an import's review (human, 2026-10-24: "Summary + flags (Recommended)",
@@ -164,13 +96,12 @@ export const AUTH_LIMITS = {
 } as const;
 
 
-// Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md, Numbers): the chart of questions survived covers
+// Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md, Numbers): the chart of points covers
 // today and the days before it, this many in all (human, 2026-10-24, M14 L35: "Last 7 days chart").
 export const STATS_CHART_DAYS = 7;
 
-// The Me tab (docs/milestones/M14-14a-3a-me.md, Numbers): how many of the player's rarest answers it shows, from closed
-// days (human, 2026-10-25: "3, from closed days (Recommended)"). Also how many of each, most common and rarest, Yesterday's
-// answers show per question of a day on a clock (docs/milestones/M23-23f-the-switch.md, Numbers: reused, the human confirms with approval).
+// How many of each, most common and rarest, Yesterday's answers show per question (docs/milestones/M14-14a-3a-me.md, Numbers:
+// "3, from closed days"; human, 2026-10-25; reused by docs/milestones/M23-23f-the-switch.md, Numbers, the human confirming with approval).
 export const RAREST_ANSWERS_SHOWN = 3;
 
 // The streak's ranks (docs/milestones/M14-14b-2a-streak-ranks.md, Numbers): the first day of each, Seed to Sakura. 1, 5,

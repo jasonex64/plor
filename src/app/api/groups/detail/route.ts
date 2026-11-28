@@ -1,7 +1,7 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { checkProtocol, handle } from "@/lib/http";
-import { msToReset } from "@/game/runs";
+import { msToReset } from "@/game/run-shared";
 import { getGroup, readGroupId } from "@/groups/groups";
 
 // A group's page: its name, members and invite link, for members only (M10 10b; G1, G3, G7), and the time to the reset,

@@ -1,148 +1,31 @@
 // Settling runs into the points ledger (docs/milestones/M09-points-and-leaderboard.md, D3, D9, D10; M00-data-design.md
-// §6): a run gets its one row once its day is closed, with what it scored by that day's midnight, the ladder and the
-// final rarity bonus of the answers given before it, finished or not (M16 16e-3a, docs/milestones/
-// M16-16e-points-and-boards.md, answers 35 and 38; it replaced M09 D1's full score whenever finished). A day closes at
-// its midnight Pacific; nothing is scheduled. Every read of a board, Me or the game screen's stats settles every
-// player's runs first, as a day's place needs the whole day (M16 16e-3b, answer 27), which is also how runs from
+// §6): a run gets its one row once its day is closed, with the points of the answers it gave before that day's midnight,
+// finished or not (M16 16e-3a, docs/milestones/M16-16e-points-and-boards.md, answers 35 and 38; M23-23c, Design, "The
+// score"). A day closes at its midnight Pacific; nothing is scheduled. Every read of a board, Me or the game screen's stats
+// settles every player's runs first, as a day's place needs the whole day (M16 16e-3b, answer 27), which is also how runs from
 // before M09 get their rows.
 // Relative imports with extensions: scripts/draft.ts runs this module on plain Node, which knows no "@/" paths.
-import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "../content/puzzle.ts";
 import { GAME_ID } from "../platform/game.ts";
 import type { Db } from "@/lib/db";
-import { scoreRun, type DayCounts, type ScoredEvent } from "./scoring.ts";
-
-type EventRow = { user_id: string; date: string; question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
 // Writes the missing rows for every player's runs on closed days, and returns how many it wrote. Settling again writes
 // nothing. Only answers given before the day's midnight count, so a row doesn't depend on when this runs, and a run
 // still being played after its midnight gets the row it will keep. day: the day it settles before, when the caller reads its day once for several reads
 // (src/game/me.ts, getMe); otherwise today.
 export async function settleRuns(db: Db, day: string | null = null): Promise<number> {
-  const { rows: runs } = await db.query<{ user_id: string; date: string }>(
-    `select s.user_id::text, s.puzzle_date::text as date
-     from private.run s
-     where s.game_id = $1 and s.puzzle_date < coalesce($2::date, private.today())
-       and not exists (select from private.points_ledger l
-                       where l.user_id = s.user_id and l.game_id = s.game_id and l.puzzle_date = s.puzzle_date)`,
-    [GAME_ID, day],
-  );
-  if (runs.length === 0) return 0;
-  const dates = [...new Set(runs.map((r) => r.date))];
-
-  const { rows: puzzles } = await db.query<{ date: string; content: ApprovedPuzzle | ClockPuzzle }>(
-    "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])",
-    [GAME_ID, dates],
-  );
-  const { rows: events } = await db.query<EventRow>(
-    `select e.user_id::text, e.puzzle_date::text as date, e.question_idx, e.entry_id, e.matched,
-            private.day_of(e.created_at) = e.puzzle_date as in_day
-     from private.run_event e
-     join unnest($2::uuid[], $3::date[]) as r(user_id, puzzle_date) on r.user_id = e.user_id and r.puzzle_date = e.puzzle_date
-     where e.game_id = $1
-     order by e.question_idx`,
-    [GAME_ID, runs.map((r) => r.user_id), runs.map((r) => r.date)],
-  );
-
-  // A day on a clock (format 4) scores by tier, with no rarity bonus: a run's row is the points of the answers it gave before
-  // the day's midnight (docs/milestones/M23-23c-the-run-on-a-clock.md, Design, "The score"), and pooledCounts is not asked.
-  const { rows: clockPoints } = await db.query<{ user_id: string; date: string; points: number }>(
-    `select a.user_id::text, a.puzzle_date::text as date, sum(a.points)::int as points
-     from private.clock_answer a
-     join unnest($2::uuid[], $3::date[]) as r(user_id, puzzle_date) on r.user_id = a.user_id and r.puzzle_date = a.puzzle_date
-     where a.game_id = $1 and private.day_of(a.created_at) = a.puzzle_date
-     group by a.user_id, a.puzzle_date`,
-    [GAME_ID, runs.map((r) => r.user_id), runs.map((r) => r.date)],
-  );
-
-  const countsByDate = new Map<string, DayCounts>();
-  for (const { date, content } of puzzles) if (content.format !== CLOCK_FORMAT) countsByDate.set(date, await pooledCounts(db, content, true));
-  const scored = runs.map((r) => {
-    const puzzle = puzzles.find((p) => p.date === r.date)!.content;
-    if (puzzle.format === CLOCK_FORMAT) return { ...r, points: clockPoints.find((c) => c.user_id === r.user_id && c.date === r.date)?.points ?? 0, bonus: 0 };
-    const own: ScoredEvent[] = events
-      .filter((e) => e.user_id === r.user_id && e.date === r.date && e.in_day)
-      .map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day }));
-    const { ladder, bonus } = scoreRun(puzzle, own, countsByDate.get(r.date)!);
-    return { ...r, points: ladder + bonus, bonus };
-  });
   const { rowCount } = await db.query(
     `insert into private.points_ledger (user_id, game_id, puzzle_date, points, bonus)
-     select r.user_id, $1, r.puzzle_date, r.points, r.bonus
-     from unnest($2::uuid[], $3::date[], $4::int[], $5::int[]) as r(user_id, puzzle_date, points, bonus)
+     select r.user_id, r.game_id, r.puzzle_date, coalesce(sum(a.points) filter (where private.day_of(a.created_at) = a.puzzle_date), 0)::int, 0
+     from private.run r
+     left join private.clock_answer a on a.user_id = r.user_id and a.game_id = r.game_id and a.puzzle_date = r.puzzle_date
+     where r.game_id = $1 and r.puzzle_date < coalesce($2::date, private.today())
+       and not exists (select from private.points_ledger l
+                       where l.user_id = r.user_id and l.game_id = r.game_id and l.puzzle_date = r.puzzle_date)
+     group by r.user_id, r.game_id, r.puzzle_date
      on conflict (user_id, game_id, puzzle_date) do nothing`,
-    [GAME_ID, scored.map((s) => s.user_id), scored.map((s) => s.date), scored.map((s) => s.points), scored.map((s) => s.bonus)],
+    [GAME_ID, day],
   );
   return rowCount!;
-}
-
-// The answers the bonus pools for each of a day's questions (M13 D5: per category, all history equal): every answer
-// given before its day's midnight (M09 D8) to a question of the same category, on the category's days before this one,
-// and on this one too when withDay (the final bonus). The provisional bonus leaves this day out, so it holds all day
-// (human, 2026-10-24: "Past days only (Recommended)"; docs/milestones/M13-13c-rarity-and-the-host.md). Guests' answers
-// count too, from private.guest_tally (M18, answer 7: "Yes, guests count"); the tally already holds only answers given
-// before their day's midnight.
-export async function pooledCounts(db: Db, puzzle: ApprovedPuzzle, withDay: boolean): Promise<DayCounts> {
-  const categories = puzzle.questions.map((q) => q.category);
-  const { rows } = await db.query<{ category: string; entry_id: string; n: number }>(
-    `select category, entry_id, sum(n)::int as n
-     from (
-       select p.content -> 'questions' -> e.question_idx ->> 'category' as category, e.entry_id, count(*) as n
-       from private.run_event e
-       join private.puzzle p on p.game_id = e.game_id and p.puzzle_date = e.puzzle_date
-       where e.game_id = $1 and p.content ->> 'format' = '3' and private.day_of(e.created_at) = e.puzzle_date
-         and (e.puzzle_date < $2::date or ($3 and e.puzzle_date = $2::date))
-         and p.content -> 'questions' -> e.question_idx ->> 'category' = any($4::text[])
-       group by 1, 2
-       union all
-       select p.content -> 'questions' -> t.question_idx ->> 'category', t.entry_id, sum(t.n)
-       from private.guest_tally t
-       join private.puzzle p on p.game_id = t.game_id and p.puzzle_date = t.puzzle_date
-       where t.game_id = $1 and p.content ->> 'format' = '3'
-         and (t.puzzle_date < $2::date or ($3 and t.puzzle_date = $2::date))
-         and p.content -> 'questions' -> t.question_idx ->> 'category' = any($4::text[])
-       group by 1, 2
-     ) counted
-     group by 1, 2`,
-    [GAME_ID, puzzle.date, withDay, categories],
-  );
-  const byCategory = new Map<string, { answered: number; byEntry: Map<string, number> }>();
-  for (const r of rows) {
-    const pooled = byCategory.get(r.category) ?? { answered: 0, byEntry: new Map<string, number>() };
-    pooled.answered += r.n;
-    pooled.byEntry.set(r.entry_id, r.n);
-    byCategory.set(r.category, pooled);
-  }
-  return new Map(categories.flatMap((c, i) => (byCategory.has(c) ? [[i, byCategory.get(c)!] as const] : [])));
-}
-
-// Every player's answers on these days before their midnight, by question and entry: the shares on the result screen
-// (docs/milestones/M11-home-screen.md, H5). Today's grow until midnight. Guests' answers are in them, from the tally.
-export async function dayCounts(db: Db, dates: string[]): Promise<Map<string, DayCounts>> {
-  const { rows: tallies } = await db.query<{ date: string; question_idx: number; entry_id: string; n: number }>(
-    `select date, question_idx, entry_id, sum(n)::int as n
-     from (
-       select puzzle_date::text as date, question_idx, entry_id, count(*) as n
-       from private.run_event
-       where game_id = $1 and puzzle_date = any($2::date[]) and private.day_of(created_at) = puzzle_date
-       group by puzzle_date, question_idx, entry_id
-       union all
-       select puzzle_date::text, question_idx, entry_id, sum(n)
-       from private.guest_tally
-       where game_id = $1 and puzzle_date = any($2::date[])
-       group by puzzle_date, question_idx, entry_id
-     ) counted
-     group by date, question_idx, entry_id`,
-    [GAME_ID, dates],
-  );
-  const counts = new Map<string, DayCounts>(dates.map((date) => [date, new Map()]));
-  for (const t of tallies) {
-    const day = counts.get(t.date)!;
-    const question = day.get(t.question_idx) ?? { answered: 0, byEntry: new Map<string, number>() };
-    question.answered += t.n;
-    question.byEntry.set(t.entry_id, t.n);
-    day.set(t.question_idx, question);
-  }
-  return counts;
 }
 
 // A player's all-time points: the sum of their ledger rows, once the runs on closed days are settled

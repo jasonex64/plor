@@ -1,7 +1,7 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
-import { isAdmin } from "@/insights/queries";
+import { isAdmin } from "@/admin/is-admin";
 import { readCommentId } from "@/comments/comments";
 import { keepReportedComment } from "@/admin/reports";
 import { STATUS } from "@/lib/status";

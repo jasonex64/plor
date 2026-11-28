@@ -1,10 +1,9 @@
 // A test run of a game 2 day (docs/milestones/M15-15f-fragments-test-run.md, 15f-2): an admin plays any day, a draft too,
-// and nothing is saved (the ticket's answer 3). The browser holds the run and sends all of it each time, as game 1's test
-// run does (src/game/runs.ts, testRun): words, one for each round done, the text typed that was accepted or null for a
+// and nothing is saved (the ticket's answer 3). The browser holds the run and sends all of it each time: words, one for each round done, the text typed that was accepted or null for a
 // round that timed out; open, whether the round after them has been opened with Start or Next; text, a new try at it,
 // if any. The word list is read through private.judge_test_word alone, which writes nothing; the rest of the rules a real
 // round holds a try to are here, from the moves: letters alone, the letters the round gives, not used earlier in the run,
-// and the score. The clock is the browser's, as in game 1's test run; a test run has no lockout, as nothing is stored
+// and the score. The clock is the browser's; a test run has no lockout, as nothing is stored
 // for it to count from.
 import type { SubstringDay } from "@/content/substrings";
 import type { Db } from "@/lib/db";

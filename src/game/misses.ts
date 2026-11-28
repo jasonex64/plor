@@ -1,6 +1,5 @@
-// Learning from misses (docs/milestones/M13-13b-learning-from-misses.md): the held-word check a miss gets before
-// private.record_miss decides what it becomes, and the flag `npm run base -- review` raises on a category (13e-2).
-// Relative-imported, as scripts/base.ts uses it too.
+// Listed words (docs/milestones/M13-13b-learning-from-misses.md): the held-word check for a text that could become an answer, and
+// the flag `npm run base -- review` raises on a category (13e-2). Relative-imported, as scripts/base.ts uses it too.
 import { normalize } from "../content/puzzle.ts";
 import { LDNOOBW_EN } from "./ldnoobw-en.ts";
 import { PLOR_LISTED } from "./plor-listed.ts";
