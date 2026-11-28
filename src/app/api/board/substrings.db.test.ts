@@ -99,8 +99,8 @@ describe("Fragments' live board over HTTP", () => {
   it("shows a friend who hasn't played, with the day's rounds and the games played today", async () => {
     useSession(V.session);
     const { board: b, row } = await friendOf(F);
-    expect(b).toMatchObject({ game: SUBSTRINGS_ID, date: today, finished: false, mine: null, rounds: 7, games: ["offbeat", SUBSTRINGS_ID] });
-    expect(row).toMatchObject({ state: "not_started", question: null, ended: null, score: null });
+    expect(b).toMatchObject({ game: SUBSTRINGS_ID, date: today, finished: false, rounds: 7, games: ["offbeat", SUBSTRINGS_ID] });
+    expect(row).toMatchObject({ state: "not_started", question: null, score: null });
   });
 
   it("shows a friend who started, and one on round 2, only as started while the viewer hasn't finished", async () => {
@@ -110,14 +110,14 @@ describe("Fragments' live board over HTTP", () => {
     await pressNext();
     useSession(V.session);
     const { row } = await friendOf(F);
-    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null });
+    expect(row).toMatchObject({ state: "started", question: null, score: null, reactions: null });
     // The fields themselves are absent of the friend's words and running score, not only unshown.
     expect(JSON.stringify((await board()).body)).not.toContain(WORDS[0]);
   });
 
   it("gives a friend's row exactly the fields it did, plus the score", async () => {
     useSession(V.session);
-    expect(Object.keys((await friendOf(F)).row).sort()).toEqual(["ended", "name", "question", "reactions", "score", "state", "userId", "username"]);
+    expect(Object.keys((await friendOf(F)).row).sort()).toEqual(["name", "question", "reactions", "score", "state", "userId", "username"]);
   });
 
   it("shows 'on round 2' once the viewer has finished, and no words or score", async () => {
@@ -126,9 +126,7 @@ describe("Fragments' live board over HTTP", () => {
     await playRounds(0, 7);
     const { board: b, row } = await friendOf(F);
     expect(b.finished).toBe(true);
-    // A Fragments board has no Offbeat place list: how a run ended is Offbeat's.
-    expect(b.mine).toBeNull();
-    expect(row).toMatchObject({ state: "playing", question: 2, ended: null, score: null });
+    expect(row).toMatchObject({ state: "playing", question: 2, score: null });
     const text = JSON.stringify((await board()).body);
     for (const word of WORDS) expect(text).not.toContain(`"${word}"`);
   });
@@ -146,7 +144,7 @@ describe("Fragments' live board over HTTP", () => {
     await playRounds(3, 7);
     useSession(V.session);
     const { row } = await friendOf(F);
-    expect(row).toMatchObject({ state: "finished", question: null, ended: null, score: scoreRun(WORDS, "j").total });
+    expect(row).toMatchObject({ state: "finished", question: null, score: scoreRun(WORDS, "j").total });
     const text = JSON.stringify((await board()).body);
     for (const word of WORDS) expect(text).not.toContain(`"${word}"`);
   });
@@ -155,7 +153,7 @@ describe("Fragments' live board over HTTP", () => {
     useSession(W.session);
     // W's only friend here is V, who has finished: W sees V as started, though V is done and scored.
     const { row } = await friendOf(V);
-    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null });
+    expect(row).toMatchObject({ state: "started", question: null, score: null, reactions: null });
   });
 
   it("lets the viewer react to a friend's Fragments run, counted on Fragments' board and not Offbeat's", async () => {

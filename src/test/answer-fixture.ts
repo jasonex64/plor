@@ -1,8 +1,8 @@
-// The tests' answer database and format-3 day (docs/milestones/M13-13a-the-base.md): seven small categories loaded
+// The tests' answer database and day on a clock (docs/milestones/M13-13a-the-base.md): seven small categories loaded
 // into the base through private.import_source, with the IDs every import computes (src/content/thing-id.ts), and a day
-// that asks them. Shared by the database tests (src/test/puzzles.ts) and the e2e tests (e2e/puzzle.ts), so it takes the
+// that asks the first three. Shared by the database tests (src/test/puzzles.ts) and the e2e tests (e2e/puzzle.ts), so it takes the
 // database client it's given. Its categories and source IDs start with "fixture", apart from any real data.
-import type { ApprovedPuzzle, ApprovedQuestion, ClockPuzzle, Puzzle } from "../content/puzzle.ts";
+import type { ClockPuzzle, Level } from "../content/puzzle.ts";
 import { normalize } from "../content/puzzle.ts";
 import { thingId } from "../content/thing-id.ts";
 import { RARE_PER_CLOCK_QUESTION } from "../config/tunables.ts";
@@ -11,18 +11,14 @@ type Querier = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Rec
 
 // A member: its names (the first is its main name), and the member it sits under, if not the root.
 type Member = { names: string[]; under?: string };
-// host follows HOST_ANSWERS_PER_QUESTION; bank is the common level and uncommon the uncommon one, leaving at least
-// FAMILIAR_SAFE_MIN of them typeable past the stolen letters and safe from the host (M13 13c).
-type FixtureQuestion = { key: string; prompt: string; steals?: string; host: string[]; bank: string[]; uncommon: string[]; members: Record<string, Member> };
+// common is the common level and uncommon the uncommon one; every other member is rare.
+type FixtureQuestion = { key: string; prompt: string; common: string[]; uncommon: string[]; members: Record<string, Member> };
 
-// Schedule A (M04 G8): Q2 and Q4 steal a medium letter, Q5 a heavy consonant, Q7 a vowel. Every host answer's main
-// name avoids the letters stolen by then, and each question keeps answers the host doesn't catch.
 export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_animal",
     prompt: "Name an animal",
-    host: ["bear"],
-    bank: ["bear", "dog"],
+    common: ["bear", "dog"],
     uncommon: ["cat", "fish", "horse"],
     members: {
       bear: { names: ["bear", "bears"] },
@@ -44,9 +40,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_fruit",
     prompt: "Name a fruit",
-    steals: "c",
-    host: ["apple"],
-    bank: ["apple", "banana"],
+    common: ["apple", "banana"],
     uncommon: ["kiwi", "mango"],
     members: {
       apple: { names: ["apple", "apples"] },
@@ -59,8 +53,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_color",
     prompt: "Name a color",
-    host: ["red"],
-    bank: ["red", "blue"],
+    common: ["red", "blue"],
     uncommon: ["green", "yellow"],
     members: {
       red: { names: ["red"] },
@@ -73,9 +66,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_country",
     prompt: "Name a country",
-    steals: "p",
-    host: ["italy"],
-    bank: ["italy", "kenya"],
+    common: ["italy", "kenya"],
     uncommon: ["mali", "togo"],
     members: {
       italy: { names: ["Italy"] },
@@ -92,9 +83,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_metal",
     prompt: "Name a metal",
-    steals: "r",
-    host: ["gold", "tin"],
-    bank: ["gold", "tin"],
+    common: ["gold", "tin"],
     uncommon: ["lead", "tungsten", "titanium"],
     members: {
       gold: { names: ["gold"] },
@@ -109,8 +98,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_sport",
     prompt: "Name a sport",
-    host: ["golf", "tennis"],
-    bank: ["golf", "tennis"],
+    common: ["golf", "tennis"],
     uncommon: ["boxing", "judo", "sumo"],
     members: {
       golf: { names: ["golf"] },
@@ -124,9 +112,7 @@ export const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_body_part",
     prompt: "Name a body part",
-    steals: "o",
-    host: ["hand", "head", "leg"],
-    bank: ["hand", "head", "leg"],
+    common: ["hand", "head", "leg"],
     uncommon: ["knee", "eye", "skin"],
     members: {
       hand: { names: ["hand", "hands"] },
@@ -145,18 +131,18 @@ const sourceId = (key: string, slug: string) => `${key}-${slug}`;
 // Rare answers the clock day's fruit and color questions need beyond their members, which hold only one rare answer each
 // (a day carries six per question: docs/milestones/M23-23d-the-screens.md, answer 49); the animals' lose the second "aardvark",
 // whose main name is the first's, which the result would show as the same answer twice. They are things of the base that
-// belong to no category, so the old game's questions, which count and list the categories' members, are unchanged.
+// belong to no category, so the categories' member counts are unchanged.
 const CLOCK_EXTRA_RARE: Record<number, string[]> = { 0: ["lynx"], 1: ["plum", "peach", "pear", "grape", "lime"], 2: ["white", "pink", "orange", "purple", "brown"] };
 const clockExtraSlug = (name: string) => `clock-${name}`;
 export const fixtureId = (index: number, slug: string) => thingId("wikidata", sourceId(FIXTURE[index].key, slug));
 
-// A fixture answer's tier from the fixture's own lists, the way fixtureDay sets the levels: common for the host bank,
+// A fixture answer's tier from the fixture's own lists, the way fixtureLevels sets the levels: common for the common list,
 // uncommon for the uncommon list, rare for every other member.
 export function fixtureTier(index: number, id: string): "common" | "uncommon" | "rare" {
   const q = FIXTURE[index];
   const slug = Object.keys(q.members).find((s) => fixtureId(index, s) === id);
   if (slug === undefined) throw new Error(`${id} isn't a member of fixture question ${index}`);
-  return q.bank.includes(slug) ? "common" : q.uncommon.includes(slug) ? "uncommon" : "rare";
+  return q.common.includes(slug) ? "common" : q.uncommon.includes(slug) ? "uncommon" : "rare";
 }
 
 // Every thing's main name, by ID.
@@ -213,74 +199,34 @@ export async function removeTestBase(db: Querier, ids: string, keys: string, sna
 // The fixture's own rows: every source ID and category key starts with "fixture_".
 export const removeFixtureBase = (db: Querier) => removeTestBase(db, "fixture\\_%", "fixture\\_%", "fixture");
 
-// The fixture day for a date, as private.approve_puzzle would store it, approved as of approvedAt (approved_at, which
-// only SQL reads: src/content/puzzle.ts).
-export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle & { approved_at: string } {
-  return {
-    format: 3, // docs/DECISIONS.md, Puzzle content format
-    game_id: "offbeat",
-    date,
-    approved_at: approvedAt,
-    questions: FIXTURE.map((q, i): ApprovedQuestion => ({
-      prompt: q.prompt,
-      category: q.key,
-      host_bank: q.bank.map((slug) => fixtureId(i, slug)),
-      host_answers: q.host.map((slug) => fixtureId(i, slug)),
-      levels: Object.fromEntries([
-        ...q.uncommon.map((slug) => [fixtureId(i, slug), "uncommon" as const]),
-        ...q.bank.map((slug) => [fixtureId(i, slug), "common" as const]),
-      ]),
-      ...(q.steals ? { steals: q.steals } : {}),
-      root: thingId("wikidata", sourceId(q.key, "root")),
-      member_of: null,
-      members: Object.keys(q.members).length,
-    })),
-  };
-}
+// A fixture question's levels, as a day on a clock holds them: the common and uncommon members by ID.
+const fixtureLevels = (index: number): Record<string, Level> =>
+  Object.fromEntries([
+    ...FIXTURE[index].uncommon.map((slug) => [fixtureId(index, slug), "uncommon" as const]),
+    ...FIXTURE[index].common.map((slug) => [fixtureId(index, slug), "common" as const]),
+  ]);
 
 // Whether a day is the fixture's (its categories are the fixture's), so a test never plays someone's real day.
 export const isFixtureDay = (p: { questions: { category: string }[] }) => p.questions.every((q, i) => q.category === FIXTURE[i]?.key);
 
-// The fixture day as a drafting session would write it: before approval adds approved_at and each question's root,
-// member_of and member count.
-export function fixtureDraft(date: string): Puzzle {
-  const day = fixtureDay(date, date);
-  return {
-    format: day.format,
-    game_id: day.game_id,
-    date: day.date,
-    questions: day.questions.map((q) => ({
-      prompt: q.prompt,
-      category: q.category,
-      host_bank: q.host_bank,
-      host_answers: q.host_answers,
-      levels: q.levels,
-      ...(q.steals ? { steals: q.steals } : {}),
-    })),
-  };
-}
-
-// The first three questions of the fixture as a day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md): no
-// host answers and no taken letters, so every member of the three categories can be typed, and its tier is the fixture's
-// (fixtureTier).
-// Each question also carries its six rare answers (the members the levels don't name, then CLOCK_EXTRA_RARE) and its list's size.
+// The first three questions of the fixture as a day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md): every
+// member of the three categories can be typed, and its tier is the fixture's (fixtureTier).
 export function fixtureClockDay(date: string, approvedAt: string): ClockPuzzle & { approved_at: string } {
   return {
     format: 4,
     game_id: "offbeat",
     date,
     approved_at: approvedAt,
-    questions: fixtureDay(date, approvedAt)
-      .questions.slice(0, 3)
-      .map(({ prompt, category, root, member_of, levels }, i) => {
-        const extra = CLOCK_EXTRA_RARE[i] ?? [];
-        const rare = [
-          ...Object.entries(FIXTURE[i].members)
-            .filter(([slug, m], n, all) => !(fixtureId(i, slug) in levels) && all.findIndex(([, other]) => other.names[0] === m.names[0]) === n)
-            .map(([slug]) => fixtureId(i, slug)),
-          ...extra.map((name) => fixtureId(i, clockExtraSlug(name))),
-        ].slice(0, RARE_PER_CLOCK_QUESTION);
-        return { prompt, category, root, member_of, levels, rare, size: Object.keys(FIXTURE[i].members).length + extra.length };
-      }),
+    questions: FIXTURE.slice(0, 3).map((q, i) => {
+      const levels = fixtureLevels(i);
+      const extra = CLOCK_EXTRA_RARE[i] ?? [];
+      const rare = [
+        ...Object.entries(FIXTURE[i].members)
+          .filter(([slug, m], n, all) => !(fixtureId(i, slug) in levels) && all.findIndex(([, other]) => other.names[0] === m.names[0]) === n)
+          .map(([slug]) => fixtureId(i, slug)),
+        ...extra.map((name) => fixtureId(i, clockExtraSlug(name))),
+      ].slice(0, RARE_PER_CLOCK_QUESTION);
+      return { prompt: q.prompt, category: q.key, root: thingId("wikidata", sourceId(q.key, "root")), member_of: null, levels, rare, size: Object.keys(q.members).length + extra.length };
+    }),
   };
 }

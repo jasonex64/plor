@@ -1,6 +1,5 @@
 // The run routes on a day on a clock, against the local stack (run with `npm run test:db`; docs/milestones/
-// M23-23c-the-run-on-a-clock.md): each route chooses the clock's module by the day's format, for a signed-in player and for a
-// guest, and Finish exists only there. The run's rules are in src/game/clock-runs.plor-app.db.test.ts and the SQL tests.
+// M23-23c-the-run-on-a-clock.md): each route plays the clock's module, for a signed-in player and for a guest. The run's rules are in src/game/clock-runs.plor-app.db.test.ts and the SQL tests.
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { getPool } from "@/lib/db";

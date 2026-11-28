@@ -9,17 +9,15 @@ import { POST as joinGroup } from "@/app/api/groups/join/route";
 import { POST as removeMember } from "@/app/api/groups/remove/route";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as reactRoute } from "@/app/api/reactions/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
 import { listReports } from "@/admin/reports";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { leaveGroup } from "@/groups/groups";
 import { setReaction } from "@/reactions/reactions";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
+import { finishTodaysRun } from "@/test/clock-routes";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as deleteRoute } from "./delete/route";
 import { POST as reportRoute } from "./report/route";
@@ -40,7 +38,6 @@ const B = player("tb");
 const C = player("tc");
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
 let club = "";
 let other = "";
 
@@ -57,11 +54,8 @@ const react = (id: string, emoji: string) =>
   call(reactRoute, "/api/reactions", "POST", { game: GAME_ID, date: today, target: { type: "comment", id }, emoji });
 const notFound = { status: 404, body: { ok: false, error: "group_not_found" } };
 
-// Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
 async function finishToday() {
-  expect((await call(startRoute, "/api/run/start", "POST")).status).toBe(200);
-  const text = hostName(puzzle, 0);
-  expect((await call(answerRoute, "/api/run/answer", "POST", { index: 0, text })).body.run.status).toBe("died");
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 
 beforeAll(async () => {
@@ -70,7 +64,7 @@ beforeAll(async () => {
     "select private.today()::text as today, (private.today() - 1)::text as yesterday",
   );
   ({ today, yesterday } = rows[0]);
-  puzzle = await ensurePuzzle(today);
+  await ensurePuzzle(today);
 });
 
 afterAll(async () => {

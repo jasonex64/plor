@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import type { DayView } from "@/admin/puzzles";
 import { tomorrowOf, warningOf } from "./tomorrow";
 
-const day = (date: string, draft: boolean, live: boolean): DayView => ({ date, draft: draft ? [] : null, live: live ? [] : null, started: false });
+const day = (date: string, draft: boolean, live: boolean): DayView => ({
+  date,
+  started: false,
+  clock: { draft: draft ? { picks: [], questions: [], menu: [] } : null, live: live ? [] : null },
+});
 
 describe("tomorrowOf and warningOf", () => {
   it("finds no warning when tomorrow is approved, across a month's end", () => {
@@ -27,18 +31,3 @@ describe("tomorrowOf and warningOf", () => {
   });
 });
 
-// A day on a clock holds its draft and live under `clock` (src/admin/puzzles.ts), so the warning must read them there too.
-describe("tomorrowOf for a day on a clock", () => {
-  const clockDay = (date: string, draft: boolean, live: boolean): DayView => ({
-    date,
-    draft: null,
-    live: null,
-    started: false,
-    clock: { draft: draft ? { picks: [], questions: [], menu: [] } : null, live: live ? [] : null },
-  });
-
-  it("finds an approved and a drafted tomorrow, as for a day of seven questions", () => {
-    expect(tomorrowOf("2026-12-01", [clockDay("2026-12-02", true, true)]).state).toBe("approved");
-    expect(tomorrowOf("2026-12-01", [clockDay("2026-12-02", true, false)]).state).toBe("drafted");
-  });
-});

@@ -1,41 +1,38 @@
-// The drafted-day validator on format 3 (src/content/puzzle.ts; docs/milestones/M13-13a-the-base.md): one valid day,
-// then the same day with a single rule broken per case, written to a temporary content root (M01: one case per rule).
+// content:validate (scripts/content-validate.ts) on a content root: one valid day on a clock, then the same day with a single rule
+// broken per case, written to a temporary content root (M01: one case per rule).
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { HOST_ANSWERS_PER_QUESTION } from "../src/config/tunables.ts";
-import type { Puzzle } from "../src/content/puzzle.ts";
+import type { ClockDraft } from "../src/content/puzzle.ts";
 import { validateRoot } from "./content-validate.ts";
 
 const FILE = "offbeat/2026-11-02.json";
 const GAME_2_FILE = "substrings/2026-11-03.json";
 const game2Day = (date: string, first = "ou") => ({ format: 1, game_id: "substrings", date, rounds: [first, "lu", "att", "yin", "odo", "hec", "vet"], bonus_letter: "f" });
 const id = (n: number) => `00000000-0000-5000-8000-${String(n).padStart(12, "0")}`;
-// Schedule A: Q2 and Q4 steal a medium letter, Q5 a heavy consonant, Q7 a vowel (M04 G8).
-const STEALS: (string | undefined)[] = [undefined, "c", undefined, "p", "r", undefined, "o"];
 
-function valid(): Puzzle {
+// A day on a clock asking these lists, as a drafting session writes it.
+function clockDay(date: string, categories: string[]): ClockDraft {
   return {
-    format: 3,
+    format: 4,
     game_id: "offbeat",
-    date: "2026-11-02",
-    questions: STEALS.map((steals, i) => ({
-      prompt: `Name a thing ${i + 1}`,
-      // Seven categories, as a day must hold (each category once: the 30-day gap, M13 13d).
-      category: ["animal", "fruit", "color", "country", "metal", "sport", "body_part"][i],
-      host_bank: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)],
-      host_answers: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)].slice(0, HOST_ANSWERS_PER_QUESTION[i]),
-      levels: { [id(i * 10 + 1)]: "common" as const, [id(i * 10 + 3)]: "uncommon" as const },
-      ...(steals ? { steals } : {}),
+    date,
+    questions: categories.map((category, i) => ({
+      prompt: `Name a ${category}`,
+      category,
+      levels: { [id(i * 10 + 1)]: "common", [id(i * 10 + 2)]: "uncommon" },
+      rare: Array.from({ length: 6 }, (_, k) => id(i * 10 + 3 + k)),
+      size: 40,
     })),
   };
 }
+const valid = () => clockDay("2026-11-02", ["animal", "fruit", "color"]);
 
 const roots: string[] = [];
 afterAll(() => roots.forEach((r) => rmSync(r, { recursive: true, force: true })));
 
-// The seven categories the day asks, in a file of this test's own (13f-4c: not the repo's data/categories.json).
+// The categories the day asks, in a file of this test's own (13f-4c: not the repo's data/categories.json).
 const CATS = join(mkdtempSync(join(tmpdir(), "plor-categories-")), "categories.json");
 roots.push(join(CATS, ".."));
 writeFileSync(CATS, JSON.stringify(["animal", "fruit", "color", "country", "metal", "sport", "body_part"].map((key, i) => ({ key, name: key, source: "wikidata", root: `Q${i + 1}` }))));
@@ -52,13 +49,13 @@ function root(files: Record<string, string>): string {
 }
 
 const errorsFor = (puzzle: unknown, file = FILE) => validateRoot(root({ [file]: JSON.stringify(puzzle) }), CATS).errors;
-const broken = (change: (p: Puzzle) => void) => {
+const broken = (change: (p: ClockDraft) => void) => {
   const p = valid();
   change(p);
   return errorsFor(p);
 };
 
-describe("content:validate on format 3", () => {
+describe("content:validate on a day on a clock", () => {
   it("passes a valid drafted day", () => {
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()) }), CATS)).toEqual({ files: 1, errors: [] });
   });
@@ -71,31 +68,28 @@ describe("content:validate on format 3", () => {
     expect(validateRoot(root({ [FILE]: "{ nope" }), CATS).errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
   });
 
-  it.each<[string, (p: Puzzle) => void, string]>([
-    ["question count", (p) => p.questions.pop(), `${FILE}: has 6 questions, expected 7`],
-    ["a host count off 1, 1, 1, 1, 2, 2, 3", (p) => (p.questions[1].host_answers = []), `${FILE} q2: has 0 host answers, expected 1`],
-    ["host answer outside the bank", (p) => (p.questions[2].host_answers = [id(99)]), `${FILE} q3 thing "${id(99)}": host answer is not in host_bank`],
-    ["host bank duplicate", (p) => p.questions[0].host_bank.push(id(1)), `${FILE} q1 thing "${id(1)}": listed twice in host_bank`],
-    ["host answer duplicate", (p) => (p.questions[4].host_answers = [id(41), id(41)]), `${FILE} q5 thing "${id(41)}": listed twice in host_answers`],
-    ["steals where schedule A steals nothing", (p) => (p.questions[0].steals = "b"), `${FILE} q1: steals "b", but schedule A steals nothing at question 1`],
-    ["no steal where schedule A steals", (p) => delete p.questions[1].steals, `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`],
-    ["a letter from the wrong tier", (p) => (p.questions[4].steals = "e"), `${FILE} q5: steals "e", which is not a heavy consonant letter (rnlts)`],
-    ["a letter stolen twice", (p) => (p.questions[3].steals = "c"), `${FILE} q4: steals "c", which an earlier question already stole`],
+  it.each<[string, (p: ClockDraft) => void, string]>([
+    ["question count", (p) => p.questions.pop(), `${FILE}: has 2 questions, expected 3`],
+    ["a list asked twice", (p) => (p.questions[2].category = "fruit"), `${FILE} q3: "fruit" is asked by q2 too`],
+    ["an empty wording", (p) => (p.questions[0].prompt = " "), `${FILE} q1: "prompt" must be a non-empty string`],
+    ["too few rare answers", (p) => p.questions[1].rare.pop(), `${FILE} q2: "rare" must be 6 thing IDs`],
+    ["a rare answer that is in levels", (p) => (p.questions[0].rare[0] = id(1)), `${FILE} q1 thing "${id(1)}": rare, but it is in levels`],
+    ["a size that is not positive", (p) => (p.questions[2].size = 0), `${FILE} q3: "size" must be a positive integer`],
   ])("refuses %s", (_, change, message) => {
     expect(broken(change)).toEqual([message]);
   });
 
   it("refuses fields of the wrong shape, and unknown ones", () => {
     const p = valid() as unknown as { questions: Record<string, unknown>[] };
-    p.questions[0].host_bank = ["dog"];
+    p.questions[0].rare = ["dog"];
     p.questions[1].category = "Dog Breed";
     p.questions[2].levels = { [id(21)]: "rare" };
-    p.questions[3].entries = [];
+    p.questions[0].entries = [];
     expect(errorsFor(p)).toEqual([
-      `${FILE} q1: "host_bank" must be a list of thing IDs`,
+      `${FILE} q1: unknown field "entries"`,
+      `${FILE} q1: "rare" must be a list of thing IDs`,
       `${FILE} q2: "category" must be a category key (lower-case letters and _)`,
       `${FILE} q3: "levels" must map thing IDs to "common" or "uncommon"`,
-      `${FILE} q4: unknown field "entries"`,
     ]);
   });
 
@@ -103,40 +97,35 @@ describe("content:validate on format 3", () => {
     expect(errorsFor(valid(), "offbeat/2026-11-03.json")).toEqual(["offbeat/2026-11-03.json: path must be offbeat/2026-11-02.json to match its game_id and date"]);
   });
 
-  it("refuses an older format", () => {
-    expect(errorsFor({ ...valid(), format: 2 })).toEqual([`${FILE}: "format" must be 3`]);
+  it("refuses any other format", () => {
+    expect(errorsFor({ ...valid(), format: 3 })).toEqual([`${FILE}: "format" must be 4`]);
+  });
+
+  it("does not hold a list to a gap: the same list on the next day is fine", () => {
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "offbeat/2026-11-03.json": JSON.stringify(clockDay("2026-11-03", ["animal", "metal", "sport"])) }), CATS).errors).toEqual([]);
   });
 });
 
-// M13 13d: the question bank at the root, and the 30-day gap across drafted days.
-describe("content:validate with the bank and the gap", () => {
-  const dated = (date: string) => ({ ...valid(), date });
-  it("refuses two days asking a category less than 30 days apart, and passes 30", () => {
-    const near = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-01.json": JSON.stringify(dated("2026-12-01")) }), CATS);
-    expect(near.errors).toContain("animal is asked on 2026-11-02 and 2026-12-01, less than 30 days apart");
-    const far = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-02.json": JSON.stringify(dated("2026-12-02")) }), CATS);
-    expect(far.errors.filter((e) => e.includes("days apart") && e.includes("2026-12-02"))).toEqual([]);
-  });
-
+// M13 13d: the question bank at the root.
+describe("content:validate with the bank", () => {
   it("checks bank.json at the root, and doesn't count it as a puzzle", () => {
-    const good = { format: 1, questions: [], themes: {} };
+    const good = { format: 1, questions: [] };
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify(good) }), CATS)).toEqual({ files: 1, errors: [] });
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ ...good, format: 2 }) }), CATS).errors).toContain('bank.json: "format" must be 1');
   });
 
-  // M13 13e: the bank asks only categories in data/categories.json, each host bank holding the 3 Q7 takes.
-  it("refuses a bank question asking a category not in data/categories.json, and a host bank under 3", () => {
-    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["a", "b", "c"], uncommon: [], themes: [], added_by: "claude" };
-    const withBank = (questions: object[]) => validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ format: 1, questions, themes: {} }) }), CATS).errors;
+  // M13 13e: the bank asks only categories in data/categories.json.
+  it("refuses a bank question asking a category not in data/categories.json", () => {
+    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["a", "b", "c"], uncommon: [] };
+    const withBank = (questions: object[]) => validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ format: 1, questions }) }), CATS).errors;
     expect(withBank([q])).toEqual([]);
     expect(withBank([{ ...q, category: "no_such_category" }])).toEqual([`bank.json question "name-a-x": category "no_such_category" is not in ${CATS}`]);
-    expect(withBank([{ ...q, host_bank: ["a", "b"] }])).toEqual(['bank.json question "name-a-x": "host_bank" lists 2 names, at least 3 needed']);
   });
 });
 
 // M16 16c: each game's folder is held to that game's rules.
 describe("content:validate on game 2's days", () => {
-  it("passes a good day beside game 1's, and counts both", () => {
+  it("passes a good day beside Offbeat's, and counts both", () => {
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), [GAME_2_FILE]: JSON.stringify(game2Day("2026-11-03")) }), CATS)).toEqual({ files: 2, errors: [] });
   });
 
@@ -180,8 +169,8 @@ describe("content:validate on researched lists", () => {
   // M23 23b: a researched question's own names in the bank are all on its list (23a's review: the cake question still
   // named brownie, cookie and waffle).
   it("refuses a bank name that isn't on its question's researched list, and a thing ID there", () => {
-    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["King Bed", "king size", "tempurpedic"], uncommon: ["FLOWER  bed"], themes: [], added_by: "claude" };
-    const withBank = (question: object) => validateRoot(root({ [FILE]: JSON.stringify(valid()), [LIST]: JSON.stringify(list()), "bank.json": JSON.stringify({ format: 1, questions: [question], themes: {} }) }), CATS).errors;
+    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["King Bed", "king size", "tempurpedic"], uncommon: ["FLOWER  bed"] };
+    const withBank = (question: object) => validateRoot(root({ [FILE]: JSON.stringify(valid()), [LIST]: JSON.stringify(list()), "bank.json": JSON.stringify({ format: 1, questions: [question] }) }), CATS).errors;
     expect(withBank(q)).toEqual([]);
     expect(withBank({ ...q, uncommon: ["cookie"] })).toEqual([`bank.json question "name-a-x": "cookie" is not on ${LIST}`]);
     expect(withBank({ ...q, host_bank: [...q.host_bank, "#b09d10e2-458c-557b-9e66-92836482b320"] })).toEqual([
@@ -229,35 +218,3 @@ describe("content:validate on researched lists", () => {
   });
 });
 
-// A day on a clock, in the same folder as the days of seven questions until 23f (docs/milestones/M23-23e-drafting-and-approving.md,
-// 23e-1): held to its own rules, and exempt from the 30-day gap, which three lists a day over twenty-one could never keep.
-describe("content:validate on a day on a clock", () => {
-  const clockDay = (date: string, categories: string[]) => ({
-    format: 4,
-    game_id: "offbeat",
-    date,
-    questions: categories.map((category, i) => ({
-      prompt: `Name a ${category}`,
-      category,
-      levels: { [id(i * 10 + 1)]: "common", [id(i * 10 + 2)]: "uncommon" },
-      rare: Array.from({ length: 6 }, (_, k) => id(i * 10 + 3 + k)),
-      size: 40,
-    })),
-  });
-  const files = (...days: ReturnType<typeof clockDay>[]) => Object.fromEntries(days.map((d) => [`offbeat/${d.date}.json`, JSON.stringify(d)]));
-
-  it("passes a valid day, beside a day of seven questions", () => {
-    expect(validateRoot(root({ ...files(clockDay("2026-12-01", ["animal", "fruit", "color"])), [FILE]: JSON.stringify(valid()) }), CATS).errors).toEqual([]);
-  });
-
-  it("does not hold a list to the 30-day gap: the same list on the next day is fine", () => {
-    expect(validateRoot(root(files(clockDay("2026-12-01", ["animal", "fruit", "color"]), clockDay("2026-12-02", ["animal", "metal", "sport"]))), CATS).errors).toEqual([]);
-  });
-
-  it("refuses a day whose list is asked twice, and one with an empty wording", () => {
-    expect(errorsFor(clockDay("2026-12-01", ["animal", "fruit", "fruit"]), "offbeat/2026-12-01.json")).toEqual(['offbeat/2026-12-01.json q3: "fruit" is asked by q2 too']);
-    const empty = clockDay("2026-12-01", ["animal", "fruit", "color"]);
-    empty.questions[0].prompt = " ";
-    expect(errorsFor(empty, "offbeat/2026-12-01.json")).toEqual(['offbeat/2026-12-01.json q1: "prompt" must be a non-empty string']);
-  });
-});

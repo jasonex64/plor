@@ -15,7 +15,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
-import { fixtureDay } from "@/test/answer-fixture";
+import { fixtureClockDay } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
 import { GET as groupBoard } from "../groups/leaderboard/route";
@@ -72,7 +72,7 @@ beforeAll(async () => {
   wednesday = lastMonday.toISOString().slice(0, 10);
   // The days are this test's own: an existing day fails the insert.
   for (const date of [monday, tuesday, wednesday]) {
-    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, date, fixtureDay(date, `${date}T00:00:00Z`)]);
+    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, date, fixtureClockDay(date, `${date}T00:00:00Z`)]);
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [
       SUBSTRINGS_ID,
       date,

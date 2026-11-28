@@ -5,13 +5,11 @@
 // friend; D is B's friend but not A's; X is an admin who hasn't played.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures, safeEntry } from "@/test/puzzles";
+import { finishTodaysRun, startTodaysRun } from "@/test/clock-routes";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as reportRoute } from "../../comments/report/route";
 import { GET as threadRoute, POST as postRoute } from "../../comments/route";
@@ -32,8 +30,6 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `p${k}${RUN}`
 >;
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
-let puzzleYesterday: ApprovedPuzzle;
 // Comment IDs by author.
 const commentOf: Record<string, string> = {};
 
@@ -53,16 +49,15 @@ const ok = { status: 200, body: { ok: true } };
 const notFound = { status: 404, body: { ok: false, error: "comment_not_found" } };
 
 async function start() {
-  expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
+  expect((await startTodaysRun()).status).toBe(200);
 }
-async function getCaught() {
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
-  expect(r.body.run.status).toBe("died");
+async function finishRun() {
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 // As whoever is signed in now.
 async function finishAndPost(key: (typeof keys)[number]) {
   await start();
-  await getCaught();
+  await finishRun();
   const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: `hello from ${key}` } })));
   expect(r.status).toBe(201);
   commentOf[key] = r.body.comment.id;
@@ -88,8 +83,8 @@ beforeAll(async () => {
     "select private.today()::text as today, (private.today() - 1)::text as yesterday",
   );
   ({ today, yesterday } = rows[0]);
-  puzzle = await ensurePuzzle(today);
-  puzzleYesterday = await ensurePuzzle(yesterday);
+  await ensurePuzzle(today);
+  await ensurePuzzle(yesterday);
 });
 
 afterAll(async () => {
@@ -135,7 +130,7 @@ describe("reporting comments, and the admins' list", () => {
 
   it("refuses reporting your own comment, one you can't see, or a missing one", async () => {
     useSession(players.a.session);
-    await getCaught();
+    await finishRun();
     const posted = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: "hello from a" } })));
     commentOf.a = posted.body.comment.id;
     expect(await report(commentOf.a)).toEqual({ status: 409, body: { ok: false, error: "report_own" } });
@@ -245,13 +240,9 @@ describe("reporting comments, and the admins' list", () => {
       "insert into private.comment (user_id, game_id, puzzle_date, body) values ($1, $2, $3::date, 'yesterday from b') returning id::text",
       [players.b.userId, GAME_ID, yesterday],
     );
-    // While A's run that day waits at a reveal (still in progress: a run can be finished after midnight), that day's
+    // While A's run that day is still going (its clock started just now: a run can be finished after midnight), that day's
     // thread is closed to A, and so is reporting on it.
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [players.a.userId, GAME_ID, yesterday]);
-    await getPool().query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
-      [players.a.userId, GAME_ID, yesterday, safeEntry(puzzleYesterday, 0)],
-    );
     useSession(players.a.session);
     expect(await report(rows[0].id)).toEqual(notFound);
     expect(await reportCount(rows[0].id)).toBe(0);

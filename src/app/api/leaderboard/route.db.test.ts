@@ -1,25 +1,24 @@
 // The friends leaderboard against the local stack (run with `npm run test:db`; docs/milestones/M09-points-and-leaderboard.md,
 // 9b; weekly since docs/milestones/M10-groups.md, 10a). Real players sign in; yesterday's runs are written directly
-// (yesterday can't be played now), answered at its noon, as an answer after its midnight counts nothing (M16 16e-3a).
-// Each safe answer is the fixture's common one: its first-guess share is 0.2, exactly RARITY_ZERO_SHARE, so it earns
-// no rarity bonus unless other fixture days' answers left in the pool lower its share (M09 N1, N2). So the expected
-// totals add the bonus each ledger row holds, which settling's own test works by hand (src/game/ledger.db.test.ts),
-// and what's checked here is the ladder of the answers before midnight.
+// (yesterday can't be played now), answered at its noon, as an answer after its midnight counts nothing (M16 16e-3a). The days
+// are the fixture's day on a clock, which scores each answer by its tier (docs/milestones/M23-23c-the-run-on-a-clock.md): an uncommon
+// answer 25 points, a rare one 50.
 // Yesterday falls in this week or, on a Monday, in last week, so those totals are read from yesterday's week. A is the
 // viewer; B and E are A's friends; C is no one's friend but F's; D is B's friend but not A's.
+import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as nextRoute } from "@/app/api/run/next/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
+import { writeClockRun, type ClockGiven } from "@/test/clock-runs";
+import { answerTodaysRun, startTodaysRun } from "@/test/clock-routes";
+import { fixtureId } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeFixtures, safeEntry, typeableName } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as leaderboardRoute } from "./route";
+import { localStack } from "../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -33,8 +32,7 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `l${k}${RUN}`
 >;
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
-let puzzleYesterday: ApprovedPuzzle;
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 // The week holding yesterday, and the other one.
 let yWeek: "thisWeek" | "lastWeek";
 let otherWeek: "thisWeek" | "lastWeek";
@@ -57,37 +55,11 @@ const daily = (week: "thisWeek" | "lastWeek", yesterdays: number) =>
 const ledgerRows = async (ids: string[]) =>
   (await getPool().query("select user_id from private.points_ledger where user_id = any($1::uuid[])", [ids])).rows.length;
 
-// Yesterday's run, written directly: safe answers to the first `survived` questions, then caught on the next, all at
-// yesterday's noon. Its ladder is the sum of POINTS_PER_QUESTION for the safe ones.
-async function playedYesterdayBonus(p: Player): Promise<number> {
-  const { rows } = await getPool().query<{ bonus: number }>(
-    "select coalesce(sum(bonus), 0)::int as bonus from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
-    [p.userId, GAME_ID, yesterday],
-  );
-  return rows[0].bonus;
-}
-// A player's yesterday on the board: that ladder plus the bonus their row holds, once it's settled.
-const yesterdays = async (p: Player, ladder: number) => ladder + (await playedYesterdayBonus(p));
-async function playedYesterday(p: Player, survived: number) {
-  const db = getPool();
-  await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [p.userId, GAME_ID, yesterday]);
-  for (let i = 0; i <= survived; i++) {
-    if (i > 0) {
-      await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
-        p.userId,
-        GAME_ID,
-        yesterday,
-        i,
-      ]);
-    }
-    const caught = i === survived;
-    await db.query(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       values ($1, $2, $3::date, $4, $5, $6, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
-      [p.userId, GAME_ID, yesterday, i, caught ? puzzleYesterday.questions[i].host_answers[0] : safeEntry(puzzleYesterday, i), caught],
-    );
-  }
-}
+// An uncommon answer of the fixture's animals (25 points) and a rare one (50), given at yesterday's noon.
+const UNCOMMON: ClockGiven = { question: 0, entry: fixtureId(0, "cat"), tier: "uncommon", points: 25, when: "noon" };
+const RARE: ClockGiven = { question: 0, entry: fixtureId(0, "horde"), tier: "rare", points: 50, when: "noon" };
+// Yesterday's run, written directly.
+const playedYesterday = (p: Player, answers: ClockGiven[]) => writeClockRun(admin, p.userId, yesterday, answers);
 
 beforeAll(async () => {
   useLocalStack();
@@ -97,8 +69,8 @@ beforeAll(async () => {
   ({ today, yesterday } = rows[0]);
   yWeek = weekStart(yesterday) === weekStart(today) ? "thisWeek" : "lastWeek";
   otherWeek = yWeek === "thisWeek" ? "lastWeek" : "thisWeek";
-  puzzle = await ensurePuzzle(today);
-  puzzleYesterday = await ensurePuzzle(yesterday);
+  await ensurePuzzle(today);
+  await ensurePuzzle(yesterday);
 });
 
 afterAll(async () => {
@@ -106,6 +78,7 @@ afterAll(async () => {
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removeFixtures();
   await getPool().end();
+  await admin.end();
 });
 
 describe("the friends leaderboard", () => {
@@ -133,19 +106,17 @@ describe("the friends leaderboard", () => {
         y.userId,
       ]);
     }
-    // Yesterday: A survives 1 (25), B 2 (75), C 1 (25), E 1 (25); D didn't play.
-    await playedYesterday(players.a, 1);
-    await playedYesterday(players.b, 2);
-    await playedYesterday(players.c, 1);
-    await playedYesterday(players.e, 1);
+    // Yesterday: A gives an uncommon answer (25), B that and a rare one (75), C and E an uncommon one (25); D didn't play.
+    await playedYesterday(players.a, [UNCOMMON]);
+    await playedYesterday(players.b, [UNCOMMON, RARE]);
+    await playedYesterday(players.c, [UNCOMMON]);
+    await playedYesterday(players.e, [UNCOMMON]);
   });
 
-  it("A plays today and survives question 1, which can't count before the day closes (D9)", async () => {
+  it("A plays today and gives an uncommon answer, which can't count before the day closes (D9)", async () => {
     useSession(players.a.session);
-    expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
-    const typed = typeableName(puzzle, 0, safeEntry(puzzle, 0))!;
-    expect((await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: typed } })))).body.run.points).toBe(25);
-    expect((await call(nextRoute(apiRequest("/api/run/next", { method: "POST" })))).status).toBe(200);
+    expect((await startTodaysRun()).status).toBe(200);
+    expect((await answerTodaysRun(0, "cat")).body.run.points).toBe(25);
   });
 
   it("shows A and A's friends, highest total first and ties by name, settling their closed days first (D3, D4)", async () => {
@@ -154,7 +125,7 @@ describe("the friends leaderboard", () => {
     const r = await leaderboard();
     expect(r.status).toBe(200);
     expect(r.body.ok).toBe(true);
-    const [b, a, e] = [await yesterdays(players.b, 75), await yesterdays(players.a, 25), await yesterdays(players.e, 25)];
+    const [b, a, e] = [75, 25, 25];
     expect(r.body[yWeek].entries).toEqual([
       { username: players.b.username, name: players.b.username, points: b, you: false, daily: daily(yWeek, b) },
       // A and E tie, with the same answers: by name, and "la…" comes before "le…".
@@ -182,7 +153,7 @@ describe("the friends leaderboard", () => {
 
   it("shows each viewer their own friends: B sees A and D, not E; a friend with no points shows 0", async () => {
     useSession(players.b.session);
-    const [b, a] = [await yesterdays(players.b, 75), await yesterdays(players.a, 25)];
+    const [b, a] = [75, 25];
     expect(await standings()).toEqual([
       { username: players.b.username, name: players.b.username, points: b, you: true, daily: daily(yWeek, b) },
       { username: players.a.username, name: players.a.username, points: a, you: false, daily: daily(yWeek, a) },
@@ -191,15 +162,10 @@ describe("the friends leaderboard", () => {
   });
 
   it("leaves a closed day out of every total while the viewer's own run that day is still going (D5)", async () => {
-    // D started yesterday's run, answered question 1 and still waits at its reveal: a run can be finished after
-    // midnight (DECISIONS.md, Game 1: Timer). B's yesterday points would tell D how far B got.
-    const db = getPool();
-    await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [players.d.userId, GAME_ID, yesterday]);
-    await db.query(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       values ($1, $2, $3::date, 0, $4, false, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
-      [players.d.userId, GAME_ID, yesterday, safeEntry(puzzleYesterday, 0)],
-    );
+    // D started yesterday's run and gave an answer, and its clock is still running: a run can be finished after midnight
+    // (DECISIONS.md, Game 1: Timer). B's yesterday points would tell D how far B got. The run starts an hour from now, so its
+    // clock outlasts the test.
+    await writeClockRun(admin, players.d.userId, yesterday, [UNCOMMON], { startedAt: "statement_timestamp() + interval '1 hour'" });
     useSession(players.d.session);
     expect((await standings()).map((x) => [x.username, x.points])).toEqual([
       [players.b.username, 0],
@@ -209,26 +175,28 @@ describe("the friends leaderboard", () => {
     const hiding = (await leaderboard()).body[yWeek];
     expect(hiding.hidden).toEqual([dayIndex(yesterday)]);
     expect(hiding.entries.map((x: Entry) => x.daily)).toEqual([daily(yWeek, 0), daily(yWeek, 0)]);
-    // D survives question 2 now, after yesterday's midnight, and is caught on question 3: once D's run is over,
-    // yesterday counts again, D's run with what it scored by that midnight, question 1's 25 and not question 2's 50
-    // (M16 16e-3a, answer 35).
-    const answerNow = async (index: number, entryId: string, matched: boolean) => {
-      await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
+    // D gives a rare answer now, after yesterday's midnight, and Finishes: once D's run is over, yesterday counts again, D's run
+    // with what it scored by that midnight, the uncommon answer's 25 and not the rare one's 50 (M16 16e-3a, answer 35).
+    const client = await admin.connect();
+    try {
+      await client.query("begin");
+      await client.query("set local session_replication_role = replica");
+      await client.query(
+        `insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at)
+         values ($1, $2, $3::date, 0, $4, 'rare', 1000, 50, statement_timestamp())`,
+        [players.d.userId, GAME_ID, yesterday, RARE.entry],
+      );
+      await client.query("insert into private.clock_finish (user_id, game_id, puzzle_date, finished_at) values ($1, $2, $3::date, statement_timestamp())", [
         players.d.userId,
         GAME_ID,
         yesterday,
-        index,
       ]);
-      await db.query(
-        "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, $4, $5, $6)",
-        [players.d.userId, GAME_ID, yesterday, index, entryId, matched],
-      );
-    };
-    await answerNow(1, safeEntry(puzzleYesterday, 1), false);
-    expect((await leaderboard()).body[yWeek].hidden).toEqual([dayIndex(yesterday)]);
-    await answerNow(2, puzzleYesterday.questions[2].host_answers[0], true);
+      await client.query("commit");
+    } finally {
+      client.release();
+    }
     const standing = await standings();
-    const [b, d] = [await yesterdays(players.b, 75), await yesterdays(players.d, 25)];
+    const [b, d] = [75, 25];
     expect(standing.map((x) => [x.username, x.points, x.daily])).toEqual([
       [players.b.username, b, daily(yWeek, b)],
       [players.d.username, d, daily(yWeek, d)],
@@ -240,7 +208,7 @@ describe("the friends leaderboard", () => {
     await getPool().query("update private.profile set display_name = 'Zed' where user_id = $1", [players.a.userId]);
     useSession(players.a.session);
     // A, now Zed, sorts after E in their tie.
-    const [b, e, a] = [await yesterdays(players.b, 75), await yesterdays(players.e, 25), await yesterdays(players.a, 25)];
+    const [b, e, a] = [75, 25, 25];
     expect((await standings()).map((x) => [x.name, x.points])).toEqual([
       [players.b.username, b],
       [players.e.username, e],

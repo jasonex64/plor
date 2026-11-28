@@ -11,14 +11,12 @@ import { GET as groupBoard } from "@/app/api/groups/leaderboard/route";
 import { GET as friendsBoard } from "@/app/api/leaderboard/route";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as reactRoute } from "@/app/api/reactions/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
-import type { ApprovedPuzzle } from "@/content/puzzle";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { GAME_ID } from "@/platform/game";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
+import { finishTodaysRun } from "@/test/clock-routes";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as blockedRoute } from "../blocked/route";
 import { POST as accept } from "../requests/accept/route";
@@ -41,7 +39,6 @@ const C = player("kc");
 // E never signs in: a plain player B can send a request to, who simply doesn't answer.
 const E = { userId: randomUUID(), username: `ke${RUN}` };
 let today = "";
-let puzzle: ApprovedPuzzle;
 let club = "";
 const ids = { bClub: "", aClub: "" };
 
@@ -71,16 +68,14 @@ const sent = { status: 200, body: { ok: true, state: "sent" } };
 const requestNotFound = { status: 404, body: { ok: false, error: "request_not_found" } };
 const commentNotFound = { status: 404, body: { ok: false, error: "comment_not_found" } };
 
-// Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
 async function finishToday() {
-  expect((await call(startRoute, "/api/run/start", "POST")).status).toBe(200);
-  expect((await call(answerRoute, "/api/run/answer", "POST", { index: 0, text: hostName(puzzle, 0) })).body.run.status).toBe("died");
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 
 beforeAll(async () => {
   useLocalStack();
   today = (await getPool().query<{ today: string }>("select private.today()::text as today")).rows[0].today;
-  puzzle = await ensurePuzzle(today);
+  await ensurePuzzle(today);
 });
 
 afterAll(async () => {

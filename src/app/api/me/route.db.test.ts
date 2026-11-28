@@ -1,33 +1,21 @@
 // The Me tab's stats against the local stack (run with `npm run test:db`; docs/milestones/M14-14a-3a-me.md, criteria
 // 1-5; docs/milestones/M14-14a-3b-settings.md, criterion 8). Past days are written directly with the answer triggers
-// switched off (session_replication_role), as src/app/api/offbeat/route.db.test.ts does. T is today. Puzzle days:
-// T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1 and T (T-4, T-6 and T-7 have none). By hand:
-//   P: T-8 survived all 7 (ledger 1000); T-5 caught on question 3 (125); T-3 time ran out on question 5
-//      (400); T-2 caught on question 1 (settled to 0 by the route); T-1 caught on question 2 (25); T one safe
-//      answer, waiting at the reveal (in progress). Points 1000 + 125 + 400 + 0 + 25 = 1550; 6 days played (a run started
-//      on T-8, T-5, T-3, T-2, T-1 and T: 16f-1, "Started counts"); best 1000; average points a day 1550 / 5 = 310
-//      (23f-2, answer 66). Streak and longest streak: T-9 wasn't
+// switched off (session_replication_role), as src/app/api/offbeat/route.db.test.ts does, on the fixture's days on a clock. T is
+// today. Puzzle days: T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1 and T (T-4, T-6 and T-7 have none). By hand:
+//   P: runs on T-8 (ledger 1000), T-5 (125), T-3 (400), T-2 (no answer: settled to 0 by the route), T-1 (25) and T, one answer given
+//      and still going. Points 1000 + 125 + 400 + 0 + 25 = 1550; 6 days played (a run started on T-8, T-5, T-3, T-2, T-1 and T: 16f-1,
+//      "Started counts"); best 1000; average points a day 1550 / 5 = 310 (23f-2, answer 66). Streak and longest streak: T-9 wasn't
 //      played, then T-8 to T all were, 6 puzzle days.
-//   L: started T-12, T-11, T-10 and T-1 and answered nothing (each timed out): longest streak 3, streak 1 (T-9
-//      unplayed; T not played yet, so it counts back from T-1).
-//   O1-O5: answered question 1 only, on some of P's days, so P's answers there have shares:
-//      T-5: P's answer, O1-O4 another: 1 of 5 → 0.2
-//      T-3: P's answer and O1, O2 the same, O3-O5 another: 3 of 6 → 0.5
-//      T-2: P's catch (the host's answer), O1-O4 the same: 5 of 5 → 1, and caught, so left out
-//      T-1: O1-O5 also answered questions 1 and 2. Question 1: P's answer and theirs the same, 6 of 6 → 1. Question 2:
-//           P's catch, theirs another: 1 of 6 → 0.17, the rarest, but caught, so left out (human, 2026-10-25: "Leave
-//           caught out (Recommended)")
-//      T-8: only P and O1 answered: under ANSWER_SHARE_MIN_PLAYERS, left out
-//      T:   P's answer, O1-O4 another: 0.2 and the latest day, so first if today weren't left out
-//   P's rarest answers: T-5's (0.2), T-3's (0.5), T-1's question 1 (1).
+//   L: started T-12, T-11, T-10 and T-1 and answered nothing: longest streak 3, streak 1 (T-9 unplayed; T not played yet, so it counts
+//      back from T-1).
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, fixture, nameOf, removeFixtures, safeEntries, safeEntry } from "@/test/puzzles";
+import { fixtureId } from "@/test/answer-fixture";
+import { ensurePuzzle, fixture, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as meRoute } from "./route";
 import { localStack } from "../../../../scripts/slot.ts";
@@ -42,7 +30,6 @@ const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1
 // T-k, from private.today().
 const day: Record<number, string> = {};
 const TODAY_MARK = `today-${RUN}`;
-const puzzles: Record<number, ApprovedPuzzle> = {};
 
 async function call() {
   const response = await meRoute(apiRequest("/api/me", { method: "GET" }));
@@ -50,20 +37,14 @@ async function call() {
 }
 
 const noon = `(($3::date + time '12:00') at time zone 'America/Los_Angeles')`;
-type Answer = { entry: string; matched?: boolean };
-async function pastRun(client: PoolClient, userId: string, date: string, answers: Answer[], opened?: number) {
+// A run started at the day's noon, with these animals given at question 1, a second apart, each a common answer for 10 points.
+async function pastRun(client: PoolClient, userId: string, date: string, slugs: string[]) {
   await client.query(`insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, $2, $3::date, ${noon})`, [userId, GAME_ID, date]);
-  for (const [i, a] of answers.entries()) {
+  for (const [i, slug] of slugs.entries()) {
     await client.query(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       values ($1, $2, $3::date, $4::int, $5, $6, ${noon} + $4::int * interval '1 second')`,
-      [userId, GAME_ID, date, i, a.entry, a.matched ?? false],
-    );
-  }
-  if (opened !== undefined) {
-    await client.query(
-      `insert into private.question_open (user_id, game_id, puzzle_date, question_idx, opened_at) values ($1, $2, $3::date, $4, ${noon} + interval '1 hour')`,
-      [userId, GAME_ID, date, opened],
+      `insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at)
+       values ($1, $2, $3::date, 0, $4, 'common', 3000, 10, ${noon} + $5::int * interval '1 second')`,
+      [userId, GAME_ID, date, fixtureId(0, slug), i],
     );
   }
 }
@@ -75,12 +56,6 @@ async function ledger(client: PoolClient, userId: string, date: string, points: 
     date,
     points,
   ]);
-}
-
-function answers(p: ApprovedPuzzle, safe: number, caught: boolean): Answer[] {
-  const list: Answer[] = Array.from({ length: safe }, (_, i) => ({ entry: safeEntry(p, i) }));
-  if (caught) list.push({ entry: p.questions[safe].host_answers[0], matched: true });
-  return list;
 }
 
 beforeAll(useLocalStack);
@@ -112,9 +87,8 @@ describe("the Me tab's stats", () => {
       [day[4], day[6], day[7]],
     ]);
     expect(taken).toEqual([]);
-    for (const k of [12, 11, 10, 9, 8, 5, 3, 2, 1]) puzzles[k] = await ensurePuzzle(day[k]);
+    for (const k of [12, 11, 10, 9, 8, 5, 3, 2, 1]) await ensurePuzzle(day[k]);
     const today = fixture(day[0]);
-    puzzles[0] = today;
     const { rowCount } = await getPool().query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3) on conflict do nothing", [
       GAME_ID,
       day[0],
@@ -126,35 +100,17 @@ describe("the Me tab's stats", () => {
     try {
       await client.query("begin");
       await client.query("set local session_replication_role = replica");
-      const others: string[] = [];
-      for (let i = 1; i <= 5; i++) {
-        const { rows: made } = await client.query<{ id: string }>(
-          "insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id",
-          [`${RUN}-o${i}@example.test`],
-        );
-        others.push(made[0].id);
-      }
-      const [o1, o2, o3, o4, o5] = others;
-      await pastRun(client, P.userId, day[8], answers(puzzles[8], 7, false));
+      await pastRun(client, P.userId, day[8], ["dog", "cat", "fish"]);
       await ledger(client, P.userId, day[8], 1000);
-      await pastRun(client, P.userId, day[5], answers(puzzles[5], 2, true));
+      await pastRun(client, P.userId, day[5], ["dog"]);
       await ledger(client, P.userId, day[5], 125);
-      await pastRun(client, P.userId, day[3], answers(puzzles[3], 4, false), 4);
+      await pastRun(client, P.userId, day[3], ["dog", "cat"]);
       await ledger(client, P.userId, day[3], 400);
-      await pastRun(client, P.userId, day[2], answers(puzzles[2], 0, true));
-      await pastRun(client, P.userId, day[1], answers(puzzles[1], 1, true));
+      await pastRun(client, P.userId, day[2], []);
+      await pastRun(client, P.userId, day[1], ["dog"]);
       await ledger(client, P.userId, day[1], 25);
-      await pastRun(client, P.userId, day[0], answers(puzzles[0], 1, false));
+      await pastRun(client, P.userId, day[0], ["dog"]);
       for (const k of [12, 11, 10, 1]) await pastRun(client, L.userId, day[k], []);
-
-      const [mine, other] = safeEntries(puzzles[5], 0);
-      for (const o of [o1, o2, o3, o4]) await pastRun(client, o, day[5], [{ entry: other }]);
-      for (const o of [o1, o2]) await pastRun(client, o, day[3], [{ entry: mine }]);
-      for (const o of [o3, o4, o5]) await pastRun(client, o, day[3], [{ entry: other }]);
-      for (const o of [o1, o2, o3, o4]) await pastRun(client, o, day[2], [{ entry: puzzles[2].questions[0].host_answers[0], matched: true }]);
-      await pastRun(client, o1, day[8], [{ entry: other }]);
-      for (const o of others) await pastRun(client, o, day[1], [{ entry: safeEntry(puzzles[1], 0) }, { entry: safeEntry(puzzles[1], 1) }]);
-      for (const o of [o1, o2, o3, o4]) await pastRun(client, o, day[0], [{ entry: other }]);
       await client.query("commit");
     } catch (err) {
       await client.query("rollback");
@@ -175,7 +131,7 @@ describe("the Me tab's stats", () => {
       offbeat: { best: 1000, average: 310 },
     });
     // Answer 66: no "full runs" and no questions survived.
-    expect(JSON.stringify(r.body.me)).not.toMatch(/survived|fullRuns|full_runs/);
+    expect(JSON.stringify(r.body.me)).not.toMatch(/survived|fullRuns|full_runs|rarest/);
   });
 
   it("gives this month's days with whether a run was started that day, today's unfinished one too (criterion 2; 16f-1)", async () => {
@@ -199,23 +155,10 @@ describe("the Me tab's stats", () => {
     expect(me.month.days.every((d: { date: string }) => d.date.startsWith(month))).toBe(true);
   });
 
-  it("gives P's 3 rarest answers that survived, from closed days with enough players, lowest share first (criterion 4)", async () => {
-    useSession(P.session);
-    const { me } = (await call()).body;
-    const [p5, p3, p1] = [puzzles[5], puzzles[3], puzzles[1]];
-    const answer = (id: string) => ({ id, name: nameOf(id) });
-    expect(me.rarest).toEqual([
-      { answer: answer(safeEntry(p5, 0)), prompt: p5.questions[0].prompt, date: day[5], share: 0.2 },
-      { answer: answer(safeEntry(p3, 0)), prompt: p3.questions[0].prompt, date: day[3], share: 0.5 },
-      { answer: answer(safeEntry(p1, 0)), prompt: p1.questions[0].prompt, date: day[1], share: 1 },
-    ]);
-  });
-
-  it("gives L's longest streak apart from the current one, and no rarest answers", async () => {
+  it("gives L's longest streak apart from the current one", async () => {
     useSession(L.session);
     const { me } = (await call()).body;
     expect(me.totals).toMatchObject({ streak: 1, longestStreak: 3 });
-    expect(me.rarest).toEqual([]);
   });
 
   // Signed in, but no username picked yet: refused as the other routes refuse it, not a 500.

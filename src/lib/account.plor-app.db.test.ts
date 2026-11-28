@@ -6,11 +6,11 @@ import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { postComment } from "@/comments/comments";
 import { GAME_ID } from "@/platform/game";
-import { startRun } from "@/game/runs";
+import { startClock } from "@/game/clock-runs";
 import { createGroup, leaveGroup } from "@/groups/groups";
 import { deleteAccount } from "./account";
 import { createProfile } from "./profile";
-import { fixtureDay, loadFixtureBase } from "@/test/answer-fixture";
+import { fixtureClockDay, loadFixtureBase } from "@/test/answer-fixture";
 import { localStack } from "../../scripts/slot.ts";
 
 const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 3 });
@@ -110,7 +110,7 @@ describe("writes for a deleted player", () => {
       [GAME_ID],
     );
     if (!rows[0].content) {
-      const puzzle = fixtureDay(rows[0].today, await loadFixtureBase(client));
+      const puzzle = fixtureClockDay(rows[0].today, await loadFixtureBase(client));
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, rows[0].today, puzzle]);
     }
     await client.query("set local role plor_app");
@@ -123,7 +123,7 @@ describe("writes for a deleted player", () => {
   // run that can't exist for them.
   const writes: [string, (client: PoolClient, userId: string) => Promise<unknown>, object][] = [
     ["create a profile", (client, userId) => createProfile(client, userId, `dg2${RUN}`), { code: "23503", constraint: "profile_user_id_fkey" }],
-    ["start a run", (client, userId) => startRun(client, userId), { code: "23503", constraint: "run_user_id_fkey" }],
+    ["start a run", (client, userId) => startClock(client, userId), { code: "23503", constraint: "run_user_id_fkey" }],
     ["create a group", (client, userId) => createGroup(client, userId, "Ghost Club"), { code: "23503", constraint: "group_member_user_id_fkey" }],
     [
       "post a comment",

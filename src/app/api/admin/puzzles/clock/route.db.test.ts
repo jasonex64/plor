@@ -8,14 +8,13 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 import { buildClockDay } from "@/content/clock-day";
 import { parseList } from "@/content/list";
 import { GAME_ID } from "@/platform/game";
-import { readBank } from "@/admin/bank";
+import { readBank } from "@/admin/lists";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
 import { ensureResearched, removeResearched } from "@/test/research-lists";
 import { localStack } from "../../../../../../scripts/slot";
 import { GET as listDays } from "../route";
-import { POST as approveOld } from "../approve/route";
 import { POST as preview } from "./route";
 import { POST as approve } from "./approve/route";
 
@@ -75,7 +74,6 @@ afterAll(async () => {
   if (draftFile) rmSync(draftFile);
   if (createdDraftsFolder && readdirSync(DRAFTS).length === 0) {
     rmdirSync(DRAFTS);
-    rmdirSync(join(process.cwd(), "content"));
   }
   const db = getPool();
   for (const date of approved) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
@@ -87,12 +85,12 @@ afterAll(async () => {
 describe("who may use the routes of a day on a clock", () => {
   it("answers 401 when signed out", async () => {
     useSession(new Map());
-    for (const response of [await show({ date: ahead, skip: [] }), await approveDay({ date: ahead, questions: [] })]) expect(response.status).toBe(401);
+    for (const response of [await list(), await show({ date: ahead, skip: [] }), await approveDay({ date: ahead, questions: [] })]) expect(response.status).toBe(401);
   });
 
   it("answers 403 admins_only to a signed-in player who isn't an admin, before reading anything else", async () => {
     useSession(await sessionFor("player"));
-    for (const response of [await show({ date: ahead, skip: [] }), await approveDay({ date: ahead, questions: [] })]) {
+    for (const response of [await list(), await show({ date: ahead, skip: [] }), await approveDay({ date: ahead, questions: [] })]) {
       expect(response.status).toBe(403);
       expect(await response.json()).toEqual({ ok: false, error: "admins_only" });
     }
@@ -218,18 +216,14 @@ describe("approving a day on a clock", () => {
     }
     // It lists as approved, with the numbers the page shows.
     const day = (await (await list()).json()).days.find((d: { date: string }) => d.date === ahead);
-    expect(day.draft).toBeNull();
-    expect(day.live).toBeNull();
+    expect(day.clock.draft).toBeNull();
     expect(day.clock.live.map((q: { prompt: string; common: number; examples: string[] }) => [q.prompt, q.common, q.examples])).toEqual(shown.questions.map((q) => [q.prompt, q.common, q.examples]));
   });
 
-  it("lists a drafted day on a clock built again now, and the old approve route refuses it", async () => {
+  it("lists a drafted day built again now", async () => {
     const day = (await (await list()).json()).days.find((d: { date: string }) => d.date === draftDate);
-    expect(day.draft).toBeNull();
     expect(day.clock.live).toBeNull();
     expect(day.clock.draft.picks).toEqual([pick("bread"), pick("soup"), pick("tool")]);
     expect(day.clock.draft.questions).toHaveLength(3);
-    const response = await approveOld(apiRequest("/api/admin/puzzles/approve", { method: "POST", body: { date: draftDate, hostAnswers: [[], [], []] } }));
-    expect(response.status).toBe(400);
   });
 });

@@ -41,7 +41,7 @@ const next = () => call(nextRoute(apiRequest("/api/guest/substrings/next", { met
 const tokenHash = () => hashKey(cookieJar.get(COOKIE)!);
 
 async function rowsWith(hash: string): Promise<number> {
-  const tables = ["guest_run", "guest_run_event", "guest_question_open", "guest_round_word", "guest_round_reject"];
+  const tables = ["guest_run", "guest_question_open", "guest_round_word", "guest_round_reject"];
   const { rows } = await getPool().query<{ n: number }>(
     `select (${tables.map((t) => `(select count(*) from private.${t} where token_hash = $1)`).join(" + ")})::int as n`,
     [hash],
@@ -94,7 +94,6 @@ beforeEach(() => {
 afterAll(async () => {
   const db = getPool();
   await db.query("delete from private.guest_run where puzzle_date = any($1::date[])", [[today, yesterday]]);
-  await db.query("delete from private.guest_tally where puzzle_date = any($1::date[])", [[today, yesterday]]);
   await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])", [SUBSTRINGS_ID, [today, yesterday]]);
   await db.query("delete from private.dictionary_word where word_key = any($1)", [WORDS]);
   await removeFixtures();

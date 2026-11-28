@@ -5,14 +5,12 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
 import { REACTIONS } from "@/config/tunables";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
+import { finishTodaysRun, startTodaysRun } from "@/test/clock-routes";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { handNameOver } from "@/test/usernames";
 import { GET as boardRoute } from "../board/route";
@@ -34,7 +32,6 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `r${k}${RUN}`
 const e = { username: `re${RUN}`, userId: "" };
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
 // Comment IDs by author.
 const commentOf: Record<string, string> = {};
 
@@ -56,16 +53,15 @@ const reactionsOnRun = async (username: string) => (await board()).friends.find(
 const none = { counts: [], mine: null };
 
 async function start() {
-  expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
+  expect((await startTodaysRun()).status).toBe(200);
 }
-async function getCaught() {
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
-  expect(r.body.run.status).toBe("died");
+async function finishRun() {
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 // As whoever is signed in now.
 async function finishAndPost(key: (typeof keys)[number]) {
   await start();
-  await getCaught();
+  await finishRun();
   const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: `hello from ${key}` } })));
   expect(r.status).toBe(201);
   commentOf[key] = r.body.comment.id;
@@ -83,7 +79,7 @@ beforeAll(async () => {
     "select private.today()::text as today, (private.today() - 1)::text as yesterday",
   );
   ({ today, yesterday } = rows[0]);
-  puzzle = await ensurePuzzle(today);
+  await ensurePuzzle(today);
   await ensurePuzzle(yesterday);
 });
 
@@ -139,7 +135,7 @@ describe("reactions on comments and on friends' runs", () => {
 
   it("sets, replaces and removes A's reaction on a comment: one per player", async () => {
     useSession(players.a.session);
-    await getCaught();
+    await finishRun();
     expect(await reactionsOnComment(commentOf.b)).toEqual(none);
     expect(await react(onComment(commentOf.b), "👍")).toEqual({ status: 200, body: { ok: true } });
     expect(await reactionsOnComment(commentOf.b)).toEqual({ counts: [{ emoji: "👍", count: 1, names: [] }], mine: "👍" });

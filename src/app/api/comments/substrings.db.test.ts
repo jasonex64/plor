@@ -12,14 +12,12 @@ import { GET as groupDetail } from "@/app/api/groups/detail/route";
 import { POST as joinGroup } from "@/app/api/groups/join/route";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as reactRoute } from "@/app/api/reactions/route";
-import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as startRoute } from "@/app/api/run/start/route";
-import { type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { runReactions } from "@/reactions/reactions";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
+import { finishTodaysRun } from "@/test/clock-routes";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as deleteRoute } from "./delete/route";
 import { POST as reportRoute } from "./report/route";
@@ -35,7 +33,6 @@ const [A, B, C, D, X, Y] = ["fa", "fb", "fc", "fd", "fx", "fy"].map(player);
 const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let today = "";
 let yesterday = "";
-let puzzle: ApprovedPuzzle;
 let club = "";
 const commentOf: Record<string, string> = {};
 
@@ -51,8 +48,7 @@ const befriend = (x: { userId: string }, y: { userId: string }) =>
   getPool().query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [x.userId, y.userId]);
 
 async function finishOffbeat() {
-  expect((await call(startRoute, "/api/run/start", "POST")).status).toBe(200);
-  expect((await call(answerRoute, "/api/run/answer", "POST", { index: 0, text: hostName(puzzle, 0) })).body.run.status).toBe("died");
+  expect((await finishTodaysRun()).body.run.status).toBe("over");
 }
 async function finishFragments(p: { userId: string }, date = today) {
   const client = await admin.connect();
@@ -76,7 +72,7 @@ beforeAll(async () => {
   const db = getPool();
   const { rows } = await db.query<{ today: string; yesterday: string }>("select private.today()::text as today, (private.today() - 1)::text as yesterday");
   ({ today, yesterday } = rows[0]);
-  puzzle = await ensurePuzzle(today);
+  await ensurePuzzle(today);
   // These days must be this test's own: an existing Fragments day fails the insert.
   for (const date of [today, yesterday]) {
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [

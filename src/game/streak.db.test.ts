@@ -6,10 +6,10 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
-import { fixtureDay } from "@/test/answer-fixture";
+import { fixtureClockDay } from "@/test/answer-fixture";
 
-// The streak reads only which days have a puzzle, so the fixture day needs no answer database here.
-const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
+// The streak reads only which days have a puzzle, so the fixture's day on a clock needs no answer database here.
+const fixture = (date: string) => fixtureClockDay(date, `${date}T00:00:00Z`);
 import { getStreak } from "./streak";
 import { localStack } from "../../scripts/slot.ts";
 

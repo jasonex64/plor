@@ -1,170 +1,29 @@
-// The question bank's rules (docs/milestones/M13-13d-the-question-bank.md): the shape, the 30-day gap per category, the
-// pick for a date, the hand-picked 7, and easiest first. Pure: a bank and drafted days built here.
+// The question bank's rules (docs/milestones/M13-13d-the-question-bank.md): the shape. Pure: a bank built here.
 import { describe, expect, it } from "vitest";
-import { easiestFirst, gapProblems, leftOutQuestions, namedQuestions, parseBank, pickQuestions, type Bank, type BankQuestion } from "./bank";
-import type { Puzzle } from "./puzzle";
+import { parseBank, type Bank, type BankQuestion } from "./bank";
 
-const question = (id: string, category = id.replaceAll("-", "_"), themes: string[] = []): BankQuestion => ({
+const question = (id: string, category = id.replaceAll("-", "_")): BankQuestion => ({
   id,
   prompt: `Name a ${id}`,
   category,
   host_bank: ["x", "y", "z"],
   uncommon: [],
-  themes,
-  added_by: "claude",
 });
-// A drafted day asking these bank questions (by prompt and category, as uses are matched).
-const day = (date: string, questions: BankQuestion[]): Puzzle => ({
-  format: 3,
-  game_id: "offbeat",
-  date,
-  questions: questions.map((q) => ({ prompt: q.prompt, category: q.category, host_bank: [], host_answers: [], levels: {} })),
-});
-const own = (key: string) => key;
 const ten = "abcdefghij".split("").map((c) => question(`q-${c}`));
-const bank = (questions: BankQuestion[], themes: Record<string, string> = {}): Bank => ({ format: 1, questions, themes });
+const bank = (questions: BankQuestion[]): Bank => ({ format: 1, questions });
 
 describe("the bank file", () => {
   it("parses a valid bank, and lists every problem in a broken one", () => {
-    expect(parseBank("bank.json", JSON.stringify(bank([question("q-a", "fruit", ["christmas"]), ten[1]], { "2026-12-25": "christmas" }))).errors).toEqual([]);
-    const broken = { format: 1, questions: [{ ...ten[0], id: "Bad Id" }, ten[1], ten[1]], themes: { "2026-02-30": "x" } };
+    expect(parseBank("bank.json", JSON.stringify(bank([question("q-a", "fruit"), ten[1]]))).errors).toEqual([]);
+    const broken = { format: 1, questions: [{ ...ten[0], id: "Bad Id" }, ten[1], ten[1]] };
     expect(parseBank("bank.json", JSON.stringify(broken)).errors).toEqual([
       'bank.json question 1: "id" must be a lower-case slug',
       'bank.json: question id "q-b" is listed twice',
-      'bank.json: theme "2026-02-30": "x" must map a date to a slug',
     ]);
   });
 
-  it("refuses a host bank smaller than the most host answers a position takes", () => {
-    const small = bank([{ ...ten[0], host_bank: ["x", "y"] }]);
-    expect(parseBank("bank.json", JSON.stringify(small)).errors).toEqual(['bank.json question "q-a": "host_bank" lists 2 names, at least 3 needed']);
-  });
-
-  it("refuses two questions asking one prompt for one category, and a themed date no question is tagged for (13f-4c)", () => {
+  it("refuses two questions asking one prompt for one category (13f-4c)", () => {
     const twin = { ...ten[1], prompt: ten[0].prompt, category: ten[0].category };
     expect(parseBank("bank.json", JSON.stringify(bank([ten[0], twin]))).errors).toEqual(['bank.json: questions "q-a" and "q-b" ask "Name a q-a" for q_a']);
-    expect(parseBank("bank.json", JSON.stringify(bank(ten.slice(0, 2), { "2026-12-25": "xmas" }))).errors).toEqual(['bank.json: theme "2026-12-25": no question is tagged "xmas"']);
-  });
-});
-
-describe("the gap", () => {
-  it("refuses a category asked 29 days apart, and passes 30", () => {
-    expect(gapProblems([day("2026-11-01", [ten[0]]), day("2026-11-30", [ten[0]])], own)).toEqual([
-      "q_a is asked on 2026-11-01 and 2026-11-30, less than 30 days apart",
-    ]);
-    expect(gapProblems([day("2026-11-01", [ten[0]]), day("2026-12-01", [ten[0]])], own)).toEqual([]);
-  });
-});
-
-describe("families", () => {
-  // A base and its subsets (human, 2026-10-26: "Separate, not same day").
-  const family = (key: string) => (key === "q_b" ? "q_a" : key);
-  it("refuses two of one family on a day, and allows them on different days", () => {
-    expect(gapProblems([day("2026-11-01", [ten[0], ten[1]])], family)).toEqual(["q_a and q_b are both asked on 2026-11-01, one family (q_a)"]);
-    expect(gapProblems([day("2026-11-01", [ten[0]]), day("2026-11-02", [ten[1]])], family)).toEqual([]);
-  });
-  it("picks one question per family", () => {
-    const picked = pickQuestions(bank(ten.slice(0, 8)), [], "2026-11-01", family).map((q) => q.category);
-    expect(picked.filter((c) => family(c) === "q_a")).toHaveLength(1);
-  });
-});
-
-describe("pickQuestions", () => {
-  it("leaves out a category used within 30 days before or after, and keeps one used 30 days away", () => {
-    // Nine questions, two blocked: the 7 left must include q-c, used exactly 30 days before.
-    const days = [day("2026-10-03", [ten[0]]), day("2026-11-30", [ten[1]]), day("2026-10-02", [ten[2]])];
-    const picked = pickQuestions(bank(ten.slice(0, 9)), days, "2026-11-01", own).map((q) => q.id);
-    expect(picked).not.toContain("q-a");
-    expect(picked).not.toContain("q-b");
-    expect(picked).toContain("q-c");
-  });
-
-  it("takes the date's theme first, then never used, then least recently used, each category once", () => {
-    const themed = [question("t-one", "t_one", ["winter"]), question("t-two", "q_a", ["winter"])];
-    const days = [day("2026-01-01", [ten[3]]), day("2026-03-01", [ten[4]])];
-    const picked = pickQuestions(bank([...ten, ...themed], { "2026-12-25": "winter" }), days, "2026-12-25", own).map((q) => q.id);
-    expect(picked.slice(0, 2).sort()).toEqual(["t-one", "t-two"]);
-    // q-a shares t-two's category, so it's out; q-d and q-e were used, so the 5 never used (q-b, q-c, q-f to q-j) fill
-    // the remaining 5 before them.
-    expect(picked).not.toContain("q-a");
-    expect(picked).not.toContain("q-d");
-    expect(picked).not.toContain("q-e");
-    expect(pickQuestions(bank([...ten, ...themed], { "2026-12-25": "winter" }), days, "2026-12-25", own).map((q) => q.id)).toEqual(picked);
-  });
-
-  it("prefers the least recently used once every question has run", () => {
-    const eight = ten.slice(0, 8);
-    const days = eight.map((q, i) => day(`2026-0${(i % 8) + 1}-01`, [q]));
-    // q-h ran last (August), so it's the one left out of 7.
-    expect(pickQuestions(bank(eight), days, "2026-12-01", own).map((q) => q.id)).not.toContain("q-h");
-  });
-
-  it("skips the questions left out, taking the next choice in their place, themed first on a themed date", () => {
-    // Eight themed questions for seven places: leaving one out brings in the eighth, not an unthemed one.
-    const themed = Array.from({ length: 8 }, (_, i) => question(`t-${i}`, `t_${i}`, ["winter"]));
-    const all = bank([...ten, ...themed], { "2026-12-25": "winter" });
-    const first = pickQuestions(all, [], "2026-12-25", own).map((q) => q.id);
-    const out = first[0];
-    const [eighth] = themed.map((q) => q.id).filter((id) => !first.includes(id));
-    const without = pickQuestions(all, [], "2026-12-25", own, new Set([out])).map((q) => q.id);
-    expect(without).not.toContain(out);
-    expect(without.sort()).toEqual([...first.filter((id) => id !== out), eighth].sort());
-  });
-
-  it("stops, saying how many are missing, when fewer than 7 are eligible", () => {
-    expect(() => pickQuestions(bank(ten.slice(0, 5)), [], "2026-12-01", own)).toThrow(
-      "2026-12-01: only 5 bank questions ask a category not used within 30 days; 2 more needed",
-    );
-  });
-});
-
-describe("leaving named questions out (--not)", () => {
-  const themed = Array.from({ length: 8 }, (_, i) => question(`t-${i}`, `t_${i}`, ["winter"]));
-  const all = bank([...ten, ...themed], { "2026-12-25": "winter" });
-  const first = pickQuestions(all, [], "2026-12-25", own).map((q) => q.id);
-
-  it("never picks a vetoed question, and the day still has 7", () => {
-    const vetoed = leftOutQuestions(all, [first[0], first[3]]);
-    const picked = pickQuestions(all, [], "2026-12-25", own, vetoed).map((q) => q.id);
-    expect(picked).toHaveLength(7);
-    expect(picked).not.toContain(first[0]);
-    expect(picked).not.toContain(first[3]);
-  });
-
-  it("leaves the pick unchanged when nothing is vetoed", () => {
-    expect(pickQuestions(all, [], "2026-12-25", own, leftOutQuestions(all, [])).map((q) => q.id)).toEqual(first);
-  });
-
-  it("refuses an ID that is not in the bank, naming it", () => {
-    expect(() => leftOutQuestions(all, [first[0], "q-typo"])).toThrow('--not: no bank question "q-typo"');
-  });
-
-  it("keeps a vetoed question out when the draft swaps others out too (the draft passes both sets to the one pick)", () => {
-    const vetoed = leftOutQuestions(all, [first[0]]);
-    const swappedOut = new Set([first[1]]);
-    const picked = pickQuestions(all, [], "2026-12-25", own, new Set([...vetoed, ...swappedOut])).map((q) => q.id);
-    expect(picked).toHaveLength(7);
-    expect(picked).not.toContain(first[0]);
-    expect(picked).not.toContain(first[1]);
-  });
-});
-
-describe("namedQuestions", () => {
-  const ids = ten.slice(0, 7).map((q) => q.id);
-  it("takes the 7 named questions in that order", () => {
-    expect(namedQuestions(bank(ten), [], "2026-12-01", [...ids].reverse(), own).map((q) => q.id)).toEqual([...ids].reverse());
-  });
-
-  it("refuses an unknown ID, and a category inside the gap", () => {
-    expect(() => namedQuestions(bank(ten), [], "2026-12-01", [...ids.slice(0, 6), "nope"], own)).toThrow('no bank question "nope"');
-    expect(() => namedQuestions(bank(ten), [day("2026-11-20", [ten[0]])], "2026-12-01", ids, own)).toThrow(
-      "q_a is asked on 2026-11-20 and 2026-12-01, less than 30 days apart",
-    );
-  });
-});
-
-describe("easiestFirst", () => {
-  it("orders by expected catch rate, lowest first, keeping ties in order", () => {
-    expect(easiestFirst(["a", "b", "c", "d"], (x) => ({ a: 0.2, b: 0.05, c: 0.2, d: 0.1 })[x]!)).toEqual(["b", "d", "a", "c"]);
   });
 });
