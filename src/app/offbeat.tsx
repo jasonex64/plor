@@ -6,7 +6,6 @@
 import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Counted, Stats, Yesterday } from "@/game/offbeat";
-import { givenText } from "./given";
 import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
@@ -164,7 +163,7 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
               <strong>
                 {q.index + 1} · {q.prompt}
               </strong>
-              {q.counts === null && <span className={styles.muted}>{givenText(null)}</span>}
+              {q.counts === null && <span className={styles.muted}>too few players yet</span>}
               {q.counts && <span className={styles.muted}>Most players gave: {countedText(q.counts.top)}</span>}
               {q.counts && q.counts.rarest.length > 0 && <span className={styles.muted}>Rarest answers: {countedText(q.counts.rarest)}</span>}
             </li>
