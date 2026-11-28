@@ -9,7 +9,7 @@ import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/p
 import type { SubstringDay } from "@/content/substrings";
 import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { runTotals } from "@/game/substring-places";
-import type { BoardGame } from "./leaderboard";
+import { getTodayBoard, type BoardGame } from "./leaderboard";
 import { named, thingNames, type Names } from "@/game/payload";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
@@ -44,6 +44,9 @@ export type BoardFriend = {
   points?: number | null;
   // Reactions on their run today (M08 8b), once the viewer's own run is over and the friend has a run.
   reactions: Reactions | null;
+  // Their place today among the viewer and the viewer's friends who have finished this game, "2nd of 5", as today's
+  // leaderboard ranks them (M25 25a, answer 12): only once the viewer and the friend have both finished, as that board opens (M22).
+  place: { place: number; of: number } | null;
 };
 
 // Each game has its own board (M16 16f-6, answer 4). rounds: Fragments' rounds today, read from the day, for "round k of
@@ -119,6 +122,9 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
   const scored = finished && game === SUBSTRINGS_ID ? friends.filter((f) => f.status !== null && FINISHED.includes(f.status)) : [];
   const scores = scored.length > 0 ? await runTotals(db, scored.map((f) => f.user_id), scored.map(() => date)) : new Map<string, number>();
 
+  // Today's leaderboard for this game, whose order is the places: it is open only once the viewer has finished.
+  const standings = finished && content ? (await getTodayBoard(db, viewerId, null, game)).entries : [];
+
   return {
     game,
     date,
@@ -145,9 +151,15 @@ export async function getBoard(db: Db, viewerId: string, game: BoardGame): Promi
           score: state === "finished" && game === SUBSTRINGS_ID ? scores.get(`${f.user_id}:${date}`)! : null,
           ...(clock ? { points: state === "not_started" ? null : (points.get(f.user_id) ?? 0) } : {}),
           reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
+          place: placeOf(standings, f.username),
         };
       }),
   };
+}
+
+function placeOf(standings: { username: string }[], username: string): BoardFriend["place"] {
+  const at = standings.findIndex((e) => e.username === username);
+  return at < 0 ? null : { place: at + 1, of: standings.length };
 }
 
 export function ended(f: Pick<Row, "username" | "status" | "answered">, event: { question_idx: number; entry_id: string } | undefined, names: Names): Ended {

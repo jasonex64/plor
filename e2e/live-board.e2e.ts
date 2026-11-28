@@ -64,14 +64,15 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
-  const started = `${playerName}: started (you'll see how it's going once you finish)`;
+  // The closed row's short word (M25 25a).
+  const started = `${playerName}: Started`;
   await player.goto("/");
   await play(player);
   await expect(row).toHaveText(started);
   // The status that changed fades in over 400ms (M20 20k-2, answers 57 and 58); the name beside it doesn't move.
   const status = row.locator("span[class*='status']");
   expect(await status.evaluate((el) => [/fade/.test(getComputedStyle(el).animationName), getComputedStyle(el).animationDuration])).toEqual([true, "0.4s"]);
-  expect(await row.locator("a[class*='name']").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await row.locator("span[class*='name']").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   await caughtToCards(player, hostAnswer);
   await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
   // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
@@ -112,35 +113,27 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
     `${playerName}: 0 points`,
     `${watcherName} (you): 0 points`,
   ]);
-  // The row ends with its ⋯ for reacting (M08 8b; 14b-13), which appears only now that the watcher has finished.
+  // Closed, the row is the name and how the run ended (an old Offbeat day's board has no points), with no control but
+  // itself; opened (M25 25a), it has the ⋯ for reacting (M08 8b; 14b-13), there only now that the watcher has finished,
+  // and showing without a hover, as the row was opened for it.
   const more = row.getByRole("button", { name: `React to ${playerName}'s run` });
   await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
+  await expect(more).toHaveCount(0);
+  await row.locator("summary").click();
   await expect(more).toBeVisible();
-  // Hidden until the row is hovered, anywhere on it, not only over the ⋯'s own cell (inbox #270).
-  const opacity = () => more.evaluate((el) => getComputedStyle(el).opacity);
   await watcher.mouse.move(0, 0);
-  await expect.poll(opacity).toBe("0");
-  await row.getByText(playerName).first().hover();
-  await expect.poll(opacity).toBe("1");
-  // On a phone the ⋯ sits beside the name and how the run stands, not over them (reactions did: 14b-8's critique;
-  // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e). Since inbox #250 the order is the name, the ⋯, then the status chip at
-  // the row's right edge, so the chips end at one edge whether or not a row has a ⋯.
+  await expect.poll(() => more.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+  // On a phone the opened row's ⋯ is inside the row and nothing pushes the page sideways.
   // Measured once the row has laid out again at the new width: straight after the resize it can still be the old one
   // (it failed twice that way, in PR #149's and #152's CI).
   await watcher.setViewportSize({ width: 390, height: 844 });
-  const chip = row.getByText(/^caught on/);
   await expect
     .poll(async () => {
-      const [dots, name] = [(await more.boundingBox())!, (await row.locator("a[class*='name']").boundingBox())!];
-      return dots.x - (name.x + name.width);
+      const [dots, box] = [(await more.boundingBox())!, (await row.boundingBox())!];
+      return dots.x >= box.x && dots.x + dots.width <= box.x + box.width;
     })
-    .toBeGreaterThanOrEqual(0);
-  await expect
-    .poll(async () => {
-      const [dots, box] = [(await more.boundingBox())!, (await chip.boundingBox())!];
-      return box.x - (dots.x + dots.width);
-    })
-    .toBeGreaterThanOrEqual(0);
+    .toBe(true);
+  expect(await watcher.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   // Each row opens by a 44px summary, at both widths (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4).
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);

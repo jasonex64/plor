@@ -291,16 +291,23 @@ test("a friend's question and points show live on the board", { tag: "@visual" }
   // The watcher has not played, and still sees the run as it goes.
   await player.goto(GAME.path);
   await player.getByRole("button", { name: "Start", exact: true }).click();
-  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 0 points`);
+  // Closed, the row is the name and the points; opened (M25 25a), it says the question too.
+  const summary = row.locator("summary");
+  await expect(row).toHaveText(`${playerName}: 0 points`);
+  await summary.click();
+  await expect(row.getByText("Question 1 of 3", { exact: true })).toBeVisible();
   await say(player, "dog");
-  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 10 points`);
+  await expect(summary).toHaveText(`${playerName}: 10 points`);
   await say(player, "cat");
-  await expect(row).toHaveText(`${playerName}: Question 1 of 3 · 35 points`);
+  await expect(summary).toHaveText(`${playerName}: 35 points`);
+  await expect(row.getByText("Question 1 of 3", { exact: true })).toBeVisible();
   await player.getByRole("button", { name: "Next question", exact: true }).click();
-  await expect(row).toHaveText(`${playerName}: Question 2 of 3 · 35 points`);
+  await expect(row.getByText("Question 2 of 3", { exact: true })).toBeVisible();
+  await expect(summary).toHaveText(`${playerName}: 35 points`);
   await player.getByRole("button", { name: "Next question", exact: true }).click();
   await player.getByRole("button", { name: "Finish", exact: true }).click();
-  await expect(row).toHaveText(`${playerName}: 35 points`);
+  await expect(row.getByText("Finished", { exact: true })).toBeVisible();
+  await expect(summary).toHaveText(`${playerName}: 35 points`);
 
   // The board as the server gives it says the same, and no frame that reached the watcher names an answer.
   await openBoard(watcher);
@@ -310,6 +317,86 @@ test("a friend's question and points show live on the board", { tag: "@visual" }
 
 // The feed's line for a finished run on a clock (23f-2, answer 67): what it scored and how many answers it gave, shown to a
 // friend who has finished their own run.
+// A friend's row on Friends today (M25 25a, answers 4 to 6, 12 and 13): the name and the points, and the whole row opens
+// the rest: how the run stands, the place once the viewer has finished too, the reactions and a Profile link. Closed
+// again after a reload and after leaving the tab.
+test("a friend's row is a name and points, and opens on a tap to the rest", { tag: "@visual" }, async ({ browser }) => {
+  test.slow();
+  const watcher = await (await browser.newContext()).newPage();
+  const player = await (await browser.newContext()).newPage();
+  await watcher.goto("/friends");
+  await signInAndPick(watcher, "ow");
+  await player.goto("/friends");
+  await signInAndPick(player, "op");
+  await befriend(player, "op", watcher, "ow");
+  const playerName = `op${RUN}`;
+
+  await player.goto(GAME.path);
+  await player.getByRole("button", { name: "Start", exact: true }).click();
+  await say(player, "dog");
+  await say(player, "cat");
+  await player.getByRole("button", { name: "Next question", exact: true }).click();
+  await player.getByRole("button", { name: "Next question", exact: true }).click();
+  await player.getByRole("button", { name: "Finish", exact: true }).click();
+
+  await openBoard(watcher);
+  const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
+  const opener = row.locator("summary");
+  const profile = row.getByRole("link", { name: "Profile", exact: true });
+  // Closed: the name and the points and nothing else, no link, one line, 44px to press, inside the page's width.
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+  await expect(row.getByRole("link")).toHaveCount(0);
+  await expect(row.getByRole("button")).toHaveCount(0);
+  const box = (await opener.boundingBox())!;
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(box.height).toBeLessThan(70);
+  expect(await watcher.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+
+  // A tap opens it. The watcher has not played: how the run stands and the way to the profile, no place and no reactions.
+  await opener.click();
+  await expect(row.getByText("Finished", { exact: true })).toBeVisible();
+  await expect(profile).toHaveAttribute("href", `/u/${playerName}`);
+  await expect(row.getByText(/ of 2$/)).toHaveCount(0);
+  await expect(row.getByRole("button")).toHaveCount(0);
+  expect(await watcher.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  // The keyboard closes and opens it: the row is one stop.
+  await opener.focus();
+  await watcher.keyboard.press("Enter");
+  await expect(profile).toHaveCount(0);
+  await watcher.keyboard.press("Enter");
+  await expect(profile).toBeVisible();
+  // Closed again after a reload.
+  await watcher.reload();
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+
+  // Once the watcher has finished too: the place among the two, and the reactions.
+  await watcher.goto(GAME.path);
+  await watcher.getByRole("button", { name: "Start", exact: true }).click();
+  await say(watcher, "dog");
+  await watcher.getByRole("button", { name: "Next question", exact: true }).click();
+  await watcher.getByRole("button", { name: "Next question", exact: true }).click();
+  await watcher.getByRole("button", { name: "Finish", exact: true }).click();
+  await openBoard(watcher);
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+  await opener.click();
+  await expect(row.getByText("1st of 2", { exact: true })).toBeVisible();
+  await expect(row.getByRole("button", { name: `React to ${playerName}'s run` })).toBeVisible();
+
+  // Leaving the tab closes it: back on Friends without a reload, the row is closed.
+  const nav = watcher.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Today", exact: true }).click();
+  await expect(watcher).toHaveURL((url) => url.pathname === "/");
+  await nav.getByRole("link", { name: "Friends", exact: true }).click();
+  await expect(watcher).toHaveURL((url) => url.pathname === "/friends");
+  await expect(row).toHaveText(`${playerName}: 35 points`);
+  await expect(profile).toHaveCount(0);
+
+  // The Profile link goes to the friend's page.
+  await opener.click();
+  await profile.click();
+  await expect(watcher).toHaveURL(new RegExp(`/u/${playerName}$`));
+});
+
 test("a friend's finished run reads as its points and answers in the feed", { tag: "@visual" }, async ({ browser, page: viewer }) => {
   test.slow();
   const friend = await (await browser.newContext()).newPage();

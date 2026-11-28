@@ -110,7 +110,11 @@ test("a name opens its profile on the board, the leaderboard, the feed and a gro
   const toProfile = (region: ReturnType<Page["getByRole"]>, name: string, href: string) => expect(region.getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
 
   await page.goto("/friends");
-  await toProfile(page.getByRole("region", { name: "Friends today" }), friend, `/u/${friend}`);
+  // On Friends today the whole row opens, and the way to the profile is the Profile link inside it (M25 25a, answer 6).
+  const today = page.getByRole("region", { name: "Friends today" });
+  await expect(today.getByRole("link", { name: friend, exact: true })).toHaveCount(0);
+  await today.locator("summary").filter({ hasText: friend }).click();
+  await toProfile(today, "Profile", `/u/${friend}`);
   const board = page.getByRole("region", { name: "Friends leaderboard" });
   // Today's board waits for the viewer's own run; the week's doesn't.
   await board.getByRole("radiogroup", { name: "Period", exact: true }).getByText("This week", { exact: true }).click();

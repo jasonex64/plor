@@ -75,7 +75,7 @@ describe("the live board on a day on a clock", () => {
     const mid = await board();
     expect(mid).toMatchObject({ game: "offbeat", finished: false, mine: null, questions: 3, rounds: null });
     expect(mid.friends).toEqual([
-      expect.objectContaining({ username: players.b.username, state: "playing", question: 1, points: 25, ended: null, score: null, reactions: null }),
+      expect.objectContaining({ username: players.b.username, state: "playing", question: 1, points: 25, ended: null, score: null, reactions: null, place: null }),
     ]);
 
     useSession(players.b.session);
@@ -89,8 +89,24 @@ describe("the live board on a day on a clock", () => {
     expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
     useSession(players.a.session);
     const done = await board();
-    expect(done.friends[0]).toMatchObject({ state: "finished", question: null, points: 35, ended: null });
+    // No place until the viewer's own run is over, as on today's leaderboard (M25 25a; M22).
+    expect(done.friends[0]).toMatchObject({ state: "finished", question: null, points: 35, ended: null, place: null });
     // No answer anywhere in what the viewer receives.
     expect(JSON.stringify(done)).not.toMatch(/cat|apple/);
+  });
+
+  it("gives a finished friend's place among those who have finished, once the viewer has finished too", async () => {
+    useSession(players.a.session);
+    expect((await post(startRoute, "/api/run/start")).status).toBe(200);
+    expect((await post(answerRoute, "/api/run/answer", { index: 0, text: "dog" })).body.run.points).toBe(10);
+    await post(nextRoute, "/api/run/next", { index: 0 });
+    await post(nextRoute, "/api/run/next", { index: 1 });
+    expect((await post(finishRoute, "/api/run/finish")).status).toBe(200);
+    const both = await board();
+    expect(both.finished).toBe(true);
+    // b's 35 points are ahead of a's 10: first of the two who have finished.
+    expect(both.friends[0]).toMatchObject({ username: players.b.username, points: 35, place: { place: 1, of: 2 } });
+    useSession(players.b.session);
+    expect((await board()).friends[0]).toMatchObject({ username: players.a.username, points: 10, place: { place: 2, of: 2 } });
   });
 });

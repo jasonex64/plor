@@ -127,7 +127,8 @@ const board = (page: Page) => page.getByRole("region", { name: "Friends today", 
 const gameSwitch = (page: Page) => board(page).getByRole("radiogroup", { name: "Game", exact: true });
 // A friend's row on the board's plain list, not the lists inside "where everyone ended".
 const row = (page: Page, username: string) => board(page).locator(":scope > ul > li").filter({ hasText: username });
-const started = "started (you'll see how it's going once you finish)";
+// A closed row's short word (M25 25a); "You'll see how it's going once you finish" is in the opened row.
+const started = "Started";
 
 test("a friend's Fragments row moves live to the round they're on, then to their score, on its own board", async ({ browser }) => {
   test.slow();
@@ -149,13 +150,16 @@ test("a friend's Fragments row moves live to the round they're on, then to their
   // The viewer has finished Fragments, so the friend's progress shows as it happens: the round, counted against the day's
   // rounds, then the score once they finish too.
   await beginRun(friend.id);
-  await expect(row(page, friend.username)).toContainText(`${friend.username}: on round 1 of ${SUBSTRING_ROUNDS.length}`);
+  // Closed, the row says only that they're playing; opened (M25 25a), the round.
+  await expect(row(page, friend.username)).toHaveText(`${friend.username}: Playing`);
+  await row(page, friend.username).locator("summary").click();
+  await expect(row(page, friend.username)).toContainText(`On round 1 of ${SUBSTRING_ROUNDS.length}`);
   await giveWord(friend.id, 0);
-  await expect(row(page, friend.username)).toContainText(`on round 2 of ${SUBSTRING_ROUNDS.length}`);
+  await expect(row(page, friend.username)).toContainText(`On round 2 of ${SUBSTRING_ROUNDS.length}`);
   for (let round = 1; round < ROUNDS.length - 1; round++) {
     await openRound(friend.id, round);
     await giveWord(friend.id, round);
-    await expect(row(page, friend.username)).toContainText(`on round ${round + 2} of ${SUBSTRING_ROUNDS.length}`);
+    await expect(row(page, friend.username)).toContainText(`On round ${round + 2} of ${SUBSTRING_ROUNDS.length}`);
   }
   await openRound(friend.id, ROUNDS.length - 1);
   await giveWord(friend.id, ROUNDS.length - 1);

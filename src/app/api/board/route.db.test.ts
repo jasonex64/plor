@@ -90,6 +90,8 @@ describe("the live board over HTTP", () => {
       score: null,
       // Reactions on runs wait for the viewer's run too (M08 8b).
       reactions: null,
+      // So does the place today (M25 25a).
+      place: null,
     };
     useSession(players.a.session);
     expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);

@@ -169,6 +169,8 @@ test("reactions sit behind each comment's and run's ⋯, and its popover closes 
   // A friend's run on the board: the same ⋯, named for the run, with only the emoji.
   await page.goto("/friends");
   const run = page.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: `ra${RUN}` });
+  // In the opened row (M25 25a).
+  await run.locator("summary").click();
   const runMore = run.getByRole("button", { name: `React to ra${RUN}'s run` });
   await expect(run.getByRole("button", { name: "👍" })).toHaveCount(0);
   await runMore.click();
@@ -188,6 +190,7 @@ test("under reduced motion the popover doesn't pop in", async ({ browser }) => {
   await caught(page);
   await page.goto("/friends");
   const run = page.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: `rc${RUN}` });
+  await run.locator("summary").click();
   await run.getByRole("button", { name: `React to rc${RUN}'s run` }).click();
   const panel = run.getByRole("group", { name: "Reactions" }).locator("xpath=ancestor::*[@id][1]");
   expect(await panel.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
