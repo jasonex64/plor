@@ -7,8 +7,8 @@
 // (M08 8b), which the player can add to friends' runs from then on. The same channel carries nudges that comments or
 // reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see. The
 // feed, on Today, listens to the channel itself (src/app/home.tsx). Each game has its own board (M16 16f-6): Offbeat's
-// as above, and Fragments', where a friend shows "on round k of n" and, once they and the player have both finished,
-// their score, and never their words. The board is a game's alone when its page names one, and otherwise has the game switch
+// as above, and Fragments', where a friend's opened row shows "On round k of n" and, once they and the player have both
+// finished, the row their score, and never their words. A row is closed until tapped (M25 25a; FriendRow, below). The board is a game's alone when its page names one, and otherwise has the game switch
 // (answers 56 and 57).
 import { useCallback, useEffect, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
@@ -26,7 +26,9 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
-import { PlayerAvatar, PlayerName } from "./player-link";
+import { ButtonLink } from "./button-link";
+import { useOpen } from "./open";
+import { ordinal } from "./ordinal";
 import styles from "./board.module.css";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
@@ -125,8 +127,9 @@ export function Board({
       return;
     }
     // A friend finished: fetch how their run ended. Only a player who has finished is told (M12 12d), so this page's
-    // own refetch for that may still be on its way. A run on a clock has no ending to fetch: its message holds the points.
-    if (message.state === "finished" && board.questions === null) {
+    // own refetch for that may still be on its way. A run on a clock has no ending to fetch: its message holds the points;
+    // once the player has finished too, the places have changed (M25 25a), so the board is read again.
+    if (message.state === "finished" && (board.questions === null || board.finished)) {
       load();
       return;
     }
@@ -174,30 +177,11 @@ export function Board({
           <p>{BETTER_WITH_FRIENDS.text}</p>
         </>
       )}
-      {/* Mockup 3's rows: the avatar, the name cut on one line, the ⋯ to react (14b-13, answer 3) and how the run stands
-          as a chip, in its own column at the row's right edge, and the reactions used on a line under the name, as a
-          comment's are (beside them, they covered the name on phones: M14 14b-8e). Short words in the chip (inbox #250;
-          M20 answers 5 and 9). */}
+      {/* A row is the avatar, the name cut on one line and the points as a chip; the whole row opens the rest (M25 25a). */}
       {shownBoard && shownBoard.friends.length > 0 && (
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
-            <li key={f.username} className={`${kit.row} ${kit.board} ${styles.friend}`}>
-              <PlayerAvatar name={f.name} username={f.username} />
-              <PlayerName username={f.username} className={styles.name}>
-                {f.name}
-              </PlayerName>
-              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds, shownBoard.questions)} className={`${toneOf(f)} ${styles.status}`} />
-              {f.reactions && (
-                <div className={styles.reactions}>
-                  <Reactions reactions={f.reactions} below />
-                </div>
-              )}
-              {f.reactions && (
-                <div className={styles.menu}>
-                  <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />
-                </div>
-              )}
-            </li>
+            <FriendRow key={f.username} friend={f} rounds={shownBoard.rounds} questions={shownBoard.questions} onReact={(emoji) => react(f, emoji)} />
           ))}
         </ul>
       )}
@@ -217,6 +201,44 @@ const BETTER_WITH_FRIENDS = {
   text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
 };
 
+// A friend's row (docs/milestones/M25-less-on-the-page.md, 25a; the human's answers 4 to 6 and 12): closed, the name and
+// the points, or a short word where there are none; the whole row is the control that opens the rest under it: how the run
+// stands, the place today, the reactions used and the ⋯ to react (M14 14b-13, answer 3), and the way to the friend's
+// profile, as the name is no link here. A native <details>, as the kit's row that opens, so it works by tap and keyboard and
+// says whether it is open; the rest is drawn only while open, and closed again on each visit (open.ts).
+function FriendRow({ friend: f, rounds, questions, onReact }: { friend: BoardFriend; rounds: number | null; questions: number | null; onReact: (emoji: Emoji | null) => void }) {
+  const [open, setOpen] = useOpen();
+  const standing = stands(f, rounds, questions);
+  return (
+    <li className={`${kit.row} ${kit.board}`}>
+      <details className={styles.friend} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+        <summary>
+          <Avatar name={f.name} />
+          <span className={styles.name}>{f.name}</span>
+          <span className="sr-only">:</span> <FadeIn value={brief(f, questions)} className={`${toneOf(f)} ${styles.status}`} />
+        </summary>
+        {open && (
+          <div className={styles.rest}>
+            {standing && <p>{standing}</p>}
+            {f.place && (
+              <p>
+                {ordinal(f.place.place)} of {f.place.of}
+              </p>
+            )}
+            {f.reactions && (
+              <div className={styles.react}>
+                <Reactions reactions={f.reactions} />
+                <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={onReact} />
+              </div>
+            )}
+            <ButtonLink href={`/u/${f.username}`}>Profile</ButtonLink>
+          </div>
+        )}
+      </details>
+    </li>
+  );
+}
+
 // A friend's state as a chip: safe for a run that survived every question, caught for one that ended earlier, plain
 // otherwise.
 function toneOf(f: BoardFriend): string {
@@ -225,16 +247,26 @@ function toneOf(f: BoardFriend): string {
   return kit.chip;
 }
 
-// rounds: Fragments' rounds today, which a friend's round is counted against; null on Offbeat's board, which has questions.
-// questions: a day on a clock's questions, whose friends show their question and points from their first answer (answer 47).
-function describe(f: BoardFriend, rounds: number | null, questions: number | null): string {
+// The closed row's chip: the points where the board has them (a clock day's from the first answer, answer 47; Fragments'
+// once both have finished), how an old Offbeat day's run ended, which has no points here, and otherwise one short word.
+function brief(f: BoardFriend, questions: number | null): string {
   if (f.ended) return endedText(f.ended);
   if (f.score !== null) return pointsText(f.score);
-  if (questions !== null && f.state === "playing") return `Question ${f.question} of ${questions} · ${pointsText(f.points ?? 0)}`;
-  if (questions !== null && f.state === "finished") return pointsText(f.points ?? 0);
-  if (f.state === "playing") return rounds === null ? `Question ${f.question}` : `on round ${f.question} of ${rounds}`;
-  if (f.state === "started") return "started (you'll see how it's going once you finish)";
+  if (questions !== null && f.state !== "not_started") return pointsText(f.points ?? 0);
+  if (f.state === "playing") return "Playing";
+  if (f.state === "started") return "Started";
+  if (f.state === "finished") return "Finished";
   return "Not yet";
+}
+
+// How the run stands, in the opened row. rounds: Fragments' rounds today, which a friend's round is counted against; null
+// on Offbeat's board, which has questions. questions: a day on a clock's questions.
+function stands(f: BoardFriend, rounds: number | null, questions: number | null): string | null {
+  if (f.state === "not_started") return null;
+  if (f.state === "started") return "You'll see how it's going once you finish";
+  if (f.state === "finished") return "Finished";
+  if (questions !== null) return `Question ${f.question} of ${questions}`;
+  return rounds === null ? `Question ${f.question}` : `On round ${f.question} of ${rounds}`;
 }
 
 function placeLabel(place: Place): string {

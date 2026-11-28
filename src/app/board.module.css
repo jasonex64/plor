@@ -1,20 +1,32 @@
-/* A friend's row on the live board (inbox #250; M20 answers 5 and 9): the avatar, the name cut on one line, the ⋯ and the
-   status chip in the last column, so the chips end at the same edge on every row; the reactions used under the name. The
-   DOM order is name, status, reactions, menu, so a screen reader reads "name: status" first. The name and the chip share
-   the row's room alike, each up to its one-line width, and a status too long for its share wraps inside its chip: a
-   long finished status no longer leaves the name no room (#257's review; the human, 2026-11-17: "Wrap them to a second
-   line"). The ⋯'s column takes what's left, holding the ⋯ against the chip, so the chips still end at the row's edge. */
-/* li.friend outranks the kit's .row, whose 10px gap would otherwise open a second row's gap under every one-line row; the
-   reactions carry their own 6px (kit.module.css, .below). */
-li.friend {
+/* A friend's row on the live board (M25 25a; before it inbox #250 and M20 answers 5 and 9): closed, the avatar, the name
+   cut on one line and the chip at the row's end, so the chips end at the same edge on every row, then the mark that says
+   the row opens. The summary is the whole row and the control, 44px tall for one line (kit.module.css, a row that
+   opens). The name and the chip share the row's room alike, each up to its one-line width, and a chip too long for its
+   share wraps inside itself (#257's review; the human, 2026-11-17: "Wrap them to a second line"). */
+.friend > summary {
   display: grid;
-  grid-template-columns: auto minmax(0, max-content) 1fr auto;
+  grid-template-columns: auto minmax(0, max-content) 1fr auto auto;
   align-items: center;
-  row-gap: 0;
+  column-gap: 10px;
+  cursor: pointer;
+  list-style: none;
 }
 
-.friend > :first-child {
-  grid-row: 1 / span 2;
+.friend > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The mark: a small arrow in the muted text, turned down while the row is open. Not read out: the summary says
+   whether it is open itself. */
+.friend > summary::after {
+  content: "▸" / "";
+  grid-column: 5;
+  grid-row: 1;
+  color: var(--muted);
+}
+
+.friend[open] > summary::after {
+  content: "▾" / "";
 }
 
 .name {
@@ -26,26 +38,38 @@ li.friend {
   white-space: nowrap;
 }
 
-.menu {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  justify-self: end;
-}
-
-/* The ⋯ is hidden until its row is hovered or has focus (reactions.module.css, inbox #270); here a cell wraps it, so
-   its own rule would need that 44px cell hovered, not the row. */
-li.friend:hover .menu button,
-li.friend:focus-within .menu button {
-  opacity: 1;
-}
-
 .status {
   grid-column: 4;
   grid-row: 1;
   justify-self: end;
 }
 
-.reactions {
-  grid-column: 2;
-  grid-row: 2;
+/* The opened row's lines, 6px apart, as a row's second line (kit.module.css, .below). */
+.rest {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.rest > p {
+  margin: 0;
+}
+
+/* The reactions used, then the ⋯ at the row's right edge, where its picker opens under it with their right edges
+   lined up (reactions.module.css): at the left it would open past the card's edge. */
+.react {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-self: stretch;
+  gap: 6px;
+}
+
+.react > :last-child {
+  margin-left: auto;
+}
+
+/* The ⋯ hides until its row is hovered (reactions.module.css, inbox #270); in an opened row it is what was asked for. */
+.react button {
+  opacity: 1;
 }

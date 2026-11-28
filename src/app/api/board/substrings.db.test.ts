@@ -110,14 +110,15 @@ describe("Fragments' live board over HTTP", () => {
     await pressNext();
     useSession(V.session);
     const { row } = await friendOf(F);
-    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null });
+    // No place either, until the viewer has finished (M25 25a).
+    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null, place: null });
     // The fields themselves are absent of the friend's words and running score, not only unshown.
     expect(JSON.stringify((await board()).body)).not.toContain(WORDS[0]);
   });
 
   it("gives a friend's row exactly the fields it did, plus the score", async () => {
     useSession(V.session);
-    expect(Object.keys((await friendOf(F)).row).sort()).toEqual(["ended", "name", "question", "reactions", "score", "state", "userId", "username"]);
+    expect(Object.keys((await friendOf(F)).row).sort()).toEqual(["ended", "name", "place", "question", "reactions", "score", "state", "userId", "username"]);
   });
 
   it("shows 'on round 2' once the viewer has finished, and no words or score", async () => {
@@ -128,7 +129,8 @@ describe("Fragments' live board over HTTP", () => {
     expect(b.finished).toBe(true);
     // A Fragments board has no Offbeat place list: how a run ended is Offbeat's.
     expect(b.mine).toBeNull();
-    expect(row).toMatchObject({ state: "playing", question: 2, ended: null, score: null });
+    // A friend still playing has no place: today's leaderboard ranks only finished runs.
+    expect(row).toMatchObject({ state: "playing", question: 2, ended: null, score: null, place: null });
     const text = JSON.stringify((await board()).body);
     for (const word of WORDS) expect(text).not.toContain(`"${word}"`);
   });
@@ -147,6 +149,14 @@ describe("Fragments' live board over HTTP", () => {
     useSession(V.session);
     const { row } = await friendOf(F);
     expect(row).toMatchObject({ state: "finished", question: null, ended: null, score: scoreRun(WORDS, "j").total });
+    // Their place today among the two who have finished (W, V's other friend, has not): F and V played the same words, so
+    // they tie and go by name, one 1st and the other 2nd, each seeing the other's place (M25 25a).
+    expect(row.place).toMatchObject({ of: 2 });
+    useSession(F.session);
+    const back = (await friendOf(V)).row;
+    expect([row.place!.place, back.place!.place].sort()).toEqual([1, 2]);
+    expect(back.place).toMatchObject({ of: 2 });
+    useSession(V.session);
     const text = JSON.stringify((await board()).body);
     for (const word of WORDS) expect(text).not.toContain(`"${word}"`);
   });
@@ -155,7 +165,7 @@ describe("Fragments' live board over HTTP", () => {
     useSession(W.session);
     // W's only friend here is V, who has finished: W sees V as started, though V is done and scored.
     const { row } = await friendOf(V);
-    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null });
+    expect(row).toMatchObject({ state: "started", question: null, ended: null, score: null, reactions: null, place: null });
   });
 
   it("lets the viewer react to a friend's Fragments run, counted on Fragments' board and not Offbeat's", async () => {

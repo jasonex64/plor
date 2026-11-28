@@ -187,6 +187,8 @@ test("a board with reactions fits 320px", async ({ browser }) => {
   await host.setViewportSize({ width: 320, height: 640 });
   await host.goto("/friends");
   const row = host.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: `xg${RUN}` });
+  // The ⋯ is in the opened row (M25 25a).
+  await row.locator("summary").click();
   await row.getByRole("button", { name: /^React to / }).click();
   await expect(row.getByRole("group", { name: "Reactions" }).getByRole("button").first()).toBeVisible();
   expect(await host.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
