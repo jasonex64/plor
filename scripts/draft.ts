@@ -1,522 +1,19 @@
-// Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
-// `npm run draft -- <date> [--questions <id>,…] [--not <id>,…]`, `npm run draft -- simulate` and `npm run draft -- check-bank` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
-// the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
-// ones in that order (`--not` leaves the named questions out of the pick, the human's veto of a drafted question that
-// stays in the bank); orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
-// "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
-// draws each question's host answers at random among its bank answers the host can still say past the letters stolen
-// so far (13c; letters first, 13e-2), so 3 familiar answers stay typeable and safe; checks the day; writes
-// content/offbeat/<date>.json for the human to approve on /admin/puzzles; and prints the soft guide: each question's
-// expected catch rate against its target. The local stack only (13a: "Local only"); thing IDs are the same on every
-// database (src/content/thing-id.ts), so the draft holds wherever the same snapshots are loaded. A day holds one
-// question per family, a base category and its subsets (13e-4a: "Separate, not same day"); a letter subset's names
-// count only when they start with its letter, its host answers' names included (O4), so a day that steals the letter
-// at or before it leaves no familiar answer typeable, and the letters skip it ("Yes, the draft skips it").
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+// Drafting a day (DECISIONS.md, Puzzle drafting; docs/milestones/M23-23e-drafting-and-approving.md, 23e-1; answers 50 and 54):
+// `npm run draft -- <date>` writes content/offbeat/<date>.json, a day on a clock for the human to approve on /admin/puzzles. Its
+// three lists are the ones asked longest ago (never first, ties at random by the date), the last asking read from the approved
+// days in the database and from the drafted files on disk (`drafted`). It builds the day as the approval page does
+// (src/content/clock-day.ts) and says for each list how long ago it last appeared, so a repeat while the lists are few is seen.
+// The local stack only (13a: "Local only").
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
-import pg from "pg";
-import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { easiestFirst, leftOutQuestions, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
-import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
+import type pg from "pg";
 import { approvedDays, buildChecked, pickLists, whenText, type ClockSource, type ListUse, type UseDay } from "../src/content/clock-day.ts";
-import { avoids, checkDayFile, checkHostNames, checkPuzzle, isCalendarDate, isClockDay, normalize, parseDay, stolenLetters, type ClockDraft, type DraftedDay, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { checkDraftFile, isCalendarDate, parseClockDraft, type ClockDraft } from "../src/content/puzzle.ts";
+import { parseBank } from "../src/content/bank.ts";
 import { GAME_ID } from "../src/platform/game.ts";
-import { pooledCounts } from "../src/game/ledger.ts";
-import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient, readEdits, readLists } from "./base.ts";
 
-// The host answers for question index: HOST_ANSWERS_PER_QUESTION[index] of the bank, drawn at random but the same for
-// a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank"). The draft passes only the bank
-// answers whose names avoid the letters stolen so far (human, 2026-10-25: "Back to 3 (Recommended)" with letters first).
-export function pickHosts(date: string, index: number, bank: string[]): string[] {
-  const count = HOST_ANSWERS_PER_QUESTION[index];
-  if (bank.length < count) throw new Error(`q${index + 1}: the host bank holds ${bank.length}, and the host names ${count}`);
-  let h = seed(`${date}:${index}`);
-  const left = [...bank];
-  const picked: string[] = [];
-  while (picked.length < count) {
-    h = (h * 1103515245 + 12345) >>> 0;
-    picked.push(...left.splice(h % left.length, 1));
-  }
-  return picked;
-}
-
-// The day with these letters (steals, by question), each question's host answers drawn among its bank answers whose
-// names (by thing ID) avoid the letters stolen up to it: letters first (13e-2). null when a question has fewer such
-// answers than the host names there.
-export function withHosts(date: string, questions: Puzzle["questions"], steals: (string | undefined)[], names: Map<string, string>): Puzzle | null {
-  const lettered = questions.map((q, i) => (steals[i] ? { ...q, steals: steals[i] } : q));
-  const out: Puzzle["questions"] = [];
-  for (const [i, q] of lettered.entries()) {
-    const stolen = stolenLetters({ questions: lettered }, i);
-    const sayable = q.host_bank.filter((id) => avoids(names.get(id)!, stolen));
-    if (sayable.length < HOST_ANSWERS_PER_QUESTION[i]) return null;
-    out.push({ ...q, host_answers: pickHosts(date, i, sayable) });
-  }
-  return { format: 3, game_id: GAME_ID, date, questions: out };
-}
-
-// The questions the letters were checking when they stopped: pickLetters checks them a slot at a time, up to the next
-// slot's question, so a held of 4 means questions 5 and 6 (indexes 4 and 5), which lose the same letters.
-export function blockRange(held: number, count: number): [number, number] {
-  const ends = [...LETTER_SCHEDULE.slice(0, count).flatMap((tier, i) => (tier ? [i] : [])).slice(1), count];
-  return [held, ends.find((end) => end > held) ?? count];
-}
-
-// The questions with the one at index from moved to index to (earlier), the others in order.
-export function moveTo<T>(questions: T[], from: number, to: number): T[] {
-  const out = [...questions];
-  out.splice(to, 0, ...out.splice(from, 1));
-  return out;
-}
-
-type Letters = { steals: (string | undefined)[] | null; held: number };
-
-// An order of the questions whose letters fit (human, 2026-10-25: "soup can be in the questions 1-6 or wherever it can
-// work and just not have it as q7", "Move any blocker earlier (Recommended)"): easiest first as given; if no letters
-// fit, each question where the letters stopped, last first, moves to each earlier place, nearest first, until one
-// fits. Returns the given order and its result when none does.
-export async function fitOrder<T>(questions: T[], tryOrder: (questions: T[]) => Promise<Letters>): Promise<Letters & { questions: T[] }> {
-  const first = await tryOrder(questions);
-  if (first.steals) return { questions, ...first };
-  const [from, to] = blockRange(first.held, questions.length);
-  for (let i = to - 1; i >= from; i--) {
-    for (let place = i - 1; place >= 0; place--) {
-      const next = moveTo(questions, i, place);
-      const result = await tryOrder(next);
-      if (result.steals) return { questions: next, ...result };
-    }
-  }
-  return { questions, ...first };
-}
-
-// The expected share of players finishing a day, from each question's expected catch rate: each must be survived.
-export function finishRate(catches: number[]): number {
-  return catches.reduce((p, c) => p * (1 - c), 1);
-}
-
-// The soft guide in the draft's summary (human, 2026-10-24: "Keep as a soft guide", "Show, never warn
-// (Recommended)"): each question's expected catch rate next to its target, and the finish rate next to the targets'.
-export function softGuide(catches: number[]): string[] {
-  const pct = (x: number) => `${Math.round(x * 100)}%`;
-  return [
-    ...catches.map((c, i) => `  q${i + 1}: expected catch ${pct(c)} (target ${pct(CATCH_TARGETS[i])})`),
-    `  expected finish ${pct(finishRate(catches))} (the targets': ${pct(finishRate(CATCH_TARGETS))})`,
-  ];
-}
-
-// The letters for schedule A's slots, tried depth first in a date-seeded order; fits(upTo, steals) says whether the
-// questions before upTo hold with those letters. null when no choice fits.
-export async function pickLetters(date: string, count: number, fits: (upTo: number, steals: (string | undefined)[]) => Promise<boolean>): Promise<(string | undefined)[] | null> {
-  const slots = LETTER_SCHEDULE.slice(0, count).flatMap((tier, i) => (tier ? [{ i, letters: LETTER_TIERS[tier] }] : []));
-  const base = seed(date);
-  const steals = (chosen: string[]) => Array.from({ length: count }, (_, i) => chosen[slots.findIndex((s) => s.i === i)]);
-  async function search(n: number, chosen: string[]): Promise<string[] | null> {
-    if (n === slots.length) return chosen;
-    const { letters } = slots[n];
-    const start = (base + n) % letters.length;
-    for (let k = 0; k < letters.length; k++) {
-      const letter = letters[(start + k) % letters.length];
-      if (chosen.includes(letter)) continue;
-      const next = [...chosen, letter];
-      const upTo = n + 1 < slots.length ? slots[n + 1].i : count;
-      if (!(await fits(upTo, steals(next)))) continue;
-      const done = await search(n + 1, next);
-      if (done) return done;
-    }
-    return null;
-  }
-  const chosen = await search(0, []);
-  return chosen ? steals(chosen) : null;
-}
-
-// The names (normalized) among texts that don't start with the category's letter, as private.alias_starts decides it, the
-// one place the letter rule lives (O4); none for a category that isn't a letter subset.
-async function offLetter(db: pg.Client, category: string, texts: string[]): Promise<Set<string>> {
-  const { rows } = await db.query<{ t: string }>(
-    `select t from unnest($2::text[]) t, private.category c where c.key = $1 and c.starts_with is not null and not private.alias_starts(t, c.starts_with)`,
-    [category, texts],
-  );
-  return new Set(rows.map((r) => r.t));
-}
-
-// Each name's candidates among the category's members: "#<id>" as given (a retired ID read as its thing's current one,
-// 13e-5b), else the members bearing that name (for a letter subset, a name starting with its letter). The one way a
-// bank answer is matched, for the draft and for check-bank.
-async function nameCandidates(db: pg.Client, category: string, names: string[]): Promise<Map<string, { id: string; name: string }[]>> {
-  const named = names.filter((n) => !n.startsWith("#")).map(normalize);
-  const off = await offLetter(db, category, named);
-  const texts = named.filter((t) => !off.has(t));
-  const { rows } = await db.query<{ alias: string; id: string; name: string }>(
-    `select a.alias, m::text as id, t.name from private.category_members($1) m
-     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
-    [category, texts],
-  );
-  const { rows: given } = await db.query<{ given: string; id: string; name: string }>(
-    `select x::text as given, t.id::text as id, t.name from unnest($2::uuid[]) as x join private.thing t on t.id = private.thing_now(x)
-     where t.id in (select private.category_members($1))`,
-    [category, names.filter((n) => n.startsWith("#")).map((n) => n.slice(1))],
-  );
-  const out = new Map<string, { id: string; name: string }[]>();
-  for (const name of names) {
-    const found = name.startsWith("#") ? given.filter((g) => g.given === name.slice(1)) : rows.filter((r) => r.alias === normalize(name));
-    out.set(name, [...new Map(found.map((r) => [r.id, r.name])).entries()].map(([id, n]) => ({ id, name: n })));
-  }
-  return out;
-}
-
-// Each name's thing among the category's members. Throws, listing the candidates, for a name with none or several.
-export async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
-  const out = new Map<string, string>();
-  for (const [name, found] of await nameCandidates(db, category, names)) {
-    if (found.length !== 1) throw new Error(`${category}: ${nameProblem(name, found)}`);
-    out.set(name, found[0].id);
-  }
-  return out;
-}
-
-function nameProblem(name: string, found: { id: string; name: string }[]): string {
-  if (name.startsWith("#")) return `${name} is not a member`;
-  return `"${name}" names ${found.length === 0 ? "no member" : `several members: ${found.map((f) => `${f.name} #${f.id}`).join(", ")}`}`;
-}
-
-// The bank's answers against the loaded base (13e-9; ROADMAP, From 13e-3: the list checks as a command, run by hand
-// for each batch since 13e-6): each answer must give one member as the draft reads it, and no two answers of one
-// question may name the same thing (13e-8 review: "xylophone" and "marimba").
-export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Promise<string[]> {
-  const problems: string[] = [];
-  for (const q of questions) {
-    const answers = [...q.host_bank, ...q.uncommon];
-    const candidates = await nameCandidates(db, q.category, answers);
-    const seen = new Map<string, string>();
-    const hostShown = new Map<string, string>();
-    for (const name of answers) {
-      const found = candidates.get(name)!;
-      if (found.length !== 1) {
-        problems.push(`${q.id}: ${nameProblem(name, found)}`);
-        continue;
-      }
-      const other = seen.get(found[0].id);
-      if (other) problems.push(`${q.id}: "${other}" and "${name}" name the same thing`);
-      seen.set(found[0].id, name);
-      if (q.host_bank.includes(name)) hostShown.set(name, found[0].name);
-    }
-    // A thing renamed after its answer was written (13e-5b's Wikidata names) breaks every day that picks it.
-    const off = new Set(await shownOffLetter(db, q.category, [...hostShown.values()]));
-    for (const [name, shown] of hostShown) if (off.has(shown)) problems.push(`${q.id}: host answer "${name}" shows as "${shown}", which doesn't start with its letter`);
-  }
-  return problems;
-}
-
-// What check-bank shows the human, for a decision per case rather than a refusal (the human, 2026-10-28: "Add check-bank
-// flag + test (Recommended)", "Fix the three, close the last (Recommended)"): a host answer above another of its
-// question's familiar answers, which leaves the host little to catch-proof (13e-2's batch: footwear's "shoe" over
-// sneaker); and an answer of a status subset that also holds another status, which can sit in two status subsets at
-// once (13e-4b: 30 animals with two IUCN statuses).
-export async function bankFlags(db: pg.Client, questions: BankQuestion[]): Promise<string[]> {
-  const flags: string[] = [];
-  for (const q of questions) {
-    const candidates = await nameCandidates(db, q.category, [...q.host_bank, ...q.uncommon]);
-    const one = (name: string) => (candidates.get(name)!.length === 1 ? candidates.get(name)![0].id : null);
-    const familiar = [...q.host_bank, ...q.uncommon].flatMap((name) => (one(name) ? [{ name, id: one(name)! }] : []));
-    for (const host of q.host_bank) {
-      const id = one(host);
-      if (!id) continue;
-      const { rows } = await db.query<{ id: string }>(
-        `select f::text as id from unnest($1::uuid[]) as f where f <> $2::uuid and $2::uuid in (select private.ancestors_as_of(f, now()))`,
-        [familiar.map((f) => f.id), id],
-      );
-      for (const r of rows) flags.push(`${q.id}: host answer "${host}" is above "${familiar.find((f) => f.id === r.id)!.name}"`);
-    }
-    const { rows: others } = await db.query<{ id: string; status: string }>(
-      `select f.thing_id::text as id, v.name as status from private.category c
-       join private.fact f on f.thing_id = any($2::uuid[]) and f.trait = 'conservation_status' and f.removed_at is null
-       join private.thing v on v.id = f.value_thing
-       where c.key = $1 and c.fact_trait = 'conservation_status' and f.value_thing <> all (c.fact_values)
-       order by v.name`,
-      [q.category, familiar.map((f) => f.id)],
-    );
-    for (const r of others) flags.push(`${q.id}: "${familiar.find((f) => f.id === r.id)!.name}" also holds the status ${r.status}`);
-  }
-  return flags;
-}
-
-// The host answers, by their shown names, that don't start with a letter subset's letter: the host says an answer by
-// its shown name (O4), so check-bank and the draft both refuse one (13e-10 review: one rule, kept in one place).
-async function shownOffLetter(db: pg.Client, category: string, shown: string[]): Promise<string[]> {
-  const off = await offLetter(db, category, shown.map(normalize));
-  return shown.filter((name) => off.has(normalize(name)));
-}
-
-// A category's members, listed once per connection: a draft can't change them (only loads and misses add members),
-// and the letter search asks for them many times, which took seconds a time for a big subset (13e-4b: 7,605
-// endangered animals; the 40-day simulator ran over 35 minutes).
-const memberLists = new WeakMap<pg.Client, Map<string, Promise<Set<string>>>>();
-function membersOf(db: pg.Client, category: string): Promise<Set<string>> {
-  let lists = memberLists.get(db);
-  if (!lists) memberLists.set(db, (lists = new Map()));
-  let members = lists.get(category);
-  if (!members) {
-    members = db.query<{ id: string }>("select m::text as id from private.category_members($1) m", [category]).then((r) => new Set(r.rows.map((x) => x.id)));
-    lists.set(category, members);
-  }
-  return members;
-}
-
-// What the host catches: the host answers and every member under them.
-async function caughtMembers(db: pg.Client, category: string, hosts: string[]): Promise<string[]> {
-  const { rows } = await db.query<{ id: string }>(
-    "select id::text from private.descendants_now($1::uuid[]) as id",
-    [hosts],
-  );
-  const members = await membersOf(db, category);
-  return rows.map((r) => r.id).filter((id) => members.has(id));
-}
-
-// Whether at least FAMILIAR_SAFE_MIN familiar members (in levels) the host doesn't catch can be typed without the
-// letters (human, 2026-10-24: "Typeable and safe (Recommended)"; private.approve_puzzle checks the same), a letter
-// subset's names only when they start with its letter.
-export async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
-  const caught = new Set(await caughtMembers(db, category, hosts));
-  const members = await membersOf(db, category);
-  const { rows } = await db.query<{ id: string }>(
-    `select distinct m::text as id from unnest($2::uuid[]) m join private.thing_alias a on a.thing_id = m
-     cross join (select starts_with from private.category where key = $1) c
-     where a.removed_at is null and ($3::text is null or a.alias !~ $3)
-       and (c.starts_with is null or private.alias_starts(a.alias, c.starts_with))`,
-    [category, Object.keys(levels).filter((id) => members.has(id)), stolen.length ? `[${stolen.join("")}]` : null],
-  );
-  return rows.filter((r) => !caught.has(r.id)).length >= FAMILIAR_SAFE_MIN;
-}
-
-type Question = Puzzle["questions"][number];
-
-// The expected share of players some host answers catch: the blended share (the first guess with the category's pooled
-// past days, as the provisional bonus sees them) of every member the host catches.
-async function catchRate(db: pg.Client, date: string, q: Question, hosts: string[]): Promise<number> {
-  const question = { ...q, host_answers: hosts, root: "", member_of: null, members: (await membersOf(db, q.category)).size };
-  const counts = (await pooledCounts(db, { format: 3, game_id: GAME_ID, date, questions: [question] }, false)).get(0);
-  const caught = await caughtMembers(db, q.category, hosts);
-  return caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(question, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(question, id)), 0);
-}
-
-// Each question's expected catch rate with its host answers, for the soft guide.
-export async function expectedCatches(db: pg.Client, day: Puzzle): Promise<number[]> {
-  const catches = [];
-  for (const q of day.questions) catches.push(await catchRate(db, day.date, q, q.host_answers));
-  return catches;
-}
-
-// A bank question as the day will hold it, before its host answers are drawn: its host bank and levels as thing IDs.
-async function resolveQuestion(db: pg.Client, q: BankQuestion): Promise<Question> {
-  const ids = await resolveNames(db, q.category, [...new Set([...q.host_bank, ...q.uncommon])]);
-  const levels: Record<string, Level> = {};
-  for (const n of q.uncommon) levels[ids.get(n)!] = "uncommon";
-  for (const n of q.host_bank) levels[ids.get(n)!] = "common";
-  return { prompt: q.prompt, category: q.category, host_bank: q.host_bank.map((n) => ids.get(n)!), host_answers: [], levels };
-}
-
-// The order measure ("Easiest first (Recommended)"): the expected catch rate of one host answer, averaged over the
-// question's host bank, so every question is measured alike before its position decides how many the host names.
-export async function oneHostCatch(db: pg.Client, date: string, q: Question): Promise<number> {
-  let sum = 0;
-  for (const id of q.host_bank) sum += await catchRate(db, date, q, [id]);
-  return sum / q.host_bank.length;
-}
-
-// A picked day's questions, swapping out a blocker until the letters fit (13e-10b; human, 2026-10-27: "Draft swaps the
-// blocker (Recommended)", "The pick's next choice (Recommended)", "Until one fits (Recommended)"): pick(leftOut) is the
-// pick without the questions left out; attempt(chosen) builds the day, or names the questions where its letters stopped
-// (fitOrder's block range). Each question of that range is left out alone, last first, and the day picked, re-sorted and
-// retried ("Re-sort and retry (Recommended)"); the first that fits wins. When none fits alone, the last stays out and
-// the next round starts from that day, so a thin list is the one left out, not the questions that replace it (review).
-// It ends when the letters fit, or when the pick throws for too few eligible questions, which names those swapped out.
-export async function withSwaps<Q extends { id: string; prompt: string }, R>(
-  pick: (leftOut: ReadonlySet<string>) => Q[],
-  attempt: (chosen: Q[]) => Promise<{ built: R } | { blockers: Q[] }>,
-): Promise<{ built: R; swapped: Q[] }> {
-  // A failure, in the pick or in building the day it picked (a host name off its letter, a name that doesn't resolve),
-  // names the questions swapped out before it, so the day that failed can be found (13e-10b review; 13f-3b-2).
-  const afterSwaps = (err: unknown, out: Q[]) => {
-    if (!out.length) return err;
-    return new Error(`${(err as Error).message}, after swapping out ${out.map((q) => `"${q.prompt}"`).join(", ")}, as no letters fit with them`, { cause: err });
-  };
-  const tryWithout = async (out: Q[]) => {
-    let chosen: Q[];
-    try {
-      chosen = pick(new Set(out.map((q) => q.id)));
-    } catch (err) {
-      throw afterSwaps(err, out);
-    }
-    try {
-      return await attempt(chosen);
-    } catch (err) {
-      throw afterSwaps(err, out);
-    }
-  };
-  const swapped: Q[] = [];
-  let result = await tryWithout(swapped);
-  while (!("built" in result)) {
-    let next: { q: Q; result: { built: R } | { blockers: Q[] } } | undefined;
-    for (const q of [...result.blockers].reverse()) {
-      const alone = await tryWithout([...swapped, q]);
-      if ("built" in alone) return { built: alone.built, swapped: [...swapped, q] };
-      next ??= { q, result: alone };
-    }
-    swapped.push(next!.q);
-    result = next!.result;
-  }
-  return { built: result.built, swapped };
-}
-
-// The summary's line for each question swapped out ("Say it in the summary (Recommended)").
-export const swapLines = (swapped: { prompt: string }[]): string[] => swapped.map((q) => `swapped out "${q.prompt}": no letters fit with it`);
-
-// days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
-// questions to use, in order, instead of the pick; a hand-picked day is never swapped ("Never (Recommended)").
-export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[], not: string[] = []): Promise<{ day: Puzzle; guide: string[]; swapped: BankQuestion[] }> {
-  // Each bank question resolved and measured once per draft: a swap round changes one question of the 7, and
-  // resolving and measuring the other 6 again gave the same answers each round (13e-10b review; 13f-4a).
-  const measured = new Map<string, Promise<{ q: Question; catch: number }>>();
-  const measure = (b: BankQuestion) => {
-    let m = measured.get(b.id);
-    if (!m) {
-      m = resolveQuestion(db, b).then(async (q) => ({ q, catch: ids ? 0 : await oneHostCatch(db, date, q) }));
-      measured.set(b.id, m);
-    }
-    return m;
-  };
-  // The day from these 7 bank questions: resolved, easiest first (a picked day), its host names checked, and its
-  // letters searched; steals is null when none fit, with held saying how far they got.
-  const assemble = async (chosen: BankQuestion[]) => {
-    const resolved: { q: Question; bank: BankQuestion; catch: number }[] = [];
-    for (const b of chosen) resolved.push({ ...(await measure(b)), bank: b });
-    const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
-    const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
-      ordered.flatMap((r) => r.q.host_bank),
-    ]);
-    const names = new Map(rows.map((r) => [r.id, r.name]));
-    for (const { q } of ordered) {
-      const named = await shownOffLetter(db, q.category, q.host_bank.map((id) => names.get(id)!));
-      if (named.length) throw new Error(`${q.category}: host bank names ${named.map((n) => `"${n}"`).join(", ")} don't start with its letter`);
-    }
-    // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so
-    // the block is at or after it.
-    const tryOrder = async (rs: typeof ordered) => {
-      let held = 0;
-      const questions = rs.map((r) => r.q);
-      const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
-        const part = withHosts(date, questions.slice(0, upTo), trial, names);
-        if (!part) return false;
-        for (let i = 0; i < upTo; i++) {
-          const q = part.questions[i];
-          if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
-        }
-        held = Math.max(held, upTo);
-        return true;
-      });
-      return { steals, held };
-    };
-    // A hand-picked day keeps the order it was given; a picked one may move its blocking question earlier.
-    const fitted = ids ? { questions: ordered, ...(await tryOrder(ordered)) } : await fitOrder(ordered, tryOrder);
-    return { ...fitted, names };
-  };
-  const blocked = (a: Awaited<ReturnType<typeof assemble>>) => {
-    const [from, to] = blockRange(a.held, a.questions.length);
-    return a.questions.slice(from, to);
-  };
-  let built: Awaited<ReturnType<typeof assemble>>;
-  let swapped: BankQuestion[] = [];
-  const vetoed = leftOutQuestions(bank, not);
-  if (ids) {
-    built = await assemble(namedQuestions(bank, days, date, ids, family));
-  } else {
-    ({ built, swapped } = await withSwaps<BankQuestion, typeof built>(
-      (leftOut) => pickQuestions(bank, days, date, family, new Set([...vetoed, ...leftOut])),
-      async (chosen) => {
-        const a = await assemble(chosen);
-        return a.steals ? { built: a } : { blockers: blocked(a).map((r) => r.bank) };
-      },
-    ));
-  }
-  if (!built.steals) {
-    const at = blocked(built).map((r) => `"${r.q.prompt}"`).join(" or ");
-    throw new Error(`no letters fit schedule A for ${date}: ${built.held ? `questions 1 to ${built.held} hold` : "no question holds"}; the block is at ${at} or after it. Change that question's bank or uncommon answers`);
-  }
-  const day = withHosts(date, built.questions.map((r) => r.q), built.steals, built.names)!;
-  const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, built.names)];
-  if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
-  return { day, guide: [...swapLines(swapped), ...softGuide(await expectedCatches(db, day))], swapped };
-}
-
-// The simulator, `npm run draft -- simulate`: draft() for SIMULATE_DAYS consecutive dates from SIMULATE_FROM, each
-// drafted day joining the past days the next one is drafted against, so the 30-day gap is tested between them (13e-10:
-// before, each date saw only the days on disk, and 40 days spaced 3 apart drafted with any 7 categories). 13e stops
-// growing when it drafts all of them (human, 2026-10-27: "When 30 days in a row draft (Recommended)", "Simulate does
-// 30 in a row (Recommended)"). It writes no files; it became this command after being rewritten by hand three times
-// (CLAUDE.md, repeated procedures; 13e-5).
-const SIMULATE_DAYS = 30;
-const SIMULATE_FROM = "2027-01-01";
-
-export function simulateDates(): string[] {
-  const from = Date.parse(`${SIMULATE_FROM}T00:00:00Z`);
-  return Array.from({ length: SIMULATE_DAYS }, (_, i) => new Date(from + i * 86_400_000).toISOString().slice(0, 10));
-}
-
-// A day the draft refused, as its own errors say: not the database's error, nor the network's (which carry a code), nor
-// the connection ending.
-export function isDayFailure(err: unknown): err is Error {
-  return err instanceof Error && !(err instanceof pg.DatabaseError) && (err as NodeJS.ErrnoException).code === undefined
-    && !/Connection terminated/.test(err.message);
-}
-
-async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key: string) => string): Promise<void> {
-  const past = [...days];
-  let drafted = 0;
-  let questions = 0;
-  let subset = 0;
-  // A day that doesn't draft is what the simulator measures: each is printed with its reason, the failed dates are
-  // named at the end, and any one makes the command exit 1. A lost connection or a database error isn't a day that
-  // didn't draft: it stops the run (13e-5 second review; 13f-4c).
-  const failed: string[] = [];
-  for (const date of simulateDates()) {
-    try {
-      const { day, swapped } = await draft(db, bank, past, date, family);
-      past.push(day);
-      const swaps = swapLines(swapped);
-      drafted++;
-      questions += day.questions.length;
-      subset += day.questions.filter((q) => family(q.category) !== q.category).length;
-      console.log(`${date} ${day.questions.map((q) => (q.steals ? `${q.category}:${q.steals}` : q.category)).join(" ")}${swaps.length ? ` (${swaps.join("; ")})` : ""}`);
-    } catch (err) {
-      if (!isDayFailure(err)) throw err;
-      failed.push(date);
-      console.log(`${date} FAILED: ${err.message}`);
-    }
-  }
-  console.log(`DRAFTED ${drafted} of ${SIMULATE_DAYS}; subset questions ${subset} of ${questions}${failed.length ? `; failed: ${failed.join(", ")}` : ""}`);
-  if (drafted < SIMULATE_DAYS) process.exitCode = 1;
-}
-
-// `npm run draft -- check-bank`: prints each of bankProblems' problems, and exits 1 on any; then bankFlags' flags,
-// for the human, which don't fail it.
-async function checkBank(db: pg.Client, bank: Bank): Promise<void> {
-  const problems = await bankProblems(db, bank.questions);
-  for (const p of problems) console.log(p);
-  console.log(`CHECKED ${bank.questions.length} questions: ${problems.length} problem${problems.length === 1 ? "" : "s"}`);
-  const flags = await bankFlags(db, bank.questions);
-  for (const f of flags) console.log(`FLAG ${f}`);
-  console.log(`FLAGGED ${flags.length} for the human`);
-  if (problems.length) process.exitCode = 1;
-}
-
-// `npm run draft -- clock <date>` (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1; answers 50 and 54): a day on a clock, its
-// three lists the ones asked longest ago (never first, ties at random by the date), the last asking read from the approved days
-// in the database and from the drafted files (`drafted`, every day on disk of either format). It builds the day as the approval
-// page does (src/content/clock-day.ts) and says for each list how long ago it last appeared, so a repeat while the lists are few is
-// seen. The old draft above stays until 23f, when it is removed and this takes its name.
 export async function draftClock(db: pg.Client, date: string, source: Pick<ClockSource, "lists" | "prompts">, drafted: UseDay[]): Promise<{ day: ClockDraft; lines: string[] }> {
   const used = [...(await approvedDays(db)), ...drafted];
   const picked = pickLists(date, source.lists.map((l) => l.category), used);
@@ -530,84 +27,43 @@ export function clockLines(day: ClockDraft, picked: ListUse[]): string[] {
   return day.questions.map((q, i) => `  q${i + 1} "${q.prompt}" (${q.category}): last appeared ${whenText(day.date, picked[i].last)}`);
 }
 
-// The clock command's date, or null for usage it doesn't take. The date is user input, as draftArgs' is.
-export function clockArgs(args: string[]): string | null {
-  return args.length === 2 && args[0] === "clock" && isCalendarDate(args[1]) ? args[1] : null;
+// The command's date, or null for usage it doesn't take. The date is user input: a malformed one would make every gap NaN
+// and let any category through (13d review).
+export function draftArgs(args: string[]): string | null {
+  return args.length === 1 && isCalendarDate(args[0]) ? args[0] : null;
 }
 
-// The command line, or null for usage it doesn't take. The date is user input: a malformed one would make every gap NaN
-// and let any category through (13d review). --not and --questions naming one question is a contradiction, refused.
-export function draftArgs(args: string[]): { date: string; ids: string[] | undefined; not: string[] } | null {
-  let parsed;
-  try {
-    parsed = parseArgs({ args, allowPositionals: true, options: { questions: { type: "string" }, not: { type: "string" } } });
-  } catch {
-    return null;
-  }
-  const { values, positionals } = parsed;
-  const [date] = positionals;
-  const command = date === "simulate" || date === "check-bank";
-  const hasFlag = values.questions !== undefined || values.not !== undefined;
-  if (positionals.length !== 1 || (command ? hasFlag : !isCalendarDate(date)) || values.questions === "" || values.not === "") return null;
-  const ids = values.questions?.split(",");
-  const not = values.not?.split(",") ?? [];
-  const both = not.find((id) => ids?.includes(id));
-  if (both) throw new Error(`--not and --questions both name "${both}"`);
-  return { date, ids, not };
-}
-
-// Every drafted day on disk, of either format, each checked as content:validate checks it.
-function readDays(dir: string): DraftedDay[] {
+// Every drafted day on disk, each checked as content:validate checks it.
+function readDays(dir: string): ClockDraft[] {
+  // No file is committed until a day is drafted, and git holds no empty folder.
+  if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((n) => n.endsWith(".json")).map((n) => {
     const file = `${GAME_ID}/${n}`;
     const text = readFileSync(join(dir, n), "utf8");
-    const problems = checkDayFile(file, text);
+    const problems = checkDraftFile(file, text);
     if (problems.length) throw new Error(problems.join("\n"));
-    return parseDay(file, text).puzzle!;
+    return parseClockDraft(file, text).puzzle!;
   });
 }
 
 async function main(): Promise<void> {
-  const clockDate = clockArgs(process.argv.slice(2));
-  const args = clockDate ? null : draftArgs(process.argv.slice(2));
-  if (!clockDate && !args) {
-    console.error("usage: npm run draft -- <date> [--questions <id>,…] [--not <id>,…]\n       npm run draft -- clock <date>\n       npm run draft -- simulate\n       npm run draft -- check-bank");
+  const date = draftArgs(process.argv.slice(2));
+  if (!date) {
+    console.error("usage: npm run draft -- <date>");
     process.exit(2);
   }
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
   if (!bank) throw new Error(errors.join("\n"));
   const dir = join("content", GAME_ID);
   const days = readDays(dir);
-  if (clockDate) {
-    const db = await localClient();
-    try {
-      const prompts = new Map(bank.questions.map((q) => [q.category, q.prompt]));
-      const { day, lines } = await draftClock(db, clockDate, { lists: readLists(), prompts }, days);
-      mkdirSync(dir, { recursive: true });
-      writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
-      console.log(`DRAFTED ${dir}/${day.date}.json: a day on a clock`);
-      console.log(lines.join("\n"));
-    } finally {
-      await db.end();
-    }
-    return;
-  }
-  const { date, ids, not } = args!;
-  const simulating = date === "simulate";
-  const checking = date === "check-bank";
-  // The old draft's gap and families are the days of seven questions' rules: a day on a clock is not one of them.
-  const sevens = days.filter((d): d is Puzzle => !isClockDay(d));
-  const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
-  if (!categories) throw new Error(categoryErrors.join("\n"));
   const db = await localClient();
   try {
-    if (simulating) return await simulate(db, bank, sevens, familyOf(categories));
-    if (checking) return await checkBank(db, bank);
-    const { day, guide } = await draft(db, bank, sevens, date, familyOf(categories), ids, not);
+    const prompts = new Map(bank.questions.map((q) => [q.category, q.prompt]));
+    const { day, lines } = await draftClock(db, date, { lists: readLists(), prompts }, days);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
-    console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);
-    console.log(guide.join("\n"));
+    console.log(`DRAFTED ${dir}/${day.date}.json`);
+    console.log(lines.join("\n"));
   } finally {
     await db.end();
   }

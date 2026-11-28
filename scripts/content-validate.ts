@@ -2,16 +2,15 @@
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
 // A researched list under lists/ (M23 23a) is checked too, and counted; the bank's names for its question must be on it (23b).
-// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d), and no day asks two of one family (13e-4a).
 // The bank asks only categories listed in the categories file (data/categories.json from the command; a test passes
 // its own, 13e-1 review; 13f-4c), which is checked too (13e).
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
-import { gapProblems, parseBank } from "../src/content/bank.ts";
-import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
+import { parseBank } from "../src/content/bank.ts";
+import { CATEGORIES_FILE, parseCategories } from "../src/content/categories.ts";
 import { LISTS_DIR, parseList } from "../src/content/list.ts";
-import { checkDayFile, isClockDay, normalize, parseDay, type Puzzle } from "../src/content/puzzle.ts";
+import { checkDraftFile, normalize } from "../src/content/puzzle.ts";
 import { checkSubstringsFile, parseSubstringDay, substringGapProblems, type SubstringDay } from "../src/content/substrings.ts";
 import { SUBSTRINGS_ID } from "../src/platform/game.ts";
 
@@ -42,15 +41,12 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
   const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle or the bank`);
   if (files.length === 0) return { files: 0, errors: [...strays, `${root}: no puzzle files found`] };
   const allTexts = files.map((file) => ({ file, text: readFileSync(join(root, file), "utf8") }));
-  // Each game's folder holds it to that game's rules. A folder that's neither fails game 1's checks, so a typo can't skip
+  // Each game's folder holds it to that game's rules. A folder that's neither fails Offbeat's checks, so a typo can't skip
   // them (M16 16c).
   const secondGame = allTexts.filter(({ file }) => file.startsWith(`${SUBSTRINGS_ID}/`));
   const texts = allTexts.filter(({ file }) => !file.startsWith(`${SUBSTRINGS_ID}/`));
-  const errors = [...strays, ...texts.flatMap(({ file, text }) => checkDayFile(file, text)), ...secondGame.flatMap(({ file, text }) => checkSubstringsFile(file, text))];
+  const errors = [...strays, ...texts.flatMap(({ file, text }) => checkDraftFile(file, text)), ...secondGame.flatMap(({ file, text }) => checkSubstringsFile(file, text))];
   errors.push(...substringGapProblems(secondGame.flatMap(({ file, text }) => parseSubstringDay(file, text).day ?? []) as SubstringDay[]));
-  // The 30-day gap and one family a day are the old game's rules, for the days of seven questions: a day on a clock asks three of
-  // twenty-one lists, which come round again in a week (answer 54: "Repeat, and warn me").
-  const days = texts.flatMap(({ file, text }) => parseDay(file, text).puzzle ?? []).filter((d): d is Puzzle => !isClockDay(d));
   const { categories, errors: categoryErrors } = parseCategories(categoriesFile, readFileSync(categoriesFile, "utf8"));
   errors.push(...categoryErrors);
   const keys = categories && { file: categoriesFile, keys: new Set(categories.map((c) => c.key)) };
@@ -61,8 +57,6 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
     errors.push(...listErrors);
     if (list) typed.set(list.category, { file, forms: new Set(list.answers.flatMap((a) => [a.name, ...a.aliases].map(normalize))) });
   }
-  // A broken categories file is reported above, and every family is then its own category.
-  errors.push(...gapProblems(days, familyOf(categories ?? [])));
   if (all.includes(BANK)) {
     const { bank, errors: bankErrors } = parseBank(BANK, readFileSync(join(root, BANK), "utf8"));
     errors.push(...bankErrors);
