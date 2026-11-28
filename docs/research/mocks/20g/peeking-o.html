@@ -1,0 +1,91 @@
+<title>Plor Point Sketches</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fafaf8;color:#1a1a18;font-family:'Baloo 2',system-ui,sans-serif;line-height:1.35}
+p,h1,h2,figure{margin:0}
+svg{display:block}
+.sheet{max-width:1248px;margin:0 auto;padding:16px 16px 40px}
+.intro h1{font-size:22px;font-weight:800;line-height:1.2}
+.intro p{font-size:14px;color:#5f5f5a;max-width:70ch;margin-top:4px}
+.intro .pick{font-size:15px;color:#1a1a18;margin-top:10px}
+.pair{margin-top:28px;padding-top:16px;border-top:1px solid #e2e2dc}
+.pair h2{font-size:20px;font-weight:800;line-height:1.2}
+.pair h2 b{display:inline-block;min-width:1.5em;font-weight:800;color:#5f5f5a}
+.idea{font-size:15px;max-width:75ch;margin-top:2px}
+.small{font-size:13px;color:#5f5f5a;max-width:75ch}
+.panels{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+@media (min-width:900px){.panels{grid-template-columns:1fr 1fr;gap:16px}}
+.panel{--m1:var(--text);--m2:var(--accent);--hole:#fff;--pupil:#1a1a18;min-width:0;padding:12px 14px 16px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:5px;display:flex;flex-direction:column;gap:14px}
+.paper{--bg:#fafaf8;--surface:#fff;--text:#1a1a18;--muted:#5f5f5a;--line:#e2e2dc;--accent:#2457d6}
+.night{--bg:#121212;--surface:#1c1c1c;--text:#ededea;--muted:#a3a39d;--line:#3a3a37;--accent:#7ea6ff}
+.th,.cap{font-size:12px;color:var(--muted);line-height:1.25}
+.th{font-weight:700}
+.row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px}
+figure{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.big{width:min(512px,100%);aspect-ratio:1}
+.big svg{width:100%;height:100%}
+.ico{border-radius:0;outline:1px solid var(--line)}
+.ico.round{border-radius:50%}
+.ico.squircle{border-radius:22%}
+.safe{fill:none;stroke:#1a1a18;stroke-opacity:.6;stroke-width:.5;stroke-dasharray:1.5 1.5}
+.side{width:280px;max-width:100%;padding:28px 28px 20px;background:var(--surface);border-right:2px solid var(--text)}
+.lock{display:flex;align-items:center;color:var(--text);min-height:40px}
+.ring{fill:var(--m2)}
+.face{fill:var(--hole);stroke:var(--hole);stroke-width:2;stroke-linejoin:round}
+.eyes{fill:var(--pupil)}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+
+<div class="sheet">
+<div class="intro">
+<h1>Plor logo: the peeking o, with a point inside</h1>
+<p>The outside is a plain circle. The white inside rises into one small soft point that leans the way he looks. Three heights of point, A to C; nothing else changes. Each is shown on Paper and on Night: alone at 16, 32, 180 and 512 px, as an app icon with the maskable safe circle (radius 40% of the icon's width) dotted over it, and as the o in the word, at sidebar size and large.</p>
+<p>At 16 and 32 px and in the sidebar word he is redrawn so the point holds up: a thinner ring, a bigger white, bigger eyes and a taller point. The app icon is the same drawing as the mark, a blue ring on a white square, not white on blue: on a blue square his face has to turn blue and stops looking like cream. That blue version is last in each icon row, for comparison.</p>
+<p class="pick">My pick is B: its point is tall enough to still show at 16 px, and low enough that he stays a round o with a soft peak.</p>
+</div>
+<div id="vers"></div>
+</div>
+<script>
+const r2=n=>Math.round(n*100)/100;
+/* The white inside: a circle (centre cx,cy, radius r) with one smooth bump added to its top, drawn as many short lines.
+   h: how far the point rises. w: how wide it is (radians). lean: how far the tip is pushed right, as a share of h.
+   q: how much of that push is kept for the very tip (higher = more of a curl). */
+const face=(cx,cy,r,p)=>{const pts=[];for(let i=0;i<720;i++){const a=(i-360)*Math.PI/360,u=(a-.1)/p.w,b=Math.pow(1/(1+u*u),1.2),R=r+p.h*b;
+if(i%8&&b<.002)continue;
+pts.push(r2(cx+R*Math.sin(a)+p.h*(p.lean*b+p.curl*Math.pow(b,4)))+' '+r2(cy-R*Math.cos(a)))}
+return 'M'+pts.join('L')+'Z'};
+const eyes=(x1,x2,y,rx,ry)=>'<g class="eyes"><ellipse cx="'+x1+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'"/><ellipse cx="'+x2+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'"/></g>';
+/* Full drawing: outer circle radius 28, inside radius 15.5 sitting 4 low. */
+const full=p=>'<circle class="ring" cx="32" cy="32" r="28"/><path class="face" d="'+face(32,36,14.5,p)+'"/>'+eyes(34,42,37,2.9,4.1);
+/* Small drawing (16 px, 32 px, sidebar word): outer circle radius 31, inside radius 19 sitting 5 low, bigger eyes. */
+const small=p=>'<circle class="ring" cx="32" cy="32" r="31"/><path class="face" d="'+face(32,37,18,p)+'"/>'+eyes(31.5,42,39.5,3.8,5);
+const VERS=[
+{l:'A',name:'A hint',idea:'The top of the white lifts into a low bump that leans right. Easy to miss: he is still very nearly the plain peeking o.',small:'At 16 px the point is not visible as a point: it shows as a faint lift in the white, no more. At 32 px it is a small bump.',
+ f:{h:3.2,w:.16,lean:.35,curl:0},
+ s:{h:4.8,w:.16,lean:.35,curl:0}},
+{l:'B',name:'Clearly raised',idea:'One clear soft peak, about a fifth as tall as the white is wide, leaning a little to the right. My best guess at &quot;slightly raised&quot;.',small:'At 16 px the point is still there as a small point. At 32 px it is clear.',
+ f:{h:6.2,w:.14,lean:.2,curl:0},
+ s:{h:8,w:.14,lean:.2,curl:0}},
+{l:'C',name:'Taller, with a curl',idea:'A taller peak whose tip bends over to the right, the way he looks.',small:'At 16 px the point is still there and leans, but the curl itself is too small to see. At 32 px the curl shows.',
+ f:{h:8.8,w:.13,lean:.3,curl:.35},
+ s:{h:10.5,w:.13,lean:.3,curl:.35}}
+];
+document.getElementById('defs').innerHTML=VERS.map(v=>'<symbol id="o'+v.l+'" viewBox="0 0 64 64">'+full(v.f)+'</symbol><symbol id="o'+v.l+'s" viewBox="0 0 64 64">'+small(v.s)+'</symbol>').join('');
+const mark=(id,px)=>'<svg viewBox="0 0 64 64" width="'+px+'" height="'+px+'" aria-hidden="true"><use href="#'+id+'"/></svg>';
+const fig=(inner,cap)=>'<figure>'+inner+'<span class="cap">'+cap+'</span></figure>';
+const ICO={blue:['#2457d6','--m2:#fff;--hole:#2457d6;--pupil:#fff'],white:['#fff','--m2:#2457d6;--hole:#fff;--pupil:#1a1a18']};
+const icon=(v,px,cls,safe,kind)=>'<svg class="ico '+cls+'" data-icon="'+v.l+'" data-bg="'+ICO[kind][0]+'" viewBox="0 0 64 64" width="'+px+'" height="'+px+'" style="'+ICO[kind][1]+'" aria-hidden="true"><rect width="64" height="64" fill="'+ICO[kind][0]+'"/><g transform="translate(32 32) scale(.84) translate(-32 -32)"><use href="#o'+v.l+'" width="64" height="64"/></g>'+(safe?'<circle class="safe" cx="32" cy="32" r="25.6"/>':'')+'</svg>';
+/* The word: P, l and r as round-ended strokes 8 wide; he is 34 tall, the x-height plus the strokes' round ends. */
+const word=(v,id,R,h)=>{const s=17/R,x=r2(69-32*s),y=r2(38-32*s),w=r2(64*s);
+return '<svg viewBox="4 -2 108 60" height="'+h+'" role="img" aria-label="Plor"><g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--m1)"><path d="M10 14V50M10 14h9a9.5 9.5 0 0 1 0 19H10"/><path d="M44 4V50"/><path d="M94 26V50M94 37a11 11 0 0 1 11-11h1"/></g><use href="#'+id+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'"/></svg>'};
+const panel=(v,t)=>'<div class="panel '+t+'"><p class="th">'+(t=='paper'?'Paper (light)':'Night (dark)')+'</p>'+
+'<div class="row" data-sizes><div class="row" data-small>'+fig(mark('o'+v.l+'s',16),'16 px')+fig(mark('o'+v.l+'s',32),'32 px')+'</div>'+fig(mark('o'+v.l,180),'180 px')+'</div>'+
+'<figure><div class="big">'+mark('o'+v.l,512).replace(' width="512" height="512"','')+'</div><span class="cap">512 px (drawn smaller where the screen is narrower than that)</span></figure>'+
+'<div class="row">'+fig(icon(v,128,'',1,'white'),'App icon, with the safe circle')+fig(icon(v,60,'round',0,'white'),'cut to a circle')+fig(icon(v,60,'squircle',0,'white'),'cut to a rounded square')+fig(icon(v,60,'squircle',0,'blue'),'on blue, for comparison')+'</div>'+
+'<figure><div class="side" data-lock="side"><div class="lock">'+word(v,'o'+v.l+'s',31,38)+'</div></div><span class="cap">The word at the top of the 280 px sidebar (he is the small drawing)</span></figure>'+
+'<figure data-lock="large">'+word(v,'o'+v.l,28,96)+'<span class="cap">The same word, 96 px tall (he is the full drawing)</span></figure></div>';
+document.getElementById('vers').innerHTML=VERS.map(v=>'<section class="pair" data-v="'+v.l+'"><h2><b>'+v.l+'</b>'+v.name+'</h2><p class="idea">'+v.idea+'</p><p class="small">'+v.small+'</p><div class="panels">'+panel(v,'paper')+panel(v,'night')+'</div></section>').join('');
+</script>

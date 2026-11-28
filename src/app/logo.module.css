@@ -1,0 +1,12 @@
+/* Plor's logo (src/app/logo.tsx; M20 20g). Drawn art keeps its own colours in every theme (DECISIONS.md, Styling): his
+   ring is Plor's blue, #2457d6 on the light themes and the lighter #7ea6ff on the dark, by the theme's own color-scheme
+   (answer 131); his face is white and his pupils near-black everywhere. The letters are the theme's text colour. */
+.ring {
+  fill: light-dark(#2457d6, #7ea6ff);
+}
+
+.word {
+  display: block;
+  width: auto;
+  overflow: visible;
+}

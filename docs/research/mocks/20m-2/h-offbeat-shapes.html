@@ -1,0 +1,212 @@
+<title>Offbeat Shapes Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Unbounded:wght@800&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--white);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:38px;height:38px;flex:none}
+.entry{display:flex;gap:8px;align-items:stretch;flex:none}
+.field{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;animation:blink 1.06s steps(1) infinite}
+.field.off .caret,.field.off .ph{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* H: Offbeat as flat shapes. Four colours and no others: Offbeat's blue, white, the emblem's yellow, the emblem's ink.
+   Every box is square-cornered; the only curves are the ring and the Common circle. Yellow means Rare and nothing else. */
+:root{--blue:#2f3d5c;--white:#fff;--yellow:#ffd84d;--ink:#1a1a1a;--outer:#1a1a1a;--kb-bg:#1a1a1a;--k:#2f3d5c;--k-ink:#fff;--disp:'Unbounded','Arial Black',sans-serif;--ring:186px}
+.phone{background:var(--blue)}
+.play{--gap:13px}
+.btn{min-height:44px;padding:0 14px;background:var(--blue);border:2px solid var(--white);border-radius:0;color:var(--white);font-weight:700;font-size:15px}
+.btn.x{width:44px;padding:0 0 3px;font-size:26px;line-height:1}
+.btn.go{min-width:88px;background:var(--ink);border-color:var(--ink);font-weight:800;font-size:18px}
+.btn.pressed{background:var(--white);border-color:var(--white);color:var(--ink)}
+.lab{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;line-height:1.2}
+.dial{flex:none;display:grid;grid-template-columns:1fr var(--ring) 1fr;align-items:end;gap:8px}
+.side{display:flex;flex-direction:column;gap:3px;padding-bottom:4px;min-width:0}
+.side.r{align-items:flex-end;text-align:right}
+#qn{font-size:25px;font-weight:800;line-height:1.05;white-space:nowrap}
+.pips{display:flex;gap:4px;margin-top:5px}
+.pips i{width:20px;height:7px;background:var(--ink)}
+.pips i.on{background:var(--white)}
+#score{font:800 31px/1.05 var(--disp);letter-spacing:-.02em}
+.ring{position:relative;width:var(--ring);height:var(--ring)}
+.ring svg.dialsvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.track{fill:none;stroke:var(--ink);stroke-width:11}
+.arc{fill:none;stroke:var(--white);stroke-width:11;stroke-dasharray:100 100;stroke-dashoffset:calc(100 - var(--f,0)*100)}
+.disc{fill:var(--blue)}
+.flash{position:absolute;inset:0;border:5px solid var(--yellow);border-radius:50%;opacity:0;pointer-events:none}
+#secs{position:absolute;left:0;right:0;top:50%;transform:translateY(-45%);text-align:center;font-size:calc(var(--ring)*.4);font-weight:800;line-height:1;color:var(--white)}
+.unit{position:absolute;left:0;right:0;bottom:calc(var(--ring)*.21);text-align:center;font-size:calc(var(--ring)*.085);font-weight:800;line-height:1;letter-spacing:.06em;color:var(--white)}
+.slot{position:absolute;left:0;right:0;top:calc(var(--ring)*.185);display:flex;justify-content:center;color:var(--white);pointer-events:none}
+.sh{display:block;flex:none;fill:currentColor}
+.sh.rare{fill:var(--yellow)}
+.drop{width:calc(var(--ring)*.125);height:calc(var(--ring)*.125)}
+.drop.rare{width:calc(var(--ring)*.18);height:calc(var(--ring)*.18);margin-top:calc(var(--ring)*-.025)}
+[data-low="1"] .disc{fill:var(--white)}
+[data-low="1"] #secs,[data-low="1"] .unit,[data-low="1"] .slot{color:var(--ink)}
+[data-low="1"] .drop.rare{stroke:var(--ink);stroke-width:1.6;stroke-linejoin:miter}
+#q{flex:none;display:flex;align-items:center;min-height:2.36em;font:800 28px/1.18 var(--disp);letter-spacing:-.015em;color:var(--white);text-wrap:balance}
+.field{padding:0 14px;background:var(--white);color:var(--ink);font-weight:700;font-size:23px}
+.field .ph{font-weight:400;font-size:17px;color:var(--blue)}
+.caret{width:11px;height:26px;margin:0 3px 0 2px;background:var(--ink)}
+.last{flex:none;min-height:58px;display:grid;grid-template-columns:30px 1fr auto;align-items:center;column-gap:12px;padding:5px 14px 4px 12px;background:var(--ink);color:var(--white);border:3px solid var(--ink)}
+.last.empty{background:var(--blue)}
+.last.rare{border-color:var(--yellow)}
+.last .sh{width:24px;height:24px;justify-self:center}
+.last.rare .sh{width:30px;height:30px}
+.last .mid{display:flex;flex-direction:column;min-width:0}
+.last .nm{font-size:19px;font-weight:800;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.last.rare .nm{color:var(--yellow)}
+.last .meta{font-size:14px;font-weight:700;line-height:1.25}
+.last .pp{text-align:right;font-size:22px;font-weight:800;line-height:1.05}
+.last .pp small{display:block;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.last .no{width:22px;height:22px;justify-self:center;stroke:var(--white);stroke-width:4;fill:none}
+.count{flex:none;display:flex;align-items:center;gap:10px;min-height:22px;font-size:14px;font-weight:700;line-height:1.2}
+.count .row{display:flex;align-items:center;gap:5px}
+.count .sh{width:15px;height:15px}
+.kr b{border-radius:0}
+.over{position:absolute;inset:60px 0 0;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:16px;background:var(--blue);text-align:center}
+.over .o1{font-size:30px;font-weight:800;line-height:1.1}
+.over .big{font:800 64px/1.05 var(--disp);letter-spacing:-.03em}
+.over .o2{font-size:14px;font-weight:700}
+.over dl{display:grid;grid-template-columns:auto auto auto;align-items:center;gap:8px 16px;margin:16px 0;padding:14px 18px;background:var(--ink);font-size:16px;font-weight:700;text-align:left}
+.over dd{display:flex;align-items:center;gap:5px}
+.over dd.n{justify-content:flex-end;font-weight:800}
+.over .sh{width:15px;height:15px}
+/* The three motions. A letter typed: */
+@keyframes hType{0%{transform:translateY(-10px) scaleY(1.4)}100%{transform:none}}
+.field .l{animation:hType .11s cubic-bezier(.2,.9,.3,1) both;transform-origin:50% 100%}
+/* An answer accepted: its shape drops into the ring, the ring takes it and fills; a star falls further, lands harder and rings out. */
+@keyframes hDrop{0%{transform:translateY(calc(var(--ring)*-.62));animation-timing-function:cubic-bezier(.5,0,1,.7)}62%{transform:translateY(0) scale(1.25,.72)}82%{transform:translateY(-3px) scale(.94,1.08)}100%{transform:none}}
+@keyframes hDropBig{0%{transform:translateY(calc(var(--ring)*-.8)) rotate(-144deg) scale(1.5);animation-timing-function:cubic-bezier(.5,0,1,.7)}55%{transform:translateY(0) rotate(0) scale(1.9,1.3)}75%{transform:translateY(-6px) scale(.9,1.12)}100%{transform:none}}
+.drop{animation:hDrop .3s linear both;transform-origin:50% 100%}
+.drop.rare{animation:hDropBig .46s linear both}
+@keyframes hBump{0%,100%{transform:none}40%{transform:scale(1.035)}}
+@keyframes hBumpBig{0%,100%{transform:none}30%{transform:scale(1.12)}60%{transform:scale(.98)}}
+.ring.fed{animation:hBump .26s cubic-bezier(.2,.8,.2,1) .18s}
+.ring.fedbig{animation:hBumpBig .42s cubic-bezier(.2,.8,.2,1) .25s}
+.ring.fed .arc{transition:stroke-dashoffset .28s cubic-bezier(.2,.8,.2,1) .18s}
+.ring.fedbig .arc{transition:stroke-dashoffset .42s cubic-bezier(.2,.8,.2,1) .25s}
+@keyframes hFlash{0%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:scale(1.34)}}
+.ring.fedbig .flash{animation:hFlash .44s cubic-bezier(.1,.7,.3,1) .25s}
+/* An answer refused: */
+@keyframes hShake{0%,100%{transform:none}15%{transform:translateX(-10px)}32%{transform:translateX(9px)}50%{transform:translateX(-7px)}68%{transform:translateX(5px)}84%{transform:translateX(-2px)}}
+.field.no{animation:hShake .32s linear}
+@media (max-height:760px){:root{--ring:146px}.play{--gap:8px}#q{font-size:23px}#score{font-size:27px}#qn{font-size:22px}.last{min-height:54px}.over .big{font-size:52px}.over dl{margin:10px 0;padding:10px 16px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">H · Offbeat · Shapes</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<div class="play">
+<div class="top"><button class="btn" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="4" width="13" height="16" rx="2.2"/><g transform="rotate(14 15 13)"><rect x="9" y="5.5" width="12" height="15" rx="2.2" fill="#ffd84d"/><path d="M12 10.5H18M12 14H16" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></g></svg>
+<button class="btn x" type="button" aria-label="Close">&times;</button></div>
+<div class="dial">
+<div class="side"><span class="lab">Question</span><b id="qn"></b><span class="pips" id="pips" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<div class="ring" id="ring"><svg class="dialsvg" viewBox="0 0 100 100" aria-hidden="true"><circle class="disc" cx="50" cy="50" r="34.5"/><circle class="track" cx="50" cy="50" r="44.5"/><circle class="arc" id="arc" cx="50" cy="50" r="44.5" pathLength="100" transform="matrix(0,-1,-1,0,100,100)"/></svg><i class="flash"></i><span class="slot" id="slot"></span><b id="secs"></b><span class="unit" id="unit"></span></div>
+<div class="side r"><span class="lab">Points</span><b id="score" data-display></b></div>
+</div>
+<h1 id="q" data-display></h1>
+<div class="entry"><div class="field" id="field"></div><button class="btn go" id="go" type="button">Next</button></div>
+<div class="last" id="last" role="status"></div>
+<div class="count"><span class="row" id="shapes" aria-hidden="true"></span><span id="cnt"></span></div>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+<div class="over" id="over" hidden></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,word='',held=0,pts=0,hold=0,given=[[],[],[]],qi=0;
+const field=$('#field'),FB=field.className,rmBox=$('#rm'),ring=$('#ring'),last=$('#last'),slot=$('#slot'),unit=$('#unit'),go=$('#go'),over=$('#over');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const kick=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+const PH='Your answer';
+// The game's numbers (supabase/migrations/20261124235832_clock_run.sql): 20 s at Start; an answer adds its tier's time,
+// 5% less for each answer the run already holds; points by tier.
+const START=20,SECS={common:3000,uncommon:5000,rare:8000},POINTS={common:10,uncommon:25,rare:50},TIER={common:'Common',uncommon:'Uncommon',rare:'Rare'},LOW=5;
+const PATH={common:'<circle cx="12" cy="12" r="9.5"/>',uncommon:'<path d="M12 1 23 12 12 23 1 12z"/>',rare:'<path d="M12 1.1 14.88 8.64 22.94 9.05 16.66 14.11 18.76 21.9 12 17.5 5.24 21.9 7.34 14.11 1.06 9.05 9.12 8.64z"/>'};
+const shp=(tier,c)=>'<svg class="sh '+tier+(c?' '+c:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+PATH[tier]+'</svg>';
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">'+PH+'</span>'}
+function fType(c){if(!word)field.innerHTML='<span class="wd"></span><i class="caret"></i>';word+=c;const s=document.createElement('span');s.className='l';s.textContent=c;field.firstChild.appendChild(s)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">go</b></div>';
+function count(){const g=given[qi];$('#shapes').innerHTML=g.map(t=>shp(t)).join('');$('#cnt').textContent=g.length+(g.length==1?' answer':' answers')+' to this question'}
+function lastShow(o){
+  if(!o){last.className='last empty';last.innerHTML='';return}
+  if(o.msg){last.className='last';last.innerHTML='<svg class="no" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3 21 21M21 3 3 21"/></svg><span class="mid"><b class="nm">'+o.msg+'</b><span class="meta">“'+o.typed+'”</span></span>';return}
+  last.className='last '+o.tier;
+  last.innerHTML=shp(o.tier)+'<span class="mid"><b class="nm">'+o.name+'</b><span class="meta">'+TIER[o.tier]+' · +'+o.secs.toFixed(1)+' seconds</span></span><span class="pp">+'+POINTS[o.tier]+'<small>points</small></span>'}
+function q(text,n){qi=n-1;$('#q').textContent=text;$('#qn').textContent=n+' of 3';[...$('#pips').children].forEach((p,i)=>p.classList.toggle('on',i<n));go.textContent=n==3?'Finish':'Next';count()}
+function score(){$('#score').textContent=pts}
+function added(tier){return Math.max(1000,Math.round(SECS[tier]*Math.pow(.95,held)))/1000}
+function idle(){slot.innerHTML='';unit.textContent='SEC';ring.classList.remove('fed','fedbig')}
+function give(name,tier){
+  const secs=added(tier),big=tier=='rare',show=big?1700:1000;
+  held++;left+=secs;pts+=POINTS[tier];given[qi].push(tier);
+  fClear();score();count();lastShow({name,tier,secs});
+  slot.innerHTML=shp(tier,'drop');unit.textContent='+'+secs.toFixed(1)+' S';
+  if(!RM){hold=performance.now()+(big?700:480);ring.style.setProperty('--f',Math.min(1,(left-(big?.7:.48))/START));kick(ring,big?'fedbig':'fed')}
+  paint();state(big?'accepted-big':'accepted');at(show,idle)}
+function refuse(msg){lastShow({msg,typed:word});kick(field,'no');state('refused')}
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);$('#secs').textContent=w;if(RM||performance.now()>=hold)ring.style.setProperty('--f',Math.min(1,(RM?w:left)/START));root.dataset.low=left<=LOW?'1':'0'}
+function startClock(){stopClock();let prev=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-prev)/1000);prev=n;paint();if(left<=0){stopClock();T.forEach(clearTimeout);T=[];tally();state('over')}},100)}
+function tally(){idle();
+  over.innerHTML='<p class="o1">Time’s up</p><p class="big" data-display>'+pts+'</p><p class="lab">points</p><dl>'+given.map((g,i)=>'<dt>Question '+(i+1)+'</dt><dd>'+g.map(t=>shp(t)).join('')+'</dd><dd class="n">'+g.length+'</dd>').join('')+'</dl><p class="o2">Tap to play again</p>';
+  over.hidden=false}
+function script(){
+  // Opens on question 2 with 10 s left: five answers held, 80 points.
+  left=10;held=5;pts=80;hold=0;given=[['common','common','uncommon','common'],['uncommon'],[]];
+  q('Name a kind of cheese',2);score();lastShow({name:'Gouda',tier:'uncommon',secs:Math.round(5000*Math.pow(.95,4))/1000});paint();state('waiting');startClock();
+  let t=typeWord(1300,'cheddar',120);
+  at(t+250,()=>give('Cheddar','common'));
+  t=typeWord(4000,'taleggio',115);
+  at(t+300,()=>give('Taleggio','rare'));
+  t=typeWord(7400,'cheddar',120);
+  at(t+250,()=>refuse('Already said'));
+  at(t+1050,fClear);
+  t=typeWord(9700,'cheez',130);
+  at(t+250,()=>refuse('Not on the list'));
+  at(t+1050,fClear);
+  at(11500,()=>state('waiting'));
+  at(14300,()=>go.classList.add('pressed'));
+  at(14550,()=>{go.classList.remove('pressed');q('Name a river',3);lastShow(null);fClear();state('waiting')});
+  t=typeWord(15400,'nile',150);
+  at(t+250,()=>give('Nile','common'));
+  typeWord(18200,'amaz',420);
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();over.hidden=true;go.classList.remove('pressed');fClear();idle();script()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>
