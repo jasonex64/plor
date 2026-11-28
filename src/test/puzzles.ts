@@ -1,9 +1,9 @@
 // Puzzle fixtures for the database tests: the fixture's day on a clock (src/test/answer-fixture.ts) on the local stack, and
-// answers a player can type. Shared by the run and board tests.
+// the names of its things. Shared by the run and board tests.
 import type { ClockPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
-import { FIXTURE_ALIASES, FIXTURE_NAMES, fixtureClockDay, isFixtureDay, loadFixtureBase, removeFixtureBase } from "./answer-fixture";
+import { FIXTURE_NAMES, fixtureClockDay, isFixtureDay, loadFixtureBase, removeFixtureBase } from "./answer-fixture";
 
 const created: string[] = [];
 let approvedAt: string | null = null;
@@ -52,11 +52,4 @@ export function nameOf(thingId: string): string {
   const name = FIXTURE_NAMES.get(thingId);
   if (!name) throw new Error(`${thingId} is not a fixture thing`);
   return name.toLowerCase();
-}
-
-// A name of the thing that a player can type: its first.
-export function typedName(thingId: string): string {
-  const names = FIXTURE_ALIASES.get(thingId);
-  if (!names) throw new Error(`${thingId} is not a fixture thing`);
-  return names[0];
 }

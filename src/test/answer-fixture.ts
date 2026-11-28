@@ -14,7 +14,7 @@ type Member = { names: string[]; under?: string };
 // common is the common level and uncommon the uncommon one; every other member is rare.
 type FixtureQuestion = { key: string; prompt: string; common: string[]; uncommon: string[]; members: Record<string, Member> };
 
-export const FIXTURE: FixtureQuestion[] = [
+const FIXTURE: FixtureQuestion[] = [
   {
     key: "fixture_animal",
     prompt: "Name an animal",
@@ -136,22 +136,9 @@ const CLOCK_EXTRA_RARE: Record<number, string[]> = { 0: ["lynx"], 1: ["plum", "p
 const clockExtraSlug = (name: string) => `clock-${name}`;
 export const fixtureId = (index: number, slug: string) => thingId("wikidata", sourceId(FIXTURE[index].key, slug));
 
-// A fixture answer's tier from the fixture's own lists, the way fixtureLevels sets the levels: common for the common list,
-// uncommon for the uncommon list, rare for every other member.
-export function fixtureTier(index: number, id: string): "common" | "uncommon" | "rare" {
-  const q = FIXTURE[index];
-  const slug = Object.keys(q.members).find((s) => fixtureId(index, s) === id);
-  if (slug === undefined) throw new Error(`${id} isn't a member of fixture question ${index}`);
-  return q.common.includes(slug) ? "common" : q.uncommon.includes(slug) ? "uncommon" : "rare";
-}
-
 // Every thing's main name, by ID.
 export const FIXTURE_NAMES = new Map<string, string>(
   FIXTURE.flatMap((q, i) => Object.entries(q.members).map(([slug, m]) => [fixtureId(i, slug), m.names[0]] as [string, string])),
-);
-// Every thing's names, by ID.
-export const FIXTURE_ALIASES = new Map<string, string[]>(
-  FIXTURE.flatMap((q, i) => Object.entries(q.members).map(([slug, m]) => [fixtureId(i, slug), m.names] as [string, string[]])),
 );
 
 // Loads the fixture into the base, as the owner (import_source adds only what's missing), and returns the database's
@@ -210,7 +197,7 @@ const fixtureLevels = (index: number): Record<string, Level> =>
 export const isFixtureDay = (p: { questions: { category: string }[] }) => p.questions.every((q, i) => q.category === FIXTURE[i]?.key);
 
 // The first three questions of the fixture as a day on a clock (format 4; docs/milestones/M23-23c-the-run-on-a-clock.md): every
-// member of the three categories can be typed, and its tier is the fixture's (fixtureTier).
+// member of the three categories can be typed, and its tier is the fixture's.
 export function fixtureClockDay(date: string, approvedAt: string): ClockPuzzle & { approved_at: string } {
   return {
     format: 4,
