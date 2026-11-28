@@ -163,7 +163,7 @@ Chosen for last week's refusals where there were any (knot 6, bone 4, hat 3, bag
 - **23c, the run on a clock, the server's side** (`M23-23c-the-run-on-a-clock.md`, approved, not started): tables and rules for a run, an answer, Next and Finish; guests; the TLA+ model rebuilt.
 - **23d, the screens** (`M23-23d-the-screens.md`, approved 2026-11-25, "Approve 23d"; 23d-1 merged, #312; 23d-2 merged, #316). The play screen, the result screen, the share text, the live board's wording.
 - **23e, drafting and approving a day** (`M23-23e-drafting-and-approving.md`, approved 2026-11-25, "Approve 23e"; 23e-1 merged, #321; 23e-2 merged, #322). `npm run draft` for three questions, the admin's approval of the new format, #251, texts on no list.
-- **23f, the switch** (`M23-23f-the-switch.md`, approved 2026-11-26, "Approve 23f"; answers 58 to 71; 23f-1, the note, merged, #325; 23f-2, every page reads a clock day, merged, #326). Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
+- **23f, the switch** (`M23-23f-the-switch.md`, approved 2026-11-26, "Approve 23f"; answers 58 to 71; 23f-1, the note, merged, #325; 23f-2, every page reads a clock day, merged, #326; 23f-3a, the old game's code out, built and reviewed, its PR open; 23f-3b, the wipe, next). Boards from the switch day, Offbeat off the overall board until its par is set, the old game removed, the old drafted days (Nov 23 to 30) dropped.
 
 ## Acceptance criteria
 - [ ] Every question a day uses has a researched list that passed both passes, and the human has seen its borderline list (a check in the draft that refuses a question without one).
