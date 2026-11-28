@@ -85,24 +85,6 @@
   background: var(--surface);
 }
 
-/* A row that opens (the board's "Where everyone ended"): its summary is the whole row, 44px tall for one line, the
-   controls' height (docs/DESIGN.md; docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4). */
-.row:has(> details) {
-  padding-block: 0;
-}
-
-.row > details {
-  flex: 1;
-}
-
-.row > details > summary {
-  padding-block: calc((44px - 1lh) / 2);
-}
-
-.row > details[open] {
-  padding-bottom: 8px;
-}
-
 /* The player's own row on a board, in the soft tint (14b-10, answer 11). */
 .row.you {
   background: var(--soft);
@@ -169,7 +151,7 @@
   margin-top: 6px;
 }
 
-/* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. Its text wraps rather than push the page
+/* A fact as a chip (mockup 3's .chip), and its dark and safe kinds. Its text wraps rather than push the page
    sideways when it can't fit (14b-17, answer 6). Soft-filled, the theme's tint with no outline (M20 20n-8, the human's
    pick; 20n-9): the 1.5px border stays, clear, so a chip is the size it was and still has an edge where the system
    draws its own colours. The badge below keeps its ink (answer 112). */
@@ -206,11 +188,6 @@ form.chips {
 .safe {
   background: var(--safe-bg);
   color: var(--safe);
-}
-
-.caught {
-  background: var(--caught-bg);
-  color: var(--caught);
 }
 
 /* A number as a stat: a cell on its card, its number over its label, centred, with no box of its own, so a card of stats

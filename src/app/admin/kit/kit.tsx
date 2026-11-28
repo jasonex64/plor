@@ -133,12 +133,11 @@ export function Kit() {
           </li>
         </ul>
       </Piece>
-      <Piece name="Chip" when="A short fact beside something else; the dark, safe and caught kinds.">
+      <Piece name="Chip" when="A short fact beside something else; the dark and safe kinds.">
         <div className={kit.chips}>
           <span className={kit.chip}>7 rounds</span>
           <span className={`${kit.chip} ${kit.dark}`}>Question 1 of 7</span>
           <span className={`${kit.chip} ${kit.safe}`}>Safe</span>
-          <span className={`${kit.chip} ${kit.caught}`}>Caught</span>
         </div>
       </Piece>
       <Piece name="Badge" when="A place or a count in a round badge; the first is the accent one. On a board the top three stand out: a crown, then ribbon tails.">
