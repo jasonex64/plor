@@ -15,7 +15,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { BoardGame } from "@/friends/leaderboard";
 import type { SubstringRun } from "@/game/substring-state";
-import { FINISHED, type RunStatus } from "@/game/status";
+import type { ClockState } from "@/game/clock-state";
 import { api } from "@/lib/api-client";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { BannerSkeleton, TodayBanner } from "./game";
@@ -25,7 +25,7 @@ import { todayCards } from "./today-games";
 import { FragmentsBanner } from "./today-fragments";
 import styles from "./today-cards.module.css";
 
-type OffbeatState = { run: { status: RunStatus; msToReset: number } } | { run: null; msToReset: number };
+type OffbeatState = { run: Pick<ClockState, "status" | "msToReset"> } | { run: null; msToReset: number };
 type Days = { offbeat: OffbeatState; fragments: SubstringRun | null };
 // games: the cards in order; front: the one opened in front; wide and at: whether they sit side by side, and the card the
 // carousel is on.
@@ -65,7 +65,7 @@ export function TodayCards({
   const { cards, front } = useMemo(
     () =>
       days
-        ? todayCards(days.offbeat.run && { over: FINISHED.includes(days.offbeat.run.status) }, days.fragments && { over: days.fragments.status === "finished" })
+        ? todayCards(days.offbeat.run && { over: days.offbeat.run.status === "over" }, days.fragments && { over: days.fragments.status === "finished" })
         : { cards: [], front: 0 },
     [days],
   );

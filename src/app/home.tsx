@@ -25,7 +25,7 @@ import {
 import { createPortal } from "react-dom";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
-import { FINISHED, type RunStatus } from "@/game/status";
+import type { ClockState } from "@/game/clock-state";
 import type { Profile } from "@/lib/profile";
 import { AdminArea, type AdminPage } from "./admin/admin-area";
 import { Board } from "./board";
@@ -646,10 +646,10 @@ function FriendsFeed({ username, name, timeUps }: { username: string; name: stri
   // Read again on the new day and when the clock bar's time runs out (the frame's timeUps), so the feed opens once the run
   // is over, whichever page the player is on.
   useEffect(() => {
-    type RunResponse = { run: { status: RunStatus; msToReset: number } } | { run: null; msToReset: number };
+    type RunResponse = { run: Pick<ClockState, "status" | "msToReset"> } | { run: null; msToReset: number };
     api<RunResponse>("/api/run", { method: "GET" }).then(
       (r) => {
-        setRun(r.run ? { over: FINISHED.includes(r.run.status), msToReset: r.run.msToReset } : { over: false, msToReset: r.msToReset });
+        setRun(r.run ? { over: r.run.status === "over", msToReset: r.run.msToReset } : { over: false, msToReset: r.msToReset });
         setError(null);
       },
       (err) => setError(errorText(err)),
