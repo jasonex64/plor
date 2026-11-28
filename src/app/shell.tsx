@@ -26,6 +26,7 @@ import { CountUp } from "./count-up";
 import { useNew } from "./shown";
 import kit from "./kit.module.css";
 import styles from "./shell.module.css";
+import { Wordmark } from "./logo";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { FORWARD } from "./slide";
 import { markToPlay } from "./to-play";
@@ -248,8 +249,8 @@ export function Shell({ lost, admin, profile, streak, requests, onChanged, onSet
       {/* Anchored while a detail page slides (globals.css; M14 14b-6e), as are the tab bar and the clock bar: named
           inline, as the guide does, since a CSS Module would rename them and the global rules wouldn't match. */}
       <header className={styles.top} style={{ viewTransitionName: "plor-top" }}>
-        <span className={styles.topWord} aria-hidden="true">
-          Plor
+        <span className={styles.topWord}>
+          <Wordmark />
         </span>
         <div className={styles.me}>
           <StreakPill days={streak} />
@@ -259,8 +260,8 @@ export function Shell({ lost, admin, profile, streak, requests, onChanged, onSet
         </div>
       </header>
       <nav ref={nav} aria-label="Main" className={styles.nav} style={{ viewTransitionName: "plor-nav" }}>
-        <span className={styles.word} aria-hidden="true">
-          Plor
+        <span className={styles.word}>
+          <Wordmark />
         </span>
         <div className={styles.who}>
           <Avatar name={profile.username} />

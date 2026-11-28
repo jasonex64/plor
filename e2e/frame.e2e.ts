@@ -116,7 +116,7 @@ test("Back sits on the heading's line, and in the top bar on phones", async ({ b
   await expect(back).toBeVisible();
   const phone = (await back.boundingBox())!;
   expect(phone.y >= 0 && phone.y + phone.height <= 56).toBe(true);
-  await expect(page.getByRole("banner").getByText("Plor", { exact: true })).toBeHidden();
+  await expect(page.getByRole("banner").locator("svg[data-logo]")).toBeHidden();
   await back.click();
   await expect(page).toHaveURL(/\/me$/);
 });
@@ -134,7 +134,9 @@ test("on a computer Plor shows once, and the page's name is its heading at 30px"
       return own === "Plor" && el.checkVisibility() && el.getBoundingClientRect().width > 1;
     }).length,
   );
-  expect(plors).toBe(1);
+  // Once, as the sidebar's drawn word (M20 20g): no "Plor" in text beside it, the heading's own being hidden.
+  expect(plors).toBe(0);
+  await expect(page.locator("svg[data-logo]").filter({ visible: true })).toHaveCount(1);
   const heading = page.locator("main > h1");
   await expect(heading).toHaveAccessibleName("Plor, Friends");
   const name = heading.getByText("Friends", { exact: true });

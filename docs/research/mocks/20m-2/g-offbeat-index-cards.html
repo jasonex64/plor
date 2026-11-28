@@ -1,0 +1,242 @@
+<title>Offbeat Index Cards Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Permanent+Marker&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:'Baloo 2',system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+p,h1,dl,dd{margin:0}
+:focus-visible{outline:3px solid #7ea6ff;outline-offset:2px}
+.page{height:100%;display:flex;flex-direction:column;align-items:center}
+.strip{flex:none;width:100%;max-width:430px;min-height:40px;display:flex;align-items:center;gap:10px;padding-block:4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#101010;color:#f4f4f4;font-size:13px;font-weight:700;line-height:1.2}
+.strip .tag{flex:1;min-width:0}
+.sw{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.sw input{appearance:none;-webkit-appearance:none;margin:0;width:34px;height:20px;border-radius:10px;background:#101010;border:2px solid #f4f4f4;position:relative;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#f4f4f4}
+.sw input:checked{background:#f4f4f4}
+.sw input:checked::after{left:16px;background:#101010}
+.strip button{min-height:30px;padding:0 10px;border-radius:15px;border:2px solid #f4f4f4;background:#101010;color:#f4f4f4;font-weight:700;font-size:13px}
+.phone{flex:1;min-height:0;width:100%;max-width:430px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.play{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--gap,10px);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;flex:none}
+.emblem{width:40px;height:40px;flex:none}
+.field{min-height:48px;display:flex;align-items:center;position:relative;white-space:nowrap;flex:none}
+.wd{display:inline-flex;align-items:center;position:relative}
+.l{display:inline-block;position:relative;z-index:1}
+.caret{flex:none;width:2px;height:26px;margin:0 2px;background:currentColor;animation:blink 1.06s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.kbd{flex:0 0 34%;max-height:290px;display:flex;flex-direction:column;gap:6px;padding:8px 4px 10px;background:var(--kb-bg)}
+.kr{flex:1;display:flex;gap:5px;justify-content:center;min-height:0}
+.kr b{flex:1;max-width:40px;display:grid;place-items:center;border-radius:6px;background:var(--k);color:var(--k-ink);font-weight:700;font-size:18px;line-height:1}
+.kr b.w{flex:1.6;max-width:62px;font-size:13px}
+.kr b.sp{flex:6;max-width:none;font-size:13px}
+@media (max-height:760px){.kbd{flex-basis:31%;gap:5px;padding-block:6px 8px}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important}
+[data-state="over"] #replay{background:#f4f4f4;color:#101010}
+/* G: Offbeat as ruled index cards and paper tape, written in felt-tip. Grown from the emblem: a straight row of answer cards, yours taped on out of line. Offbeat's #2f3d5c is the desk and, darker, the ink; the emblem's #ffd84d is kept for a Rare card alone. Nothing but your card is tilted. */
+:root{--outer:#1a2236;--desk:#2f3d5c;--deep:#1f2a44;--card:#fbf7ea;--ink:#1f2a44;--soft:#3f4b69;--rule:#b4c4e2;--head:#e2848a;--lit:#ffd84d;--tape:#eadfba;--red:#b3261e;--kb-bg:#253150;--k:#fbf7ea;--k-ink:#1f2a44;--disp:'Permanent Marker','Comic Sans MS',cursive}
+.fx{position:absolute;width:0;height:0}
+.phone{background:repeating-linear-gradient(0deg,#ffffff07 0 1px,#0000 1px 4px),repeating-linear-gradient(90deg,#0000000d 0 1px,#0000 1px 3px),linear-gradient(#34436a,#2f3d5c 40%,#2a3754)}
+.play{--gap:9px;color:var(--ink)}
+.card{position:relative;isolation:isolate;color:var(--ink)}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--bg,var(--card));border-radius:2px 3px 2px 4px;box-shadow:1px 2.5px 0 #0c132499;filter:url(#rough)}
+.lab{font-size:13px;font-weight:700}
+.pb{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);overflow:visible;pointer-events:none;filter:url(#felt)}
+.pb path{fill:none;stroke:var(--pen,var(--ink));stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.btn{min-height:44px;padding:1px 16px 0;border:0;background:none;font-weight:700;font-size:15px}
+.btn.x{width:46px;padding:0 0 4px;font-size:26px;line-height:1}
+.btn.go{--bg:var(--deep);--pen:#fff;color:#fff;min-width:132px;font-weight:800;font-size:17px}
+.btn.go::before{box-shadow:1px 2.5px 0 #0c1324cc}
+.btn.pressed{transform:translate(1px,2px)}
+.btn.pressed::before{box-shadow:none}
+/* the clock: paper tape stuck along a pen-drawn measure, peeled back from the right */
+.clock{flex:none;display:flex;align-items:center;gap:12px}
+.secs{flex:none;display:flex;align-items:center;gap:10px;padding:0 10px 0 9px;height:40px}
+.secs .num{position:relative;display:block}
+.secs b{display:block;min-width:1.25em;font-size:30px;font-weight:800;line-height:1;text-align:right;padding-top:3px}
+.secs .lab{font-size:11.5px;line-height:1.05}
+.track{flex:1;min-width:0;height:40px;position:relative;--f:1}
+.track .meas{position:absolute;left:0;right:0;bottom:2px;height:13px;border-bottom:2px solid #ffffff8c;border-left:2px solid #ffffff8c;border-right:2px solid #ffffff8c;border-radius:0 0 2px 3px;background:repeating-linear-gradient(90deg,#0000 0 calc(5% - 1.5px),#ffffff80 calc(5% - 1.5px) 5%) 0 100%/100% 7px no-repeat,repeating-linear-gradient(90deg,#0000 0 calc(25% - 2px),#ffffffa6 calc(25% - 2px) 25%)}
+.track .gone{position:absolute;left:0;right:0;top:7px;height:21px;border:1.5px dashed #ffffff38;border-radius:2px;background:#ffffff0d}
+.tape{position:absolute;left:0;right:0;top:6px;height:23px;background:repeating-linear-gradient(90deg,#0000 0 5px,#8a742f14 5px 6px,#0000 6px 11px,#ffffff2e 11px 12px),linear-gradient(#f3e9c9e0,#e6d9aee0 55%,#dccf9fe6);clip-path:polygon(0 0,4px 17%,1px 35%,5px 52%,0 71%,4px 87%,1px 100%,calc(var(--f)*100% - 13px) 100%,calc(var(--f)*100%) 0)}
+.tape i{position:absolute;top:0;bottom:0;width:7px;margin-left:-7px;background:#b9a66a73;border-right:1.5px solid #8a742f8c}
+.peel{position:absolute;left:calc(var(--f)*100% - 27px);top:-13px;width:30px;height:44px;overflow:visible;pointer-events:none}
+.patch{position:absolute;top:6px;height:23px;background:linear-gradient(#f7efd2,#e9ddb4);clip-path:polygon(0 0,3px 20%,0 40%,4px 60%,1px 80%,3px 100%,calc(100% - 13px) 100%,100% 0);transform-origin:0 50%}
+[data-low="1"] .secs b{color:var(--red)}
+.lowring{inset:-3px -5px -1px -5px;width:calc(100% + 10px);height:calc(100% + 4px);visibility:hidden}
+[data-state="over"] .clock{visibility:hidden}
+.lowring path{stroke:var(--red)}
+[data-low="1"] .lowring{visibility:visible}
+/* the head card */
+.qcard{flex:none;height:118px;--bg:linear-gradient(#0000 33px,var(--head) 33px 34.5px,#0000 34.5px),repeating-linear-gradient(#0000 0 37px,var(--rule) 37px 38.2px) 0 34px/100% 100% no-repeat,var(--card)}
+.qh{height:34px;display:flex;align-items:center;justify-content:space-between;padding:2px 14px 0}
+.score{display:flex;align-items:baseline;gap:6px}
+.score b{font:400 23px/1 var(--disp);filter:url(#felt)}
+.q{padding:0 14px;font:400 27px/38px var(--disp);padding-top:7px;text-wrap:balance;filter:url(#felt)}
+/* the input */
+.field{padding:0 14px;font-weight:700;font-size:23px;--bg:linear-gradient(#0000 37px,var(--rule) 37px 38.2px,#0000 38.2px),var(--card)}
+.field .ph{font-weight:400;font-size:16px;color:var(--soft)}
+.field .l{animation:gType .14s cubic-bezier(.2,.8,.2,1) both}
+.field.no{animation:gShake .36s cubic-bezier(.2,.8,.2,1)}
+.field.no .l{color:var(--soft)}
+.strike{position:absolute;inset:0 -6px;width:calc(100% + 12px);height:100%;overflow:visible;z-index:2;filter:url(#felt)}
+.strike path{fill:none;stroke:var(--red);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0;animation:gDraw .22s ease-out both}
+/* the row: everyone's answer, card after identical card, in a straight line; yours taped on */
+.row{flex:1;min-height:0;margin-inline:-16px;position:relative;display:flex;align-items:center;justify-content:center;gap:14px}
+.rline{position:absolute;left:0;right:0;top:calc(50% - 50px);width:100%;height:8px;overflow:visible}
+.rline path{fill:none;stroke:#ffffff59;stroke-width:1.6;stroke-linecap:round}
+.ghost,.slot{flex:none;width:158px;height:96px;position:relative}
+.ghost::before{content:"";position:absolute;inset:0;border:1.6px solid #ffffff61;border-radius:2px 3px 2px 4px;background:#ffffff1f;filter:url(#rough)}
+.ghost svg{position:absolute;inset:0;width:100%;height:100%}
+.ghost path{fill:none;stroke:#ffffff47;stroke-width:1.5;stroke-linecap:round}
+.ghost path.wr{stroke:#ffffff6b;stroke-width:2.6}
+.tp{position:absolute;z-index:2;left:calc(50% - 24px);top:-9px;width:48px;height:18px;background:repeating-linear-gradient(90deg,#0000 0 5px,#8a742f14 5px 6px,#0000 6px 11px,#ffffff2e 11px 12px),linear-gradient(#f3e9c9d9,#dfd2a4d9);clip-path:polygon(0 0,3px 20%,0 38%,4px 55%,1px 75%,3px 100%,calc(100% - 3px) 100%,100% 80%,calc(100% - 4px) 62%,100% 42%,calc(100% - 3px) 22%,calc(100% - 1px) 0);transform:var(--tr,none)}
+.ghost .tp{background:#ffffff40}
+.slot .empty{position:absolute;inset:0;border:2px dashed #ffffff70;border-radius:3px}
+.mine{position:absolute;inset:0;--bg:linear-gradient(#0000 25px,var(--head) 25px 26.4px,#0000 26.4px),repeating-linear-gradient(#0000 0 31px,var(--rule) 31px 32px) 0 26px/100% 100% no-repeat,var(--card);--r:-1.5deg;--tx:0px;--ty:1px;transform:translate(var(--tx),var(--ty)) rotate(var(--r));padding:0 12px}
+.mine.uncommon{--r:6deg;--tx:3px;--ty:-3px}
+.mine.rare{--r:13deg;--tx:7px;--ty:-7px;--rule:#1f2a4440;--head:#1f2a4473;--bg:linear-gradient(#0000 25px,var(--head) 25px 26.4px,#0000 26.4px),repeating-linear-gradient(#0000 0 31px,var(--rule) 31px 32px) 0 26px/100% 100% no-repeat,var(--lit)}
+.mine .tier{display:block;height:26px;padding-top:7px;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;line-height:1.3}
+.mine .tier span{position:relative;display:inline-block}
+.mine .nm{display:block;font-size:22px;font-weight:800;line-height:32px;padding-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mine .gain{display:block;font-size:13.5px;font-weight:700;line-height:32px;padding-top:3px;white-space:nowrap}
+.mine.common .gain,.mine.uncommon .gain{color:var(--soft)}
+.mine .tp.a{--tr:rotate(-4deg)}
+.mine.uncommon .tp.a{--tr:rotate(-9deg)}
+.mine.rare .tp.a{left:-19px;top:auto;bottom:-10px;--tr:rotate(37deg)}
+.mine.rare .tp.b{left:auto;right:-13px;top:-3px;--tr:rotate(34deg)}
+.ring{position:absolute;inset:-6px -14px -4px -14px;width:calc(100% + 28px);height:calc(100% + 10px);overflow:visible;filter:url(#felt)}
+.ring path{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.slip{position:absolute;left:8px;right:8px;top:29px;height:38px;display:grid;place-items:center;font-size:17px;font-weight:800;padding-top:2px;--bg:var(--card)}
+.slip::before{clip-path:polygon(0 4%,2% 22%,0 41%,2.5% 60%,.5% 80%,2% 100%,98% 97%,100% 78%,97.5% 58%,100% 40%,98% 20%,99.5% 0)}
+/* the foot */
+.foot{flex:none;display:flex;align-items:center;justify-content:space-between}
+.count{position:relative;isolation:isolate;padding:3px 16px 1px;font-size:14.5px;font-weight:700;color:var(--ink)}
+.count::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--tape);clip-path:polygon(0 0,3px 20%,0 38%,4px 55%,1px 75%,3px 100%,calc(100% - 3px) 100%,100% 80%,calc(100% - 4px) 62%,100% 42%,calc(100% - 3px) 22%,calc(100% - 1px) 0)}
+/* the tally */
+.over{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:62px;bottom:10px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:0 16px 16px;--bg:linear-gradient(#0000 43px,var(--head) 43px 44.5px,#0000 44.5px),var(--card)}
+.over .o1{align-self:stretch;height:44px;padding-top:4px;text-align:left;font-size:20px;font-weight:800;line-height:40px}
+.over .o2{margin-top:auto;display:flex;align-items:baseline;gap:8px;font-size:17px;font-weight:700}
+.over .o2 b{font:400 52px/1 var(--disp);filter:url(#felt)}
+.over dl{display:grid;grid-template-columns:auto auto;gap:0 22px;font-size:17px;text-align:left;margin-top:4px}
+.over dd{font-weight:800;text-align:right}
+.over .o3{font-size:14px;color:var(--soft);margin:6px 0 auto}
+.kr b{border-radius:2px 3px 2px 4px;box-shadow:1px 2px 0 #0c132499}
+/* three motions: a letter written, a card taped on (further and harder the rarer), a refusal */
+@keyframes gType{0%{clip-path:inset(-20% 100% -20% -20%);transform:translateY(-4px) rotate(-5deg)}60%{clip-path:inset(-20% -20% -20% -20%)}100%{clip-path:inset(-20% -20% -20% -20%);transform:none}}
+@keyframes gDrop{0%{opacity:0;transform:translate(var(--tx),calc(var(--ty) - 44px)) rotate(0deg) scale(1.1)}55%{opacity:1;transform:translate(var(--tx),var(--ty)) rotate(calc(var(--r)*1.6)) scale(1)}100%{transform:translate(var(--tx),var(--ty)) rotate(var(--r))}}
+@keyframes gDropBig{0%{opacity:0;transform:translate(0,-70px) rotate(-4deg) scale(1.55)}32%{opacity:1;transform:translate(var(--tx),var(--ty)) rotate(calc(var(--r)*1.7)) scale(.97)}55%{transform:translate(var(--tx),var(--ty)) rotate(calc(var(--r)*.7)) scale(1.03)}78%{transform:translate(var(--tx),var(--ty)) rotate(calc(var(--r)*1.15))}100%{transform:translate(var(--tx),var(--ty)) rotate(var(--r))}}
+@keyframes gTape{0%{opacity:0;transform:var(--tr,rotate(0deg)) translateY(-12px) scale(1.5)}100%{opacity:1;transform:var(--tr,rotate(0deg))}}
+@keyframes gDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gPatch{0%{opacity:0;transform:translateY(-15px) rotate(-5deg) scale(1.08)}100%{opacity:1;transform:none}}
+@keyframes gJolt{0%,100%{transform:none}30%{transform:translateX(calc(var(--d)*7px))}}
+@keyframes gShake{0%,100%{transform:none}16%{transform:translateX(-9px)}34%{transform:translateX(8px)}52%{transform:translateX(-6px)}72%{transform:translateX(4px)}}
+@keyframes gSlip{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:none}}
+.mine.in{animation:gDrop .32s cubic-bezier(.2,.8,.2,1) both}
+.mine.uncommon.in{animation-duration:.42s}
+.mine.rare.in{animation:gDropBig .72s cubic-bezier(.2,.8,.2,1) both}
+.mine.in .tp{animation:gTape .14s cubic-bezier(.4,0,.7,.4) .3s both}
+.mine.uncommon.in .tp{animation-delay:.4s}
+.mine.rare.in .tp.a{animation-delay:.66s}
+.mine.rare.in .tp.b{animation-delay:.8s}
+.mine.rare.in .ring path{animation:gDraw .34s ease-out .96s both}
+.row.jolt .ghost{animation:gJolt .4s cubic-bezier(.2,.8,.2,1) .2s}
+.patch{animation:gPatch .2s cubic-bezier(.4,0,.7,.4) both}
+.slip.in{animation:gSlip .2s cubic-bezier(.2,.8,.2,1) both}
+@media (max-height:760px){.play{--gap:6px}.secs,.track{height:36px}.tape,.patch{top:4px}.track .gone{top:5px}.peel{top:-15px}.qcard{height:102px;--bg:linear-gradient(#0000 29px,var(--head) 29px 30.5px,#0000 30.5px),repeating-linear-gradient(#0000 0 33px,var(--rule) 33px 34.2px) 0 30px/100% 100% no-repeat,var(--card)}.qh{height:30px}.q{font-size:24px;line-height:34px;padding-top:6px}.score b{font-size:21px}.field{min-height:44px;--bg:linear-gradient(#0000 34px,var(--rule) 34px 35.2px,#0000 35.2px),var(--card)}.btn{min-height:42px}}
+</style>
+<div class="page">
+<div class="strip"><span class="tag">G · Offbeat · Index cards</span><label class="sw" for="rm"><input type="checkbox" id="rm"> Reduce motion</label><button type="button" id="replay">Replay</button></div>
+<div class="phone" id="phone">
+<svg class="fx" aria-hidden="true"><defs>
+<filter id="rough" x="-5%" y="-12%" width="110%" height="124%"><feTurbulence type="fractalNoise" baseFrequency=".028 .05" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+<filter id="felt" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="1" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+<div class="play">
+<div class="top"><button class="btn card pen" type="button">How to play</button>
+<svg class="emblem" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M5.1 4.1C8.6 3.8 11.2 3.9 14.1 4.1c1.2.1 1.9.8 1.9 2 .2 4 .1 7.900 0 12-.1 1.200-.8 1.800-2 1.900-3 .2-6 .2-8.900 0-1.200-.1-1.900-.8-2-2C2.900 14 2.900 10 3.100 6c.1-1.200.8-1.800 2-1.900z"/><g transform="rotate(14 15 13)"><path d="M11.100 5.600c2.600-.2 5.300-.2 7.800 0 1.200.1 2 .8 2.100 2 .2 3.600.2 7.300 0 10.900-.1 1.200-.9 1.900-2.100 2-2.600.2-5.200.2-7.800 0-1.200-.1-2-.8-2.100-2-.2-3.600-.2-7.300 0-10.900.1-1.200.9-1.900 2.100-2z" fill="#ffd84d"/><path d="M12 10.600c2 -.3 4-.2 6 -.1M12 14.100c1.400-.2 2.700-.2 4-.1" stroke="#1a1a1a" stroke-width="1.5"/></g></svg>
+<button class="btn x card pen" type="button" aria-label="Close">&times;</button></div>
+<div class="clock"><div class="secs card"><span class="num"><b id="secs"></b><svg class="pb lowring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M54 6C24 3 4 20 5 50c1 32 24 46 50 44 28-2 42-18 41-46C95 22 76 6 44 9"/></svg></span><span class="lab">seconds<br>left</span></div>
+<div class="track" id="track"><i class="meas"></i><i class="gone"></i><div class="tape" id="tape"></div>
+<svg class="peel" viewBox="0 0 30 44" aria-hidden="true"><path d="M27.500 20.500 14.500 43.500 5 28.500 8.500 25.500 9 21.500 12.500 18.500 13 14.500 16.500 11.500 17.500 7.500z" fill="#0c132466" transform="translate(1.500 3)"/><path d="M27 19 14 42 4.500 27 8 24 8.500 20 12 17 12.500 13 16 10 17 6z" fill="#fbf5df"/><path d="M27 19 14 42" stroke="#8a742f" stroke-opacity=".55" stroke-width="1.200" fill="none"/></svg></div></div>
+<div class="qcard card"><div class="qh"><span class="lab" id="qn"></span><span class="score"><b id="score" data-display></b><span class="lab">points</span></span></div><div class="q" id="q" data-display></div></div>
+<div class="field card" id="field"></div>
+<div class="row" id="row"><svg class="rline" viewBox="0 0 400 8" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M-4 4C40 3 90 5 150 4s120-1.500 170 0 60 .5 90 0"/></svg>
+<div class="ghost" style="--d:-1"></div><div class="slot" id="slot" role="status" aria-label="Last answer"><i class="empty"></i></div><div class="ghost" style="--d:1"></div></div>
+<div class="foot"><span class="count" id="count"></span><button class="btn go card pen" id="go" type="button"></button></div>
+<div class="over card" id="over" hidden><p class="o1">Time's up</p><p class="o2"><b id="final" data-display></b>points</p><dl><dt>Answers</dt><dd id="oa"></dd><dt>Common</dt><dd id="oc"></dd><dt>Uncommon</dt><dd id="ou"></dd><dt>Rare</dt><dd id="or"></dd></dl><p class="o3">Tap to play it again</p></div>
+</div>
+<div class="kbd" id="kbd" aria-hidden="true"></div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement;
+let RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T=[],tick=null,left=0,hold=0,word='',score=0,given=0,tally={};
+const field=$('#field'),FB=field.className,rmBox=$('#rm'),slot=$('#slot'),row=$('#row'),track=$('#track'),tape=$('#tape'),go=$('#go'),over=$('#over');
+const at=(ms,fn)=>T.push(setTimeout(fn,ms));
+const state=s=>{root.dataset.state=s};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const PEN='<svg class="pb" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M1.500 5C30 1.500 68 3.500 98.500 2 99.500 30 98 68 99 97.500 68 99.500 30 97.500 2 98.500 .5 68 2.500 32 1 1.500"/></svg>';
+document.querySelectorAll('.pen').forEach(b=>b.insertAdjacentHTML('beforeend',PEN));
+const goText=el('span');go.prepend(goText);
+document.querySelectorAll('.ghost').forEach(g=>{g.innerHTML='<i class="tp"></i><svg viewBox="0 0 158 96" aria-hidden="true"><path d="M3 26C50 25 100 27 155 26M3 58C60 57 110 59 155 58M3 89C50 88 110 90 155 89"/><path class="wr" d="M14 48c5-7 8 6 13 0s8 6 13 0 8 6 13 0 8 6 13 0 8 6 13 0 8 5 12 1M14 79c5-6 8 5 13 0s8 5 13 0 8 5 13 0 7 4 10 1"/></svg>'});
+$('#kbd').innerHTML=['qwertyuiop','asdfghjkl','zxcvbnm'].map((r,i)=>'<div class="kr">'+(i==2?'<b class="w">shift</b>':'')+[...r].map(c=>'<b>'+c+'</b>').join('')+(i==2?'<b class="w">del</b>':'')+'</div>').join('')+'<div class="kr"><b class="w">123</b><b class="sp">space</b><b class="w">send</b></div>';
+function fClear(){word='';field.className=FB;field.innerHTML='<i class="caret"></i><span class="ph">Your answer</span>'}
+function fType(c){if(!word)field.innerHTML='<span class="wd"></span><i class="caret"></i>';word+=c;const s=el('span','l');s.textContent=c;field.firstChild.appendChild(s)}
+function typeWord(t,w,per){[...w].forEach((c,i)=>at(t+i*per,()=>{state('typing');fType(c)}));return t+w.length*per}
+// The game's own numbers (supabase/migrations/20261124235832_clock_run.sql): 20 s to start; an answer adds 3, 5 or 8 s, 5% less for each answer already given in the run; 10, 25 or 50 points.
+const START=20,BASE={common:3000,uncommon:5000,rare:8000},POINTS={common:10,uncommon:25,rare:50},WORD={common:'Common',uncommon:'Uncommon',rare:'Rare'};
+const addedMs=(tier,answers)=>Math.max(1000,Math.round(BASE[tier]*Math.pow(.95,answers)));
+const addedText=ms=>'+'+(ms%1000?(ms/1000).toFixed(1):ms/1000)+' s';
+const frac=s=>Math.max(0,Math.min(1,s/START));
+function setScore(n){score=n;$('#score').textContent=n}
+function setCount(n){given=n;$('#count').textContent=n==1?'1 answer':n+' answers'}
+function setQ(text,i){$('#q').textContent=text;$('#qn').textContent='Question '+i+' of 3';goText.textContent=i==3?'Finish':'Next question'}
+function clearSlot(){slot.querySelectorAll('.mine,.slip').forEach(e=>e.remove())}
+function accept(name,tier){
+  const answers=tally.common+tally.uncommon+tally.rare,ms=addedMs(tier,answers),was=frac(left);
+  tally[tier]++;left+=ms/1000;
+  tape.querySelectorAll('i').forEach(s=>{if(parseFloat(s.style.left)>=was*100)s.remove()});
+  if(was<1){const s=el('i');s.style.left=was*100+'%';tape.appendChild(s)}
+  if(!RM&&was<1){hold=ms/1000;const p=el('i','patch');p.style.left='calc('+was*100+'% - 14px)';p.style.width='calc('+(frac(left)-was)*100+'% + 14px)';track.insertBefore(p,track.querySelector('.peel'));at(200,()=>{hold=0;p.remove();paint()})}
+  clearSlot();fClear();
+  const c=el('div','mine card in '+tier,'<i class="tp a"></i>'+(tier=='rare'?'<i class="tp b"></i>':'')+'<span class="tier"><span>'+WORD[tier]+(tier=='rare'?'<svg class="ring" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" vector-effect="non-scaling-stroke" d="M52 5C22 3 4 13 5 26c1 14 24 20 49 18 26-2 41-9 40-22C93 10 70 4 40 8"/></svg>':'')+'</span></span><span class="nm">'+name+'</span><span class="gain">'+addedText(ms)+' · +'+POINTS[tier]+' points</span>');
+  slot.appendChild(c);
+  row.classList.remove('jolt');if(tier=='rare'){void row.offsetWidth;row.classList.add('jolt')}
+  setScore(score+POINTS[tier]);setCount(given+1);paint();state('accepted-'+tier);
+}
+function refuse(msg){
+  field.classList.remove('no');void field.offsetWidth;field.classList.add('no');
+  field.firstChild.insertAdjacentHTML('beforeend','<svg class="strike" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" vector-effect="non-scaling-stroke" d="M1 17C18 11 36 20 56 14s30-2 43 0"/></svg>');
+  clearSlot();const s=el('div','slip card in');s.textContent=msg;slot.appendChild(s);state('refused');
+}
+function stopClock(){clearInterval(tick);tick=null}
+function paint(){const w=Math.ceil(left-1e-9);track.style.setProperty('--f',frac(RM?w:left-hold));$('#secs').textContent=w;root.dataset.low=left<=5?'1':'0'}
+function finish(){stopClock();T.forEach(clearTimeout);T=[];left=0;hold=0;paint();$('#final').textContent=score;$('#oa').textContent=tally.common+tally.uncommon+tally.rare;$('#oc').textContent=tally.common;$('#ou').textContent=tally.uncommon;$('#or').textContent=tally.rare;over.hidden=false;state('over')}
+function startClock(){stopClock();let last=performance.now();tick=setInterval(()=>{const n=performance.now();left=Math.max(0,left-(n-last)/1000);last=n;paint();if(left<=0)finish()},100)}
+function script(){
+  // Question 1 is behind us: three answers given (two Common, one Uncommon), 45 points, 8.5 s on the clock.
+  tally={common:2,uncommon:1,rare:0};left=8.5;setQ('Name a kind of cheese',2);setScore(45);setCount(0);paint();state('waiting');startClock();
+  let t=typeWord(1300,'cheddar',130);
+  at(t+250,()=>accept('cheddar','common'));
+  t=typeWord(3600,'taleggio',125);
+  at(t+300,()=>accept('taleggio','rare'));
+  t=typeWord(6700,'cheddar',110);
+  at(t+250,()=>refuse('Already said'));
+  at(t+1050,fClear);
+  t=typeWord(8900,'cheez',130);
+  at(t+250,()=>refuse('Not on the list'));
+  at(t+1050,fClear);
+  at(13700,()=>go.classList.add('pressed'));
+  at(13950,()=>{go.classList.remove('pressed');clearSlot();fClear();setQ('Name a card game',3);setCount(0);state('waiting')});
+  typeWord(15100,'solita',370);
+}
+function restart(){T.forEach(clearTimeout);T=[];stopClock();hold=0;over.hidden=true;go.classList.remove('pressed');row.classList.remove('jolt');tape.innerHTML='';track.querySelectorAll('.patch').forEach(p=>p.remove());clearSlot();fClear();script()}
+rmBox.checked=RM;root.classList.toggle('rm',RM);
+rmBox.addEventListener('change',()=>{RM=rmBox.checked;root.classList.toggle('rm',RM);restart()});
+$('#phone').addEventListener('click',restart);$('#replay').addEventListener('click',restart);
+restart();
+</script>
