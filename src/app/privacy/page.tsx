@@ -25,10 +25,9 @@ export default function Privacy() {
           account. Plor doesn&apos;t show or use them.
         </li>
         <li>
-          <strong>Your games:</strong> each day you play, which answer you picked for each question, whether it matched
-          the host, and when. If you send an answer that isn&apos;t on our list, we keep what you typed (up to 40
-          characters). Once enough players type the same answer, it can become an answer everyone can give, shown
-          without who typed it.
+          <strong>Your games:</strong> each day you play, each answer you gave, how rare it was, the time and points it
+          earned, and when. If you send an answer that isn&apos;t on our list, we keep what you typed (up to 40
+          characters) so it can be reviewed.
         </li>
         {/* The next two, the guest cookie under "Sign-in cookies" and Cloudflare below: docs/milestones/M18-guest-play.md,
             "Privacy page draft" (approved 2026-11-13); the guest item's run-keeping words: docs/milestones/M19-pre-beta-fixes.md,
