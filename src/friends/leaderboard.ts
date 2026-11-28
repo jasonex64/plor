@@ -13,11 +13,11 @@
 // (docs/milestones/M14-14b-14-leaderboard-graph.md). Each board is one game's (M16 16e-2,
 // docs/milestones/M16-16e-points-and-boards.md): each adds up its game's points (the human, 2026-11-17, issue #265:
 // "each individual game leaderboard should just be the raw points"), game 2's counted from the day's midnight like game
-// 1's (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up both games' par scores, each day's
-// points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), and averages them over the
-// game-days played.
+// 1's (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up the par scores of the games that have
+// a par, each day's points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), and averages
+// them over the game-days played; Offbeat has none for now (M23 23f-2, answer 60).
 import { PAR_POINTS } from "@/config/tunables";
-import type { ApprovedPuzzle } from "@/content/puzzle";
+import { CLOCK_FORMAT, type ApprovedPuzzle, type ClockPuzzle } from "@/content/puzzle";
 import { GAME_ID, OVERALL, SUBSTRINGS_ID } from "@/platform/game";
 import { pooledCounts, settleRuns } from "@/game/ledger";
 import { parScore, scoreAverage, scoreTotal } from "@/game/par";
@@ -32,7 +32,7 @@ import { STATUS } from "@/lib/status";
 
 // The games a board can be for.
 export type BoardGame = typeof GAME_ID | typeof SUBSTRINGS_ID;
-// What a board can show: one game's, or both games' par scores, the overall board.
+// What a board can show: one game's, or the par scores of the games that have a par, the overall board.
 export type BoardChoice = BoardGame | typeof OVERALL.id;
 
 // A request names its game, as each game has its own board, thread and reactions (comments and reactions: M16 16f-3).
@@ -54,7 +54,7 @@ export type WeekEntry = LeaderboardEntry & { daily: number[] };
 // the viewer is still playing, by place in the week, which add nothing to anyone (M09 D5; 14b-14, answer 28).
 export type Week = { from: string; days: number; hidden: number[]; entries: WeekEntry[] };
 export type Leaderboard = { thisWeek: Week; lastWeek: Week };
-// The overall board's weeks: points is the Sum of a player's par scores in both games, average their Average per game-day
+// The overall board's weeks: points is the Sum of a player's par scores in the games that have a par, average their Average per game-day
 // played (answer 2). List only (answer 33), so no days.
 export type OverallEntry = LeaderboardEntry & { average: number };
 export type OverallWeek = { from: string; entries: OverallEntry[] };
@@ -101,6 +101,9 @@ function entry(row: Row, viewerId: string, points: number): LeaderboardEntry {
 
 const byTotal = (e: LeaderboardEntry) => e.points;
 
+// The games the overall board counts: those with a par, in the switch's order (M23 23f-2, answer 60).
+const PAR_GAMES = [GAME_ID, SUBSTRINGS_ID].filter((g) => PAR_POINTS[g] !== undefined);
+
 export async function getLeaderboard(db: Db, viewerId: string, game: BoardChoice): Promise<Leaderboard | OverallBoard> {
   // Never null: the friends circle always holds the viewer.
   return (await weeklyBoard(db, viewerId, game, circleSql("$1"), [viewerId], null))!;
@@ -115,8 +118,8 @@ export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: str
 
 // Yesterday's standings, a closed day's, so final (M09 D9), for the game card (docs/milestones/M11-home-screen.md, H7):
 // the viewer and their friends, or the members of one of the viewer's groups (a non-member gets the group page's 404).
-// The card names its game as the weekly boards do (M16 16f-6, answer 20): that game's points, or both games' par scores
-// added up.
+// The card names its game as the weekly boards do (M16 16f-6, answer 20): that game's points, or the par scores of the
+// games that have one added up.
 export async function getYesterdayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<Day> {
   const circle =
     groupId === null
@@ -125,7 +128,7 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
   if (!circle) throw new AppError("group_not_found", STATUS.notFound);
   const yesterday = daysBefore(circle.today, 1);
   if (game === OVERALL.id) {
-    const both = await bothGames(db, viewerId, circle.ids, groupId, yesterday, circle.today);
+    const both = await parGames(db, viewerId, circle.ids, groupId, yesterday, circle.today);
     return { date: yesterday, entries: ranked(overallDays(both, groupId, yesterday, circle.today).map(({ row, days }) => entry(row, viewerId, scoreTotal(days))), byTotal) };
   }
   const { rows } = await gameRows(db, game, viewerId, circle.ids, groupId, yesterday, circle.today);
@@ -135,7 +138,7 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
 // Today's standings (docs/milestones/M22-todays-board.md): the viewer and their friends, or a group's members, with the
 // score each finished run shows on its result screen, read from today's runs, not the ledger, which waits for midnight
 // (M09 D9). Closed, with no score and no one's state, until the viewer has finished that game today, or for Overall
-// each of today's games (answers 1 and 6; DECISIONS.md, Game 1: no spoilers). Once open: the finished players ranked,
+// each of today's games that has a par (answers 1 and 6; DECISIONS.md, Game 1: no spoilers). Once open: the finished players ranked,
 // then the rest by name (answer 5). Overall ranks a player who's finished one game by that game's par score (answer 6).
 export async function getTodayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<TodayBoard> {
   const circle =
@@ -143,8 +146,8 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
       ? await circleOf(db, circleSql("$1"), [viewerId])
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
   if (!circle) throw new AppError("group_not_found", STATUS.notFound);
-  const asked: BoardGame[] = game === OVERALL.id ? [GAME_ID, SUBSTRINGS_ID] : [game];
-  const { rows: days } = await db.query<{ game_id: BoardGame; content: ApprovedPuzzle }>(
+  const asked: BoardGame[] = game === OVERALL.id ? PAR_GAMES : [game];
+  const { rows: days } = await db.query<{ game_id: BoardGame; content: ApprovedPuzzle | ClockPuzzle }>(
     "select game_id, content from private.puzzle where puzzle_date = $1::date and game_id = any($2::text[])",
     [circle.today, asked],
   );
@@ -172,8 +175,9 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
     const points = g === GAME_ID ? await offbeatToday(db, days.find((d) => d.game_id === g)!.content, finished) : await runTotals(db, finished, finished.map(() => circle.today));
     for (const id of finished) {
       const score = g === GAME_ID ? points.get(id)! : points.get(`${id}:${circle.today}`)!;
-      // Shown as the boards show each game: a game's own board in points (issue #265), Overall as par scores (M15 15i).
-      scores.set(id, [...(scores.get(id) ?? []), game === OVERALL.id ? parScore(score, PAR_POINTS[g]) : score]);
+      // Shown as the boards show each game: a game's own board in points (issue #265), Overall as par scores (M15 15i),
+      // and Overall asks only games that have a par.
+      scores.set(id, [...(scores.get(id) ?? []), game === OVERALL.id ? parScore(score, PAR_POINTS[g]!) : score]);
     }
   }
   const finishedRows = people.filter((p) => scores.has(p.user_id));
@@ -199,9 +203,21 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
   return { ...closed, open: true, entries, rest };
 }
 
-// Today's Offbeat score of each of these players' finished runs, by user ID: the ladder and the provisional rarity
-// bonus, the result screen's points + bonus (src/game/runs.ts, buildState), from the same events and pooled counts.
-async function offbeatToday(db: Db, puzzle: ApprovedPuzzle, userIds: string[]): Promise<Map<string, number>> {
+// Today's Offbeat score of each of these players' finished runs, by user ID: on a day on a clock the sum of its answers'
+// points (M23 23f-2); otherwise the ladder and the provisional rarity bonus, the result screen's points + bonus
+// (src/game/runs.ts, buildState), from the same events and pooled counts.
+async function offbeatToday(db: Db, puzzle: ApprovedPuzzle | ClockPuzzle, userIds: string[]): Promise<Map<string, number>> {
+  if (puzzle.format === CLOCK_FORMAT) {
+    const { rows } = await db.query<{ user_id: string; points: number }>(
+      `select user_id::text, sum(points)::int as points from private.clock_answer
+       where game_id = $1 and puzzle_date = $2::date and user_id = any($3::uuid[]) group by user_id`,
+      [GAME_ID, puzzle.date, userIds],
+    );
+    // A run with no answer scores 0.
+    const byUser = new Map(userIds.map((id) => [id, 0]));
+    for (const r of rows) byUser.set(r.user_id, r.points);
+    return byUser;
+  }
   const { rows } = await db.query<{ user_id: string; events: { index: number; entryId: string; matched: boolean; inDay: boolean }[] }>(
     `select e.user_id::text,
             jsonb_agg(jsonb_build_object('index', e.question_idx, 'entryId', e.entry_id, 'matched', e.matched,
@@ -238,7 +254,7 @@ async function weeklyBoard(
   const nextWeek = daysBefore(thisWeek, -7); // docs/DECISIONS.md, Log 2026-10-22: weeks run Monday to Sunday
   const rowsOf = (g: BoardGame) => gameRows(db, g, viewerId, circle.ids, groupId, lastWeek, nextWeek);
   if (game === OVERALL.id) {
-    const both = await bothGames(db, viewerId, circle.ids, groupId, lastWeek, nextWeek);
+    const both = await parGames(db, viewerId, circle.ids, groupId, lastWeek, nextWeek);
     const overallWeek = (from: string, to: string): OverallWeek => ({
       from,
       entries: ranked(
@@ -277,17 +293,16 @@ async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[]
   return { rows: await ledger(db, game, ids, groupId, from, to, []), skip: [] };
 }
 
-// Both games' rows for an overall board, from (included) to (excluded), each turned into par scores. Game 1's leave out
-// the days the viewer is still playing, game 2's count (answer 32).
-async function bothGames(db: Db, viewerId: string, ids: string[], groupId: string | null, from: string, to: string): Promise<[Row[], Row[]]> {
-  const first = await gameRows(db, GAME_ID, viewerId, ids, groupId, from, to);
-  const second = await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to);
-  return [parScores(GAME_ID, first.rows), parScores(SUBSTRINGS_ID, second.rows)];
+// The rows of each game that has a par, for an overall board, from (included) to (excluded), each turned into par scores.
+// Game 1's leave out the days the viewer is still playing, game 2's count (answer 32).
+async function parGames(db: Db, viewerId: string, ids: string[], groupId: string | null, from: string, to: string): Promise<Row[][]> {
+  return Promise.all(PAR_GAMES.map(async (g) => parScores(g, (await gameRows(db, g, viewerId, ids, groupId, from, to)).rows)));
 }
 
-// Each player on an overall board with the par scores of both games they hold on the days from (included) to (excluded).
-const overallDays = (both: [Row[], Row[]], groupId: string | null, from: string, to: string) =>
-  onBoard(both[0], groupId, to).map((row) => ({ row, days: [row, both[1].find((s) => s.user_id === row.user_id)!].flatMap((r) => inWeek(r, from, to)) }));
+// Each player on an overall board with the par scores of the games they hold on the days from (included) to (excluded).
+// Every game's rows list the same players, so the first lists them for the board.
+const overallDays = (games: Row[][], groupId: string | null, from: string, to: string) =>
+  onBoard(games[0], groupId, to).map((row) => ({ row, days: games.flatMap((rows) => inWeek(rows.find((r) => r.user_id === row.user_id)!, from, to)) }));
 
 // A friends board for a period lists only the players whose account was made before it ended, the viewer too; a group's
 // keeps a member who joined later, on 0 (M19 19c; M12 12d, D3). to is the period's end, excluded.
@@ -309,7 +324,7 @@ async function circleOf(db: Db, players: string, params: unknown[]): Promise<{ i
 
 // The board's rows with each day's points turned into its par score in that game (M15 15i).
 const parScores = (game: BoardGame, rows: Row[]): Row[] =>
-  rows.map((r) => ({ ...r, days: Object.fromEntries(Object.entries(r.days).map(([day, points]) => [day, parScore(points, PAR_POINTS[game])])) }));
+  rows.map((r) => ({ ...r, days: Object.fromEntries(Object.entries(r.days).map(([day, points]) => [day, parScore(points, PAR_POINTS[game]!)])) }));
 
 // The puzzle days from (included) to (excluded) whose own run the viewer is still playing, in order: a run can be
 // finished after midnight, and one waiting at a reveal stays in progress until Next (DECISIONS.md, Game 1: Timer).

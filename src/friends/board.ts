@@ -20,6 +20,11 @@ import { circleSql } from "./circle";
 // question is 1-based, as players count.
 export type Ended = { result: "caught"; question: number; answer: string } | { result: "survived" } | { result: "timed_out"; question: number };
 
+// How a finished run on a clock reads in the feed: what it scored and how many answers it gave, by the answers given
+// before the day's midnight, as the ledger counts them (M23 23f-2, answer 67). Its own word, as a day on a clock has no
+// catch to say.
+export type Scored = { result: "scored"; points: number; answers: number };
+
 export type BoardFriend = {
   // What a reaction on their run names (M19 19e).
   userId: string;

@@ -307,3 +307,26 @@ test("a friend's question and points show live on the board", { tag: "@visual" }
   await expect(row).toHaveText(`${playerName}: 35 points`);
   expect(frames.join("\n")).not.toMatch(/\b(dog|cat)\b/i);
 });
+
+// The feed's line for a finished run on a clock (23f-2, answer 67): what it scored and how many answers it gave, shown to a
+// friend who has finished their own run.
+test("a friend's finished run reads as its points and answers in the feed", { tag: "@visual" }, async ({ browser, page: viewer }) => {
+  test.slow();
+  const friend = await (await browser.newContext()).newPage();
+  await viewer.goto("/friends");
+  await signInAndPick(viewer, "kv");
+  await friend.goto("/friends");
+  await signInAndPick(friend, "kf");
+  await befriend(friend, "kf", viewer, "kv");
+
+  // The friend gives dog and cat (10 and 25 points); the viewer gives one answer, so their own result is one answer.
+  await friend.goto(GAME.path);
+  await quickRun(friend, ["dog", "cat"]);
+  await viewer.goto(GAME.path);
+  await quickRun(viewer, ["dog"]);
+
+  await viewer.goto("/");
+  await expect(viewer.getByText("scored 35 points with 2 answers")).toBeVisible();
+  await expect(viewer.getByText("scored 10 points with 1 answer", { exact: true })).toBeVisible();
+  await expect(viewer.getByText(/survived every question/)).toHaveCount(0);
+});

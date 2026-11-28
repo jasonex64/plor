@@ -14,6 +14,8 @@ import { GAME } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
+// The local superuser, which may switch the answer triggers off to write a past day's run.
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 // Yesterday's fixture day, when this file added it.
 let yesterdayAdded: string | null = null;
@@ -36,6 +38,7 @@ test.afterAll(async () => {
   await removePuzzle(DB, puzzle);
   if (yesterdayAdded) await DB.query("delete from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [yesterdayAdded]);
   await DB.end();
+  await ADMIN.end();
 });
 
 const PHONE = { width: 360, height: 800 };
@@ -81,17 +84,18 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
 });
 
 // Criteria 4 and 5: a player who never played, then plays and is caught on question 1.
-test("Your Offbeat counts the run once it's over, and yesterday's answers show the host's", async ({ browser }) => {
+test("Your Offbeat counts the run once it's over, and yesterday's answers show the host's", { tag: "@visual" }, async ({ browser }) => {
   const page = await player(browser, "ob");
   await page.goto("/play");
   const stats = page.getByRole("region", { name: `Your ${GAME.name}` });
   const stat = (label: string) => stats.locator("div", { has: page.getByText(label, { exact: true }) }).locator("dd");
   await expect(stat("day streak")).toHaveText("0");
   await expect(stat("best score")).toHaveText("–");
-  await expect(stat("avg. survived")).toHaveText("–");
+  await expect(stat("avg. points a day")).toHaveText("–");
+  await expect(stats).not.toContainText(/survived|full runs/);
   const chart = stats.getByRole("img");
-  // Seven days, today last and not played yet; the six before it not played.
-  await expect(chart).toHaveAttribute("aria-label", /^([A-Z][a-z]{2} not played, ){6}[A-Z][a-z]{2} not played yet$/);
+  // Seven days, today last and not scored yet; the six before it not scored (23f-2, answer 66).
+  await expect(chart).toHaveAttribute("aria-label", /^([A-Z][a-z]{2} not scored, ){6}[A-Z][a-z]{2} not scored yet$/);
 
   const yesterday = page.getByRole("region", { name: "Yesterday's answers" });
   await expect(yesterday.getByRole("listitem")).toHaveCount(7);
@@ -107,23 +111,72 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
-  // Today's run counts now in the streak, the average and the chart; its points only once the day closes (M09 D9).
+  // Today's run counts now in the streak; its points only once the day closes (M09 D9), so the rest still has none.
   await expect(stat("day streak")).toHaveText("1");
-  await expect(stat("avg. survived")).toHaveText("0.0/7");
+  await expect(stat("avg. points a day")).toHaveText("–");
   await expect(stat("best score")).toHaveText("–");
-  await expect(chart).toHaveAttribute("aria-label", /, [A-Z][a-z]{2} 0$/);
+  await expect(chart).toHaveAttribute("aria-label", /, [A-Z][a-z]{2} not scored yet$/);
+
+  // A closed day with points in the ledger: the best score, the average a day and the chart's bar say them.
+  const { rows: made } = await DB.query<{ id: string }>("select id from auth.users where email = $1", [`${RUN}-ob@example.test`]);
+  const client = await ADMIN.connect();
+  try {
+    await client.query("begin");
+    await client.query("set local session_replication_role = replica");
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today() - 1, now() - interval '1 day')", [made[0].id]);
+    await client.query("insert into private.points_ledger (user_id, game_id, puzzle_date, points, bonus) values ($1, 'offbeat', private.today() - 1, 340, 0)", [made[0].id]);
+    await client.query("commit");
+  } finally {
+    client.release();
+  }
+  await page.goto("/play");
+  await expect(stat("best score")).toHaveText("340");
+  await expect(stat("avg. points a day")).toHaveText("340");
+  await expect(chart).toHaveAttribute("aria-label", /, [A-Z][a-z]{2} 340, [A-Z][a-z]{2} not scored yet$/);
 
   // Opened again on the finished run, the stats load with the page and not again once the run's state arrives
   // (14a-2c, criterion 3).
   const seen = timeline(page);
   await page.goto("/play");
   await expect(page.locator("#result")).toBeVisible();
-  await expect(stat("day streak")).toHaveText("1");
+  // Yesterday's run, written above, adds a day to the streak.
+  await expect(stat("day streak")).toHaveText("2");
   await page.waitForLoadState("networkidle");
   expect(seen).toContain("stats");
   // The run's state was seen, so the check below looks at what came after it (14b-2c-4, item 22).
   expect(seen).toContain("run");
   expect(seen.slice(seen.indexOf("run")).filter((e) => e === "stats")).toEqual([]);
+});
+
+// 23f-2, answer 66: the stats of a player with a closed day, on the game screen and on Me, at both screen sizes.
+test("Your Offbeat and Me show the best score, the average points a day and a chart of points", { tag: "@visual" }, async ({ page }) => {
+  await page.goto("/");
+  await signInAndPick(page, "of");
+  const { rows } = await DB.query<{ id: string }>("select id from auth.users where email = $1", [`${RUN}-of@example.test`]);
+  const client = await ADMIN.connect();
+  try {
+    await client.query("begin");
+    await client.query("set local session_replication_role = replica");
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today() - 1, now() - interval '1 day')", [rows[0].id]);
+    await client.query("insert into private.points_ledger (user_id, game_id, puzzle_date, points, bonus) values ($1, 'offbeat', private.today() - 1, 340, 0)", [rows[0].id]);
+    await client.query("commit");
+  } finally {
+    client.release();
+  }
+  await page.goto("/play");
+  const stats = page.getByRole("region", { name: `Your ${GAME.name}` });
+  const stat = (label: string) => stats.locator("div", { has: page.getByText(label, { exact: true }) }).locator("dd");
+  await expect(stat("best score")).toHaveText("340");
+  await expect(stat("avg. points a day")).toHaveText("340");
+  await expect(stats.getByRole("img")).toHaveAttribute("aria-label", /, [A-Z][a-z]{2} 340, [A-Z][a-z]{2} not scored yet$/);
+  await expect(stats).not.toContainText(/survived|full runs/);
+
+  await page.goto("/me");
+  const card = page.getByRole("region", { name: GAME.name, exact: true });
+  await expect(card.locator("div", { has: page.getByText("best score", { exact: true }) }).locator("dd")).toHaveText("340");
+  await expect(card.locator("div", { has: page.getByText("avg. points a day", { exact: true }) }).locator("dd")).toHaveText("340");
+  await expect(card).not.toContainText(/survived|full runs/);
+  await expect(page.getByRole("region", { name: "Calendar" }).getByRole("img")).toHaveAttribute("aria-label", /, 340 points/);
 });
 
 // Criteria 6 and 7.

@@ -1,10 +1,10 @@
 // The overall board on the Friends page and a group's (M16 16e-3b, docs/milestones/M16-16e-points-and-boards.md,
 // answers 29 and 33): the Game switch's third choice, list only, by Sum or by Average. Two closed days of last week,
 // Thursday and Friday, are this file's own in both games; the runs and their ledger rows are written directly. X is
-// the viewer, Y X's friend and fellow member of a group. Par scores (docs/milestones/M15-15i-par-scores.md), game 1's
-// against 1,250 and game 2's against 1,500: Thursday's game 1, X 1000 and Y 500, gives X 80 and Y 40; Thursday's and
-// Friday's game 2, Y's 600 and 300, give Y 40 and 20. So by Sum Y leads, 100 to 80, and by Average X does, 80 over one
-// game-day to 33.3 over three.
+// the viewer, Y X's friend and fellow member of a group. Par scores (docs/milestones/M15-15i-par-scores.md): only game 2
+// has a par, 1,500, until the human sets Offbeat's (M23 23f-2, answer 60), so Thursday's game 1, X 1000 and Y 500, counts
+// for nothing, and Thursday's and Friday's game 2, Y's 600 and 300, give Y 40 and 20. So by Sum Y leads, 60 to 0, and by
+// Average too, 30 over two game-days to 0; the board says under it that Offbeat joins once its typical score is known.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { fixtureDay } from "../src/test/answer-fixture";
@@ -65,19 +65,19 @@ async function bothViews(page: Page, board: string, x: string, y: string) {
   const count = region.getByRole("radiogroup", { name: "Count" });
   await expect(count.getByRole("radio", { name: "Sum" })).toBeChecked();
   await expect(region.getByText("Each day adds your score out of 100 in each game.")).toBeVisible();
+  await expect(region.getByText("Offbeat joins once its typical score is known.")).toBeVisible();
   // One period shows at a time, Today on load (docs/milestones/M20-design-rules-and-clean-up.md, 20i).
   await region.getByRole("radio", { name: "Last week", exact: true }).check();
-  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 100$`), new RegExp(`${x} \\(you\\): 80$`)]);
+  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 60$`), new RegExp(`${x} \\(you\\): 0$`)]);
   await count.getByText("Average").click();
   await expect(region.getByText("Your average score out of 100, per game played.")).toBeVisible();
-  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${x} \\(you\\): 80$`), new RegExp(`${y}: 33.3$`)]);
+  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 30$`), new RegExp(`${x} \\(you\\): 0$`)]);
 }
 
-test("the overall board shows Sum and Average on the Friends page and a group's", async ({ browser }) => {
+test("the overall board shows Sum and Average of the games with a par on the Friends page and a group's, and says Offbeat joins later", { tag: "@visual" }, async ({ browser, page }) => {
   const friend = await (await browser.newContext()).newPage();
   await friend.goto("/");
   await signInAndPick(friend, "wy");
-  const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "wx");
   const [x, y] = [await idOf("wx"), await idOf("wy")];

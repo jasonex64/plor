@@ -221,7 +221,7 @@ test("with the cards in a carousel, Today's board has no switch and follows the 
   await expect(row(page, friend.username)).toContainText(started);
 });
 
-test("Today's leaderboard card switches between Offbeat, Fragments and Overall", async ({ browser }) => {
+test("Today's leaderboard card switches between Offbeat, Fragments and Overall", { tag: "@visual" }, async ({ browser }) => {
   await addDay();
   const page = await viewer(browser, "bve");
   const friend = await friendOf("bve", "bfe");
@@ -233,12 +233,12 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
   // Offbeat on load, as the other leaderboards, in points.
   await expect(choices.getByRole("radio", { name: GAME.name, exact: true })).toBeChecked();
   await expect(choices.getByRole("radio")).toHaveCount(3);
-  // Today on load, closed until the viewer has finished that game, or both for Overall (docs/milestones/M22-todays-board.md,
-  // answers 3, 6 and 10).
+  // Today on load, closed until the viewer has finished that game, or each game with a par for Overall, Fragments alone
+  // while Offbeat has none (docs/milestones/M22-todays-board.md, answers 3, 6 and 10; M23 23f-2, answer 60).
   await expect(card.getByRole("radio", { name: "Today", exact: true })).toBeChecked();
   for (const [game, line] of [
     [SUBSTRINGS.name, `Finish today's ${SUBSTRINGS.name} to see today's board.`],
-    ["Overall", "Finish both of today's games to see today's board."],
+    ["Overall", `Finish today's ${SUBSTRINGS.name} to see today's board.`],
     [GAME.name, `Finish today's ${GAME.name} to see today's board.`],
   ] as const) {
     await choices.getByText(game, { exact: true }).click();
