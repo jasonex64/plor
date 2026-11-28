@@ -113,6 +113,12 @@ Second round (2026-11-25):
 70. Whether Fragments, paused too, shows the note as well: "Yes, both games (Recommended)". Its own line is put back by hand when Fragments gets days again.
 71. When the front page's "How Offbeat works" becomes "Three questions, one clock. Name as many as you can.": "Now, with the note (Recommended)".
 
+Before 23f-3 (2026-11-28, "Build 23f-3"):
+72. The admin Audit page, which reviews texts typed in the old Offbeat and gets nothing from a clock day: "Remove it (Recommended)". Its tab, routes, database functions and table go with the old game; Admin, Lists stays the one place for unlisted texts.
+73. The three tables only the old game used (signed-in answers, guest answers, guest answer tallies), emptied by the wipe: "Drop them (Recommended)".
+74. Records of comments an admin deleted name no game, so the wipe cannot pick out Offbeat's (plor.app held 0 of them, and 0 kept records, on 2026-11-28): "Leave them alone (Recommended)".
+75. `scripts/research.db.test.ts`'s setup, which timed out at 10 s in CI on #325 and #326: "Yes, 30 seconds (Recommended)", as its own quick fix.
+
 The human approved 23f on 2026-11-26: "Approve 23f".
 
 The human's lists load, 2026-11-25 ("ok its ndone"): read back through the Supabase connector, plor.app's database holds 12,525 research things (12,504 answers and the 21 roots), 23 categories pointed at lists, all three migrations (last `20261125011243`), no list edits, and no day from today on.
