@@ -5,13 +5,13 @@
 // criterion 6).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
+import { finishClockRun } from "./game";
 import { UNDO_SECONDS } from "../src/config/tunables";
 import { GAME } from "../src/platform/game";
-import { RUN, play, sent, signInAndPick } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { slideOf, watchSlides } from "./slides";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, play, sent, signInAndPick, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -134,8 +134,7 @@ test("comments and reactions show at once, with Undo before they're sent", async
   test.slow();
   await page.goto("/");
   await signInAndPick(page, "fu");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   const thread = page.getByRole("region", { name: `${GAME.name} comments` });
   const toast = page.getByRole("status").filter({ has: page.getByRole("button", { name: "Undo" }) });
   const posts: number[] = [];
@@ -221,7 +220,7 @@ test("a question shows its seconds with the prompt, and nothing else until the r
   ];
   for (const part of hidden) await expect(part).toHaveCount(0);
 
-  await caughtToCards(page, puzzle.hostAnswer);
+  await finishClockRun(page);
   for (const part of hidden) await expect(part).toBeVisible();
 });
 
@@ -246,7 +245,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
 
   const before = (await slides()).length;
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
-  await expect(page.getByRole("region", { name: "Your rarest answers" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "All games" })).toBeVisible();
   const after = (await slides()).slice(before);
   expect(after.flatMap((s) => s.types)).toEqual([]);
   expect(after.flatMap((s) => s.animations).filter((a) => a.name === "slide")).toEqual([]);

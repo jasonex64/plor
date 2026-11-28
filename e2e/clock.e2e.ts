@@ -8,10 +8,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { answerBox } from "./game";
-import { RUN, befriend, openBoard, signInAndPick } from "./players";
-import { removePuzzle, todayClockPuzzle } from "./puzzle";
+import { answerBox, finishClockRun, say } from "./game";
+import { removePuzzle, todayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, befriend, openBoard, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let day: { created: string };
@@ -20,7 +20,7 @@ let day: { created: string };
 test.use({ permissions: ["clipboard-read", "clipboard-write"] });
 
 test.beforeAll(async () => {
-  day = await todayClockPuzzle(DB);
+  day = await todayPuzzle(DB);
 });
 
 test.afterAll(async () => {
@@ -33,14 +33,6 @@ test.afterAll(async () => {
 const outcome = (page: Page) => page.getByRole("status", { name: "Last answer" });
 const chip = (page: Page, text: string) => page.getByText(text, { exact: true });
 const heading = (page: Page, prompt: string) => page.getByRole("heading", { name: prompt, exact: true });
-
-// Types text and presses Enter: the input is emptied and keeps focus.
-async function say(page: Page, text: string): Promise<void> {
-  await answerBox(page).fill(text);
-  await answerBox(page).press("Enter");
-  await expect(answerBox(page)).toHaveValue("");
-  await expect(answerBox(page)).toBeFocused();
-}
 
 // Questions 1 to 3 as the first three tests play them, from the card's Start to the end: 10 + 25 + 50 + 10 points. Leaves
 // the end showing. Checks what a player sees along the way.
@@ -220,12 +212,7 @@ const shareDay = (date: string) => new Date(`${date}T00:00:00Z`).toLocaleDateStr
 // Plays a run quickly: the text given on question 1, then Next, Next and Finish. Leaves the result showing.
 async function quickRun(page: Page, onFirst: string[]): Promise<void> {
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  for (const text of onFirst) await say(page, text);
-  await page.getByRole("button", { name: "Next question", exact: true }).click();
-  await expect(heading(page, "Name a fruit")).toBeVisible();
-  await page.getByRole("button", { name: "Next question", exact: true }).click();
-  await expect(heading(page, "Name a color")).toBeVisible();
-  await page.getByRole("button", { name: "Finish", exact: true }).click();
+  await finishClockRun(page, onFirst);
   await expect(page.getByRole("heading", { name: "Your answers", exact: true })).toBeVisible();
 }
 

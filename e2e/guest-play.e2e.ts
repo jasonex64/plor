@@ -1,13 +1,13 @@
 // A visitor plays game 1 or game 2 with no account (docs/milestones/M18-guest-play.md, 18c to 18e): "Play without an account" on a game's card on the front page,
 // Start with Cloudflare's always-pass test keys (CI's .env.local, .github/workflows/e2e.yml), the run through the guest routes to
-// a catch (game 1) or through the seven rounds (game 2), its result with the peek at what an account adds (and Share, game 1),
+// its end (game 1) or through the seven rounds (game 2), its result with the peek at what an account adds (and Share, game 1),
 // and none of the account screens. A signed-in player still plays through /api/run and sees no peek; a guest who makes an
 // account the same day starts clean and plays today's game for points (answer 14). The front page's sign-in is a small link
 // that opens the form at /?sign-in (answers 32 and 33). Game 2's day and words are this file's own, as the real list isn't in
 // git (as play2.e2e.ts).
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { answer, asked, caught, next, safe, seeResults } from "./game";
+import { asked, finishClockRun } from "./game";
 import { play, RUN, signInAndPick } from "./players";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
@@ -28,10 +28,8 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  // What a guest left on the fixture days: a run that is still going, which references its puzzle, and the tally, which has no
-  // foreign key.
+  // What a guest left on the fixture days: a run that is still going, which references its puzzle.
   await DB.query("delete from private.guest_run where puzzle_date = $1::date", [today]);
-  await DB.query("delete from private.guest_tally where puzzle_date = $1::date", [today]);
   await DB.query("delete from private.puzzle where game_id = 'substrings' and puzzle_date = $1::date", [today]);
   await DB.query("delete from private.dictionary_word where word_key = any($1)", [WORDS]);
   await removePuzzle(DB, puzzle);
@@ -57,7 +55,7 @@ async function expectPeek(region: Locator): Promise<void> {
   expect(await standIn.evaluate((el) => getComputedStyle(el).filter)).toBe("blur(4px)");
 }
 
-test("a visitor plays game 1 as a guest from the front page, through the guest routes only, to the result with Share and the peek", async ({ page }) => {
+test("a visitor plays game 1 as a guest from the front page, through the guest routes only, to the result with Share and the peek", { tag: "@visual" }, async ({ page }) => {
   const posts: string[] = [];
   page.on("request", (request) => {
     if (request.method() === "POST") posts.push(new URL(request.url()).pathname);
@@ -75,26 +73,18 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
   await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await safe(page, "aardvark");
-  await next(page, "Name a fruit");
-  await safe(page, "kiwi");
-  await next(page, "Name a color");
-  await safe(page, "blue");
-  await next(page, "Name a country");
-  await caught(page, "italy");
-  await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeVisible();
+  await finishClockRun(page, ["dog", "cat"]);
 
   // The result, with Share and the peek under it (answer 2); it stays until the day ends (M19 answers 3 and 10).
-  await seeResults(page).click();
-  await expect(page.locator("#result")).toContainText("You survived 3 of 7 questions");
+  await expect(page.getByText("35 points", { exact: true })).toBeVisible();
+  await expect(page.getByText("2 answers", { exact: true })).toBeVisible();
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("button", { name: "Share", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "Copied" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`\n${localStack().appUrl}/$`));
   await expectPeek(peek(page));
 
-  expect(posts).toEqual(expect.arrayContaining(["/api/guest/run/start", "/api/guest/run/answer", "/api/guest/run/next"]));
+  expect(posts).toEqual(expect.arrayContaining(["/api/guest/run/start", "/api/guest/run/answer", "/api/guest/run/next", "/api/guest/run/finish"]));
   expect(posts.filter((path) => path.startsWith("/api/run"))).toEqual([]);
   for (const name of ["Friends", "Groups", "Me", "Settings"]) await expect(page.getByRole("link", { name, exact: true })).toHaveCount(0);
   await expect(page.getByText("Comments", { exact: true })).toHaveCount(0);
@@ -162,7 +152,7 @@ test("a visitor plays game 2 as a guest from the front page, through the guest r
   await expect(playAsGuest(page, SUBSTRINGS)).toHaveCount(0);
 });
 
-test("a signed-in player still plays through /api/run, and their result has Share and no peek", async ({ browser }) => {
+test("a signed-in player still plays through /api/run, and their result has Share and no peek", { tag: "@visual" }, async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   const posts: string[] = [];
   page.on("request", (request) => {
@@ -171,17 +161,11 @@ test("a signed-in player still plays through /api/run, and their result has Shar
   await page.goto("/");
   await signInAndPick(page, "gsigned");
   await play(page);
-  await asked(page, "Name an animal");
-  await answer(page, "aardvark");
-  await expect(page.getByRole("heading", { name: "Safe!", exact: true })).toBeVisible();
-  await next(page, "Name a fruit");
-  // The fixture host's fruit (src/test/answer-fixture.ts).
-  await caught(page, "apple");
-  await seeResults(page).click();
-  await expect(page.locator("#result")).toContainText("You survived 1 of 7 questions");
+  await finishClockRun(page, ["dog"]);
+  await expect(page.getByText("10 points", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Share", exact: true })).toBeVisible();
   await expect(peek(page)).toHaveCount(0);
-  expect(posts).toEqual(expect.arrayContaining(["/api/run/start", "/api/run/answer"]));
+  expect(posts).toEqual(expect.arrayContaining(["/api/run/start", "/api/run/answer", "/api/run/finish"]));
   expect(posts.filter((path) => path.startsWith("/api/guest"))).toEqual([]);
 });
 
@@ -191,7 +175,7 @@ const total = (page: Page, region: string, label: string) =>
 
 // Answers 9 and 14: nothing of a guest run carries into the account (the run itself waits for the day's purge), so the new account starts clean, and it may still play today's game for
 // points, which then count as any player's run does.
-test("a guest who makes an account the same day starts clean and plays today's game for points", async ({ browser }) => {
+test("a guest who makes an account the same day starts clean and plays today's game for points", { tag: "@visual" }, async ({ browser }) => {
   // Two runs and a sign-in: 25.6 s of the default 30 s on a warm local dev server (2026-11-12).
   test.slow();
   const page = await (await browser.newContext()).newPage();
@@ -202,12 +186,8 @@ test("a guest who makes an account the same day starts clean and plays today's g
   await page.goto("/");
   await playAsGuest(page, GAME).click();
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await safe(page, "aardvark");
-  await next(page, "Name a fruit");
-  await caught(page, "apple");
-  await seeResults(page).click();
-  await expect(page.locator("#result")).toContainText(/You survived 1 of 7 questions and scored [1-9]/);
+  await finishClockRun(page, ["dog"]);
+  await expect(page.getByText("10 points", { exact: true })).toBeVisible();
 
   await peek(page).getByRole("link", { name: "Make an account", exact: true }).click();
   await expect(page).toHaveURL(/\/\?sign-in$/);
@@ -221,12 +201,8 @@ test("a guest who makes an account the same day starts clean and plays today's g
   // Today's game, for points, through the player's routes.
   await page.goto("/");
   await play(page);
-  await asked(page, "Name an animal");
-  await safe(page, "aardvark");
-  await next(page, "Name a fruit");
-  await caught(page, "apple");
-  await seeResults(page).click();
-  await expect(page.locator("#result")).toContainText(/You survived 1 of 7 questions and scored [1-9]/);
+  await finishClockRun(page, ["dog"]);
+  await expect(page.getByText("10 points", { exact: true })).toBeVisible();
   await expect(peek(page)).toHaveCount(0);
   expect(posts).toEqual(expect.arrayContaining(["/api/run/start", "/api/run/answer"]));
   // It counts as a player's run does (as e2e/me.e2e.ts reads a finished run). Me's points all time add a day only once it
@@ -268,7 +244,8 @@ test("the signed-out front page is one line, the two game cards with their emble
     await expect(card.locator("svg[data-emblem]")).toHaveCount(1);
     await expect(card.getByText(/^\d+ (questions|rounds)$/)).toBeVisible();
     await expect(playAsGuest(page, game)).toHaveAttribute("href", game.path);
-    await expect(card.getByRole("button", { name: "How to play", exact: true })).toBeVisible();
+    // Offbeat's How to play is on its game screen, under Start; Fragments' is on its card.
+    await expect(card.getByRole("button", { name: "How to play", exact: true })).toHaveCount(game === GAME ? 0 : 1);
     // The band is one line with its dot, or, in a card too narrow for that, the day under the name with no dot.
     const band = await card.getByRole("heading", { level: 2, name: game.name, exact: true }).evaluate((h2) => {
       const [dot, day] = [h2.parentElement!.querySelector("span")!, h2.parentElement!.querySelector("p")!];

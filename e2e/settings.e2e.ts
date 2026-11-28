@@ -5,7 +5,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
-import { answerBox } from "./game";
 import { fixedWidth } from "./fixed-width";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
@@ -111,20 +110,18 @@ async function flip(page: Page, name: string, on: boolean) {
   await page.keyboard.press("Escape");
 }
 
-// Criterion 4: off, Play opens the game screen; on, the banner states the 20 seconds and Play starts question 1.
-test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
+// Criterion 4: the Skip the game screen switch saves on the account, and a reload keeps it. Nothing on Today reads it since
+// 23f-3a took the old game's skip out (the clock game's Play always opens its game screen), so only the switch is checked.
+test("the Skip the game screen switch is saved on the account", async () => {
   await page.goto("/");
   const banner = page.getByRole("region", { name: GAME.name });
   await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
-  await expect(banner).not.toContainText("20 seconds each");
 
   await flip(page, "Skip the game screen", true);
   // Saved on the account: a reload keeps it.
   await page.reload();
-  // Said before the time runs, as the banner's chips since 14b-8b.
-  await expect(banner.getByText("20 seconds each", { exact: true })).toBeVisible();
-  await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
-  await banner.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
-  await expect(answerBox(page)).toBeVisible();
+  await page.getByRole("button", { name: "Settings" }).click();
+  await expect(sheetOf(page).getByRole("switch", { name: /Skip the game screen/ })).toBeChecked();
+  await page.keyboard.press("Escape");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
 });

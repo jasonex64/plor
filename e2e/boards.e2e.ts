@@ -9,10 +9,10 @@ import { Pool } from "pg";
 import { SUBSTRING_ROUNDS } from "../src/config/tunables";
 import { scoreRun } from "../src/game/substring-scoring";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
-import { asked, caughtToCards } from "./game";
-import { RUN, openBoard, play, signInAndPick } from "./players";
+import { fixtureId } from "../src/test/answer-fixture";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, openBoard, signInAndPick, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // A player who never signs in, and a finished run of Fragments with no word, are written with the round rules off, which needs
@@ -113,13 +113,9 @@ async function finishFragments(userId: string) {
   }
 }
 
-// Plays Offbeat's run to a caught first answer, from Today's card, and leaves the player on Today.
+// Plays Offbeat's run on a clock from Today's card to its result, and leaves the player on Today.
 async function finishOffbeat(page: Page) {
-  await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
-  await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await page.goto("/");
 }
 
@@ -267,9 +263,8 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
 test("today's board opens once the viewer has finished, on Today's card and the Friends tab", async ({ browser }) => {
   const page = await viewer(browser, "bvt", WIDE);
   const friend = await friendOf("bvt", "bft");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await playToEnd(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
   const rows = [`bvt${RUN} (you): 0 points`, `${friend.username}: not played yet`];
   await page.goto("/");
   const card = page.getByRole("region", { name: "Leaderboard", exact: true });
@@ -300,38 +295,35 @@ test("a long name is cut with an ellipsis on one line and every status chip ends
   expect(longChip!.x + longChip!.width).toBeCloseTo(shortChip!.x + shortChip!.width, 0);
 });
 
-// #257's review: a long finished status beside a long name on a 320px phone. The status wraps to a second line inside its
+// #257's review: a long status beside a long name on a 320px phone. The status wraps to a second line inside its
 // chip rather than take the name's room (the human, 2026-11-17: "Wrap them to a second line"); the chip still ends at the
 // row's right edge.
-test("a long finished status wraps inside its chip and leaves the name its room", async ({ browser }) => {
+test("a long status wraps inside its chip and leaves the name its room", async ({ browser }) => {
   test.slow();
   await removeDay();
   const page = await viewer(browser, "bvw", { width: 320, height: 640 });
   const longName = "W".repeat(24);
-  const [caught, waiting] = [await friendOf("bvw", "bfw"), await friendOf("bvw", "bfx")];
-  await DB.query("update private.profile set display_name = $2 where username = $1", [caught.username, longName]);
-  // The friend was caught on question 1, written as feed.e2e.ts writes it, with the rules off.
+  const [friend, waiting] = [await friendOf("bvw", "bfw"), await friendOf("bvw", "bfx")];
+  await DB.query("update private.profile set display_name = $2 where username = $1", [friend.username, longName]);
+  // The friend is on question 1 with two answers, 35 points, written with the rules off (the longest status Offbeat's board shows).
   const client = await ADMIN.connect();
   try {
     await client.query("begin");
     await client.query("set local session_replication_role = replica");
-    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [caught.id]);
-    await client.query(
-      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
-       select $1, 'offbeat', private.today(), 0, content #>> '{questions,0,host_answers,0}', true, now() - interval '30 minutes'
-       from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()`,
-      [caught.id],
-    );
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now())", [friend.id]);
+    for (const [slug, tier, points] of [["dog", "common", 10], ["cat", "uncommon", 25]] as const)
+      await client.query(
+        "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, 'offbeat', private.today(), 0, $2, $3, 3000, $4, now())",
+        [friend.id, fixtureId(0, slug), tier, points],
+      );
     await client.query("commit");
   } finally {
     client.release();
   }
-  // How a friend's run ended shows only to a viewer who has finished (M12 12d).
-  await finishOffbeat(page);
   await openBoard(page);
   const [longRow, shortRow] = [row(page, longName), row(page, waiting.username)];
-  await expect(longRow).toContainText(`${longName}: caught on question 1 by "`);
-  const longChip = longRow.getByText(/^caught on question 1 by "/);
+  await expect(longRow).toContainText(`${longName}: Question 1 of 3 · 35 points`);
+  const longChip = longRow.getByText("Question 1 of 3 · 35 points", { exact: true });
   const shortChip = shortRow.getByText("Not yet", { exact: true });
   const [name, avatar, chip, notYet, box] = await Promise.all([
     longRow.getByText(longName, { exact: true }).boundingBox(),

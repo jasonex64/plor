@@ -3,11 +3,10 @@
 // it; every other button flat. Read from what the browser paints: a box and its shadow's drop.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, signInAndPick, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const ROUNDS = ["zx", "zy", "zqp", "zrs", "ztv", "zwu", "zkl"];
@@ -112,7 +111,7 @@ test("each main screen shows at most one raised button, on a phone and a compute
   }
 });
 
-// The screens around the tabs (answer 46): signed out, with the sign-in form; How to play over Today; the settings sheet;
+// The screens around the tabs (answer 46): signed out, with the sign-in form; How to play over the game screen; the settings sheet;
 // the game screen before Start; a result.
 test("the sign-in form, How to play, the settings sheet, the game screen and a result each show at most one raised button", async ({ browser }) => {
   test.slow();
@@ -125,13 +124,15 @@ test("the sign-in form, How to play, the settings sheet, the game screen and a r
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   await page.goto("/");
   await signInAndPick(page, "bs");
+  // How to play is on the game screen's card, under Start.
+  await page.goto("/play");
   // On the game's card a flat button takes the card's text colour (answer 49; since 20k-3 the card is white, so the theme's text).
   const howToPlay = page.getByRole("region", { name: GAME.name, exact: true }).getByRole("button", { name: "How to play" });
   const [own, card] = await howToPlay.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el.closest("[class*='banner']")!).color]);
   expect(own).toBe(card);
   await howToPlay.click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await oneAtMost(page, "How to play over Today");
+  await oneAtMost(page, "How to play over the game screen");
   await page.keyboard.press("Escape");
   await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: "Settings" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -141,8 +142,7 @@ test("the sign-in form, How to play, the settings sheet, the game screen and a r
   await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
   await oneAtMost(page, "the game screen before Start");
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await oneAtMost(page, "a result");
 });
 

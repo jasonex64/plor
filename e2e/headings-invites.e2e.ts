@@ -5,10 +5,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, emailedCode, emailsTo, forwardPlayerIp, play, signInAndPick, befriend } from "./players";
-import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, emailedCode, emailsTo, forwardPlayerIp, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -163,8 +162,7 @@ test("a refused clipboard shows the link to copy, for a group and the result", a
   await check("Share group link", new RegExp(`^${localStack().appUrl}/g/[A-Za-z0-9_-]{10}$`));
 
   await page.goto("/");
-  await play(page);
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await expect(page.locator("#result")).toBeVisible();
   await check("Share", new RegExp(`${localStack().appUrl}/$`));
 });
@@ -193,8 +191,7 @@ test("the feed's comments have no bullets, reactions are apart, and back arrows 
   await befriend(page, "hx", friend, "hw");
   for (const p of [friend, page]) {
     await p.goto("/");
-    await play(p);
-    await caughtToCards(p, puzzle.hostAnswer);
+    await playToEnd(p);
     await expect(p.locator("#result")).toBeVisible();
   }
   // The friend's comment, with a reaction from each of them, written straight to the database: the reaction rules

@@ -2,11 +2,11 @@
 // the feed before playing (names, no words), and Today's columns from phone to desktop.
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, sent, signInAndPick, befriend } from "./players";
-import { asked, caughtToCards } from "./game";
+import { asked, finishClockRun } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, play, sent, signInAndPick, befriend, playToEnd } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -33,14 +33,14 @@ async function player(browser: Browser, name: string, viewport = PHONE) {
 const path = (url: string) => new URL(url).pathname;
 
 // Criteria 1 and 2.
-test("Offbeat's banner has Play before the run, and the score, how it ended and Result after", async ({ browser }) => {
+test("Offbeat's banner has Play before the run, and the score, the answers given and Result after", async ({ browser }) => {
   const page = await player(browser, "ta");
   // Today's region, which the game screen's has the same name as: each check below first waits for Today's address,
   // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
   // The day's facts as chips (docs/milestones/M14-14b-8-the-new-look.md, 14b-8b; mockup 3).
-  await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
-  await expect(banner.getByText("Don't match the host", { exact: true })).toBeVisible();
+  await expect(banner.getByText("3 questions", { exact: true })).toBeVisible();
+  await expect(banner.getByText("One clock", { exact: true })).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: GAME.name }).locator("..");
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
@@ -48,7 +48,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
   await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
   await play(page);
-  // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff). The game
+  // During the run, Today's banner leads back to it: the run's clock is on the game screen. The game
   // is full screen, with no tabs (docs/milestones/M14-14c-8-plain-game-1.md), so this goes to Today by the browser's
   // Back; the × is play.e2e.ts's.
   await asked(page, "Name an animal");
@@ -58,13 +58,13 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
   await expect(page).toHaveURL("/play");
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await finishClockRun(page);
+  await expect(page.getByText("0 points", { exact: true })).toBeVisible();
 
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page).toHaveURL("/");
   await expect(banner.getByText("0 points", { exact: true })).toBeVisible();
-  await expect(banner.getByText("caught on question 1", { exact: true })).toBeVisible();
+  await expect(banner.getByText("0 answers", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
   // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
@@ -129,8 +129,7 @@ test("before playing, a friend's comment is in the feed whole, with its game; th
   await signInAndPick(friend, "td");
   await befriend(friend, "td", viewer, "tc");
   await friend.goto("/");
-  await play(friend);
-  await caughtToCards(friend, puzzle.hostAnswer);
+  await playToEnd(friend);
   const body = `the words ${RUN}`;
   await friend.getByLabel("Comment to your friends").fill(body);
   await friend.getByRole("button", { name: "Post" }).click();

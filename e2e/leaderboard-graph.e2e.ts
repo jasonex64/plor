@@ -4,7 +4,7 @@
 // written straight into the database, last week's on every day and this week's on the days that are over.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool, type PoolClient } from "pg";
-import { fixtureDay, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
+import { fixtureClockDay, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, signInAndPick } from "./players";
 import { localStack } from "../scripts/slot.ts";
 
@@ -280,18 +280,19 @@ test("a day the viewer is still playing is flat, struck through and noted, and '
   test.slow();
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
   const viewer = await withFriends(page, "gh");
-  // Last Wednesday's run: the viewer's points come out of the ledger and its question 1 is answered, so it waits at
-  // the reveal, in progress (DECISIONS.md, Game 1: Timer). A run in progress needs its day's puzzle.
+  // Last Wednesday's run: the viewer's points come out of the ledger, and the run began just now with an answer that added an
+  // hour to its clock, so it is in progress. A run in progress needs its day's puzzle.
   const wednesday = day(lastMonday, 2);
   if ((await DB.query("select 1 from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [wednesday])).rowCount === 0) {
-    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [wednesday, fixtureDay(wednesday, await loadFixtureBase(DB))]);
+    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [wednesday, fixtureClockDay(wednesday, await loadFixtureBase(DB))]);
     createdPuzzle = wednesday;
   }
   await written(async (client) => {
     await client.query("delete from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [viewer, wednesday]);
+    await client.query("update private.run set started_at = now() where user_id = $1 and game_id = 'offbeat' and puzzle_date = $2::date", [viewer, wednesday]);
     await client.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, 'offbeat', $2::date, 0, $3, false)",
-      // Question 1's safe answer (e2e/puzzle.ts): a real entry, so the screens that name it can.
+      "insert into private.clock_answer (user_id, game_id, puzzle_date, question_idx, entry_id, tier, added_ms, points, created_at) values ($1, 'offbeat', $2::date, 0, $3, 'common', 3600000, 10, now())",
+      // Question 1's dog (src/test/answer-fixture.ts): a real entry, so the screens that name it can.
       [viewer, wednesday, fixtureId(0, "dog")],
     );
   });

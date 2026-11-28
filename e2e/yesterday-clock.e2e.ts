@@ -8,9 +8,9 @@
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { fixtureClockDay, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
-import { RUN, signInAndPick } from "./players";
-import { removePuzzle, todayClockPuzzle } from "./puzzle";
+import { removePuzzle, todayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
+import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // The local superuser, which may switch the answer triggers off to write a past day's answers.
@@ -24,7 +24,7 @@ test.beforeAll(async () => {
   );
   if (rows[0].taken) throw new Error(`${rows[0].date} has a puzzle already; this file needs yesterday free for a clock day`);
   yesterday = rows[0].date;
-  today = await todayClockPuzzle(DB);
+  today = await todayPuzzle(DB);
   await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [yesterday, fixtureClockDay(yesterday, await loadFixtureBase(DB))]);
 });
 

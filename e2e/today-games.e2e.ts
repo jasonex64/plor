@@ -7,8 +7,8 @@ import { expect, test, type Browser, type BrowserContext, type Locator, type Pag
 import { Pool } from "pg";
 import { PERCENTILE_MIN_PLAYERS, SUBSTRING_ROUNDS } from "../src/config/tunables";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
-import { asked, caughtToCards, next as nextQuestion, safe } from "./game";
-import { RUN, signInAndPick } from "./players";
+import { finishClockRun } from "./game";
+import { RUN, signInAndPick, playToEnd } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
 
@@ -79,13 +79,9 @@ const noArrows = async (page: Page) => {
   await expect(carousel(page)).toHaveCount(0);
 };
 
-// Plays Offbeat's run to a caught first answer, from Today's card, and leaves the player on Today.
+// Plays Offbeat's run on a clock from Today's card to its result, with no answer, and leaves the player on Today.
 async function finishOffbeat(page: Page) {
-  await offbeat(page).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
-  await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await caughtToCards(page, puzzle.hostAnswer);
+  await playToEnd(page);
   await page.goto("/");
 }
 
@@ -337,7 +333,7 @@ test("each game's start is Back to Today and one card with its band, the rules, 
   await page.goto("/");
   await finishOffbeat(page);
   await finishFragments(await idOf("gcs"));
-  for (const [game, detail] of [[GAME, "You survived 0 of 7 questions"], [SUBSTRINGS, "Your score"]] as const) {
+  for (const [game, detail] of [[GAME, /^0 answers$/], [SUBSTRINGS, "Your score"]] as const) {
     await page.goto(game.path);
     const words = main.getByText(detail).filter({ visible: true });
     await expect(words).toBeVisible();
@@ -347,50 +343,36 @@ test("each game's start is Back to Today and one card with its band, the rules, 
   }
 });
 
-// M20 20n-5 (the second look audit's finding 7; answer 88): a question's row in Offbeat's result is stacked, not a
-// sentence: the question in bold with a Safe or Caught chip in that colour, "You: … · Host: …" under it, then the points
-// and how many players gave the answer, and Search answers after them.
-test("Offbeat's result rows are stacked: the question in bold with a Safe or Caught chip, then You and Host, then Search answers", { tag: "@visual" }, async ({ page }) => {
+// M20 20n-5 (the second look audit's finding 7; answer 88), as the result on a clock keeps it: a question's row is stacked, not a
+// sentence: the question in bold, then its count and points, the answers given each with its tier chip, then the ones missed.
+test("Offbeat's result rows are stacked: the question in bold, its count and points, the answers with their tiers, then what was missed", { tag: "@visual" }, async ({ page }) => {
   test.slow();
   await page.goto("/");
   await signInAndPick(page, "gcr");
   await offbeat(page).getByRole("link", { name: "Play", exact: true }).click();
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await asked(page, "Name an animal");
-  await safe(page, puzzle.safeAnswer);
-  await nextQuestion(page, "Name a fruit");
-  await caughtToCards(page, "apple");
+  await finishClockRun(page, ["dog", "cat"]);
 
   const result = page.locator("#result");
-  await expect(result).not.toContainText("you said");
-  const rows = result.getByRole("listitem");
-  await expect(rows).toHaveCount(2);
+  const rows = result.locator(":scope > ol > li");
+  await expect(rows).toHaveCount(3);
   const read = (row: Locator) =>
     row.evaluate((li) => {
-      const [question, chip, search] = [li.querySelector("strong")!, li.querySelector("[class*='_chip']")!, [...li.querySelectorAll("button")].find((b) => b.textContent === "Search answers")!];
-      const style = getComputedStyle(chip);
+      const [question, count, given, missed] = [li.querySelector("strong")!, li.querySelector("span[class*='small']")!, li.querySelector("ul")!, li.querySelectorAll("ul")[1]];
+      const top = (el: Element | undefined) => (el ? Math.round(el.getBoundingClientRect().top) : null);
       return {
         question: question.textContent,
         bold: Number(getComputedStyle(question).fontWeight) >= 700,
-        chip: chip.textContent,
-        colours: `${style.color} on ${style.backgroundColor}`,
-        // On the question's line, at its right; Search answers after everything the row says.
-        chipOnLine: Math.abs(chip.getBoundingClientRect().top - question.getBoundingClientRect().top) < 12 && chip.getBoundingClientRect().left > question.getBoundingClientRect().right,
-        searchLast: search.getBoundingClientRect().top > question.getBoundingClientRect().bottom,
+        count: count.textContent,
+        chips: [...(given?.querySelectorAll("[class*='_chip']") ?? [])].map((c) => c.textContent),
+        stacked: top(question)! < top(count)! && top(count)! < (top(given) ?? Infinity) && (top(given) ?? 0) <= (top(missed) ?? Infinity),
+        missed: li.textContent!.includes("You missed"),
       };
     });
-  const [first, second] = [await read(rows.nth(0)), await read(rows.nth(1))];
-  expect(first).toMatchObject({ question: "Name an animal", bold: true, chip: "Safe", chipOnLine: true, searchLast: true });
-  expect(second).toMatchObject({ question: "Name a fruit", bold: true, chip: "Caught", chipOnLine: true, searchLast: true });
-  expect(first.colours).not.toBe(second.colours);
-  await expect(rows.nth(0)).toContainText(`You: ${puzzle.safeAnswer} · Host: ${puzzle.hostAnswer}`);
-  await expect(rows.nth(0)).toContainText("+25 points, bonus +0");
-  await expect(rows.nth(1)).toContainText("You: apple · Host: apple");
+  expect(await read(rows.nth(0))).toEqual({ question: "Name an animal", bold: true, count: "2 answers · 35 points", chips: ["Common", "Uncommon"], stacked: true, missed: true });
+  expect(await read(rows.nth(1))).toMatchObject({ question: "Name a fruit", bold: true, count: "0 answers · 0 points", missed: true });
+  await expect(result).not.toContainText("you said");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  // Opened, the search is the row's width, not a narrow box at its left (20n-5's review).
-  await rows.nth(0).getByRole("button", { name: "Search answers", exact: true }).click();
-  const [box, row] = await Promise.all([rows.nth(0).getByRole("searchbox").or(rows.nth(0).getByRole("textbox")).boundingBox(), rows.nth(0).boundingBox()]);
-  expect(box!.width).toBeGreaterThan(row!.width * 0.6);
 });
 
 // M20 20n-10 (answers 114 to 116): on Me, each game's card has its emblem inside the game's colour block beside the
