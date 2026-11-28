@@ -18,7 +18,6 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useState,
   type FormEvent,
   type ReactNode,
@@ -43,7 +42,7 @@ import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
 import { FragmentsScreen } from "./fragments";
-import { OffbeatScreen, TestScreen } from "./offbeat";
+import { OffbeatScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
 import { TodayCards, type CardsView } from "./today-cards";
 import { SIGN_IN_HREF, signInOpen } from "./sign-in-open";
@@ -316,7 +315,7 @@ export function PlayFirst() {
           <SignIn onSignedIn={loadMe} />
         </div>
       )}
-      <TodayCards family="guest" raise={!open} skip={false} day={day} timeUps={0} onOver={NOTHING} onDayOver={nextDay} onView={NOTHING} />
+      <TodayCards family="guest" raise={!open} day={day} timeUps={0} onOver={NOTHING} onDayOver={nextDay} onView={NOTHING} />
     </>
   );
 }
@@ -358,7 +357,7 @@ function RedirectError() {
 // Each page's section, with what it needs from the player.
 export function TodayTab() {
   const { player, timeUps } = usePlayer();
-  return <Today username={player.username} name={nameOf(player)} skip={player.settings.skipGameScreen} timeUps={timeUps} />;
+  return <Today username={player.username} name={nameOf(player)} timeUps={timeUps} />;
 }
 
 export function FriendsTab() {
@@ -400,28 +399,6 @@ function BackTo({ href, children }: { href: string; children: ReactNode }) {
     </ButtonLink>,
     document.getElementById(PAGE_BACK)!,
   );
-}
-
-// A test run (docs/milestones/M14-14b-11-test-runs.md) of a date: a draft's when hosts holds the host answers its page
-// showed, as JSON (Play test on the admin puzzles page writes it), otherwise the approved day. The route checks the
-// admin, so a player who isn't one gets its refusal and no game.
-export function TestTab({ date, hosts }: { date: string; hosts: string | null }) {
-  // Parsed once per link, so the run isn't sent again on each render.
-  const hostAnswers = useMemo(() => (hosts === null ? null : hostLists(hosts)), [hosts]);
-  if (hostAnswers === undefined) return <p role="alert">This link&apos;s host answers can&apos;t be read. Open Play test from the puzzles page again.</p>;
-  return <TestScreen date={date} hostAnswers={hostAnswers} />;
-}
-
-// The link's host answers, one list of IDs per question, or undefined when it holds something else (a link typed or
-// cut short: user input). The route checks them against the draft.
-function hostLists(text: string): string[][] | undefined {
-  try {
-    const value: unknown = JSON.parse(text);
-    return Array.isArray(value) && value.every((l) => Array.isArray(l) && l.every((id) => typeof id === "string")) ? value : undefined;
-  } catch (err) {
-    if (err instanceof SyntaxError) return undefined;
-    throw err;
-  }
 }
 
 export function StreakTab() {
@@ -612,7 +589,7 @@ function PickUsername({ onDone }: { onDone: () => void }) {
 // the one leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in the right column (SideColumn). The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
-function Today({ username, name, skip, timeUps }: { username: string; name: string; skip: boolean; timeUps: number }) {
+function Today({ username, name, timeUps }: { username: string; name: string; timeUps: number }) {
   const [runOver, setRunOver] = useState(false);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
@@ -637,7 +614,7 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
   return (
     <div className={styles.today}>
       <div className={styles.game}>
-        <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} onView={setView} />
+        <TodayCards day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} onView={setView} />
         {/* Read again when the day turns, a run times out or the player's run ends (M20 20n-6b). */}
         <PlaceStrip key={`place-${day}-${timeUps}-${runOver}`} />
       </div>

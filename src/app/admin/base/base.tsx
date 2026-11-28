@@ -1,8 +1,7 @@
 "use client";
 
 // Looking a thing up in the answer database (docs/milestones/M13-13a-the-base.md): by any of its names, with its
-// aliases, where it came from, its facts and the categories it falls in. Read-only; what players added is audited on
-// /admin/audit (13b). Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6): the
+// aliases, where it came from, its facts and the categories it falls in. Read-only. Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6): the
 // search, then each thing as a card.
 import { useState, type FormEvent } from "react";
 import type { ThingView } from "@/admin/base";

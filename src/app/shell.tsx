@@ -11,7 +11,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import type { RunState } from "@/game/runs";
+import type { ClockState } from "@/game/clock-state";
 import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
@@ -363,10 +363,10 @@ export function MeAdminLink() {
 // a link to the result. The database stays the judge of the timer; this is only a display. Nothing shows without a
 // question in play.
 export function ClockBar({ onTimeUp }: { onTimeUp: () => void }) {
-  const [run, setRun] = useState<RunState | null>(null);
+  const [run, setRun] = useState<ClockState | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    api<{ run: RunState | null }>("/api/run", { method: "GET" }).then(
+    api<{ run: ClockState | null }>("/api/run", { method: "GET" }).then(
       (r) => setRun(r.run),
       (err) => setError(errorText(err)),
     );

@@ -1,7 +1,7 @@
 /* The admin area (docs/milestones/M14-14b-2b-2-admin-build.md; round 10, approved 2026-10-26): Plor's look made denser
    for desk work. Sizes are round 10's (the ticket's Numbers); cards and spacing as Me's. Colours are the slots, each
    with one meaning: neutral tags for states, the accent's soft tint for "needs a decision", the danger colour for
-   problems, and the caught colour only for the insights chart's dip. In the new look (M14 14b-8d, by analogy with
+   problems. In the new look (M14 14b-8d, by analogy with
    mockup 3; docs/milestones/M14-14b-8-the-new-look.md, answer 8) its cards, rows, chips and buttons are the kit's
    (kit.module.css); what's below is the admin's own layout and the kit's admin variants. */
 .area {

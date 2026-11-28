@@ -7,24 +7,10 @@
 // of 4", announced politely as it changes, with Previous and Next, which don't move focus; Next becomes Close on the last
 // step. The words are neutral (docs/milestones/M14-14c-2-neutral-words.md).
 import { useId, useRef, useState } from "react";
-import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY, SUBSTRING_BONUS_LETTER_POINTS, SUBSTRING_ROUNDS } from "@/config/tunables";
+import { SUBSTRING_BONUS_LETTER_POINTS, SUBSTRING_ROUNDS } from "@/config/tunables";
 import kit from "./kit.module.css";
 import styles from "./how-to-play.module.css";
 
-// The questions where a letter is taken, from tunables.ts: "2, 4, 5 and 7", with no comma before "and", as the human
-// approved the words (14c-6d, answer 43), which British English's list leaves out.
-const TAKEN = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(
-  LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
-);
-const [FIRST, LAST] = [POINTS_PER_QUESTION[0], POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]];
-// The same four steps as 14c-6d's (answers 38, 43), in the app's words. The 20 seconds are judged in SQL
-// (private.question_deadline), so they have no constant here.
-export const GAME_1_STEPS = [
-  `The host has picked a few answers to each question. Say one and your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
-  "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going.",
-  `On questions ${TAKEN} a letter is taken. Answer without it.`,
-  `Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${FIRST} points for the first, ${LAST} for the last. Run out of time and your run ends.`,
-];
 // Game 2's four steps, as the human approved them word for word (docs/milestones/M14-14c-9-plain-game-2.md, answer 8). The
 // 20 seconds are judged in SQL as well (supabase/migrations/20261107105151_game_2_rounds.sql), so they have no constant.
 export const GAME_2_STEPS = [
@@ -34,7 +20,7 @@ export const GAME_2_STEPS = [
   `Longer words score more, and each word with the day's bonus letter earns ${SUBSTRING_BONUS_LETTER_POINTS} more. At the end, every different letter you've used adds to your bonus.`,
 ];
 
-// The clock game's four steps (docs/milestones/M23-23d-the-screens.md, Design). The clock's 20 seconds, the time each tier adds
+// Offbeat's four steps (docs/milestones/M23-23d-the-screens.md, Design). The clock's 20 seconds, the time each tier adds
 // and its points are judged in SQL (private.clock_start_ms, clock_added_ms, clock_points), so no number is typed here.
 export const CLOCK_STEPS = [
   "One clock runs for the whole run. Name answers to each question: every answer adds time to the clock, and the rarer the answer, the more time and the more points.",
@@ -43,7 +29,7 @@ export const CLOCK_STEPS = [
   "When the clock reaches zero, your run is over. Your points are the total of your answers. The result lists each one with how rare it was, shows some you missed, and lets you share your run as a row of coloured squares.",
 ];
 
-// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS, CLOCK_STEPS).
+// steps: the game's four (CLOCK_STEPS, GAME_2_STEPS).
 export function HowToPlay({ steps }: { steps: readonly string[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();

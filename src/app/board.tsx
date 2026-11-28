@@ -1,18 +1,18 @@
 "use client";
 
 // The live board (docs/milestones/M07-friends-and-live-board.md, 7c): friends' runs today, updated over the player's
-// own Realtime topic (src/app/board-channel.ts). Until the player's own run is over, a friend shows only whether
-// they've started (M12 12d); then their question, or that they've finished. How a friend's run ended comes from the
-// HTTP board once the player's own run is over, so nothing reaches the page early. So do reactions on runs
-// (M08 8b), which the player can add to friends' runs from then on. The same channel carries nudges that comments or
+// own Realtime topic (src/app/board-channel.ts). On Offbeat a friend shows their question and points as they play
+// (docs/milestones/M23-23d-the-screens.md, answer 47). On Fragments, until the player's own run is over, a friend shows only
+// whether they've started (M12 12d), then their round, and their score once both have finished: the HTTP board gives it once
+// the player's own run is over, so nothing reaches the page early. So do reactions on runs (M08 8b), which the player can add
+// to friends' runs from then on. The same channel carries nudges that comments or
 // reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see. The
 // feed, on Today, listens to the channel itself (src/app/home.tsx). Each game has its own board (M16 16f-6): Offbeat's
 // as above, and Fragments', where a friend shows "on round k of n" and, once they and the player have both finished,
 // their score, and never their words. The board is a game's alone when its page names one, and otherwise has the game switch
 // (answers 56 and 57).
 import { useCallback, useEffect, useState } from "react";
-import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
-import { placeRows, type Place } from "@/friends/ended";
+import type { Board as BoardData, BoardFriend } from "@/friends/board";
 import type { BoardGame } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
@@ -25,14 +25,12 @@ import {
   type ChangedMessage,
   type StatusMessage,
 } from "./board-channel";
-import { Avatar } from "./avatar";
 import { PlayerAvatar, PlayerName } from "./player-link";
 import styles from "./board.module.css";
 import kit from "./kit.module.css";
 import { gameColour } from "./game-colour";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
-import { endedText } from "./ended-text";
 import { pointsText } from "./game";
 import { GameSwitch } from "./leaderboard";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
@@ -119,13 +117,13 @@ export function Board({
     }
     // Another game's run says nothing about this board.
     if (!board || message.puzzleDate !== board.date || message.gameId !== board.game) return;
-    // The player's own run ended: how friends' runs ended may now be shown.
+    // The player's own run ended: Fragments' scores may now be shown.
     if (message.username === username) {
       if (message.state === "finished" && !board.finished) load();
       return;
     }
-    // A friend finished: fetch how their run ended. Only a player who has finished is told (M12 12d), so this page's
-    // own refetch for that may still be on its way. A run on a clock has no ending to fetch: its message holds the points.
+    // A friend finished on Fragments: fetch their score. Only a player who has finished is told (M12 12d), so this page's
+    // own refetch for that may still be on its way. Offbeat's message holds the points.
     if (message.state === "finished" && board.questions === null) {
       load();
       return;
@@ -159,7 +157,6 @@ export function Board({
       {game === undefined && gameChoices.length > 1 && (
         <GameSwitch choices={gameChoices.map((id) => ({ id, name: NAMES[id] }))} value={shown} onChange={setChosen} />
       )}
-      {shownBoard?.mine && <WhereEveryoneEnded username={username} mine={shownBoard.mine} friends={shownBoard.friends} />}
       {shownBoard?.reactionsOnMine && shownBoard.reactionsOnMine.counts.length > 0 && (
         // Read once, as the group's name: "Reactions on your run, 😂 1" (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 6).
         <p>
@@ -186,7 +183,7 @@ export function Board({
               <PlayerName username={f.username} className={styles.name}>
                 {f.name}
               </PlayerName>
-              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds, shownBoard.questions)} className={`${toneOf(f)} ${styles.status}`} />
+              <span className="sr-only">:</span> <FadeIn value={describe(f, shownBoard.rounds, shownBoard.questions)} className={`${kit.chip} ${styles.status}`} />
               {f.reactions && (
                 <div className={styles.reactions}>
                   <Reactions reactions={f.reactions} below />
@@ -217,66 +214,15 @@ const BETTER_WITH_FRIENDS = {
   text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
 };
 
-// A friend's state as a chip: safe for a run that survived every question, caught for one that ended earlier, plain
-// otherwise.
-function toneOf(f: BoardFriend): string {
-  if (f.ended?.result === "survived") return `${kit.chip} ${kit.safe}`;
-  if (f.ended) return `${kit.chip} ${kit.caught}`;
-  return kit.chip;
-}
-
 // rounds: Fragments' rounds today, which a friend's round is counted against; null on Offbeat's board, which has questions.
 // questions: a day on a clock's questions, whose friends show their question and points from their first answer (answer 47).
 function describe(f: BoardFriend, rounds: number | null, questions: number | null): string {
-  if (f.ended) return endedText(f.ended);
   if (f.score !== null) return pointsText(f.score);
   if (questions !== null && f.state === "playing") return `Question ${f.question} of ${questions} · ${pointsText(f.points ?? 0)}`;
   if (questions !== null && f.state === "finished") return pointsText(f.points ?? 0);
   if (f.state === "playing") return rounds === null ? `Question ${f.question}` : `on round ${f.question} of ${rounds}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "Not yet";
-}
-
-function placeLabel(place: Place): string {
-  if (place.kind === "caught") return `Caught on question ${place.question}`;
-  if (place.kind === "timed_out") return `Ran out of time on question ${place.question}`;
-  return "Survived";
-}
-
-// "Where everyone ended" (M07 7d): one row per place, the player first, up to FRIENDS_PER_PLACE friends by name, then
-// a count. Each row opens to its full list: a native <details>, so it works by tap and keyboard with no state. The full
-// list has the avatar slot by every name, as the board's other rows do (L37, "Boards"; human, 2026-10-26: "Yes, add
-// them (Recommended)"; docs/milestones/M14-14b-2c-review-items.md, answer 11).
-function WhereEveryoneEnded({ username, mine, friends }: { username: string; mine: Ended; friends: BoardFriend[] }) {
-  return (
-    <section aria-label="Where everyone ended">
-      <h3>Where everyone ended</h3>
-      <ul className={kit.rows}>
-        {placeRows(mine, friends).map((row) => (
-          <li key={placeLabel(row.place)} className={row.you ? `${kit.row} ${kit.board} ${kit.you}` : `${kit.row} ${kit.board}`}>
-            <details>
-              <summary>
-                {placeLabel(row.place)}: {[...(row.you ? ["You"] : []), ...row.named.map((p) => p.name)].join(", ")}
-                {row.more > 0 && ` + ${row.more} more`}
-              </summary>
-              <ul>
-                {row.you && (
-                  <li>
-                    <Avatar name={username} /> You
-                  </li>
-                )}
-                {row.everyone.map((p) => (
-                  <li key={p.username}>
-                    <Avatar name={p.name} /> {p.name}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
 }
 
 // A friend's status that fades in each time it changes, not when the board first shows it (docs/milestones/

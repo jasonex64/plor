@@ -17,11 +17,8 @@ import { errorText, messageFor } from "../messages";
 import { useDismiss } from "../dismiss";
 import { useMinWidth } from "../min-width";
 import { SideColumn } from "../side-column";
-import { Audit } from "./audit/audit";
 import { AnswerBase } from "./base/base";
-import { Bank } from "./bank/bank";
 import { dayText, whenText } from "../day-text";
-import { Insights } from "./insights";
 import { Kit } from "./kit/kit";
 import { Lists } from "./lists/lists";
 import { Puzzles } from "./puzzles/puzzles";
@@ -31,22 +28,19 @@ import styles from "./admin.module.css";
 import { Line, Skeleton } from "../skeleton";
 import { warningOf, tomorrowOf, type Tomorrow } from "./tomorrow";
 
-export type AdminPage = "puzzles" | "audit" | "reports" | "lists" | "insights" | "bank" | "base" | "kit";
+export type AdminPage = "puzzles" | "reports" | "lists" | "base" | "kit";
 
-// What waits for the admin: drafted days not yet approved (and the first), texts to review, reported comments (and
+// What waits for the admin: drafted days not yet approved (and the first), reported comments (and
 // when the first was reported), the approved days after today (and the last), and whether tomorrow has a puzzle
 // (14b-6f), and the researched lists nobody has looked through (M23 23b-2).
-type Counts = { toApprove: string[]; ahead: string[]; review: number; reports: ReportedComment[]; unseen: number; tomorrow: Tomorrow };
+type Counts = { toApprove: string[]; ahead: string[]; reports: ReportedComment[]; unseen: number; tomorrow: Tomorrow };
 
 const TO_DO: { page: AdminPage; name: string; count: (c: Counts) => number }[] = [
   { page: "puzzles", name: "Puzzles", count: (c) => c.toApprove.length },
-  { page: "audit", name: "Audit", count: (c) => c.review },
   { page: "reports", name: "Reports", count: (c) => c.reports.length },
   { page: "lists", name: "Lists", count: (c) => c.unseen },
 ];
 const LOOK_UP: { page: AdminPage; name: string }[] = [
-  { page: "insights", name: "Insights" },
-  { page: "bank", name: "Bank" },
   { page: "base", name: "Database" },
   // The kit's sample page (docs/milestones/M20-design-rules-and-clean-up.md, 20a).
   { page: "kit", name: "Kit" },
@@ -59,17 +53,15 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
   const refresh = useCallback(() => {
     Promise.all([
       api<{ today: string; days: DayView[]; substringDays: SubstringDayView[] }>("/api/admin/puzzles", { method: "GET" }),
-      api<{ open: number }>("/api/admin/audit?count", { method: "GET" }),
       api<{ reports: ReportedComment[] }>("/api/admin/reports", { method: "GET" }),
       api<{ lists: { seen: string | null }[] }>("/api/admin/lists", { method: "GET" }),
     ]).then(
-      ([puzzles, audit, reports, lists]) => {
+      ([puzzles, reports, lists]) => {
         const dates = (keep: (d: DayView) => boolean) => puzzles.days.filter(keep).map((d) => d.date).sort();
         setCounts({
           // Both games' days, so a drafted game 2 day can't sit unnoticed (M16 16c-2).
           toApprove: [...dates((d) => hasDraft(d) && !isApproved(d)), ...puzzles.substringDays.filter((d) => d.draft !== null && d.live === null).map((d) => d.date)].sort(),
           ahead: dates((d) => isApproved(d) && d.date > puzzles.today),
-          review: audit.open,
           reports: reports.reports,
           unseen: lists.lists.filter((l) => !l.seen).length,
           tomorrow: tomorrowOf(puzzles.today, puzzles.days),
@@ -112,16 +104,10 @@ function Page({ page, onChanged }: { page: AdminPage; onChanged: () => void }) {
   switch (page) {
     case "puzzles":
       return <Puzzles onChanged={onChanged} />;
-    case "audit":
-      return <Audit onChanged={onChanged} />;
     case "reports":
       return <Reports onChanged={onChanged} />;
     case "lists":
       return <Lists onChanged={onChanged} />;
-    case "insights":
-      return <Insights />;
-    case "bank":
-      return <Bank />;
     case "base":
       return <AnswerBase />;
     case "kit":
@@ -171,7 +157,6 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
   const waiting = counts
     ? [
         { href: "/admin/puzzles", n: counts.toApprove.length, one: "day", many: "days" },
-        { href: "/admin/audit", n: counts.review, one: "answer", many: "answers" },
         { href: "/admin/reports", n: counts.reports.length, one: "report", many: "reports" },
         { href: "/admin/lists", n: counts.unseen, one: "list to read", many: "lists to read" },
       ].filter((w) => w.n > 0)
@@ -229,14 +214,14 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
   );
 }
 
-// The rail before the counts load: its title and its four rows (NeedsYou), each a line.
+// The rail before the counts load: its title and its rows (NeedsYou), each a line.
 function NeedsYouSkeleton() {
   return (
     <Skeleton label="Loading what needs you">
       <div className={kit.card}>
         <h2>What needs you</h2>
         <ul className={kit.rows}>
-          {["puzzles", "audit", "reports", "lists", "ahead"].map((row) => (
+          {["puzzles", "reports", "lists", "ahead"].map((row) => (
             <li key={row} className={kit.row}>
               <Line />
             </li>
@@ -259,12 +244,6 @@ function NeedsYou({ counts }: { counts: Counts }) {
       n: counts.toApprove.length,
       what: counts.toApprove.length === 1 ? "day to approve" : "days to approve",
       more: counts.toApprove.length ? `Next: ${dayText(counts.toApprove[0])}` : "None drafted",
-    },
-    {
-      href: "/admin/audit",
-      n: counts.review,
-      what: counts.review === 1 ? "answer to review" : "answers to review",
-      more: "Held, rejected or near a typo",
     },
     {
       href: "/admin/reports",

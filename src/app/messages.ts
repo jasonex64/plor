@@ -68,15 +68,11 @@ const MESSAGES: Record<string, string> = {
   run_over: "This run is already over.",
   round_running: "Finish this round first.",
   out_of_order: "That question isn't the current one. Reload the page.",
-  already_answered: "You already answered that question. Reload the page.",
-  stolen_letter: "One of those letters is taken. Try another answer.",
   not_open: "Tap Next to see the next question.",
-  no_reveal: "There is nothing to go on to yet.",
   not_current_question: "That question isn't the current one. Reload the page.",
   // The 40-character limit is the database's check (M02 ticket, Numbers).
   text_invalid: "That's too long to send. Try a shorter answer.",
   admins_only: "This page is for admins only.",
-  not_available: "There's no report for that day yet.",
   // The guest start's bot check (docs/milestones/M18-guest-play.md, Design, "The bot check"). Wording approved by the human, 2026-11-11.
   captcha_failed: "The check didn't pass. Try again.",
   captcha_unavailable: "The check isn't working on our side right now. Try again in a few minutes.",
@@ -84,16 +80,11 @@ const MESSAGES: Record<string, string> = {
   day_past: "That day is over.",
   puzzle_started: "That day has started, so its puzzle can't change.",
   no_draft: "There's no drafted puzzle for that day yet.",
-  no_category: "That category isn't in the answer database.",
   puzzle_invalid: "The puzzle breaks a content rule. See the problems listed.",
   // A test run (docs/milestones/M14-14b-11-test-runs.md).
   no_puzzle: "There's no approved puzzle for that day.",
-  // A question's answer search (docs/milestones/M14-14b-12-answer-lists.md).
-  answers_closed: "This question's answers open once your run of the day is over.",
-  // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md).
   reaction_changed: "That changed in another tab. Try again.",
   busy: "Plor was busy. Try again.",
-  audit_invalid: "That decision no longer fits this answer. Reload the page.",
   // The review of a researched list (docs/milestones/M23-23b-research-and-review.md, 23b-2).
   list_invalid: "That change doesn't fit this list any more. Reload the page.",
   // Drafting a day on a clock (docs/milestones/M23-23e-drafting-and-approving.md, 23e-1): Redraft has shown every list there is.

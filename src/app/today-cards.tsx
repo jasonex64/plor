@@ -34,7 +34,6 @@ export type CardsView = { games: BoardGame[]; front: number; wide: boolean; at: 
 export function TodayCards({
   family = "account",
   raise = true,
-  skip,
   day,
   timeUps,
   onOver,
@@ -43,7 +42,6 @@ export function TodayCards({
 }: {
   family?: RunFamily;
   raise?: boolean;
-  skip: boolean;
   day: number;
   timeUps: number;
   onOver: (over: boolean) => void;
@@ -87,7 +85,7 @@ export function TodayCards({
   const shown = cards.map((card, i) =>
     card === GAME.id ? (
       <section key={card} id="offbeat" aria-label={GAME.name}>
-        <TodayBanner key={`game-${day}-${timeUps}`} family={family} skip={skip} main={raise && i === front} onOver={onOver} onDayOver={onDayOver} />
+        <TodayBanner key={`game-${day}-${timeUps}`} family={family} main={raise && i === front} onOver={onOver} onDayOver={onDayOver} />
       </section>
     ) : (
       <section key={card} aria-label={SUBSTRINGS.name}>

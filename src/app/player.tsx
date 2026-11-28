@@ -2,7 +2,7 @@
 
 // Another player's profile, at /u/<username>, which is also what Find a player opens
 // (docs/milestones/M17-profiles-and-friend-requests.md, "17b design", E1 and E6): the cards the Me tab shows, as far as
-// the viewer may see them (the server decides: a stranger's totals and game card, a friend's calendar, rarest answers
+// the viewer may see them (the server decides: a stranger's totals and game card, a friend's calendar
 // and last days too), and one row of actions for how the two players stand, each calling 17a's routes.
 import { useEffect, useState, type ReactNode } from "react";
 import type { PlayerProfile } from "@/friends/players";
@@ -117,7 +117,6 @@ export function PlayerPage({ username, onRequestsChanged }: { username: string; 
       totals={player.totals}
       offbeat={player.offbeat}
       month={player.month}
-      rarest={player.rarest}
       recent={player.recent}
     >
       <section aria-label="You and this player" className={kit.card}>

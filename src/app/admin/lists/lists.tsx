@@ -4,7 +4,7 @@
 // and 30 in M23-offbeat-on-a-clock.md): each researched question with its counts, and one question's answers, the doubtful
 // ones and the brands first, then every answer behind a search. An answer can be struck (Undo works until midnight),
 // an answer added, an answer given another tier (23e-2; Undo works until the file holds it), and the list marked seen; the
-// texts players typed on its clock days that are on no list wait under it, each to add or dismiss. Built from the admin's own pieces: the audit's table, the pool's page of 20,
+// texts players typed on its clock days that are on no list wait under it, each to add or dismiss. Built from the admin's own pieces: the table, a page of 20 answers,
 // the base page's search row.
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { AnswerView, ListRow, ListView, Unlisted } from "@/admin/lists";
@@ -14,7 +14,7 @@ import { normalize } from "@/content/puzzle";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
-import { Table } from "../audit/audit";
+import { Table } from "../table";
 import kit from "../../kit.module.css";
 import { Line, Skeleton } from "../../skeleton";
 

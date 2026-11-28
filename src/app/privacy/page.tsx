@@ -56,7 +56,7 @@ export default function Privacy() {
           username (not by display name or part of a username) and open your profile. A signed-in player who isn&apos;t
           your friend sees your username, your display name if you set one, your points, days played and streaks, and
           your best and average results in the daily game. Your friends also see when you started playing, your
-          calendar of days played this month, your rarest answers and a chart of your last 7 days. Nobody who is signed
+          calendar of days played this month and a chart of your last 7 days. Nobody who is signed
           out can see a profile. If you change your username, the old one still opens your profile for 30 days and no
           one else can take it; if you delete your account in that time, the old username is freed at once.
         </li>

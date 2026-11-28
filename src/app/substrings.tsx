@@ -20,7 +20,6 @@ import { errorText, PAUSED_NOTE } from "./messages";
 import { ordinal } from "./ordinal";
 import { startBody, substringRoutes, type RunFamily } from "./run-routes";
 import { GuestPeek } from "./guest-peek";
-import { resultExtras } from "./result-extras";
 import { PlayFrame, StatusMessage } from "./play-frame";
 import { ShareResult } from "./share";
 import { BACK } from "./slide";
@@ -62,7 +61,7 @@ const BEHIND = ["no_run", "no_puzzle_today", "run_over", "round_running"];
 // family: which routes it plays (src/app/run-routes.ts); a guest's Start runs botCheck first and sends its token (as game.tsx).
 // onPlaying: whether the play frame is up, when the screen shows only the game (src/app/guest-game.tsx). onOver: whether the
 // run is over, which opens the day's comments (src/app/fragments.tsx). test: an admin's test run in place of a player's, with
-// no Share (src/app/result-extras.ts).
+// no Share.
 export function SubstringsScreen({
   family = "account",
   botCheck,
@@ -182,7 +181,7 @@ export function SubstringsScreen({
     <>
       {card}
       {/* Under a guest's result (docs/milestones/M18-guest-play.md, answer 2). */}
-      {run?.status === "finished" && resultExtras(family).peek && <GuestPeek />}
+      {run?.status === "finished" && family === "guest" && <GuestPeek />}
     </>
   );
 }
